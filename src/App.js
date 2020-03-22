@@ -19,29 +19,33 @@ function parse(value) {
 }
 
 // Renders an editor block.
-const Block = React.memo(({ block, ...props }) => {
+const Block = ({ focused, block, ...props }) => {
 	const measureRef = React.useRef()
 
 	const [cursorStyle, setCursorStyle] = React.useState(null)
 	React.useLayoutEffect(() => {
+		if (!focused) {
+			setCursorStyle(null) // Reset
+			return
+		}
 		const rect = measureRef.current.getBoundingClientRect()
-		setCursorStyle({ left: rect.width })
-	}, [block.cursor])
+		setCursorStyle({ left: rect.width, height: rect.height })
+	}, [focused, block.cursor])
 
 	return (
-		<div id={block.id} className="relative" data-block>
-			<div ref={measureRef} className="absolute pointer-events-none" data-measure>
-				{block.cursor.active && (
+		<div id={block.id} className="relative" style={{ caretColor: "transparent" }} data-block>
+			<div ref={measureRef} className="absolute invisible pointer-events-none" data-measure>
+				{(focused && block.cursor.active) && (
 					// Cursor:
 					block.cursor.x1 === block.cursor.x2 ? (
-						block.value.slice(0, block.cursor.x1)
+						block.value.slice(0, block.cursor.x1) || "\u200b"
 					// Selection:
 					) : (
 						block.value.slice(block.cursor.x1, block.cursor.x2)
 					)
 				)}
 			</div>
-			<div className="absolute h-6 bg-blue-500" style={{ width: 2, ...cursorStyle }} data-cursor />
+			<div className="absolute bg-blue-500" style={{ width: 2, ...cursorStyle }} data-cursor />
 			<div>
 				{block.value || (
 					<br />
@@ -49,12 +53,16 @@ const Block = React.memo(({ block, ...props }) => {
 			</div>
 		</div>
 	)
-})
+}
 
 // Renders the editor blocks.
 const Blocks = ({ state, ...props }) => (
 	state.data.map(each => (
-		<Block key={each.id} block={each} />
+		<Block
+			key={each.id}
+			focused={state.focused}
+			block={each}
+		/>
 	))
 )
 
