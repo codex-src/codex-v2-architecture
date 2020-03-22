@@ -7,28 +7,54 @@ import uuidv4 from "uuid/v4"
 function parse(value) {
 	const data = value.split("\n").map(each => ({
 		id: uuidv4(),
+		// TODO: Change API to left, top or x, y?
+		cursor: {
+			active: false,
+			x1: 0, // NOTE: -1 refers to the end
+			x2: 0, // NOTE: -1 refers to the end
+		},
 		value: each,
 	}))
 	return data
 }
 
 // Renders an editor block.
-const Block = ({ block, pos1, pos2, ...props }) => (
-	<div id={block.id} className="relative" data-block>
-		<div className="absolute" data-cursor />
-		{/* TODO: Does data-block go here? */}
-		<div>
-			{block.value || (
-				<br />
-			)}
+const Block = React.memo(({ block, ...props }) => {
+	const measureRef = React.useRef()
+
+	const [cursorStyle, setCursorStyle] = React.useState(null)
+	React.useLayoutEffect(() => {
+		const rect = measureRef.current.getBoundingClientRect()
+		setCursorStyle({ left: rect.width })
+	}, [block.cursor])
+
+	return (
+		<div id={block.id} className="relative" data-block>
+			<div ref={measureRef} className="absolute pointer-events-none" data-measure>
+				{block.cursor.active && (
+					// Cursor:
+					block.cursor.x1 === block.cursor.x2 ? (
+						block.value.slice(0, block.cursor.x1)
+					// Selection:
+					) : (
+						block.value.slice(block.cursor.x1, block.cursor.x2)
+					)
+				)}
+			</div>
+			<div className="absolute h-6 bg-blue-500" style={{ width: 2, ...cursorStyle }} data-cursor />
+			<div>
+				{block.value || (
+					<br />
+				)}
+			</div>
 		</div>
-	</div>
-)
+	)
+})
 
 // Renders the editor blocks.
 const Blocks = ({ state, ...props }) => (
 	state.data.map(each => (
-		<Block key={each.id} block={each} pos1={state.pos1} pos2={state.pos2} />
+		<Block key={each.id} block={each} />
 	))
 )
 
@@ -46,15 +72,15 @@ const Editor = ({ value: $value, ...props }) => {
 			focused: false,
 			data,
 			pos1: {
-				id: "",
-				ref: null,
+				// id: "",
+				// ref: null,
 				x: 0,
 				y: 0,
 				pos: 0,
 			},
 			pos2: {
-				id: "",
-				ref: null,
+				// id: "",
+				// ref: null,
 				x: 0,
 				y: 0,
 				pos: 0,
@@ -62,9 +88,6 @@ const Editor = ({ value: $value, ...props }) => {
 		}
 		return state
 	})
-
-	const measureRef = React.useRef()
-	const [measure, setMeasure] = React.useState("")
 
 	// // Recompute virtual cursors:
 	// React.useEffect(() => {
@@ -88,11 +111,6 @@ const Editor = ({ value: $value, ...props }) => {
 	return (
 		<div>
 
-			{/* Measurer */}
-			<div ref={measureRef} className="absolute right-0 top-0">
-				{measure}
-			</div>
-
 			{/* Editor */}
 			{React.createElement(
 				"div",
@@ -101,8 +119,8 @@ const Editor = ({ value: $value, ...props }) => {
 
 					className: "text-lg",
 
+					// Imperative styles:
 					style: {
-						// Imperative styles:
 						whiteSpace: "pre-wrap",
 						outline: "none",
 						overflowWrap: "break-word",
@@ -136,12 +154,37 @@ const Editor = ({ value: $value, ...props }) => {
 						if (!range.collapsed) {
 							pos2 = getPosFromRange(ref.current, range.endContainer, range.endOffset)
 						}
-						setState(current => ({
-							...current,
-							pos1,
-							pos2,
-						}))
-						setMeasure(pos1.ref.innerText.slice(0, pos1.x))
+						const data = state.data.map((each, index) => {
+							let cursor = null
+							if (index < pos1.y || index > pos2.y) {
+								cursor = {
+									active: false,
+									x1 :0,
+									x2: 0,
+								}
+							} else if (index === pos1.y) {
+								cursor = {
+									active: true,
+									x1: pos1.x,
+									x2: pos1.y !== pos2.y ? -1 : pos2.x,
+								}
+							} else if (index > pos1.y && index < pos2.y) {
+								cursor = {
+									active: true,
+									x1: 0,
+									x2: -1,
+								}
+							} else if (index === pos2.y) {
+								cursor = {
+									active: true,
+									x1: pos1.y !== pos2.y ? 0 : pos2.x,
+									x2: pos2.x,
+								}
+							}
+							return { ...each, cursor }
+						})
+						setState(current => ({ ...current, data, pos1, pos2 }))
+						// setMeasure(pos1.ref.innerText.slice(0, pos1.x))
 					},
 				},
 			)}
