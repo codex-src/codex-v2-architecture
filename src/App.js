@@ -22,19 +22,28 @@ function parse(value) {
 const Block = ({ focused, block, ...props }) => {
 	const measureRef = React.useRef()
 
+	// TODO: Selection (need to measure offset and width)
 	const [cursorStyle, setCursorStyle] = React.useState(null)
+
 	React.useLayoutEffect(() => {
 		if (!focused) {
 			setCursorStyle(null) // Reset
 			return
 		}
 		const rect = measureRef.current.getBoundingClientRect()
-		setCursorStyle({ left: rect.width, height: rect.height })
+		// Cursor:
+		if (block.cursor.x1 === block.cursor.x2) {
+			setCursorStyle({ left: rect.width, height: rect.height })
+		// Selection:
+		} else {
+			setCursorStyle({ /* left: rect.width, */ width: rect.width, height: rect.height, opacity: 0.25 })
+		}
 	}, [focused, block.cursor])
 
 	return (
 		<div id={block.id} className="relative" style={{ caretColor: "transparent" }} data-block>
-			<div ref={measureRef} className="absolute invisible pointer-events-none" data-measure>
+			{/* FIXME: Prevent selection */}
+			<div ref={measureRef} className="absolute invisible pointer-events-none select-none" data-measure contentEditable={false}>
 				{(focused && block.cursor.active) && (
 					// Cursor:
 					block.cursor.x1 === block.cursor.x2 ? (
@@ -45,7 +54,7 @@ const Block = ({ focused, block, ...props }) => {
 					)
 				)}
 			</div>
-			<div className="absolute bg-blue-500" style={{ width: 2, ...cursorStyle }} data-cursor />
+			<div className="absolute bg-md-blue-a400 select-none" style={{ width: 2, ...cursorStyle /* , zIndex: -1 */ }} data-cursor contentEditable={false} />
 			<div>
 				{block.value || (
 					<br />
@@ -74,6 +83,7 @@ const Blocks = ({ state, ...props }) => (
 // Renders an editor.
 const Editor = ({ value: $value, ...props }) => {
 	const ref = React.useRef()
+
 	const [state, setState] = React.useState(() => {
 		const data = parse($value)
 		const state = {
@@ -125,13 +135,16 @@ const Editor = ({ value: $value, ...props }) => {
 				{
 					ref,
 
-					className: "text-lg",
+					className: "codex-editor text-3xl",
 
 					// Imperative styles:
 					style: {
 						whiteSpace: "pre-wrap",
 						outline: "none",
 						overflowWrap: "break-word",
+
+						// Etc.
+						lineHeight: 1.3,
 					},
 
 					contentEditable: true,
@@ -198,7 +211,7 @@ const Editor = ({ value: $value, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			<div className="py-6 whitespace-pre font-mono text-xs" style={{ tabSize: 2 }}>
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 				{JSON.stringify(
 					{
 						...state,
@@ -221,11 +234,11 @@ const Editor = ({ value: $value, ...props }) => {
 }
 
 const App = props => {
-	const value = "hello, world!"
+	const value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 	return (
 		<div className="flex flex-row justify-center">
-			<div className="py-32 w-full max-w-xl">
+			<div className="py-32 w-full max-w-3xl">
 				<Editor value={value} />
 			</div>
 		</div>
