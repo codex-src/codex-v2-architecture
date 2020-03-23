@@ -97,107 +97,6 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-const data = [
-	{
-		id: uuidv4(),
-		component: Header,
-		syntax: ["# "],
-		children: "This is a header",
-	},
-	{
-		id: uuidv4(),
-		component: Subheader,
-		syntax: ["## "],
-		children: "This is a subheader",
-	},
-	{
-		id: uuidv4(),
-		component: H3,
-		syntax: ["### "],
-		children: "H3",
-	},
-	{
-		id: uuidv4(),
-		component: H4,
-		syntax: ["#### "],
-		children: "H4",
-	},
-	{
-		id: uuidv4(),
-		component: H5,
-		syntax: ["##### "],
-		children: "H5",
-	},
-	{
-		id: uuidv4(),
-		component: H6,
-		syntax: ["###### "],
-		children: "H6",
-	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		syntax: null,
-		children: null,
-	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		syntax: null,
-		children: [
-			{
-				component: Em,
-				syntax: "_",
-				children: [
-					"em ",
-					{
-						component: Strong,
-						syntax: "**",
-						children: "and",
-					},
-				],
-			},
-			" ",
-			{
-				component: Strong,
-				syntax: "**",
-				children: "strong",
-			},
-		],
-	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		syntax: null,
-		children: null,
-	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		syntax: null,
-		children: [
-			{
-				component: Em,
-				syntax: "_",
-				children: "em",
-			},
-			" ",
-			{
-				component: Strong,
-				syntax: "**",
-				children: [
-					{
-						component: Em,
-						syntax: "_",
-						children: "and",
-					},
-					" strong",
-				],
-			},
-		],
-	},
-]
-
 // Parses span VDOM representations to React components.
 function parseSpans(children) {
 	if (children === null || typeof children === "string") {
@@ -218,8 +117,6 @@ function parseSpans(children) {
 	}
 	return components
 }
-
-const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### H5\n###### H6\n\n_em **and**_ **strong**\n\n_em_ **_and_ strong**"
 
 // Parses markdown spans (GFM) to a VDOM representation.
 function parseTextVDOM(markdown) {
@@ -280,6 +177,11 @@ function parseTextVDOM(markdown) {
 			data[data.length - 1] += char
 		}
 	}
+	// Return a string instead of an array:
+	if (data.length === 1) {
+		return data[0]
+	}
+	// Return an array:
 	return data
 }
 
@@ -304,7 +206,7 @@ function parseVDOM(markdown) {
 				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
 				const children = each.slice(syntax[0].length) // TODO
 				data.push({
-					key: uuidv4(),
+					id: uuidv4(),
 					// NOTE: Use ... - 2 for zero-based and space
 					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
@@ -316,7 +218,7 @@ function parseVDOM(markdown) {
 		default:
 			// No-op
 			data.push({
-				key: uuidv4(),
+				id: uuidv4(),
 				component: Paragraph,
 				syntax: null,
 				children: parseTextVDOM(each),
@@ -327,8 +229,112 @@ function parseVDOM(markdown) {
 	return data
 }
 
-// TESTING
-console.log(parseVDOM(raw))
+// Supposed to be a markdown (GFM) representation of data.
+const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### H5\n###### H6\n\n_em **and**_ **strong**\n\n_em_ **_and_ strong**"
+
+// const data = [
+// 	{
+// 		id: uuidv4(),
+// 		component: Header,
+// 		syntax: ["# "],
+// 		children: "This is a header",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: Subheader,
+// 		syntax: ["## "],
+// 		children: "This is a subheader",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: H3,
+// 		syntax: ["### "],
+// 		children: "H3",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: H4,
+// 		syntax: ["#### "],
+// 		children: "H4",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: H5,
+// 		syntax: ["##### "],
+// 		children: "H5",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: H6,
+// 		syntax: ["###### "],
+// 		children: "H6",
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: Paragraph,
+// 		syntax: null,
+// 		children: null,
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: Paragraph,
+// 		syntax: null,
+// 		children: [
+// 			{
+// 				component: Em,
+// 				syntax: "_",
+// 				children: [
+// 					"em ",
+// 					{
+// 						component: Strong,
+// 						syntax: "**",
+// 						children: "and",
+// 					},
+// 				],
+// 			},
+// 			" ",
+// 			{
+// 				component: Strong,
+// 				syntax: "**",
+// 				children: "strong",
+// 			},
+// 		],
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: Paragraph,
+// 		syntax: null,
+// 		children: null,
+// 	},
+// 	{
+// 		id: uuidv4(),
+// 		component: Paragraph,
+// 		syntax: null,
+// 		children: [
+// 			{
+// 				component: Em,
+// 				syntax: "_",
+// 				children: "em",
+// 			},
+// 			" ",
+// 			{
+// 				component: Strong,
+// 				syntax: "**",
+// 				children: [
+// 					{
+// 						component: Em,
+// 						syntax: "_",
+// 						children: "and",
+// 					},
+// 					" strong",
+// 				],
+// 			},
+// 		],
+// 	},
+// ]
+
+// // TESTING
+// console.log(parseVDOM(raw))
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
@@ -373,7 +379,7 @@ function convertToText(data, { gfm }) {
 }
 
 // Renders an editor.
-const Editor = props => {
+const Editor = ({ data, ...props }) => {
 	const text = convertToText(data, { gfm: false })
 	const markdown = convertToText(data, { gfm: true })
 
@@ -405,7 +411,7 @@ const Editor = props => {
 const App = props => (
 	<div className="flex flex-row justify-center">
 		<div className="py-32 w-full max-w-3xl">
-			<Editor />
+			<Editor data={parseVDOM(raw)} />
 		</div>
 	</div>
 )
