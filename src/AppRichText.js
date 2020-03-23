@@ -49,43 +49,6 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// // Converts a React component tree to plain text. GitHub
-// // Flavored Markdown (GFM) is an option.
-// function convertToText(data, opts = { gfm: false }) {
-// 	let text = ""
-// 	const recurse = data => {
-// 		// No nesting:
-// 		if (typeof data === "string") {
-// 			text += data
-// 			return
-// 		// Guard <Component><br /></Component>:
-// 		} else if (!Array.isArray(data)) {
-// 			// No-op
-// 			return
-// 		}
-// 		// Nesting:
-// 		for (const each of data) {
-// 			if (typeof each === "string") {
-// 				text += each
-// 				continue
-// 			}
-// 			if (opts.gfm) {
-// 				text += each.props.syntax || ""
-// 			}
-// 			recurse(each.props.children)
-// 			if (opts.gfm) {
-// 				text += each.props.syntax || ""
-// 			}
-// 			// TODO: Add other components (not just Paragraph)
-// 			if (each.type === Paragraph) {
-// 				text += "\n"
-// 			}
-// 		}
-// 	}
-// 	recurse(data)
-// 	return text
-// }
-
 const data = [
 	{
 		id: uuidv4(),
@@ -127,38 +90,6 @@ const data = [
 		],
 	},
 ]
-
-// const data = [
-// 	((key = uuidv4()) => (
-// 		<Paragraph key={key} id={key}>
-// 			<Em syntax="_">
-// 				em <Strong syntax="**">and</Strong>
-// 			</Em>{" "}
-// 			<Strong syntax="**">
-// 				strong
-// 			</Strong>
-// 		</Paragraph>
-// 	))(),
-// 	((key = uuidv4()) => (
-// 		<Paragraph key={key} id={key}>
-// 			<br />
-// 		</Paragraph>
-// 	))(),
-// 	((key = uuidv4()) => (
-// 		<Paragraph key={key} id={key}>
-// 			<Em syntax="_">
-// 				em <Strong syntax="**">and</Strong>
-// 			</Em>{" "}
-// 			<Strong syntax="**">
-// 				strong
-// 			</Strong>
-// 		</Paragraph>
-// 	))(),
-// ]
-
-// // DEBUG
-// console.log(convertToText(data))
-// console.log(convertToText(data, { gfm: true }))
 
 // Parses component children objects into renderable React
 // components.
@@ -228,6 +159,7 @@ function convertToText(data, opts = { gfm: true }) {
 	return text
 }
 
+// DELETEME
 console.log(convertToText(data))
 
 // Renders an editor.
