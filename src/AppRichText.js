@@ -57,110 +57,108 @@ const data = [
 			{
 				component: Em,
 				syntax: "_",
-				children: "em",
+				children: [
+					"em and ",
+					{
+						component: Strong,
+						syntax: "**",
+						children: "strong",
+					}
+				],
 			},
-			" and ",
-			{
-				component: Strong,
-				syntax: "**",
-				children: "strong",
-			},
+			// " and ",
+			// {
+			// 	component: Strong,
+			// 	syntax: "**",
+			// 	children: "strong",
+			// },
 		],
 	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		children: null,
-	},
-	{
-		id: uuidv4(),
-		component: Paragraph,
-		children: [
-			{
-				component: Em,
-				syntax: "_",
-				children: "em",
-			},
-			" and ",
-			{
-				component: Strong,
-				syntax: "**",
-				children: "strong",
-			},
-		],
-	},
+	// {
+	// 	id: uuidv4(),
+	// 	component: Paragraph,
+	// 	children: null,
+	// },
+	// {
+	// 	id: uuidv4(),
+	// 	component: Paragraph,
+	// 	children: [
+	// 		{
+	// 			component: Em,
+	// 			syntax: "_",
+	// 			children: "em",
+	// 		},
+	// 		" and ",
+	// 		{
+	// 			component: Strong,
+	// 			syntax: "**",
+	// 			children: "strong",
+	// 		},
+	// 	],
+	// },
 ]
 
 // Parses component children objects into renderable React
 // components.
 function parseChildren(children) {
-	// Guard <br>:
-	if (children === null) {
-		return null
+	if (children === null || typeof children === "string") {
+		return children
 	}
-	const components = []
-	const recurse = children => {
-		if (children == null) {
-			return
-		} else if (typeof children === "string") {
-			return children
+	const component = []
+	for (const each of children) {
+		if (each === null || typeof each === "string") {
+			component.push(each)
+			continue
 		}
-		for (const each of children) {
-			if (typeof each === "string") {
-				components.push(each)
-				continue
-			}
-			const { component: Component } = each
-			components.push((
-				<Component key={components.length} syntax={each.syntax}>
-					{recurse(each.children)}
-				</Component>
-			))
-		}
+		const { component: Component } = each
+		component.push((
+			<Component key={component.length} syntax={each.syntax}>
+				{parseChildren(each.children)}
+			</Component>
+		))
 	}
-	recurse(children)
-	return components
+	return component
 }
 
-// Converts a data structure to plain text (GitHub Flavored
-// Markdown is an option).
-function convertToText(data, opts = { gfm: true }) {
-	let text = ""
-	const recurse = children => {
-		if (children === null) {
-			// No-op
-			return
-		} else if (typeof children === "string") {
-			text += children
-			return
-		}
-		for (const each of children) {
-			if (typeof each === null) {
-				// No-op
-				continue
-			} if (typeof each === "string") {
-				text += each
-				continue
-			}
-			if (opts.gfm) {
-				text += each.syntax
-			}
-			recurse(each.children)
-			if (opts.gfm) {
-				text += each.syntax
-			}
-		}
-	}
-	for (const each of data) {
-		// Paragraph ...
-		recurse(each.children)
-		text += "\n"
-	}
-	return text
-}
-
-// DELETEME
-console.log(convertToText(data))
+// // Converts a data structure to plain text (GitHub Flavored
+// // Markdown is an option).
+// function convertToText(data, opts = { gfm: true }) {
+// 	let text = ""
+// 	const recurse = children => {
+// 		if (children === null) {
+// 			// No-op
+// 			return
+// 		} else if (typeof children === "string") {
+// 			text += children
+// 			return
+// 		}
+// 		for (const each of children) {
+// 			if (typeof each === null) {
+// 				// No-op
+// 				continue
+// 			} if (typeof each === "string") {
+// 				text += each
+// 				continue
+// 			}
+// 			if (opts.gfm) {
+// 				text += each.syntax
+// 			}
+// 			recurse(each.children)
+// 			if (opts.gfm) {
+// 				text += each.syntax
+// 			}
+// 		}
+// 	}
+// 	for (const each of data) {
+// 		// Paragraph ...
+// 		recurse(each.children)
+// 		text += "\n"
+// 	}
+// 	return text
+// }
+//
+// // DELETEME
+// console.log(convertToText(data))
 
 // Renders an editor.
 const Editor = props => (
