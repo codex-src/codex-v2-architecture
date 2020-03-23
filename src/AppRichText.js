@@ -72,11 +72,30 @@ const Paragraph = ({ id, ...props }) => (
 
 // // Exports a data structure to GFM markdown.
 // function exportGFM(data) {
+// 	let gfm = ""
+// 	for (block of data) {
+// 		switch (block.component) {
+// 		case Paragraph:
+// 			gfm +=
+// 			break
+// 		}
+// 		default:
+// 			// No-op
+// 			break
+// 	}
+// 	return gfm
 // }
 
-// Parses plain text and a formatting object into renderable
-// components.
-function parseText(text, formatting) {
+// Maps inline components.
+const map = new Map()
+
+;(() => {
+	map["em"] = Em
+	map["strong"] = Strong
+})()
+
+// Parses plain text into renderable components.
+function parse(text, formatting) {
 	if (!formatting) {
 		return text
 	}
@@ -86,33 +105,36 @@ function parseText(text, formatting) {
 		if (f.x1 > index) {
 			components.push(text.slice(index, f.x1))
 		}
-		components.push(<f.component key={components.length} syntax={f.syntax}>{text.slice(f.x1, f.x2)}</f.component>)
+		components.push({ type: f.type, syntax: f.syntax, text: text.slice(f.x1, f.x2) })
 		if (f === formatting.slice(-1)[0]) {
 			components.push(text.slice(f.x2))
 		}
 		index = f.x2
 	}
-	console.log(components)
 	return components
 }
 
 // Renders an editor block.
-const Block = ({
-	block: {
-		id,
-		component: Component,
-		text,
-		formatting,
-		...block
-	},
-	...props
-}) => (
-	<Component id={id}>
-		{parseText(text, formatting) || (
-			<br />
-		)}
-	</Component>
-)
+const Block = ({ block: { component: Component, ...block }, ...props }) => {
+
+	// Parse block into renderable components:
+	let children = parse(block.text, block.formatting)
+	children = children.map(each => {
+		if (typeof each === "string") {
+			return each
+		}
+		const Component = map[each.type]
+		return <Component syntax={each.syntax}>{each.text}</Component>
+	})
+
+	return (
+		<Component id={block.id}>
+			{children || (
+				<br />
+			)}
+		</Component>
+	)
+}
 
 // TODO (1): Parse markdown to a data structure
 // TODO (2): Parse a data structure to WYSIWYG or markdown
