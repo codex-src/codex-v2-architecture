@@ -198,9 +198,8 @@ const data = [
 	},
 ]
 
-// Parses component children objects into renderable React
-// components.
-function parseReact(children) {
+// Parses span VDOM representations to React components.
+function parseSpans(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -213,27 +212,67 @@ function parseReact(children) {
 		const { component: Component } = each
 		components.push((
 			<Component key={components.length} syntax={each.syntax}>
-				{parseReact(each.children)}
+				{parseSpans(each.children)}
 			</Component>
 		))
 	}
 	return components
 }
 
-// function parseVDOM(markdown) {
-// 	const body = markdown.split("\n")
-//
-// 	const data = []
-// 	for (let index = 0; index < body.length; index++) {
-//
-// 	}
-// 	return data
-// }
+const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### H5\n###### H6\n\n_em **and**_ **strong**\n\n_em_ **_and_ strong**"
+
+// Parses markdown (GFM text) to a VDOM representation.
+function parseVDOM(markdown) {
+	const data = []
+	const paragraphs = markdown.split("\n")
+	for (let index = 0; index < paragraphs.length; index++) {
+		const each = paragraphs[index] // Shorthand
+		// const char = each.charAt(0) // Shorthand
+		switch (each.charAt(0)) {
+		// Header:
+		case "#":
+			if (
+				(each.length >= 2 && each.slice(0, 2) === "# ") ||
+				(each.length >= 3 && each.slice(0, 3) === "## ") ||
+				(each.length >= 4 && each.slice(0, 4) === "### ") ||
+				(each.length >= 5 && each.slice(0, 5) === "#### ") ||
+				(each.length >= 6 && each.slice(0, 6) === "##### ") ||
+				(each.length >= 7 && each.slice(0, 7) === "###### ")
+			) {
+				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
+				const children = each.slice(syntax[0].length)
+				data.push({
+					key: uuidv4(),
+					// NOTE: Use ... - 2 for zero-based and space
+					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
+					syntax,
+					children,
+				})
+				continue
+			}
+			break
+		default:
+			// No-op
+			data.push({
+				key: uuidv4(),
+				component: Paragraph,
+				syntax: null,
+				children: each,
+			})
+			break
+		}
+	}
+	return data
+}
+
+// TESTING
+console.log(parseVDOM(raw))
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
 function convertToText(data, { gfm }) {
 	let result = ""
+	// Recurse inline elements:
 	const recurse = children => {
 		if (children === null || typeof children === "string") {
 			result += children || ""
@@ -249,6 +288,7 @@ function convertToText(data, { gfm }) {
 			result += (gfm && each.syntax) || ""
 		}
 	}
+	// Iterate block elements:
 	for (const each of data) {
 		// (Code based on <Markdown>)
 		const { syntax } = each
@@ -281,7 +321,7 @@ const Editor = props => {
 			{/* Blocks */}
 			{data.map(({ component: Component, ...each }) => (
 				<Component key={each.id} id={each.id} syntax={each.syntax}>
-					{parseReact(each.children)}
+					{parseSpans(each.children)}
 				</Component>
 			))}
 
