@@ -221,7 +221,69 @@ function parseSpans(children) {
 
 const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### H5\n###### H6\n\n_em **and**_ **strong**\n\n_em_ **_and_ strong**"
 
-// Parses markdown (GFM text) to a VDOM representation.
+// Parses markdown spans (GFM) to a VDOM representation.
+function parseTextVDOM(markdown) {
+	if (!markdown) {
+		return null
+	}
+	const data = []
+	for (let index = 0; index < markdown.length; index++) {
+		const char = markdown[index]         // Shortcut
+		const numCharsToEnd = markdown.length - index // Shortcut
+		switch (true) {
+		// Emphasis or strong:
+		case char === "*" || char === "_":
+			if (numCharsToEnd >= (4 + 1) && markdown.slice(index, index + 2) === char.repeat(2)) {
+				const syntax = char.repeat(2)
+				const offset = markdown.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0) {
+					// No-op
+					break
+				}
+				index += syntax.length
+				const children = parseTextVDOM(markdown.slice(index, index + offset))
+				data.push({
+					component: Strong,
+					syntax,
+					children,
+				})
+				index += syntax.length + offset - 1
+				continue
+			// *Emphasis*
+			} else if (numCharsToEnd >= (2 + 1)) {
+				const syntax = char.repeat(1)
+				const offset = markdown.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0) {
+					// No-op
+					break
+				}
+				index += syntax.length
+				const children = parseTextVDOM(markdown.slice(index, index + offset))
+				data.push({
+					component: Em,
+					syntax,
+					children,
+				})
+				index += offset + syntax.length - 1
+				continue
+			}
+			break
+		default:
+			// No-op
+			break
+		}
+		// Push string:
+		if (!data.length || typeof data[data.length - 1] !== "string") {
+			data.push(char)
+		// OR Concatenate string:
+		} else {
+			data[data.length - 1] += char
+		}
+	}
+	return data
+}
+
+// Parses markdown (GFM) to a VDOM representation.
 function parseVDOM(markdown) {
 	const data = []
 	const paragraphs = markdown.split("\n")
@@ -240,7 +302,7 @@ function parseVDOM(markdown) {
 				(each.length >= 7 && each.slice(0, 7) === "###### ")
 			) {
 				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
-				const children = each.slice(syntax[0].length)
+				const children = each.slice(syntax[0].length) // TODO
 				data.push({
 					key: uuidv4(),
 					// NOTE: Use ... - 2 for zero-based and space
@@ -257,7 +319,7 @@ function parseVDOM(markdown) {
 				key: uuidv4(),
 				component: Paragraph,
 				syntax: null,
-				children: each,
+				children: parseTextVDOM(each),
 			})
 			break
 		}
