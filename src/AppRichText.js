@@ -42,6 +42,19 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
+// formatting: [
+// 	{ type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
+// 	{ type: InlineTypes.Strong, component: Strong, x1: 21, x2: 26 },
+// ],
+
+// [
+// 	"Hello, ",
+// 	"world",
+// 	"! Hello ",
+// 	"world",
+// 	"!",
+// ]
+
 // Parses plain text and a formatting object into renderable
 // components.
 function parseText(text, formatting) {
@@ -50,22 +63,22 @@ function parseText(text, formatting) {
 	if (!formatting) {
 		components = text
 	}
-	// for (const f of formatting) { // Works as an else-statement
-	// 	const key = components.length
-	// 	if (f.x1 > index) {
-	// 		components.push(text.slice(index, f.x1))
-	// 	}
-	// 	components.push(<f.component key={key}>{text.slice(f.x1, f.x2)}</f.component>)
-	// 	if (f.x2 < text.length) {
-	// 		components.push(text.slice(f.x2))
-	// 	}
-	// 	index = f.x2
-	// }
-	// console.log(components)
+	for (const f of formatting) { // Works as an else-statement
+		if (f.x1 > index) {
+			components.push(text.slice(index, f.x1))
+		}
+		components.push((
+			<f.component key={components.length}>
+				{text.slice(f.x1, f.x2)}
+			</f.component>
+		))
+		if (f === formatting.slice(-1)[0]) {
+			components.push(text.slice(f.x2))
+		}
+		index = f.x2
+	}
+	console.log(components)
 	return components
-
-	// console.log(text.slice(f.x1, f.x2))
-	// return "Hello, world!"
 }
 
 // Renders an editor block.
@@ -85,12 +98,13 @@ const data = [
 		type: BlockTypes.Paragraph,
 		component: Paragraph,
 		text: "Hello, world! Hello, world!",
-		// What guarantees can we make about formatting? Can we
-		// assume formatting is ordered?
-		formatting: null, // [
-			// { type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
-			// { type: InlineTypes.Strong, component: Strong, x1: 12, x2: 26 },
-		// ],
+		// What guarantees can we make about formatting?
+		// - Can we assume formatting is ordered?
+		// - Can x1 >= x2?
+		formatting: [
+			{ type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
+			{ type: InlineTypes.Strong, component: Strong, x1: 21, x2: 26 },
+		],
 	},
 	// {
 	// 	id: uuidv4(),
