@@ -129,7 +129,7 @@ function parseChildren(children) {
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
-function convertToText(data) {
+function convertToText(data, { gfm }) {
 	let result = ""
 	const recurse = children => {
 		if (children === null || typeof children === "string") {
@@ -141,9 +141,9 @@ function convertToText(data) {
 				result += each || ""
 				continue
 			}
-			result += each.syntax
+			result += (gfm && each.syntax) || ""
 			recurse(each.children)
-			result += each.syntax
+			result += (gfm && each.syntax) || ""
 		}
 	}
 	for (const each of data) {
@@ -155,7 +155,7 @@ function convertToText(data) {
 }
 
 // DELETEME
-console.log(convertToText(data))
+console.log(convertToText(data, { gfm: false }))
 
 // Renders an editor.
 const Editor = props => (
