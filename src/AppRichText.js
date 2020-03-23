@@ -107,7 +107,7 @@ const data = [
 
 // Parses component children objects into renderable React
 // components.
-function parseChildren(children) {
+function parse(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -120,7 +120,7 @@ function parseChildren(children) {
 		const { component: Component } = each
 		components.push((
 			<Component key={components.length} syntax={each.syntax}>
-				{parseChildren(each.children)}
+				{parse(each.children)}
 			</Component>
 		))
 	}
@@ -137,7 +137,7 @@ function convertToText(data, { gfm }) {
 			return
 		}
 		for (const each of children) {
-			if (typeof each === null || typeof each === "string") {
+			if (each === null || typeof each === "string") {
 				result += each || ""
 				continue
 			}
@@ -154,27 +154,35 @@ function convertToText(data, { gfm }) {
 	return result
 }
 
-// DELETEME
-console.log(convertToText(data, { gfm: false }))
-
 // Renders an editor.
-const Editor = props => (
-	<div className="text-lg">
+const Editor = props => {
+	const text = convertToText(data, { gfm: false })
+	const markdown = convertToText(data, { gfm: true })
 
-		{/* Blocks */}
-		{data.map(({ component: Component, ...each }) => (
-			<Component key={each.id} id={each.id}>
-				{parseChildren(each.children)}
-			</Component>
-		))}
+	return (
+		<div className="text-lg">
 
-		{/* Debugger */}
-		<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-			{JSON.stringify(data, null, "\t")}
+			{/* Blocks */}
+			{data.map(({ component: Component, ...each }) => (
+				<Component key={each.id} id={each.id}>
+					{parse(each.children)}
+				</Component>
+			))}
+
+			{/* Debugger */}
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+				{JSON.stringify({
+					text,
+					markdown,
+					charCount: [...text].length,
+					wordCount: text.split(/\s+/).filter(Boolean).length,
+					data,
+				}, null, "\t")}
+			</div>
+
 		</div>
-
-	</div>
-)
+	)
+}
 
 const App = props => (
 	<div className="flex flex-row justify-center">
