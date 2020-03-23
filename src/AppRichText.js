@@ -100,49 +100,51 @@ function parseText(text, formatting) {
 	return components
 }
 
-// Exports a data structure to GFM markdown.
-function exportGFM(data) {
-	let gfm = ""
+// if (gfm) {
+// 	if (each.component !== "paragraph") {
+// 		// No-op
+// 		return
+// 	}
+// }
+
+// Converts a data structure to plain text or GitHub
+// Flavored Markdown (GFM).
+function convertToText(data, markdown) {
+	let str = ""
 	for (const block of data) {
+		// TODO: Add support non-paragraph blocks
 		const { text, formatting } = block
-		// if (each.component !== "paragraph") {
-		// 	// No-op
-		// 	return
-		// }
+		if (!formatting) {
+			str += text
+			continue
+		}
 		const spans = parseText(text, formatting)
 		for (const span of spans) {
+			const { start, end, text } = span
 			if (typeof span === "string") {
-				gfm += span
-			} else {
-				gfm += `${span.start || ""}${span.text}${span.end || ""}`
+				str += span
+				continue
 			}
+			str += `${!markdown ? "" : start || ""}${text}${!markdown ? "" : end || ""}`
 		}
 	}
-	console.log({ gfm })
-	return null
+	return str
 }
-
-// // Exports a data structure to plain text.
-// function exportText(data) {
-// 	const parsed = data.map(each => (
-// 		parseText(each.text, each.formatting)
-// 	))
-// 	console.log(parsed)
-// 	return null
-// }
 
 // Renders an editor block.
 const Block = ({ block: { component: Component, ...block }, ...props }) => {
 
 	// Parse block into renderable components:
 	let children = parseText(block.text, block.formatting)
-	children = children.map((each, index) => {
-		if (typeof each === "string") {
-			return each
-		}
-		const Component = map[each.type]
-		return <Component key={index} start={each.start} end={each.end}>{each.text}</Component>
-	})
+	if (typeof children !== "string") { // Array
+		children = children.map((each, index) => {
+			if (typeof each === "string") {
+				return each
+			}
+			const Component = map[each.type]
+			return <Component key={index} start={each.start} end={each.end}>{each.text}</Component>
+		})
+	}
 
 	return (
 		<Component id={block.id}>
@@ -165,16 +167,34 @@ const data = [
 		id: uuidv4(),
 		type: "paragraph",
 		component: Paragraph,
-		text: "This is em, this is bold",
+		text: "This is em, this is strong",
 		formatting: [
 			{ type: "em", component: Em, start: "_", end: "_", x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 24 },
+			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 26 },
+		],
+	},
+	{
+		id: uuidv4(),
+		type: "paragraph",
+		component: Paragraph,
+		text: "",
+		formatting: null,
+	},
+	{
+		id: uuidv4(),
+		type: "paragraph",
+		component: Paragraph,
+		text: "This is em, this is strong",
+		formatting: [
+			{ type: "em", component: Em, start: "_", end: "_", x1: 8, x2: 10 },
+			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 26 },
 		],
 	},
 ]
 
 // DELETEME
-exportGFM(data)
+console.log(convertToText(data, false))
+console.log(convertToText(data, true))
 
 // Renders an editor.
 const Editor = props => (
