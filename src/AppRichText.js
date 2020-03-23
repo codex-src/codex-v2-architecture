@@ -70,22 +70,6 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// // Exports a data structure to GFM markdown.
-// function exportGFM(data) {
-// 	let gfm = ""
-// 	for (block of data) {
-// 		switch (block.component) {
-// 		case Paragraph:
-// 			gfm +=
-// 			break
-// 		}
-// 		default:
-// 			// No-op
-// 			break
-// 	}
-// 	return gfm
-// }
-
 // Maps inline components.
 const map = new Map()
 
@@ -94,8 +78,9 @@ const map = new Map()
 	map["strong"] = Strong
 })()
 
-// Parses plain text into renderable components.
-function parse(text, formatting) {
+// Parses plain text and a formatting array into renderable
+// components.
+function parseText(text, formatting) {
 	if (!formatting) {
 		return text
 	}
@@ -114,17 +99,60 @@ function parse(text, formatting) {
 	return components
 }
 
+// Exports a data structure to GFM markdown.
+function exportGFM(data) {
+	let gfm = ""
+	const parsed = data.map(each => {
+		// if (each.component !== "paragraph") {
+		// 	// No-op
+		// 	return
+		// }
+		const spans = parseText(each.text, each.formatting)
+		for (const span of spans) {
+			if (typeof span === "string") {
+				gfm += span
+			} else {
+				gfm += `${span.syntax}${span.text}${span.syntax}`
+			}
+		}
+	})
+	console.log({ gfm })
+	return null
+
+	// let gfm = ""
+	// for (block of data) {
+	// 	switch (block.component) {
+	// 	case Paragraph:
+	// 		gfm +=
+	// 		break
+	// 	}
+	// 	default:
+	// 		// No-op
+	// 		break
+	// }
+	// return gfm
+}
+
+// // Exports a data structure to plain text.
+// function exportText(data) {
+// 	const parsed = data.map(each => (
+// 		parseText(each.text, each.formatting)
+// 	))
+// 	console.log(parsed)
+// 	return null
+// }
+
 // Renders an editor block.
 const Block = ({ block: { component: Component, ...block }, ...props }) => {
 
 	// Parse block into renderable components:
-	let children = parse(block.text, block.formatting)
-	children = children.map(each => {
+	let children = parseText(block.text, block.formatting)
+	children = children.map((each, index) => {
 		if (typeof each === "string") {
 			return each
 		}
 		const Component = map[each.type]
-		return <Component syntax={each.syntax}>{each.text}</Component>
+		return <Component key={index} syntax={each.syntax}>{each.text}</Component>
 	})
 
 	return (
@@ -155,6 +183,9 @@ const data = [
 		],
 	},
 ]
+
+// DELETEME
+exportGFM(data)
 
 // Renders an editor.
 const Editor = props => (
