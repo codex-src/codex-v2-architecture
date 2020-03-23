@@ -400,30 +400,36 @@ const Editor = ({ data, prefs, ...props }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={prefs}>
-			<div className="text-lg">
 
-				{data.map(({ component: Component, ...each }) => (
+			{React.createElement(
+				"div",
+				{
+					className: "text-lg outline-none",
+
+					contentEditable: !prefs.readOnly,
+				},
+				data.map(({ component: Component, ...each }) => (
 					<Component key={each.id} id={each.id} syntax={each.syntax}>
 						{parseSpansReact(each.children)}
 					</Component>
-				))}
+				)),
+			)}
 
-				<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-					{JSON.stringify(
-						{
-							text,
-							textGFM,
-							charCount: [...text].length,
-							wordCount: text.split(/\s+/).filter(Boolean).length,
-							prefs, // Takes precedence?
-							data,
-						},
-						null,
-						"\t",
-					)}
-				</div>
-
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+				{JSON.stringify(
+					{
+						text,
+						textGFM,
+						charCount: [...text].length,
+						wordCount: text.split(/\s+/).filter(Boolean).length,
+						prefs, // Takes precedence?
+						data,
+					},
+					null,
+					"\t",
+				)}
 			</div>
+
 		</Provider>
 	)
 }
@@ -438,13 +444,23 @@ const App = props => {
 		readOnly: true,
 	}))
 
-	// const [markdown, setMarkdown] = React.useState(true)
-
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="py-32 w-full max-w-3xl">
-				<button className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150" onPointerDown={e => e.preventDefault()} onClick={e => setPrefs(current => ({ ...current, markdown: !current.markdown }))}>
-					Toggle markdown
+				<button
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150"
+					onPointerDown={e => e.preventDefault()}
+					onClick={e => setPrefs(current => ({ ...current, markdown: !current.markdown }))}
+				>
+					Toggle markdown: {!prefs.markdown ? "OFF" : "ON"}
+				</button>
+				<span className="inline-block w-3" />
+				<button
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150"
+					onPointerDown={e => e.preventDefault()}
+					onClick={e => setPrefs(current => ({ ...current, readOnly: !current.readOnly }))}
+				>
+					Toggle read-only: {!prefs.readOnly ? "OFF" : "ON"}
 				</button>
 				<Editor data={data} prefs={prefs} />
 			</div>
