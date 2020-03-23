@@ -51,7 +51,7 @@ const Paragraph = ({ id, ...props }) => (
 
 // // Converts a React component tree to plain text. GitHub
 // // Flavored Markdown (GFM) is an option.
-// function convertToText(data, options = { gfm: false }) {
+// function convertToText(data, opts = { gfm: false }) {
 // 	let text = ""
 // 	const recurse = data => {
 // 		// No nesting:
@@ -69,11 +69,11 @@ const Paragraph = ({ id, ...props }) => (
 // 				text += each
 // 				continue
 // 			}
-// 			if (options.gfm) {
+// 			if (opts.gfm) {
 // 				text += each.props.syntax || ""
 // 			}
 // 			recurse(each.props.children)
-// 			if (options.gfm) {
+// 			if (opts.gfm) {
 // 				text += each.props.syntax || ""
 // 			}
 // 			// TODO: Add other components (not just Paragraph)
@@ -89,26 +89,43 @@ const Paragraph = ({ id, ...props }) => (
 const data = [
 	{
 		id: uuidv4(),
-		type: "paragraph",
 		component: Paragraph,
 		children: [
-			"This is ",
 			{
-				type: "strong",
+				component: Em,
+				syntax: "_",
+				children: "em",
+			},
+			" and ",
+			{
 				component: Strong,
 				syntax: "**",
 				children: "strong",
 			},
 		],
 	},
-	// {
-	// 	id: uuidv4(),
-	// 	type: "paragraph",
-	// 	component: Paragraph,
-	// 	children: [
-	// 		"Hello, world!"
-	// 	],
-	// },
+	{
+		id: uuidv4(),
+		component: Paragraph,
+		children: null,
+	},
+	{
+		id: uuidv4(),
+		component: Paragraph,
+		children: [
+			{
+				component: Em,
+				syntax: "_",
+				children: "em",
+			},
+			" and ",
+			{
+				component: Strong,
+				syntax: "**",
+				children: "strong",
+			},
+		],
+	},
 ]
 
 // const data = [
@@ -143,18 +160,24 @@ const data = [
 // console.log(convertToText(data))
 // console.log(convertToText(data, { gfm: true }))
 
-// Parses component objects into renderable React
+// Parses component children objects into renderable React
 // components.
-function parseText(children) {
+function parseChildren(children) {
+	// Guard <br>:
+	if (children === null) {
+		return null
+	}
 	const components = []
 	const recurse = children => {
-		if (typeof children === "string") {
+		if (children == null) {
+			return
+		} else if (typeof children === "string") {
 			return children
 		}
 		for (const each of children) {
 			if (typeof each === "string") {
 				components.push(each)
-				return
+				continue
 			}
 			const { component: Component } = each
 			components.push((
@@ -168,36 +191,63 @@ function parseText(children) {
 	return components
 }
 
-// Parses a component object into a renderable React
-// component.
-function parse(data) {
-	const Component = data.component
-	return <Component key={data.id} id={data.id}>{parseText(data.children)}</Component>
+// Converts a data structure to plain text (GitHub Flavored
+// Markdown is an option).
+function convertToText(data, opts = { gfm: true }) {
+	let text = ""
+	const recurse = children => {
+		if (children === null) {
+			// No-op
+			return
+		} else if (typeof children === "string") {
+			text += children
+			return
+		}
+		for (const each of children) {
+			if (typeof each === null) {
+				// No-op
+				continue
+			} if (typeof each === "string") {
+				text += each
+				continue
+			}
+			if (opts.gfm) {
+				text += each.syntax
+			}
+			recurse(each.children)
+			if (opts.gfm) {
+				text += each.syntax
+			}
+		}
+	}
+	for (const each of data) {
+		// Paragraph ...
+		recurse(each.children)
+		text += "\n"
+	}
+	return text
 }
 
-// console.log(parseText(data))
+console.log(convertToText(data))
 
 // Renders an editor.
-const Editor = props => {
-	const Blocks = data.map(each => (
-		parse(each)
-	))
-	console.log(Blocks)
+const Editor = props => (
+	<div className="text-lg">
 
-	return (
-		<div className="text-lg">
+		{/* Blocks */}
+		{data.map(({ component: Component, ...each }) => (
+			<Component key={each.id} id={each.id}>
+				{parseChildren(each.children)}
+			</Component>
+		))}
 
-			{/* Blocks */}
-			{Blocks}
-
-			{/* Debugger */}
-			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-				{JSON.stringify(data, null, "\t")}
-			</div>
-
+		{/* Debugger */}
+		<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+			{JSON.stringify(data, null, "\t")}
 		</div>
-	)
-}
+
+	</div>
+)
 
 const App = props => (
 	<div className="flex flex-row justify-center">
