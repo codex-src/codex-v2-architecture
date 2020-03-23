@@ -16,6 +16,7 @@ const Markdown = ({ syntax, ...props }) => {
 	}
 
 	return (
+		// TODO: Move data-syntax to host component?
 		<span data-syntax={JSON.stringify(syntax)}>
 			{(markdown && start) && (
 				<span className="text-md-blue-a400">
@@ -48,56 +49,56 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
-const Header = ({ id, syntax, ...props }) => (
+const Header = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-medium text-4xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
-const Subheader = ({ id, syntax, ...props }) => (
+))
+const Subheader = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-medium text-2xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
-const H3 = ({ id, syntax, ...props }) => (
+))
+const H3 = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold text-xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
-const H4 = ({ id, syntax, ...props }) => (
+))
+const H4 = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold text-lg">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
-const H5 = ({ id, syntax, ...props }) => (
+))
+const H5 = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
-const H6 = ({ id, syntax, ...props }) => (
+))
+const H6 = React.memo(({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
-)
+))
 
-const Paragraph = ({ id, ...props }) => (
+const Paragraph = React.memo(({ id, ...props }) => (
 	<div id={id}>
 		{props.children || (
 			<br />
 		)}
 	</div>
-)
+))
 
 // Parses span VDOM representations to React components.
 function parseSpans(children) {
@@ -427,7 +428,7 @@ const Editor = ({ data, markdown, ...props }) => {
 }
 
 const App = props => {
-	const [data, setData] = React.useState(() => {
+	const [data /* , setData */] = React.useState(() => {
 		return parseMarkdown(raw, { markdown: true })
 	})
 
