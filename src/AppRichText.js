@@ -4,6 +4,8 @@ import uuidv4 from "uuid/v4"
 import "./AppRichText.css"
 
 const Markdown = ({ syntax, ...props }) => {
+	const { markdown } = React.useContext(EditorContext)
+
 	let start = ""
 	let end = ""
 	if (typeof syntax === "string") {
@@ -15,13 +17,13 @@ const Markdown = ({ syntax, ...props }) => {
 
 	return (
 		<React.Fragment>
-			{start && (
+			{(markdown && start) && (
 				<span className="text-md-blue-a400">
 					{start}
 				</span>
 			)}
 			{props.children}
-			{end && (
+			{(markdown && end) && (
 				<span className="text-md-blue-a400">
 					{end}
 				</span>
@@ -32,7 +34,7 @@ const Markdown = ({ syntax, ...props }) => {
 
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
-		<Markdown syntax={syntax || console.error("Em: syntax={syntax} must be set")}>
+		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</span>
@@ -40,7 +42,7 @@ const Em = ({ syntax, ...props }) => (
 
 const Strong = ({ syntax, ...props }) => (
 	<span className="font-bold">
-		<Markdown syntax={syntax || console.error("Strong: syntax={syntax} must be set")}>
+		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</span>
@@ -118,27 +120,27 @@ function parseSpans(children) {
 	return components
 }
 
-// Parses markdown spans (GFM) to a VDOM representation.
-function parseTextVDOM(markdown) {
-	if (!markdown) {
+// Parses markdown text (GFM) to a VDOM representation.
+function parseMarkdownText(text) {
+	if (!text) {
 		return null
 	}
 	const data = []
-	for (let index = 0; index < markdown.length; index++) {
-		const char = markdown[index]         // Shortcut
-		const numCharsToEnd = markdown.length - index // Shortcut
+	for (let index = 0; index < text.length; index++) {
+		const char = text[index]         // Shortcut
+		const numCharsToEnd = text.length - index // Shortcut
 		switch (true) {
 		// Emphasis or strong:
 		case char === "*" || char === "_":
-			if (numCharsToEnd >= (4 + 1) && markdown.slice(index, index + 2) === char.repeat(2)) {
+			if (numCharsToEnd >= (4 + 1) && text.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
-				const offset = markdown.slice(index + syntax.length).indexOf(syntax)
+				const offset = text.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
 					// No-op
 					break
 				}
 				index += syntax.length
-				const children = parseTextVDOM(markdown.slice(index, index + offset))
+				const children = parseMarkdownText(text.slice(index, index + offset))
 				data.push({
 					component: Strong,
 					syntax,
@@ -149,13 +151,13 @@ function parseTextVDOM(markdown) {
 			// *Emphasis*
 			} else if (numCharsToEnd >= (2 + 1)) {
 				const syntax = char.repeat(1)
-				const offset = markdown.slice(index + syntax.length).indexOf(syntax)
+				const offset = text.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
 					// No-op
 					break
 				}
 				index += syntax.length
-				const children = parseTextVDOM(markdown.slice(index, index + offset))
+				const children = parseMarkdownText(text.slice(index, index + offset))
 				data.push({
 					component: Em,
 					syntax,
@@ -186,9 +188,9 @@ function parseTextVDOM(markdown) {
 }
 
 // Parses markdown (GFM) to a VDOM representation.
-function parseVDOM(markdown) {
+function parseMarkdown(text) {
 	const data = []
-	const paragraphs = markdown.split("\n")
+	const paragraphs = text.split("\n")
 	for (let index = 0; index < paragraphs.length; index++) {
 		const each = paragraphs[index] // Shorthand
 		// const char = each.charAt(0) // Shorthand
@@ -221,7 +223,7 @@ function parseVDOM(markdown) {
 				id: uuidv4(),
 				component: Paragraph,
 				syntax: null,
-				children: parseTextVDOM(each),
+				children: parseMarkdownText(each),
 			})
 			break
 		}
@@ -230,7 +232,16 @@ function parseVDOM(markdown) {
 }
 
 // Supposed to be a markdown (GFM) representation of data.
-const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### H5\n###### H6\n\n_em **and**_ **strong**\n\n_em_ **_and_ strong**"
+const raw = `# This is a header
+## This is a subheader
+### H3
+#### H4
+##### H5
+###### H6
+
+_em **and**_ **strong**
+
+_em_ **_and_ strong**`
 
 // const data = [
 // 	{
@@ -334,11 +345,11 @@ const raw = "# This is a header\n## This is a subheader\n### H3\n#### H4\n##### 
 // ]
 
 // // TESTING
-// console.log(parseVDOM(raw))
+// console.log(parseMarkdown(raw))
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
-function convertToText(data, { gfm }) {
+function convertToText(data, { markdown }) {
 	let result = ""
 	// Recurse inline elements:
 	const recurse = children => {
@@ -351,9 +362,9 @@ function convertToText(data, { gfm }) {
 				result += each || ""
 				continue
 			}
-			result += (gfm && each.syntax) || ""
+			result += (markdown && each.syntax) || ""
 			recurse(each.children)
-			result += (gfm && each.syntax) || ""
+			result += (markdown && each.syntax) || ""
 		}
 	}
 	// Iterate block elements:
@@ -368,9 +379,9 @@ function convertToText(data, { gfm }) {
 		} else if (Array.isArray(syntax)) {
 			;[start, end] = syntax
 		}
-		result += (gfm && start) || ""
+		result += (markdown && start) || ""
 		recurse(each.children)
-		result += (gfm && end) || ""
+		result += (markdown && end) || ""
 		if (each !== data[data.length - 1]) {
 			result += "\n" // EOL
 		}
@@ -378,42 +389,53 @@ function convertToText(data, { gfm }) {
 	return result
 }
 
+const EditorContext = React.createContext()
+
 // Renders an editor.
-const Editor = ({ data, ...props }) => {
-	const text = convertToText(data, { gfm: false })
-	const markdown = convertToText(data, { gfm: true })
+const Editor = ({ data, markdown, ...props }) => {
+	const text = convertToText(data, { markdown: false })
+	const textGFM = convertToText(data, { markdown: true })
 
+	const { Provider } = EditorContext
 	return (
-		<div className="text-lg">
+		<Provider value={{ markdown: markdown === true /* Coerce */ }}>
+			<div className="text-lg">
 
-			{/* Blocks */}
-			{data.map(({ component: Component, ...each }) => (
-				<Component key={each.id} id={each.id} syntax={each.syntax}>
-					{parseSpans(each.children)}
-				</Component>
-			))}
+				{data.map(({ component: Component, ...each }) => (
+					<Component key={each.id} id={each.id} syntax={each.syntax}>
+						{parseSpans(each.children)}
+					</Component>
+				))}
 
-			{/* Debugger */}
-			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-				{JSON.stringify({
-					text,
-					markdown,
-					charCount: [...text].length,
-					wordCount: text.split(/\s+/).filter(Boolean).length,
-					data,
-				}, null, "\t")}
+				<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+					{JSON.stringify(
+						{
+							text,
+							textGFM,
+							charCount: [...text].length,
+							wordCount: text.split(/\s+/).filter(Boolean).length,
+							data,
+						},
+						null,
+						"\t",
+					)}
+				</div>
+
 			</div>
-
-		</div>
+		</Provider>
 	)
 }
 
-const App = props => (
-	<div className="flex flex-row justify-center">
-		<div className="py-32 w-full max-w-3xl">
-			<Editor data={parseVDOM(raw)} />
+const App = props => {
+	const data = parseMarkdown(raw, { markdown: true })
+
+	return (
+		<div className="flex flex-row justify-center">
+			<div className="py-32 w-full max-w-3xl">
+				<Editor data={data} markdown={false} />
+			</div>
 		</div>
-	</div>
-)
+	)
+}
 
 export default App
