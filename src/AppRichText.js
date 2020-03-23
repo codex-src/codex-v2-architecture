@@ -429,10 +429,15 @@ const Editor = ({ data, markdown, ...props }) => {
 const App = props => {
 	const data = parseMarkdown(raw, { markdown: true })
 
+	const [markdown, setMarkdown] = React.useState(true)
+
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="py-32 w-full max-w-3xl">
-				<Editor data={data} markdown={false} />
+				<button className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150" onPointerDown={e => e.preventDefault()} onClick={e => setMarkdown(!markdown)}>
+					Toggle markdown
+				</button>
+				<Editor data={data} markdown={markdown} />
 			</div>
 		</div>
 	)
