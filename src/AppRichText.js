@@ -16,7 +16,7 @@ const Markdown = ({ syntax, ...props }) => {
 	}
 
 	return (
-		<React.Fragment>
+		<span data-syntax={JSON.stringify(syntax)}>
 			{(markdown && start) && (
 				<span className="text-md-blue-a400">
 					{start}
@@ -28,7 +28,7 @@ const Markdown = ({ syntax, ...props }) => {
 					{end}
 				</span>
 			)}
-		</React.Fragment>
+		</span>
 	)
 }
 
