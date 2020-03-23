@@ -46,17 +46,17 @@ const Markdown = ({ start, end, ...props }) => (
 	</React.Fragment>
 )
 
-const Em = ({ syntax, ...props }) => (
+const Em = ({ start, end, ...props }) => (
 	<span className="italic">
-		<Markdown start={syntax} end={syntax}>
+		<Markdown start={start} end={end}>
 			{props.children}
 		</Markdown>
 	</span>
 )
 
-const Strong = ({ syntax, ...props }) => (
+const Strong = ({ start, end, ...props }) => (
 	<span className="font-bold">
-		<Markdown start={syntax} end={syntax}>
+		<Markdown start={start} end={end}>
 			{props.children}
 		</Markdown>
 	</span>
@@ -74,8 +74,8 @@ const Paragraph = ({ id, ...props }) => (
 const map = new Map()
 
 ;(() => {
-	map["em"] = Em
-	map["strong"] = Strong
+	map.em = Em
+	map.strong = Strong
 })()
 
 // Parses plain text and a formatting array into renderable
@@ -84,17 +84,18 @@ function parseText(text, formatting) {
 	if (!formatting) {
 		return text
 	}
-	let components = []
+	const components = []
 	let index = 0
 	for (const f of formatting) { // Works as an else-statement
-		if (f.x1 > index) {
-			components.push(text.slice(index, f.x1))
+		const { type, start, end, x1, x2 } = f
+		if (x1 > index) {
+			components.push(text.slice(index, x1))
 		}
-		components.push({ type: f.type, syntax: f.syntax, text: text.slice(f.x1, f.x2) })
+		components.push({ type, start, end, text: text.slice(x1, x2) })
 		if (f === formatting.slice(-1)[0]) {
-			components.push(text.slice(f.x2))
+			components.push(text.slice(x2))
 		}
-		index = f.x2
+		index = x2
 	}
 	return components
 }
@@ -102,35 +103,23 @@ function parseText(text, formatting) {
 // Exports a data structure to GFM markdown.
 function exportGFM(data) {
 	let gfm = ""
-	const parsed = data.map(each => {
+	for (const block of data) {
+		const { text, formatting } = block
 		// if (each.component !== "paragraph") {
 		// 	// No-op
 		// 	return
 		// }
-		const spans = parseText(each.text, each.formatting)
+		const spans = parseText(text, formatting)
 		for (const span of spans) {
 			if (typeof span === "string") {
 				gfm += span
 			} else {
-				gfm += `${span.syntax}${span.text}${span.syntax}`
+				gfm += `${span.start || ""}${span.text}${span.end || ""}`
 			}
 		}
-	})
+	}
 	console.log({ gfm })
 	return null
-
-	// let gfm = ""
-	// for (block of data) {
-	// 	switch (block.component) {
-	// 	case Paragraph:
-	// 		gfm +=
-	// 		break
-	// 	}
-	// 	default:
-	// 		// No-op
-	// 		break
-	// }
-	// return gfm
 }
 
 // // Exports a data structure to plain text.
@@ -152,7 +141,7 @@ const Block = ({ block: { component: Component, ...block }, ...props }) => {
 			return each
 		}
 		const Component = map[each.type]
-		return <Component key={index} syntax={each.syntax}>{each.text}</Component>
+		return <Component key={index} start={each.start} end={each.end}>{each.text}</Component>
 	})
 
 	return (
@@ -178,8 +167,8 @@ const data = [
 		component: Paragraph,
 		text: "This is em, this is bold",
 		formatting: [
-			{ type: "em", component: Em, syntax: "_", x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, syntax: "**", x1: 20, x2: 24 },
+			{ type: "em", component: Em, start: "_", end: "_", x1: 8, x2: 10 },
+			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 24 },
 		],
 	},
 ]
@@ -189,7 +178,7 @@ exportGFM(data)
 
 // Renders an editor.
 const Editor = props => (
-	<React.Fragment>
+	<div className="text-lg">
 
 		{/* Blocks */}
 		{data.map(each => (
@@ -201,7 +190,7 @@ const Editor = props => (
 			{JSON.stringify(data, null, "\t")}
 		</div>
 
-	</React.Fragment>
+	</div>
 )
 
 const App = props => (
