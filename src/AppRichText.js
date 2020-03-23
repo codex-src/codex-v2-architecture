@@ -30,33 +30,33 @@ import "./AppRichText.css"
 // 	return data
 // }
 
-const Markdown = ({ start, end, ...props }) => (
+const Markdown = ({ syntax, ...props }) => (
 	<React.Fragment>
-		{start && (
+		{syntax && (
 			<span className="text-md-blue-a400">
-				{start}
+				{syntax.slice(0)[0]}
 			</span>
 		)}
 		{props.children}
-		{end && (
+		{syntax && (
 			<span className="text-md-blue-a400">
-				{end}
+				{syntax.slice(-1)[0]}
 			</span>
 		)}
 	</React.Fragment>
 )
 
-const Em = ({ start, end, ...props }) => (
+const Em = ({ syntax, ...props }) => (
 	<span className="italic">
-		{/* <Markdown start={start} end={end}> */}
+		{/* <Markdown syntax={syntax}> */}
 			{props.children}
 		{/* </Markdown> */}
 	</span>
 )
 
-const Strong = ({ start, end, ...props }) => (
+const Strong = ({ syntax, ...props }) => (
 	<span className="font-bold">
-		{/* <Markdown start={start} end={end}> */}
+		{/* <Markdown syntax={syntax}> */}
 			{props.children}
 		{/* </Markdown> */}
 	</span>
@@ -113,12 +113,15 @@ function parseText(spans) {
 			return each
 		}
 		let Component = null
-		if (each.meta.strong) {
+		let syntax = null
+		if (each.attr.strong) {
+			syntax = each.attr.strong
 			Component = componentMap.strong
-		} else if (each.meta.em) {
+		} else if (each.attr.em) {
+			syntax = each.attr.em
 			Component = componentMap.em
 		}
-		return <Component key={index}>{each.text}</Component>
+		return <Component key={index} syntax={syntax}>{each.text}</Component>
 	})
 	return components
 }
@@ -163,30 +166,45 @@ const Block = ({ block, ...props }) => (
 // - Can we assume formatting is ordered?
 // - Can x1 >= x2?
 // - Can x1 === x2? We don’t want this
-//
-// NOTE: start and end are global scope, not local scope
-const data = [
-	{
-		id: uuidv4(),
-		type: "paragraph",
-		component: Paragraph,
-		spans: [
-			{
-				text: "em ",
-				meta: { code: 0, em: 1, strike: 0, strong: 0 }, // TODO: Can use bitwise operators
-			},
-			// {
-			// 	text: "and",
-			// 	meta: { code: 0, em: 1, strike: 0, strong: 1 },
-			// },
-			" ",
-			{
-				text: "strong",
-				meta: { code: 0, em: 0, strike: 0, strong: 1 },
-			},
-		]
-	},
-]
+const data = {
+	blocks: [
+		{
+			id: uuidv4(),
+			type: "paragraph",
+			component: Paragraph,
+			spans: [
+				{
+					text: "em ",
+					attr: {
+						code: 0,
+						em: ["_"],
+						strike: 0,
+						strong: 0,
+					},
+				},
+				{
+					text: "and",
+					attr: {
+						code: 0,
+						em: ["_"],
+						strike: 0,
+						strong: ["**"],
+					},
+				},
+				" ",
+				{
+					text: "strong",
+					attr: {
+						code: 0,
+						em: 0,
+						strike: 0,
+						strong: ["**"],
+					},
+				},
+			]
+		},
+	],
+}
 
 // em and strong
 //
@@ -208,7 +226,7 @@ const Editor = props => (
 	<div className="text-lg">
 
 		{/* Blocks */}
-		{data.map(each => (
+		{data.blocks.map(each => (
 			<Block key={each.id} block={each} />
 		))}
 
