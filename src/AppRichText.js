@@ -48,17 +48,17 @@ const Markdown = ({ start, end, ...props }) => (
 
 const Em = ({ start, end, ...props }) => (
 	<span className="italic">
-		<Markdown start={start} end={end}>
+		{/* <Markdown start={start} end={end}> */}
 			{props.children}
-		</Markdown>
+		{/* </Markdown> */}
 	</span>
 )
 
 const Strong = ({ start, end, ...props }) => (
 	<span className="font-bold">
-		<Markdown start={start} end={end}>
+		{/* <Markdown start={start} end={end}> */}
 			{props.children}
-		</Markdown>
+		{/* </Markdown> */}
 	</span>
 )
 
@@ -70,90 +70,91 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// Maps inline components.
-const map = new Map()
+// // Maps inline components.
+// const componentMap = new Map()
+//
+// ;(() => {
+// 	componentMap.em = Em
+// 	componentMap.strong = Strong
+// })()
+
+const componentMap = new Map()
 
 ;(() => {
-	map.em = Em
-	map.strong = Strong
+	componentMap["strong"] = Strong
+	componentMap["em"] = Em
 })()
 
-// Parses plain text and a formatting array into renderable
-// components.
-function parseText(text, formatting) {
-	if (!formatting) {
-		return text
-	}
-	const components = []
-	let index = 0
-	for (const f of formatting) { // Works as an else-statement
-		const { type, start, end, x1, x2 } = f
-		if (x1 > index) {
-			components.push(text.slice(index, x1))
+// // Parses plain text and a formatting array into renderable
+// // components.
+// function parseText(text, formatting) {
+// 	if (!formatting) {
+// 		return text
+// 	}
+// 	const components = []
+// 	let index = 0
+// 	for (const f of formatting) { // Works as an else-statement
+// 		const { type, start, end, x1, x2 } = f
+// 		if (x1 > index) {
+// 			components.push(text.slice(index, x1))
+// 		}
+// 		components.push({ type, start, end, text: text.slice(x1, x2) })
+// 		if (f === formatting.slice(-1)[0]) {
+// 			components.push(text.slice(x2))
+// 		}
+// 		index = x2
+// 	}
+// 	return components
+// }
+
+function parseText(spans) {
+	const components = spans.map((each, index) => {
+		if (typeof each === "string") {
+			return each
 		}
-		components.push({ type, start, end, text: text.slice(x1, x2) })
-		if (f === formatting.slice(-1)[0]) {
-			components.push(text.slice(x2))
+		let Component = null
+		if (each.meta.strong) {
+			Component = componentMap.strong
+		} else if (each.meta.em) {
+			Component = componentMap.em
 		}
-		index = x2
-	}
+		return <Component key={index}>{each.text}</Component>
+	})
 	return components
 }
 
-// if (gfm) {
-// 	if (each.component !== "paragraph") {
-// 		// No-op
-// 		return
+// // Converts a data structure to plain text or GitHub
+// // Flavored Markdown (GFM).
+// function convertToText(data, markdown) {
+// 	let str = ""
+// 	for (const block of data) {
+// 		// TODO: Add support non-paragraph blocks
+// 		const { text, formatting } = block
+// 		if (!formatting) {
+// 			str += text
+// 			continue
+// 		}
+// 		const spans = parseText(text, formatting)
+// 		for (const span of spans) {
+// 			const { start, end, text } = span
+// 			if (typeof span === "string") {
+// 				str += span
+// 				continue
+// 			}
+// 			str += `${!markdown ? "" : start || ""}${text}${!markdown ? "" : end || ""}`
+// 		}
 // 	}
+// 	return str
 // }
 
-// Converts a data structure to plain text or GitHub
-// Flavored Markdown (GFM).
-function convertToText(data, markdown) {
-	let str = ""
-	for (const block of data) {
-		// TODO: Add support non-paragraph blocks
-		const { text, formatting } = block
-		if (!formatting) {
-			str += text
-			continue
-		}
-		const spans = parseText(text, formatting)
-		for (const span of spans) {
-			const { start, end, text } = span
-			if (typeof span === "string") {
-				str += span
-				continue
-			}
-			str += `${!markdown ? "" : start || ""}${text}${!markdown ? "" : end || ""}`
-		}
-	}
-	return str
-}
-
 // Renders an editor block.
-const Block = ({ block: { component: Component, ...block }, ...props }) => {
-
-	// Parse block into renderable components:
-	let children = parseText(block.text, block.formatting)
-	if (typeof children !== "string") { // Array
-		children = children.map((each, index) => {
-			if (typeof each === "string") {
-				return each
-			}
-			const Component = map[each.type]
-			return <Component key={index} start={each.start} end={each.end}>{each.text}</Component>
-		})
-	}
-
-	return (
-		<Component id={block.id}>
-			{children || (
-				<br />
-			)}
-		</Component>
-	)
-}
+const Block = ({ block, ...props }) => (
+	<Paragraph id={block.id}>
+		{parseText(block.spans) || (
+			<br />
+		)}
+	</Paragraph>
+)
 
 // TODO (1): Parse markdown to a data structure
 // TODO (2): Parse a data structure to WYSIWYG or markdown
@@ -161,40 +162,46 @@ const Block = ({ block: { component: Component, ...block }, ...props }) => {
 // What guarantees can we make about formatting?
 // - Can we assume formatting is ordered?
 // - Can x1 >= x2?
+// - Can x1 === x2? We don’t want this
 //
+// NOTE: start and end are global scope, not local scope
 const data = [
 	{
 		id: uuidv4(),
 		type: "paragraph",
 		component: Paragraph,
-		text: "This is em, this is strong",
-		formatting: [
-			{ type: "em", component: Em, start: "_", end: "_", x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 26 },
-		],
-	},
-	{
-		id: uuidv4(),
-		type: "paragraph",
-		component: Paragraph,
-		text: "",
-		formatting: null,
-	},
-	{
-		id: uuidv4(),
-		type: "paragraph",
-		component: Paragraph,
-		text: "This is em, this is strong",
-		formatting: [
-			{ type: "em", component: Em, start: "_", end: "_", x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, start: "**", end: "**", x1: 20, x2: 26 },
-		],
+		spans: [
+			{
+				text: "em ",
+				meta: { code: 0, em: 1, strike: 0, strong: 0 }, // TODO: Can use bitwise operators
+			},
+			// {
+			// 	text: "and",
+			// 	meta: { code: 0, em: 1, strike: 0, strong: 1 },
+			// },
+			" ",
+			{
+				text: "strong",
+				meta: { code: 0, em: 0, strike: 0, strong: 1 },
+			},
+		]
 	},
 ]
 
-// DELETEME
-console.log(convertToText(data, false))
-console.log(convertToText(data, true))
+// em and strong
+//
+// <em>
+// 	em{" "}
+// 	<strong>
+// 		and
+// 	</strong>
+// </em>
+// {" "}
+// strong
+
+// // DELETEME
+// console.log(convertToText(data, false))
+// console.log(convertToText(data, true))
 
 // Renders an editor.
 const Editor = props => (
