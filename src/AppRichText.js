@@ -4,26 +4,26 @@ import uuidv4 from "uuid/v4"
 import "./AppRichText.css"
 
 const Markdown = ({ syntax, ...props }) => {
-	let s1 = ""
-	let s2 = ""
+	let start = ""
+	let end = ""
 	if (typeof syntax === "string") {
-		s1 = syntax
-		s2 = syntax
+		start = syntax
+		end = syntax
 	} else if (Array.isArray(syntax)) {
-		;[s1, s2] = syntax
+		;[start, end] = syntax
 	}
 
 	return (
 		<React.Fragment>
-			{s1 && (
+			{start && (
 				<span className="text-md-blue-a400">
-					{s1}
+					{start}
 				</span>
 			)}
 			{props.children}
-			{s2 && (
+			{end && (
 				<span className="text-md-blue-a400">
-					{s2}
+					{end}
 				</span>
 			)}
 		</React.Fragment>
@@ -54,6 +54,46 @@ const Header = ({ id, syntax, ...props }) => (
 	</div>
 )
 
+const Subheader = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-medium text-2xl">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
+const H3 = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-semibold text-xl">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
+const H4 = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-semibold text-lg">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
+const H5 = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-semibold">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
+const H6 = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-semibold">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
 const Paragraph = ({ id, ...props }) => (
 	<div id={id}>
 		{props.children || (
@@ -67,7 +107,37 @@ const data = [
 		id: uuidv4(),
 		component: Header,
 		syntax: ["# "],
-		children: "Hello, world!",
+		children: "This is a header",
+	},
+	{
+		id: uuidv4(),
+		component: Subheader,
+		syntax: ["## "],
+		children: "This is a subheader",
+	},
+	{
+		id: uuidv4(),
+		component: H3,
+		syntax: ["### "],
+		children: "H3",
+	},
+	{
+		id: uuidv4(),
+		component: H4,
+		syntax: ["#### "],
+		children: "H4",
+	},
+	{
+		id: uuidv4(),
+		component: H5,
+		syntax: ["##### "],
+		children: "H5",
+	},
+	{
+		id: uuidv4(),
+		component: H6,
+		syntax: ["###### "],
+		children: "H6",
 	},
 	{
 		id: uuidv4(),
@@ -187,17 +257,17 @@ function convertToText(data, { gfm }) {
 	for (const each of data) {
 		// (Code based on <Markdown>)
 		const { syntax } = each
-		let s1 = ""
-		let s2 = ""
+		let start = ""
+		let end = ""
 		if (typeof syntax === "string") {
-			s1 = syntax
-			s2 = syntax
+			start = syntax
+			end = syntax
 		} else if (Array.isArray(syntax)) {
-			;[s1, s2] = syntax
+			;[start, end] = syntax
 		}
-		result += (gfm && s1) || ""
+		result += (gfm && start) || ""
 		recurse(each.children)
-		result += (gfm && s2) || ""
+		result += (gfm && end) || ""
 		result += "\n"
 	}
 	return result
