@@ -50,9 +50,13 @@ const Strong = ({ syntax, ...props }) => (
 
 export const Block = ({ id, type, syntax, ...props }) => (
 	<div
+		// DOM and VDOM ID:
 		id={id}
+		// DOM style:
 		style={{ whiteSpace: "pre-wrap" }}
+		// VDOM type:
 		data-type={type}
+		// VDOM syntax:
 		data-syntax={JSON.stringify(syntax || null)} {...props}
 	>
 		{props.children || (
@@ -68,6 +72,7 @@ const H1 = React.memo(({ id, syntax, ...props }) => (
 		</Markdown>
 	</Block>
 ))
+
 const H2 = React.memo(({ id, syntax, ...props }) => (
 	<Block id={id} className="font-500 text-2xl" type="h2" syntax={syntax}>
 		<Markdown syntax={syntax}>
@@ -75,6 +80,7 @@ const H2 = React.memo(({ id, syntax, ...props }) => (
 		</Markdown>
 	</Block>
 ))
+
 const H3 = React.memo(({ id, syntax, ...props }) => (
 	<Block id={id} className="font-600 text-xl" type="h3" syntax={syntax}>
 		<Markdown syntax={syntax}>
@@ -82,6 +88,7 @@ const H3 = React.memo(({ id, syntax, ...props }) => (
 		</Markdown>
 	</Block>
 ))
+
 const H4 = React.memo(({ id, syntax, ...props }) => (
 	<Block id={id} className="font-600 text-lg" type="h4" syntax={syntax}>
 		<Markdown syntax={syntax}>
@@ -89,6 +96,7 @@ const H4 = React.memo(({ id, syntax, ...props }) => (
 		</Markdown>
 	</Block>
 ))
+
 const H5 = React.memo(({ id, syntax, ...props }) => (
 	<Block id={id} className="font-600" type="h5" syntax={syntax}>
 		<Markdown syntax={syntax}>
@@ -96,6 +104,7 @@ const H5 = React.memo(({ id, syntax, ...props }) => (
 		</Markdown>
 	</Block>
 ))
+
 const H6 = React.memo(({ id, syntax, ...props }) => (
 	<Block id={id} className="font-600" type="h6" syntax={syntax}>
 		<Markdown syntax={syntax}>
@@ -447,7 +456,7 @@ const Editor = ({ data, prefs, ...props }) => {
 }
 
 const App = props => {
-	const [data /* , setData */] = React.useState(() => {
+	const [data] = React.useState(() => {
 		return parseMarkdown(raw, { markdown: true })
 	})
 
