@@ -34,13 +34,19 @@ const Markdown = ({ syntax, ...props }) => (
 	<React.Fragment>
 		{syntax && (
 			<span className="text-md-blue-a400">
-				{syntax.slice(0)[0]}
+				{typeof syntax === "string"
+					? syntax
+					: syntax.slice(0)[0]
+				}
 			</span>
 		)}
 		{props.children}
 		{syntax && (
 			<span className="text-md-blue-a400">
-				{syntax.slice(-1)[0]}
+				{typeof syntax === "string"
+					? syntax
+					: syntax.slice(-1)[0]
+				}
 			</span>
 		)}
 	</React.Fragment>
@@ -48,17 +54,17 @@ const Markdown = ({ syntax, ...props }) => (
 
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
-		{/* <Markdown syntax={syntax}> */}
+		<Markdown syntax={syntax || console.error("Em: syntax={syntax} must be set")}>
 			{props.children}
-		{/* </Markdown> */}
+		</Markdown>
 	</span>
 )
 
 const Strong = ({ syntax, ...props }) => (
 	<span className="font-bold">
-		{/* <Markdown syntax={syntax}> */}
+		<Markdown syntax={syntax || console.error("Strong: syntax={syntax} must be set")}>
 			{props.children}
-		{/* </Markdown> */}
+		</Markdown>
 	</span>
 )
 
@@ -71,19 +77,12 @@ const Paragraph = ({ id, ...props }) => (
 )
 
 // // Maps inline components.
-// const componentMap = new Map()
+// const map = new Map()
 //
 // ;(() => {
-// 	componentMap.em = Em
-// 	componentMap.strong = Strong
+// 	map.em = Em
+// 	map.strong = Strong
 // })()
-
-const componentMap = new Map()
-
-;(() => {
-	componentMap["strong"] = Strong
-	componentMap["em"] = Em
-})()
 
 // // Parses plain text and a formatting array into renderable
 // // components.
@@ -107,128 +106,57 @@ const componentMap = new Map()
 // 	return components
 // }
 
-function parseText(spans) {
-	const components = spans.map((each, index) => {
-		if (typeof each === "string") {
-			return each
+// Converts a React component tree to plain text. GitHub
+// Flavored Markdown (GFM) is an option.
+function convertToText(data, options = { gfm: false }) {
+	let str = ""
+	const recurse = children => {
+		// No nesting:
+		if (typeof children === "string") {
+			str += children
+			return
 		}
-		let Component = null
-		let syntax = null
-		if (each.attr.strong) {
-			syntax = each.attr.strong
-			Component = componentMap.strong
-		} else if (each.attr.em) {
-			syntax = each.attr.em
-			Component = componentMap.em
+		// Nesting:
+		for (const each of children) {
+			if (typeof each === "string") {
+				str += each
+				continue
+			}
+			if (options.gfm) {
+				str += each.props.syntax || ""
+			}
+			recurse(each.props.children)
+			if (options.gfm) {
+				str += each.props.syntax || ""
+			}
 		}
-		return <Component key={index} syntax={syntax}>{each.text}</Component>
-	})
-	return components
+	}
+	recurse(data)
+	return str
 }
 
-// // Converts a data structure to plain text or GitHub
-// // Flavored Markdown (GFM).
-// function convertToText(data, markdown) {
-// 	let str = ""
-// 	for (const block of data) {
-// 		// TODO: Add support non-paragraph blocks
-// 		const { text, formatting } = block
-// 		if (!formatting) {
-// 			str += text
-// 			continue
-// 		}
-// 		const spans = parseText(text, formatting)
-// 		for (const span of spans) {
-// 			const { start, end, text } = span
-// 			if (typeof span === "string") {
-// 				str += span
-// 				continue
-// 			}
-// 			str += `${!markdown ? "" : start || ""}${text}${!markdown ? "" : end || ""}`
-// 		}
-// 	}
-// 	return str
-// }
+const data = [
+	((key = uuidv4()) => (
+		<Paragraph key={key} id={key}>
+			<Em syntax="_">
+				em <Strong syntax="**">and</Strong>
+			</Em>{" "}
+			<Strong syntax="**">
+				strong
+			</Strong>
+		</Paragraph>
+	))(),
+]
 
-// Renders an editor block.
-const Block = ({ block, ...props }) => (
-	<Paragraph id={block.id}>
-		{parseText(block.spans) || (
-			<br />
-		)}
-	</Paragraph>
-)
-
-// TODO (1): Parse markdown to a data structure
-// TODO (2): Parse a data structure to WYSIWYG or markdown
-//
-// What guarantees can we make about formatting?
-// - Can we assume formatting is ordered?
-// - Can x1 >= x2?
-// - Can x1 === x2? We don’t want this
-const data = {
-	blocks: [
-		{
-			id: uuidv4(),
-			type: "paragraph",
-			component: Paragraph,
-			spans: [
-				{
-					text: "em ",
-					attr: {
-						code: 0,
-						em: ["_"],
-						strike: 0,
-						strong: 0,
-					},
-				},
-				{
-					text: "and",
-					attr: {
-						code: 0,
-						em: ["_"],
-						strike: 0,
-						strong: ["**"],
-					},
-				},
-				" ",
-				{
-					text: "strong",
-					attr: {
-						code: 0,
-						em: 0,
-						strike: 0,
-						strong: ["**"],
-					},
-				},
-			]
-		},
-	],
-}
-
-// em and strong
-//
-// <em>
-// 	em{" "}
-// 	<strong>
-// 		and
-// 	</strong>
-// </em>
-// {" "}
-// strong
-
-// // DELETEME
-// console.log(convertToText(data, false))
-// console.log(convertToText(data, true))
+// DEBUG
+console.log({ str: convertToText(data, { gfm: true }) })
 
 // Renders an editor.
 const Editor = props => (
 	<div className="text-lg">
 
 		{/* Blocks */}
-		{data.blocks.map(each => (
-			<Block key={each.id} block={each} />
-		))}
+		{data}
 
 		{/* Debugger */}
 		<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
