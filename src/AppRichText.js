@@ -110,14 +110,18 @@ const Paragraph = ({ id, ...props }) => (
 // Flavored Markdown (GFM) is an option.
 function convertToText(data, options = { gfm: false }) {
 	let str = ""
-	const recurse = children => {
+	const recurse = data => {
 		// No nesting:
-		if (typeof children === "string") {
-			str += children
+		if (typeof data === "string") {
+			str += data
+			return
+		// Guard <Component><br /></Component>:
+		} else if (!Array.isArray(data)) {
+			// No-op
 			return
 		}
 		// Nesting:
-		for (const each of children) {
+		for (const each of data) {
 			if (typeof each === "string") {
 				str += each
 				continue
@@ -128,6 +132,10 @@ function convertToText(data, options = { gfm: false }) {
 			recurse(each.props.children)
 			if (options.gfm) {
 				str += each.props.syntax || ""
+			}
+			// TODO: Add other components (not just Paragraph)
+			if (each.type === Paragraph) {
+				str += "\n"
 			}
 		}
 	}
@@ -146,10 +154,25 @@ const data = [
 			</Strong>
 		</Paragraph>
 	))(),
+	((key = uuidv4()) => (
+		<Paragraph key={key} id={key}>
+			<br />
+		</Paragraph>
+	))(),
+	((key = uuidv4()) => (
+		<Paragraph key={key} id={key}>
+			<Em syntax="_">
+				em <Strong syntax="**">and</Strong>
+			</Em>{" "}
+			<Strong syntax="**">
+				strong
+			</Strong>
+		</Paragraph>
+	))(),
 ]
 
 // DEBUG
-console.log({ str: convertToText(data, { gfm: true }) })
+console.log(convertToText(data, { gfm: true }))
 
 // Renders an editor.
 const Editor = props => (
