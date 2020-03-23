@@ -3,27 +3,33 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-const Markdown = ({ syntax, ...props }) => (
-	<React.Fragment>
-		{syntax && (
-			<span className="text-md-blue-a400">
-				{typeof syntax === "string"
-					? syntax
-					: syntax.slice(0)[0]
-				}
-			</span>
-		)}
-		{props.children}
-		{syntax && (
-			<span className="text-md-blue-a400">
-				{typeof syntax === "string"
-					? syntax
-					: syntax.slice(-1)[0]
-				}
-			</span>
-		)}
-	</React.Fragment>
-)
+const Markdown = ({ syntax, ...props }) => {
+	let start = ""
+	let end = ""
+	if (typeof syntax === "string") {
+		start = syntax
+		end = syntax
+	} else {
+		// Assumes array..,
+		;[start, end] = syntax
+	}
+
+	return (
+		<React.Fragment>
+			{start && (
+				<span className="text-md-blue-a400">
+					{start}
+				</span>
+			)}
+			{props.children}
+			{end && (
+				<span className="text-md-blue-a400">
+					{end}
+				</span>
+			)}
+		</React.Fragment>
+	)
+}
 
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
@@ -41,6 +47,14 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
+const Header = ({ id, syntax, ...props }) => (
+	<div id={id} className="font-medium text-3xl">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</div>
+)
+
 const Paragraph = ({ id, ...props }) => (
 	<div id={id}>
 		{props.children || (
@@ -52,7 +66,20 @@ const Paragraph = ({ id, ...props }) => (
 const data = [
 	{
 		id: uuidv4(),
+		component: Header,
+		syntax: ["# "],
+		children: "Hello, world!",
+	},
+	{
+		id: uuidv4(),
 		component: Paragraph,
+		syntax: null,
+		children: null,
+	},
+	{
+		id: uuidv4(),
+		component: Paragraph,
+		syntax: null,
 		children: [
 			{
 				component: Em,
@@ -77,11 +104,13 @@ const data = [
 	{
 		id: uuidv4(),
 		component: Paragraph,
+		syntax: null,
 		children: null,
 	},
 	{
 		id: uuidv4(),
 		component: Paragraph,
+		syntax: null,
 		children: [
 			{
 				component: Em,
@@ -107,7 +136,7 @@ const data = [
 
 // Parses component children objects into renderable React
 // components.
-function parse(children) {
+function parseReact(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -120,12 +149,22 @@ function parse(children) {
 		const { component: Component } = each
 		components.push((
 			<Component key={components.length} syntax={each.syntax}>
-				{parse(each.children)}
+				{parseReact(each.children)}
 			</Component>
 		))
 	}
 	return components
 }
+
+// function parseVDOM(markdown) {
+// 	const body = markdown.split("\n")
+//
+// 	const data = []
+// 	for (let index = 0; index < body.length; index++) {
+//
+// 	}
+// 	return data
+// }
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
@@ -164,8 +203,8 @@ const Editor = props => {
 
 			{/* Blocks */}
 			{data.map(({ component: Component, ...each }) => (
-				<Component key={each.id} id={each.id}>
-					{parse(each.children)}
+				<Component key={each.id} id={each.id} syntax={each.syntax}>
+					{parseReact(each.children)}
 				</Component>
 			))}
 
