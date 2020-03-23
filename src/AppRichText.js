@@ -1,15 +1,15 @@
 import React from "react"
 import uuidv4 from "uuid/v4"
 
-const InlineTypes = {
-	Strong: "strong",
-	// ...
-}
-
-const BlockTypes = {
-	Paragraph: "paragraph",
-	// ...
-}
+// const InlineTypes = {
+// 	Strong: "strong",
+// 	// ...
+// }
+//
+// const BlockTypes = {
+// 	Paragraph: "paragraph",
+// 	// ...
+// }
 
 // const markdown = `Hello, world!\n\nHello, darkness…`
 //
@@ -27,6 +27,12 @@ const BlockTypes = {
 // 	}))
 // 	return data
 // }
+
+const Em = props => (
+	<span className="italic">
+		{props.children}
+	</span>
+)
 
 const Strong = props => (
 	<span className="font-bold">
@@ -67,11 +73,7 @@ function parseText(text, formatting) {
 		if (f.x1 > index) {
 			components.push(text.slice(index, f.x1))
 		}
-		components.push((
-			<f.component key={components.length}>
-				{text.slice(f.x1, f.x2)}
-			</f.component>
-		))
+		components.push(<f.component key={components.length}>{text.slice(f.x1, f.x2)}</f.component>)
 		if (f === formatting.slice(-1)[0]) {
 			components.push(text.slice(f.x2))
 		}
@@ -95,31 +97,16 @@ const Block = ({ block: { id, component: Component, text, formatting }, ...props
 const data = [
 	{
 		id: uuidv4(),
-		type: BlockTypes.Paragraph,
 		component: Paragraph,
-		text: "Hello, world! Hello, world!",
+		text: "This is em, this is bold",
 		// What guarantees can we make about formatting?
 		// - Can we assume formatting is ordered?
 		// - Can x1 >= x2?
 		formatting: [
-			{ type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
-			{ type: InlineTypes.Strong, component: Strong, x1: 21, x2: 26 },
+			{ component: Em, x1: 8, x2: 10 },
+			{ component: Strong, x1: 20, x2: 24 },
 		],
 	},
-	// {
-	// 	id: uuidv4(),
-	// 	type: BlockTypes.Paragraph,
-	// 	component: Paragraph,
-	// 	text: "Hello, world!",
-	// 	formatting: [{ type: InlineTypes.Strong, component: Strong, offset: 7, length: 5 }],
-	// },
-	// {
-	// 	id: uuidv4(),
-	// 	type: BlockTypes.Paragraph,
-	// 	component: Paragraph,
-	// 	text: "Hello, world!",
-	// 	formatting: [{ type: InlineTypes.Strong, component: Strong, offset: 7, length: 5 }],
-	// },
 ]
 
 // Renders an editor.
