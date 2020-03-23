@@ -16,8 +16,8 @@ const Markdown = ({ syntax, ...props }) => {
 	}
 
 	return (
-		// TODO: Move data-syntax to host component?
-		<span data-syntax={JSON.stringify(syntax)}>
+		// <span data-syntax={JSON.stringify(syntax)}>
+		<React.Fragment>
 			{(markdown && start) && (
 				<span className="text-md-blue-a400">
 					{start}
@@ -29,12 +29,13 @@ const Markdown = ({ syntax, ...props }) => {
 					{end}
 				</span>
 			)}
-		</span>
+		</React.Fragment>
+		// </span>
 	)
 }
 
 const Em = ({ syntax, ...props }) => (
-	<span className="italic">
+	<span className="italic" data-inline="em">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -42,50 +43,50 @@ const Em = ({ syntax, ...props }) => (
 )
 
 const Strong = ({ syntax, ...props }) => (
-	<span className="font-bold">
+	<span className="font-bold" data-inline="strong">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</span>
 )
 
-const Header = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-medium text-4xl">
+const H1 = React.memo(({ id, syntax, ...props }) => (
+	<div id={id} className="font-medium text-4xl" data-type="h1" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
 ))
-const Subheader = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-medium text-2xl">
+const H2 = React.memo(({ id, syntax, ...props }) => (
+	<div id={id} className="font-medium text-2xl" data-type="h2" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
 ))
 const H3 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold text-xl">
+	<div id={id} className="font-semibold text-xl" data-type="h3" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
 ))
 const H4 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold text-lg">
+	<div id={id} className="font-semibold text-lg" data-type="h4" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
 ))
 const H5 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold">
+	<div id={id} className="font-semibold" data-type="h5" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</div>
 ))
 const H6 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold">
+	<div id={id} className="font-semibold" data-type="h6" data-syntax={JSON.stringify(syntax)}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -93,7 +94,7 @@ const H6 = React.memo(({ id, syntax, ...props }) => (
 ))
 
 const Paragraph = React.memo(({ id, ...props }) => (
-	<div id={id}>
+	<div id={id} data-type="paragraph">
 		{props.children || (
 			<br />
 		)}
@@ -196,7 +197,7 @@ function parseMarkdown(text) {
 		const each = paragraphs[index] // Shorthand
 		// const char = each.charAt(0) // Shorthand
 		switch (each.charAt(0)) {
-		// Header:
+		// H1:
 		case "#":
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
@@ -211,7 +212,7 @@ function parseMarkdown(text) {
 				data.push({
 					id: uuidv4(),
 					// NOTE: Use ... - 2 for zero-based and space
-					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
+					component: [H1, H2, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
 					children,
 				})
@@ -247,13 +248,13 @@ _em_ **_and_ strong**`
 // const data = [
 // 	{
 // 		id: uuidv4(),
-// 		component: Header,
+// 		component: H1,
 // 		syntax: ["# "],
 // 		children: "This is a header",
 // 	},
 // 	{
 // 		id: uuidv4(),
-// 		component: Subheader,
+// 		component: H2,
 // 		syntax: ["## "],
 // 		children: "This is a subheader",
 // 	},
