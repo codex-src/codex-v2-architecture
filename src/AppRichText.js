@@ -4,27 +4,26 @@ import uuidv4 from "uuid/v4"
 import "./AppRichText.css"
 
 const Markdown = ({ syntax, ...props }) => {
-	let start = ""
-	let end = ""
+	let s1 = ""
+	let s2 = ""
 	if (typeof syntax === "string") {
-		start = syntax
-		end = syntax
-	} else {
-		// Assumes array..,
-		;[start, end] = syntax
+		s1 = syntax
+		s2 = syntax
+	} else if (Array.isArray(syntax)) {
+		;[s1, s2] = syntax
 	}
 
 	return (
 		<React.Fragment>
-			{start && (
+			{s1 && (
 				<span className="text-md-blue-a400">
-					{start}
+					{s1}
 				</span>
 			)}
 			{props.children}
-			{end && (
+			{s2 && (
 				<span className="text-md-blue-a400">
-					{end}
+					{s2}
 				</span>
 			)}
 		</React.Fragment>
@@ -48,7 +47,7 @@ const Strong = ({ syntax, ...props }) => (
 )
 
 const Header = ({ id, syntax, ...props }) => (
-	<div id={id} className="font-medium text-3xl">
+	<div id={id} className="font-medium text-4xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -186,8 +185,19 @@ function convertToText(data, { gfm }) {
 		}
 	}
 	for (const each of data) {
-		// Paragraph ...
+		// (Code based on <Markdown>)
+		const { syntax } = each
+		let s1 = ""
+		let s2 = ""
+		if (typeof syntax === "string") {
+			s1 = syntax
+			s2 = syntax
+		} else if (Array.isArray(syntax)) {
+			;[s1, s2] = syntax
+		}
+		result += (gfm && s1) || ""
 		recurse(each.children)
+		result += (gfm && s2) || ""
 		result += "\n"
 	}
 	return result
