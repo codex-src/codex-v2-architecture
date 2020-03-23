@@ -16,7 +16,6 @@ const Markdown = ({ syntax, ...props }) => {
 	}
 
 	return (
-		// <span data-syntax={JSON.stringify(syntax)}>
 		<React.Fragment>
 			{(markdown && start) && (
 				<span className="text-md-blue-a400">
@@ -30,7 +29,6 @@ const Markdown = ({ syntax, ...props }) => {
 				</span>
 			)}
 		</React.Fragment>
-		// </span>
 	)
 }
 
@@ -50,55 +48,68 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
-const H1 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-medium text-4xl" data-type="h1" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-const H2 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-medium text-2xl" data-type="h2" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-const H3 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold text-xl" data-type="h3" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-const H4 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold text-lg" data-type="h4" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-const H5 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold" data-type="h5" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-const H6 = React.memo(({ id, syntax, ...props }) => (
-	<div id={id} className="font-semibold" data-type="h6" data-syntax={JSON.stringify(syntax)}>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</div>
-))
-
-const Paragraph = React.memo(({ id, ...props }) => (
-	<div id={id} data-type="paragraph">
+export const Block = ({ id, type, syntax, ...props }) => (
+	<div
+		id={id}
+		style={{ whiteSpace: "pre-wrap" }}
+		data-type={type}
+		data-syntax={JSON.stringify(syntax || null)} {...props}
+	>
 		{props.children || (
 			<br />
 		)}
 	</div>
+)
+
+const H1 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-500 text-4xl" type="h1" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+const H2 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-500 text-2xl" type="h2" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+const H3 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-600 text-xl" type="h3" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+const H4 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-600 text-lg" type="h4" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+const H5 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-600" type="h5" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+const H6 = React.memo(({ id, syntax, ...props }) => (
+	<Block id={id} className="font-600" type="h6" syntax={syntax}>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</Block>
+))
+
+const Paragraph = React.memo(({ id, ...props }) => (
+	<Block id={id} data-type="p">
+		{props.children || (
+			<br />
+		)}
+	</Block>
 ))
 
 // Parses VDOM representations of spans to React components.
