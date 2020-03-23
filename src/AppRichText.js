@@ -30,39 +30,35 @@ import "./AppRichText.css"
 // 	return data
 // }
 
-// const Markdown = ({ start, end, ...props }) => (
-// 	<React.Fragment>
-// 		{start && (
-// 			<span className="markdown">{start}</span>
-// 		)}
-// 		{props.children}
-// 		{end && (
-// 			<span className="markdown">{end}</span>
-// 		)}
-// 	</React.Fragment>
-// )
-
-const Em = props => (
-	<span className="italic">
-		<span className="text-md-blue-a400">
-			_
-		</span>
+const Markdown = ({ start, end, ...props }) => (
+	<React.Fragment>
+		{start && (
+			<span className="text-md-blue-a400">
+				{start}
+			</span>
+		)}
 		{props.children}
-		<span className="text-md-blue-a400">
-			_
-		</span>
+		{end && (
+			<span className="text-md-blue-a400">
+				{end}
+			</span>
+		)}
+	</React.Fragment>
+)
+
+const Em = ({ syntax, ...props }) => (
+	<span className="italic">
+		<Markdown start={syntax} end={syntax}>
+			{props.children}
+		</Markdown>
 	</span>
 )
 
-const Strong = props => (
+const Strong = ({ syntax, ...props }) => (
 	<span className="font-bold">
-		<span className="text-md-blue-a400">
-			**
-		</span>
-		{props.children}
-		<span className="text-md-blue-a400">
-			**
-		</span>
+		<Markdown start={syntax} end={syntax}>
+			{props.children}
+		</Markdown>
 	</span>
 )
 
@@ -73,6 +69,10 @@ const Paragraph = ({ id, ...props }) => (
 		)}
 	</div>
 )
+
+// // Exports a data structure to GFM markdown.
+// function exportGFM(data) {
+// }
 
 // Parses plain text and a formatting object into renderable
 // components.
@@ -86,7 +86,7 @@ function parseText(text, formatting) {
 		if (f.x1 > index) {
 			components.push(text.slice(index, f.x1))
 		}
-		components.push(<f.component key={components.length}>{text.slice(f.x1, f.x2)}</f.component>)
+		components.push(<f.component key={components.length} syntax={f.syntax}>{text.slice(f.x1, f.x2)}</f.component>)
 		if (f === formatting.slice(-1)[0]) {
 			components.push(text.slice(f.x2))
 		}
@@ -97,7 +97,16 @@ function parseText(text, formatting) {
 }
 
 // Renders an editor block.
-const Block = ({ block: { id, component: Component, text, formatting }, ...props }) => (
+const Block = ({
+	block: {
+		id,
+		component: Component,
+		text,
+		formatting,
+		...block
+	},
+	...props
+}) => (
 	<Component id={id}>
 		{parseText(text, formatting) || (
 			<br />
@@ -119,25 +128,8 @@ const data = [
 		component: Paragraph,
 		text: "This is em, this is bold",
 		formatting: [
-			{ type: "em", component: Em, x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, x1: 20, x2: 24 },
-		],
-	},
-	{
-		id: uuidv4(),
-		type: "paragraph",
-		component: Paragraph,
-		text: "",
-		formatting: null,
-	},
-	{
-		id: uuidv4(),
-		type: "paragraph",
-		component: Paragraph,
-		text: "This is em, this is bold",
-		formatting: [
-			{ type: "em", component: Em, x1: 8, x2: 10 },
-			{ type: "strong", component: Strong, x1: 20, x2: 24 },
+			{ type: "em", component: Em, syntax: "_", x1: 8, x2: 10 },
+			{ type: "strong", component: Strong, syntax: "**", x1: 20, x2: 24 },
 		],
 	},
 ]
