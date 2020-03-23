@@ -49,89 +49,155 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// Converts a React component tree to plain text. GitHub
-// Flavored Markdown (GFM) is an option.
-function convertToText(data, options = { gfm: false }) {
-	let text = ""
-	const recurse = data => {
-		// No nesting:
-		if (typeof data === "string") {
-			text += data
-			return
-		// Guard <Component><br /></Component>:
-		} else if (!Array.isArray(data)) {
-			// No-op
-			return
-		}
-		// Nesting:
-		for (const each of data) {
-			if (typeof each === "string") {
-				text += each
-				continue
-			}
-			if (options.gfm) {
-				text += each.props.syntax || ""
-			}
-			recurse(each.props.children)
-			if (options.gfm) {
-				text += each.props.syntax || ""
-			}
-			// TODO: Add other components (not just Paragraph)
-			if (each.type === Paragraph) {
-				text += "\n"
-			}
-		}
-	}
-	recurse(data)
-	return text
-}
+// // Converts a React component tree to plain text. GitHub
+// // Flavored Markdown (GFM) is an option.
+// function convertToText(data, options = { gfm: false }) {
+// 	let text = ""
+// 	const recurse = data => {
+// 		// No nesting:
+// 		if (typeof data === "string") {
+// 			text += data
+// 			return
+// 		// Guard <Component><br /></Component>:
+// 		} else if (!Array.isArray(data)) {
+// 			// No-op
+// 			return
+// 		}
+// 		// Nesting:
+// 		for (const each of data) {
+// 			if (typeof each === "string") {
+// 				text += each
+// 				continue
+// 			}
+// 			if (options.gfm) {
+// 				text += each.props.syntax || ""
+// 			}
+// 			recurse(each.props.children)
+// 			if (options.gfm) {
+// 				text += each.props.syntax || ""
+// 			}
+// 			// TODO: Add other components (not just Paragraph)
+// 			if (each.type === Paragraph) {
+// 				text += "\n"
+// 			}
+// 		}
+// 	}
+// 	recurse(data)
+// 	return text
+// }
 
 const data = [
-	((key = uuidv4()) => (
-		<Paragraph key={key} id={key}>
-			<Em syntax="_">
-				em <Strong syntax="**">and</Strong>
-			</Em>{" "}
-			<Strong syntax="**">
-				strong
-			</Strong>
-		</Paragraph>
-	))(),
-	((key = uuidv4()) => (
-		<Paragraph key={key} id={key}>
-			<br />
-		</Paragraph>
-	))(),
-	((key = uuidv4()) => (
-		<Paragraph key={key} id={key}>
-			<Em syntax="_">
-				em <Strong syntax="**">and</Strong>
-			</Em>{" "}
-			<Strong syntax="**">
-				strong
-			</Strong>
-		</Paragraph>
-	))(),
+	{
+		id: uuidv4(),
+		type: "paragraph",
+		component: Paragraph,
+		children: [
+			"This is ",
+			{
+				type: "strong",
+				component: Strong,
+				syntax: "**",
+				children: "strong",
+			},
+		],
+	},
+	// {
+	// 	id: uuidv4(),
+	// 	type: "paragraph",
+	// 	component: Paragraph,
+	// 	children: [
+	// 		"Hello, world!"
+	// 	],
+	// },
 ]
+
+// const data = [
+// 	((key = uuidv4()) => (
+// 		<Paragraph key={key} id={key}>
+// 			<Em syntax="_">
+// 				em <Strong syntax="**">and</Strong>
+// 			</Em>{" "}
+// 			<Strong syntax="**">
+// 				strong
+// 			</Strong>
+// 		</Paragraph>
+// 	))(),
+// 	((key = uuidv4()) => (
+// 		<Paragraph key={key} id={key}>
+// 			<br />
+// 		</Paragraph>
+// 	))(),
+// 	((key = uuidv4()) => (
+// 		<Paragraph key={key} id={key}>
+// 			<Em syntax="_">
+// 				em <Strong syntax="**">and</Strong>
+// 			</Em>{" "}
+// 			<Strong syntax="**">
+// 				strong
+// 			</Strong>
+// 		</Paragraph>
+// 	))(),
+// ]
 
 // // DEBUG
 // console.log(convertToText(data))
 // console.log(convertToText(data, { gfm: true }))
 
+// Parses component objects into renderable React
+// components.
+function parseText(children) {
+	const components = []
+	const recurse = children => {
+		if (typeof children === "string") {
+			return children
+		}
+		for (const each of children) {
+			if (typeof each === "string") {
+				components.push(each)
+				return
+			}
+			const { component: Component } = each
+			components.push((
+				<Component key={components.length} syntax={each.syntax}>
+					{recurse(each.children)}
+				</Component>
+			))
+		}
+	}
+	recurse(children)
+	return components
+}
+
+// Parses a component object into a renderable React
+// component.
+function parse(data) {
+	const Component = data.component
+	return <Component key={data.id} id={data.id}>{parseText(data.children)}</Component>
+}
+
+// console.log(parseText(data))
+
 // Renders an editor.
-const Editor = props => (
-	<div className="text-lg">
+const Editor = props => {
+	const Blocks = data.map(each => (
+		parse(each)
+	))
+	console.log(Blocks)
 
-		{/* Blocks */}
-		{data}
+	return (
+		<div className="text-lg">
 
-		{/* Debugger */}
-		<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-			{JSON.stringify(data, null, "\t")}
+			{/* Blocks */}
+			{Blocks}
+
+			{/* Debugger */}
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+				{JSON.stringify(data, null, "\t")}
+			</div>
+
 		</div>
-
-	</div>
-)
+	)
+}
 
 const App = props => (
 	<div className="flex flex-row justify-center">
