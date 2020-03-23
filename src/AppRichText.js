@@ -100,8 +100,8 @@ const Paragraph = React.memo(({ id, ...props }) => (
 	</div>
 ))
 
-// Parses span VDOM representations to React components.
-function parseSpans(children) {
+// Parses VDOM representations of spans to React components.
+function parseSpansReact(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -114,7 +114,7 @@ function parseSpans(children) {
 		const { component: Component } = each
 		components.push((
 			<Component key={components.length} syntax={each.syntax}>
-				{parseSpans(each.children)}
+				{parseSpansReact(each.children)}
 			</Component>
 		))
 	}
@@ -393,18 +393,18 @@ function convertToText(data, { markdown }) {
 const EditorContext = React.createContext()
 
 // Renders an editor.
-const Editor = ({ data, markdown, ...props }) => {
+const Editor = ({ data, prefs, ...props }) => {
 	const text = convertToText(data, { markdown: false })
 	const textGFM = convertToText(data, { markdown: true })
 
 	const { Provider } = EditorContext
 	return (
-		<Provider value={{ markdown: markdown === true /* Coerce */ }}>
+		<Provider value={prefs}>
 			<div className="text-lg">
 
 				{data.map(({ component: Component, ...each }) => (
 					<Component key={each.id} id={each.id} syntax={each.syntax}>
-						{parseSpans(each.children)}
+						{parseSpansReact(each.children)}
 					</Component>
 				))}
 
@@ -415,6 +415,7 @@ const Editor = ({ data, markdown, ...props }) => {
 							textGFM,
 							charCount: [...text].length,
 							wordCount: text.split(/\s+/).filter(Boolean).length,
+							prefs, // Takes precedence?
 							data,
 						},
 						null,
@@ -432,15 +433,20 @@ const App = props => {
 		return parseMarkdown(raw, { markdown: true })
 	})
 
-	const [markdown, setMarkdown] = React.useState(true)
+	const [prefs, setPrefs] = React.useState(() => ({
+		markdown: true,
+		readOnly: true,
+	}))
+
+	// const [markdown, setMarkdown] = React.useState(true)
 
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="py-32 w-full max-w-3xl">
-				<button className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150" onPointerDown={e => e.preventDefault()} onClick={e => setMarkdown(!markdown)}>
+				<button className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150" onPointerDown={e => e.preventDefault()} onClick={e => setPrefs(current => ({ ...current, markdown: !current.markdown }))}>
 					Toggle markdown
 				</button>
-				<Editor data={data} markdown={markdown} />
+				<Editor data={data} prefs={prefs} />
 			</div>
 		</div>
 	)
