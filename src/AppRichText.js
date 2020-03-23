@@ -53,7 +53,6 @@ const Header = ({ id, syntax, ...props }) => (
 		</Markdown>
 	</div>
 )
-
 const Subheader = ({ id, syntax, ...props }) => (
 	<div id={id} className="font-medium text-2xl">
 		<Markdown syntax={syntax}>
@@ -61,7 +60,6 @@ const Subheader = ({ id, syntax, ...props }) => (
 		</Markdown>
 	</div>
 )
-
 const H3 = ({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold text-xl">
 		<Markdown syntax={syntax}>
@@ -69,7 +67,6 @@ const H3 = ({ id, syntax, ...props }) => (
 		</Markdown>
 	</div>
 )
-
 const H4 = ({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold text-lg">
 		<Markdown syntax={syntax}>
@@ -77,7 +74,6 @@ const H4 = ({ id, syntax, ...props }) => (
 		</Markdown>
 	</div>
 )
-
 const H5 = ({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
@@ -85,7 +81,6 @@ const H5 = ({ id, syntax, ...props }) => (
 		</Markdown>
 	</div>
 )
-
 const H6 = ({ id, syntax, ...props }) => (
 	<div id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
@@ -268,7 +263,9 @@ function convertToText(data, { gfm }) {
 		result += (gfm && start) || ""
 		recurse(each.children)
 		result += (gfm && end) || ""
-		result += "\n"
+		if (each !== data[data.length - 1]) {
+			result += "\n" // EOL
+		}
 	}
 	return result
 }
