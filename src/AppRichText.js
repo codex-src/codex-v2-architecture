@@ -47,24 +47,24 @@ const Paragraph = ({ id, ...props }) => (
 function parseText(text, formatting) {
 	let components = []
 	let index = 0
-	// if (!formatting || !formatting.length) { // TODO: Need to decide
-	// 	components = text
-	// }
-	for (const f of formatting) { // Works as an else-statement
-		const key = components.length
-		if (f.offset > index) {
-			components.push(text.slice(index, f.offset))
-		}
-		components.push(<f.component key={key}>{text.slice(f.offset, f.offset + f.length)}</f.component>)
-		if (f.offset + f.length < text.length) {
-			components.push(text.slice(f.offset + f.length))
-		}
-		index += f.offset + f.length
+	if (!formatting) {
+		components = text
 	}
-	console.log(components)
+	// for (const f of formatting) { // Works as an else-statement
+	// 	const key = components.length
+	// 	if (f.x1 > index) {
+	// 		components.push(text.slice(index, f.x1))
+	// 	}
+	// 	components.push(<f.component key={key}>{text.slice(f.x1, f.x2)}</f.component>)
+	// 	if (f.x2 < text.length) {
+	// 		components.push(text.slice(f.x2))
+	// 	}
+	// 	index = f.x2
+	// }
+	// console.log(components)
 	return components
 
-	// console.log(text.slice(f.offset, f.offset + f.length))
+	// console.log(text.slice(f.x1, f.x2))
 	// return "Hello, world!"
 }
 
@@ -84,12 +84,13 @@ const data = [
 		id: uuidv4(),
 		type: BlockTypes.Paragraph,
 		component: Paragraph,
-		text: "Hello, world!",
-		formatting: [ // What assumptions can we make about formatting? Can we assume formatting is ordered?
-			{ type: InlineTypes.Strong, component: Strong, offset: 7, length: 5 },
-			// { type: InlineTypes.Strong, component: Strong, offset: 7, length: 5 },
-			// { type: InlineTypes.Strong, component: Strong, offset: 7, length: 5 },
-		],
+		text: "Hello, world! Hello, world!",
+		// What guarantees can we make about formatting? Can we
+		// assume formatting is ordered?
+		formatting: null, // [
+			// { type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
+			// { type: InlineTypes.Strong, component: Strong, x1: 12, x2: 26 },
+		// ],
 	},
 	// {
 	// 	id: uuidv4(),
