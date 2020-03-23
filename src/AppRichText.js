@@ -3,33 +3,6 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-// const InlineTypes = {
-// 	Strong: "strong",
-// 	// ...
-// }
-//
-// const BlockTypes = {
-// 	Paragraph: "paragraph",
-// 	// ...
-// }
-
-// const markdown = `Hello, world!\n\nHello, darkness…`
-//
-// // Parses a plain text value into a data structure.
-// function parse(value) {
-// 	const data = value.split("\n").map(each => ({
-// 		id: uuidv4(),
-// 		// TODO: Change API to left, top or x, y?
-// 		cursor: {
-// 			active: false,
-// 			x1: 0, // NOTE: -1 refers to the end
-// 			x2: 0, // NOTE: -1 refers to the end
-// 		},
-// 		value: each,
-// 	}))
-// 	return data
-// }
-
 const Markdown = ({ syntax, ...props }) => (
 	<React.Fragment>
 		{syntax && (
@@ -76,44 +49,14 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// // Maps inline components.
-// const map = new Map()
-//
-// ;(() => {
-// 	map.em = Em
-// 	map.strong = Strong
-// })()
-
-// // Parses plain text and a formatting array into renderable
-// // components.
-// function parseText(text, formatting) {
-// 	if (!formatting) {
-// 		return text
-// 	}
-// 	const components = []
-// 	let index = 0
-// 	for (const f of formatting) { // Works as an else-statement
-// 		const { type, start, end, x1, x2 } = f
-// 		if (x1 > index) {
-// 			components.push(text.slice(index, x1))
-// 		}
-// 		components.push({ type, start, end, text: text.slice(x1, x2) })
-// 		if (f === formatting.slice(-1)[0]) {
-// 			components.push(text.slice(x2))
-// 		}
-// 		index = x2
-// 	}
-// 	return components
-// }
-
 // Converts a React component tree to plain text. GitHub
 // Flavored Markdown (GFM) is an option.
 function convertToText(data, options = { gfm: false }) {
-	let str = ""
+	let text = ""
 	const recurse = data => {
 		// No nesting:
 		if (typeof data === "string") {
-			str += data
+			text += data
 			return
 		// Guard <Component><br /></Component>:
 		} else if (!Array.isArray(data)) {
@@ -123,24 +66,24 @@ function convertToText(data, options = { gfm: false }) {
 		// Nesting:
 		for (const each of data) {
 			if (typeof each === "string") {
-				str += each
+				text += each
 				continue
 			}
 			if (options.gfm) {
-				str += each.props.syntax || ""
+				text += each.props.syntax || ""
 			}
 			recurse(each.props.children)
 			if (options.gfm) {
-				str += each.props.syntax || ""
+				text += each.props.syntax || ""
 			}
 			// TODO: Add other components (not just Paragraph)
 			if (each.type === Paragraph) {
-				str += "\n"
+				text += "\n"
 			}
 		}
 	}
 	recurse(data)
-	return str
+	return text
 }
 
 const data = [
@@ -171,8 +114,9 @@ const data = [
 	))(),
 ]
 
-// DEBUG
-console.log(convertToText(data, { gfm: true }))
+// // DEBUG
+// console.log(convertToText(data))
+// console.log(convertToText(data, { gfm: true }))
 
 // Renders an editor.
 const Editor = props => (
