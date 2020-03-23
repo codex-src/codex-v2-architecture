@@ -1,6 +1,8 @@
 import React from "react"
 import uuidv4 from "uuid/v4"
 
+import "./AppRichText.css"
+
 // const InlineTypes = {
 // 	Strong: "strong",
 // 	// ...
@@ -28,15 +30,39 @@ import uuidv4 from "uuid/v4"
 // 	return data
 // }
 
+// const Markdown = ({ start, end, ...props }) => (
+// 	<React.Fragment>
+// 		{start && (
+// 			<span className="markdown">{start}</span>
+// 		)}
+// 		{props.children}
+// 		{end && (
+// 			<span className="markdown">{end}</span>
+// 		)}
+// 	</React.Fragment>
+// )
+
 const Em = props => (
 	<span className="italic">
+		<span className="text-md-blue-a400">
+			_
+		</span>
 		{props.children}
+		<span className="text-md-blue-a400">
+			_
+		</span>
 	</span>
 )
 
 const Strong = props => (
 	<span className="font-bold">
+		<span className="text-md-blue-a400">
+			**
+		</span>
 		{props.children}
+		<span className="text-md-blue-a400">
+			**
+		</span>
 	</span>
 )
 
@@ -48,27 +74,14 @@ const Paragraph = ({ id, ...props }) => (
 	</div>
 )
 
-// formatting: [
-// 	{ type: InlineTypes.Strong, component: Strong, x1:  7, x2: 12 },
-// 	{ type: InlineTypes.Strong, component: Strong, x1: 21, x2: 26 },
-// ],
-
-// [
-// 	"Hello, ",
-// 	"world",
-// 	"! Hello ",
-// 	"world",
-// 	"!",
-// ]
-
 // Parses plain text and a formatting object into renderable
 // components.
 function parseText(text, formatting) {
+	if (!formatting) {
+		return text
+	}
 	let components = []
 	let index = 0
-	if (!formatting) {
-		components = text
-	}
 	for (const f of formatting) { // Works as an else-statement
 		if (f.x1 > index) {
 			components.push(text.slice(index, f.x1))
@@ -92,19 +105,39 @@ const Block = ({ block: { id, component: Component, text, formatting }, ...props
 	</Component>
 )
 
-// TODO (1): Parse markdown to a data structure.
-// TODO (2): Parse a data structure to WYSIWYG or markdown.
+// TODO (1): Parse markdown to a data structure
+// TODO (2): Parse a data structure to WYSIWYG or markdown
+//
+// What guarantees can we make about formatting?
+// - Can we assume formatting is ordered?
+// - Can x1 >= x2?
+//
 const data = [
 	{
 		id: uuidv4(),
+		type: "paragraph",
 		component: Paragraph,
 		text: "This is em, this is bold",
-		// What guarantees can we make about formatting?
-		// - Can we assume formatting is ordered?
-		// - Can x1 >= x2?
 		formatting: [
-			{ component: Em, x1: 8, x2: 10 },
-			{ component: Strong, x1: 20, x2: 24 },
+			{ type: "em", component: Em, x1: 8, x2: 10 },
+			{ type: "strong", component: Strong, x1: 20, x2: 24 },
+		],
+	},
+	{
+		id: uuidv4(),
+		type: "paragraph",
+		component: Paragraph,
+		text: "",
+		formatting: null,
+	},
+	{
+		id: uuidv4(),
+		type: "paragraph",
+		component: Paragraph,
+		text: "This is em, this is bold",
+		formatting: [
+			{ type: "em", component: Em, x1: 8, x2: 10 },
+			{ type: "strong", component: Strong, x1: 20, x2: 24 },
 		],
 	},
 ]
