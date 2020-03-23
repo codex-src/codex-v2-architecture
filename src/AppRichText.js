@@ -427,7 +427,9 @@ const Editor = ({ data, markdown, ...props }) => {
 }
 
 const App = props => {
-	const data = parseMarkdown(raw, { markdown: true })
+	const [data, setData] = React.useState(() => {
+		return parseMarkdown(raw, { markdown: true })
+	})
 
 	const [markdown, setMarkdown] = React.useState(true)
 
