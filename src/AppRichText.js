@@ -44,9 +44,9 @@ const Markdown = ({ syntax, ...props }) => {
 	)
 }
 
-// const Escape = ({ syntax, ...props }) => (
-// 	<Markdown syntax={syntax} />
-// )
+const Escape = ({ syntax, ...props }) => (
+	<Markdown syntax={syntax} />
+)
 
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
@@ -155,6 +155,9 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 
 // Registers a component for parseTextGFM.
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
+	// NOTE: Escape syntax for regex
+	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
+	const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
 	const parse = (text, index) => {
 		// // NOTE: _ and ~ based syntax must be at the start and
 		// // end of a word to parse
@@ -164,13 +167,14 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 		// 	return null
 		// }
 
-		// Find an offset proceeded by a space or EOL:
-		const offset = text.slice(index + syntax.length).search(`${syntax.split("").map(each => `\\${each}`).join("")}( |$)`) // text.slice(index + syntax.length).indexOf(syntax)
+		// Get the nearest offset proceeded by a space or EOL:
+		//
+		// NOTE: Use ... + 1 because of escape character
+		const offset = text.slice(index + syntax.length).search(searchRe) + 1 // text.slice(index + syntax.length).indexOf(syntax)
 		if (
-			(syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
-			offset <= 0 ||
-			(syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
-			// ((syntax[0] === "_" || syntax[0] === "~") && text[index + syntax.length + offset - 1] !== " ")
+			// (syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
+			offset <= 0
+			// (syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
 		) {
 			return null
 		}
@@ -198,15 +202,15 @@ function parseTextGFM(text) {
 		const charsToEnd = text.length - index
 		switch (true) {
 
-		// // <Escape>
-		// case char === "\\":
-		// 	// No-op
-		// 	data.push({
-		// 		component: Escape,
-		// 		syntax: [char],
-		// 		children: null,
-		// 	})
-		// 	continue
+		// <Escape>
+		case char === "\\":
+			// No-op
+			data.push({
+				component: Escape,
+				syntax: [char],
+				children: null,
+			})
+			continue
 
 		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
@@ -483,7 +487,7 @@ const cmap = new Map()
 
 ;(() => {
 	// Inline components:
-	// cmap[Escape] = "Escape"
+	cmap[Escape] = "Escape"
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
 	cmap[StrongAndEm] = "StrongAndEm"
@@ -519,8 +523,7 @@ function stringify(obj) {
 }
 
 const App = props => {
-	const [data] = React.useState(() => (
-		parseGFM(`# This is a **header**
+	const [value, setValue] = React.useState(`# This is a **header**
 ## This is a subheader
 ### H3
 #### H4
@@ -532,31 +535,60 @@ _oh_test_
 _em **and**_ **strong** or ~strike~ or ~~strike~~
 
 _em_ **_and_ strong**`)
-	))
 
-	const [prefers, setPrefers] = React.useState({
+	const data = React.useMemo(() => parseGFM(value), [value])
+
+	// 	const [data] = React.useState(() => (
+	// 		parseGFM(`# This is a **header**
+	// ## This is a subheader
+	// ### H3
+	// #### H4
+	// ##### H5
+	// ###### H6
+	//
+	// _oh_test_
+	//
+	// _em **and**_ **strong** or ~strike~ or ~~strike~~
+	//
+	// _em_ **_and_ strong**`)
+	// 	))
+
+	const [prefers /* , setPrefers */] = React.useState({
 		readOnly: false,
 	})
 
 	return (
 		<div className="flex flex-row justify-center">
-			<div className="py-32 w-full max-w-3xl">
+			<div className="px-6 py-32 flex flex-row w-full max-w-6xl">
 
-				{/* Buttons */}
-				<button
-					className="m-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onPointerDown={e => e.preventDefault()}
-					onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
-				>
-					Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
-				</button>
+				{/* LHS */}
+				<textarea
+					className="w-full outline-none"
+					value={value}
+					onChange={e => setValue(e.target.value)}
+				/>
 
-				{/* Editor */}
-				<Editor className="px-6 text-lg" data={data} prefers={prefers} />
+				{/* RHS */}
+				<div className="flex-shrink-0 w-6" />
+				<div className="w-full">
+					<Editor
+						className="text-lg"
+						data={data}
+						prefers={prefers}
+					/>
+				</div>
 
 			</div>
 		</div>
 	)
 }
+
+// <button
+// 	className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+// 	onPointerDown={e => e.preventDefault()}
+// 	onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
+// >
+// 	Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
+// </button>
 
 export default App
