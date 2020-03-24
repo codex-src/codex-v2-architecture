@@ -138,12 +138,19 @@ function parseTextGFM(gfm) {
 	}
 	const data = []
 	for (let index = 0; index < gfm.length; index++) {
-		const char = gfm[index]         // Shortcut
-		const numCharsToEnd = gfm.length - index // Shortcut
+		// The current character:
+		const char = gfm[index]
+		// The number of characters to EOL:
+		const charsToEnd = gfm.length - index
 		switch (true) {
-		// Emphasis or strong:
+		// \\
+		case !!index && gfm[index - 1] === "\\": // Coerce
+			// No-op
+			break
+		// Emphasis or strong (supports alternate syntax):
 		case char === "*" || char === "_":
-			if (numCharsToEnd >= (4 + 1) && gfm.slice(index, index + 2) === char.repeat(2)) {
+			// **Strong** or __strong__
+			if (charsToEnd >= (4 + 1) && gfm.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
@@ -151,16 +158,15 @@ function parseTextGFM(gfm) {
 					break
 				}
 				index += syntax.length
-				const children = parseTextGFM(gfm.slice(index, index + offset))
 				data.push({
 					component: Strong,
 					syntax,
-					children,
+					children: parseTextGFM(gfm.slice(index, index + offset)),
 				})
 				index += syntax.length + offset - 1
 				continue
-			// *Emphasis*
-			} else if (numCharsToEnd >= (2 + 1)) {
+			// _Emphasis_ or *emphasis*
+			} else if (charsToEnd >= (2 + 1)) {
 				const syntax = char.repeat(1)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
@@ -168,11 +174,10 @@ function parseTextGFM(gfm) {
 					break
 				}
 				index += syntax.length
-				const children = parseTextGFM(gfm.slice(index, index + offset))
 				data.push({
 					component: Em,
 					syntax,
-					children,
+					children: parseTextGFM(gfm.slice(index, index + offset)),
 				})
 				index += offset + syntax.length - 1
 				continue
@@ -185,10 +190,10 @@ function parseTextGFM(gfm) {
 		// Push string:
 		if (!data.length || typeof data[data.length - 1] !== "string") {
 			data.push(char)
-		// OR Concatenate string:
-		} else {
-			data[data.length - 1] += char
+			continue
 		}
+		// Concatenate string:
+		data[data.length - 1] += char
 	}
 	// Return a string or an array:
 	return !data.length ? data[0] : data
@@ -442,7 +447,7 @@ const App = props => {
 ##### H5
 ###### H6
 
-_em **and**_ **strong**
+_em \\**and**_ **strong**
 
 _em_ **_and_ strong**`)
 	))
