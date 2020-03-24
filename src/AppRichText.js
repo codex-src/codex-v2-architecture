@@ -157,8 +157,8 @@ function registerComponent(component, syntax) {
 			syntax,
 			children: parseTextGFM(text.slice(index, index + offset)),
 		}
-		index += syntax.length + offset // - 1
-		return { object, x2: index }
+		index += syntax.length + offset - 1
+		return { object, goto: index }
 	}
 	return parse
 }
@@ -175,7 +175,7 @@ function parseTextGFM(text) {
 		// The number of characters to EOL:
 		const charsToEnd = text.length - index
 		switch (true) {
-		// Escape:
+		// <Escape>
 		case char === "\\": // Coerce
 			// No-op
 			data.push({
@@ -184,59 +184,41 @@ function parseTextGFM(text) {
 				children: null,
 			})
 			continue
-		// Emphasis or strong:
+		// <Strong> or <Em>
 		case char === "*" || char === "_":
 			// **Strong** or __strong__
 			if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
-				const syntax = char.repeat(2)
-				const offset = text.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+				const parsed = registerComponent(Strong, char.repeat(2))(text, index)
+				if (!parsed) {
 					// No-op
 					break
 				}
-				index += syntax.length
-				data.push({
-					component: Strong,
-					syntax,
-					children: parseTextGFM(text.slice(index, index + offset)),
-				})
-				index += syntax.length + offset - 1
+				data.push(parsed.object)
+				index = parsed.goto
 				continue
 			// _Emphasis_ or *emphasis*
 			} else if (charsToEnd >= "*x*".length) {
-				const syntax = char.repeat(1)
-				const offset = text.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+				const parsed = registerComponent(Em, char)(text, index)
+				if (!parsed) {
 					// No-op
 					break
 				}
-				index += syntax.length
-				data.push({
-					component: Em,
-					syntax,
-					children: parseTextGFM(text.slice(index, index + offset)),
-				})
-				index += offset + syntax.length - 1
+				data.push(parsed.object)
+				index = parsed.goto
 				continue
 			}
 			break
-		// Strikethrough:
+		// <Strike>
 		case char === "~":
 			// ~~Strike~~
-			if (charsToEnd >= "~~x~~".length && text.slice(index, index + 2) === char.repeat(2)) {
-				const syntax = char.repeat(2)
-				const offset = text.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+			if (charsToEnd >= "~~x~~".length && text.slice(index, index + 2) === "~~") {
+				const parsed = registerComponent(Strike, "~~")(text, index)
+				if (!parsed) {
 					// No-op
 					break
 				}
-				index += syntax.length
-				data.push({
-					component: Strike,
-					syntax,
-					children: parseTextGFM(text.slice(index, index + offset)),
-				})
-				index += syntax.length + offset - 1
+				data.push(parsed.object)
+				index = parsed.goto
 				continue
 			// ~Strike~
 			} else if (charsToEnd >= "~x~".length) {
@@ -246,21 +228,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.x2 - 1
-
-				// const syntax = char.repeat(1)
-				// const offset = text.slice(index + syntax.length).indexOf(syntax)
-				// if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
-				// 	// No-op
-				// 	break
-				// }
-				// index += syntax.length
-				// data.push({
-				// 	component: Strike,
-				// 	syntax,
-				// 	children: parseTextGFM(text.slice(index, index + offset)),
-				// })
-				// index += offset + syntax.length - 1
+				index = parsed.goto
 				continue
 			}
 			break
@@ -268,12 +236,10 @@ function parseTextGFM(text) {
 			// No-op
 			break
 		}
-		// Push string:
 		if (!data.length || typeof data[data.length - 1] !== "string") {
 			data.push(char)
 			continue
 		}
-		// Concatenate string:
 		data[data.length - 1] += char
 	}
 	// Return a string or an array:
@@ -288,7 +254,7 @@ function parseGFM(text) {
 	for (let index = 0; index < paragraphs.length; index++) {
 		const each = paragraphs[index]
 		switch (each.charAt(0)) {
-		// # Header:
+		// <Header>
 		case "#":
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
@@ -310,14 +276,15 @@ function parseGFM(text) {
 			break
 		default:
 			// No-op
-			data.push({
-				id: uuidv4(),
-				component: Paragraph,
-				syntax: null,
-				children: parseTextGFM(each),
-			})
 			break
 		}
+		// <Paragraph>
+		data.push({
+			id: uuidv4(),
+			component: Paragraph,
+			syntax: null,
+			children: parseTextGFM(each),
+		})
 	}
 	return data
 }
