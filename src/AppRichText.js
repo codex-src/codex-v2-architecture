@@ -57,7 +57,7 @@ const Em = ({ syntax, ...props }) => (
 )
 
 const Strong = ({ syntax, ...props }) => (
-	<span className="font-bold">
+	<span className="font-semibold">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -65,7 +65,7 @@ const Strong = ({ syntax, ...props }) => (
 )
 
 const StrongAndEm = ({ syntax, ...props }) => (
-	<span className="font-bold italic">
+	<span className="font-semibold italic">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -90,7 +90,7 @@ export const $Node = ({ id, ...props }) => (
 
 const Header = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-500 text-4xl">
+	<$Node id={id} className="font-medium text-4xl">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -99,7 +99,7 @@ const Header = React.memo(({ id, syntax, data, ...props }) => (
 
 const Subheader = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-500 text-2xl">
+	<$Node id={id} className="font-medium text-2xl">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -108,7 +108,7 @@ const Subheader = React.memo(({ id, syntax, data, ...props }) => (
 
 const H3 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-600 text-xl">
+	<$Node id={id} className="font-semibold text-xl">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -117,7 +117,7 @@ const H3 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H4 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-600 text-lg">
+	<$Node id={id} className="font-semibold text-lg">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -126,7 +126,7 @@ const H4 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H5 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-600">
+	<$Node id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -135,7 +135,7 @@ const H5 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H6 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-600">
+	<$Node id={id} className="font-semibold">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -155,7 +155,7 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	const parse = (text, index) => {
 		const offset = text.slice(index + syntax.length).indexOf(syntax)
-		if (offset <= 0) { // || text[index + syntax.length + offset - 1] === "\\") {
+		if (text[index + syntax.length] === " " || offset <= 0 || text[index + syntax.length + offset - 1] === " ") { // || text[index + syntax.length + offset - 1] === "\\") {
 			return null
 		}
 		index += syntax.length
