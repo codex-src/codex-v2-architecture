@@ -372,8 +372,8 @@ const Editor = ({ data, prefers, ...props }) => {
 
 			{/* Debugger */}
 			{true && (
-				<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
-					{JSON.stringify(
+				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+					{stringify(
 						{
 							txt: {
 								data: txt,
@@ -388,14 +388,63 @@ const Editor = ({ data, prefers, ...props }) => {
 							prefers,
 							data,
 						},
-						null,
-						"\t",
 					)}
 				</div>
 			)}
 
 		</React.Fragment>
 	)
+}
+
+// Maps component references to names.
+const cmap = new Map()
+
+;(() => {
+	// Inline components:
+	cmap[Em] = "Em"
+	cmap[Strong] = "Strong"
+
+	// Block components:
+	//
+	// NOTE: Use X.type because of React.memo
+	cmap[Header.type] = "Header"
+	cmap[Subheader.type] = "Subheader"
+	cmap[H3.type] = "H3"
+	cmap[H4.type] = "H4"
+	cmap[H5.type] = "H5"
+	cmap[H6.type] = "H6"
+	cmap[Paragraph.type] = "Paragraph"
+})()
+
+function destructure(component) {
+	// Guard non-objects:
+	if (!component || typeof component !== "object") {
+		return component
+	}
+	// Guard arrays:
+	if (Array.isArray(component)) {
+		return component.map(each => destructure(each))
+	}
+	// Guard non-React components:
+	if (!component.$$typeof && component.$$typeof !== Symbol.for("react.element")) {
+		return component
+	}
+	// React component:
+	return cmap[component.type]
+}
+
+function stringify(obj) {
+	const data = JSON.stringify(
+		obj,
+		(key, value) => {
+			if (key === "component") {
+				return destructure(value)
+			}
+			return value
+		},
+		"\t",
+	)
+	return data
 }
 
 const App = props => {
@@ -422,7 +471,7 @@ _em_ **_and_ strong**`)
 
 				{/* Buttons */}
 				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					className="m-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onPointerDown={e => e.preventDefault()}
 					onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
 				>
@@ -430,7 +479,7 @@ _em_ **_and_ strong**`)
 				</button>
 
 				{/* Editor */}
-				<Editor className="px-6" data={data} prefers={prefers} />
+				<Editor className="px-6 text-lg" data={data} prefers={prefers} />
 
 			</div>
 		</div>
