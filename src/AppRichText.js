@@ -151,11 +151,27 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 	</$Node>
 ))
 
+// || text[index + syntax.length + offset - 1] === "\\") {
+
 // Registers a component for parseTextGFM.
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	const parse = (text, index) => {
-		const offset = text.slice(index + syntax.length).indexOf(syntax)
-		if (text[index + syntax.length] === " " || offset <= 0 || text[index + syntax.length + offset - 1] === " ") { // || text[index + syntax.length + offset - 1] === "\\") {
+		// // NOTE: _ and ~ based syntax must be at the start and
+		// // end of a word to parse
+		// //
+		// // https://spec.commonmark.org/dingus
+		// if ((syntax[0] === "_" || syntax[0] === "~") && (!index || text[index] !== " ")) {
+		// 	return null
+		// }
+
+		// Find an offset proceeded by a space or EOL:
+		const offset = text.slice(index + syntax.length).search(`${syntax.split("").map(each => `\\${each}`).join("")}( |$)`) // text.slice(index + syntax.length).indexOf(syntax)
+		if (
+			(syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
+			offset <= 0 ||
+			(syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
+			// ((syntax[0] === "_" || syntax[0] === "~") && text[index + syntax.length + offset - 1] !== " ")
+		) {
 			return null
 		}
 		index += syntax.length
@@ -510,6 +526,8 @@ const App = props => {
 #### H4
 ##### H5
 ###### H6
+
+_oh_test_
 
 _em **and**_ **strong** or ~strike~ or ~~strike~~
 
