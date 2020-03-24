@@ -158,7 +158,10 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	// NOTE: Escape syntax for regex
 	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
 	// const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
-	const searchRe = `[^\\\\]${escapedSyntax}` // FIXME: N/A code
+	let searchRe = `[^\\\\]${escapedSyntax}`
+	if (syntax[0] === "_") {
+		searchRe = `[^\\\\]${escapedSyntax}( |$)`
+	}
 	const parse = (text, index) => {
 		// // NOTE: _ and ~ based syntax must be at the start and
 		// // end of a word to parse
@@ -547,21 +550,6 @@ _em_ **_and_ strong**
 	}, [value])
 
 	const data = React.useMemo(() => parseGFM(value), [value])
-
-	// 	const [data] = React.useState(() => (
-	// 		parseGFM(`# This is a **header**
-	// ## This is a subheader
-	// ### H3
-	// #### H4
-	// ##### H5
-	// ###### H6
-	//
-	// _oh_test_
-	//
-	// _em **and**_ **strong** or ~strike~ or ~~strike~~
-	//
-	// _em_ **_and_ strong**`)
-	// 	))
 
 	const [prefers] = React.useState({
 		readOnly: false,
