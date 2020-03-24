@@ -3,7 +3,7 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-// Parses syntax into a start and end string.
+// Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
 	let s1 = "" // Start syntax
 	let s2 = "" // End syntax
@@ -59,6 +59,7 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
+// Wrapper component for block elements.
 export const $Node = ({ id, type, syntax, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
@@ -130,48 +131,27 @@ const Paragraph = React.memo(({ id, ...props }) => (
 	</$Node>
 ))
 
-// Parses VDOM representations to React components.
-function parseChildren(children) {
-	if (children === null || typeof children === "string") {
-		return children
-	}
-	const components = []
-	for (const each of children) {
-		if (each === null || typeof each === "string") {
-			components.push(each)
-			continue
-		}
-		const { component: Component } = each
-		components.push((
-			<Component key={components.length} syntax={each.syntax}>
-				{parseChildren(each.children)}
-			</Component>
-		))
-	}
-	return components
-}
-
-// Parses markdown text (GFM) to a VDOM representation.
-function parseMarkdownText(text) {
-	if (!text) {
+// Parses GFM text to a VDOM representation.
+function parseTextGFM(gfm) {
+	if (!gfm) {
 		return null
 	}
 	const data = []
-	for (let index = 0; index < text.length; index++) {
-		const char = text[index]         // Shortcut
-		const numCharsToEnd = text.length - index // Shortcut
+	for (let index = 0; index < gfm.length; index++) {
+		const char = gfm[index]         // Shortcut
+		const numCharsToEnd = gfm.length - index // Shortcut
 		switch (true) {
 		// Emphasis or strong:
 		case char === "*" || char === "_":
-			if (numCharsToEnd >= (4 + 1) && text.slice(index, index + 2) === char.repeat(2)) {
+			if (numCharsToEnd >= (4 + 1) && gfm.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
-				const offset = text.slice(index + syntax.length).indexOf(syntax)
+				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
 					// No-op
 					break
 				}
 				index += syntax.length
-				const children = parseMarkdownText(text.slice(index, index + offset))
+				const children = parseTextGFM(gfm.slice(index, index + offset))
 				data.push({
 					component: Strong,
 					syntax,
@@ -182,13 +162,13 @@ function parseMarkdownText(text) {
 			// *Emphasis*
 			} else if (numCharsToEnd >= (2 + 1)) {
 				const syntax = char.repeat(1)
-				const offset = text.slice(index + syntax.length).indexOf(syntax)
+				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
 				if (offset <= 0) {
 					// No-op
 					break
 				}
 				index += syntax.length
-				const children = parseMarkdownText(text.slice(index, index + offset))
+				const children = parseTextGFM(gfm.slice(index, index + offset))
 				data.push({
 					component: Em,
 					syntax,
@@ -214,13 +194,13 @@ function parseMarkdownText(text) {
 	return !data.length ? data[0] : data
 }
 
-// Parses markdown (GFM) to a VDOM representation.
-function parseMarkdown(text) {
+// Parses GFM to a VDOM representation.
+function parseGFM(gfm) {
 	const data = []
-	const paragraphs = text.split("\n")
+	const paragraphs = gfm.split("\n")
+	// NOTE: Use an index for multiline elements
 	for (let index = 0; index < paragraphs.length; index++) {
-		const each = paragraphs[index] // Shorthand
-		// const char = each.charAt(0) // Shorthand
+		const each = paragraphs[index]
 		switch (each.charAt(0)) {
 		// # Header:
 		case "#":
@@ -236,7 +216,6 @@ function parseMarkdown(text) {
 				const children = each.slice(syntax[0].length) // TODO
 				data.push({
 					id: uuidv4(),
-					// NOTE: Use ... - 2 for zero-based and space
 					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
 					children,
@@ -250,7 +229,7 @@ function parseMarkdown(text) {
 				id: uuidv4(),
 				component: Paragraph,
 				syntax: null,
-				children: parseMarkdownText(each),
+				children: parseTextGFM(each),
 			})
 			break
 		}
@@ -258,10 +237,31 @@ function parseMarkdown(text) {
 	return data
 }
 
-// Converts an editor data structure to plain text.
+// Converts a VDOM representation to React components.
+function toReact(children) {
+	if (children === null || typeof children === "string") {
+		return children
+	}
+	const components = []
+	for (const each of children) {
+		if (each === null || typeof each === "string") {
+			components.push(each)
+			continue
+		}
+		const { component: Component } = each
+		components.push((
+			<Component key={components.length} syntax={each.syntax}>
+				{toReact(each.children)}
+			</Component>
+		))
+	}
+	return components
+}
+
+// Converts a VDOM representation to a string.
 function toString(data, { markdown } = { markdown: false }) {
 	let str = ""
-	// Recurse inline elements:
+	// Recurse children:
 	const recurse = children => {
 		if (children === null || typeof children === "string") {
 			str += children || ""
@@ -277,7 +277,7 @@ function toString(data, { markdown } = { markdown: false }) {
 			str += (markdown && each.syntax) || ""
 		}
 	}
-	// Iterate block elements:
+	// Iterate top-level children:
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
 		str += (markdown && s1) || ""
@@ -313,7 +313,7 @@ function innerText(element) {
 
 const EditorContext = React.createContext()
 
-// Renders a Codex editor.
+// Renders an editor.
 const Editor = ({ data, prefs, ...props }) => {
 	const ref = React.useRef()
 
@@ -343,7 +343,7 @@ const Editor = ({ data, prefs, ...props }) => {
 				},
 				data.map(({ component: Component, ...each }) => (
 					<Component key={each.id} id={each.id} syntax={each.syntax}>
-						{parseChildren(each.children)}
+						{toReact(each.children)}
 					</Component>
 				)),
 			)}
@@ -376,7 +376,7 @@ const Editor = ({ data, prefs, ...props }) => {
 
 const App = props => {
 	const [data] = React.useState(() => (
-		parseMarkdown(`# This is a header
+		parseGFM(`# This is a header
 ## This is a subheader
 ### H3
 #### H4
