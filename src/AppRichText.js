@@ -4,8 +4,6 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-const EditorContext = React.createContext()
-
 // Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
 	let s1 = "" // Start syntax
@@ -26,22 +24,19 @@ function parseSyntax(syntax) {
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const res = React.useContext(EditorContext)
-	console.log({ res })
-
-	const readOnly = true
+	const prefers = React.useContext(EditorContext)
 
 	const [s1, s2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 			{s1 && (
-				<span className="text-md-blue-a400" style={{ display: readOnly && "none" }}>
+				<span className="text-md-blue-a400" style={{ display: prefers.readOnly && "none" }}>
 					{s1}
 				</span>
 			)}
 			{props.children}
 			{s2 && (
-				<span className="text-md-blue-a400" style={{ display: readOnly && "none" }}>
+				<span className="text-md-blue-a400" style={{ display: prefers.readOnly && "none" }}>
 					{s2}
 				</span>
 			)}
@@ -324,15 +319,23 @@ const EditorBlocks = ({ data, ...props }) => (
 	))
 )
 
+const EditorContext = React.createContext()
+
 // Renders an editor.
-const Editor = ({ data, prefs, ...props }) => {
+const Editor = ({ data, prefers, ...props }) => {
 	const ref = React.useRef()
 
 	// Rerender the DOM when data changes (use useLayoutEffect
 	// because of contenteditable):
 	React.useLayoutEffect(() => {
-		ReactDOM.render(<EditorBlocks data={data} />, ref.current)
-	}, [data])
+		const { Provider } = EditorContext
+		ReactDOM.render(
+			<Provider value={prefers}>
+				<EditorBlocks data={data} />
+			</Provider>,
+			ref.current,
+		)
+	}, [data, prefers])
 
 	const [txt, setTxt] = React.useState(() => toString(data))
 	const [gfm, setGfm] = React.useState(() => toString(data, { markdown: true }))
@@ -344,9 +347,8 @@ const Editor = ({ data, prefs, ...props }) => {
 		setGfm(toString(data, { markdown: true }))
 	}, [data])
 
-	const { Provider } = EditorContext
 	return (
-		<Provider value={prefs}>
+		<React.Fragment>
 
 			{/* Editor */}
 			{React.createElement(
@@ -358,11 +360,9 @@ const Editor = ({ data, prefs, ...props }) => {
 
 					style: { caretColor: "black" },
 
-					contentEditable: !prefs.readOnly,
-					suppressContentEditableWarning: !prefs.readOnly,
+					contentEditable: !prefers.readOnly,
+					suppressContentEditableWarning: !prefers.readOnly,
 				},
-				// NOTE: Leave empty because of contenteditable; use
-				// useLayoutEffect and ReactDOM.render
 			)}
 
 			{/* Debugger */}
@@ -379,7 +379,7 @@ const Editor = ({ data, prefs, ...props }) => {
 							characters: [...gfm].length,
 							words: gfm.split(/\s+/).filter(Boolean).length,
 						},
-						prefs,
+						prefers,
 						data,
 					},
 					null,
@@ -387,7 +387,7 @@ const Editor = ({ data, prefs, ...props }) => {
 				)}
 			</div>
 
-		</Provider>
+		</React.Fragment>
 	)
 }
 
@@ -405,9 +405,9 @@ _em **and**_ **strong**
 _em_ **_and_ strong**`)
 	))
 
-	const [prefs, setPrefs] = React.useState(() => ({
+	const [prefers, setPrefers] = React.useState({
 		readOnly: false,
-	}))
+	})
 
 	return (
 		<div className="flex flex-row justify-center">
@@ -417,13 +417,13 @@ _em_ **_and_ strong**`)
 				<button
 					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onPointerDown={e => e.preventDefault()}
-					onClick={e => setPrefs({ ...prefs, readOnly: !prefs.readOnly })}
+					onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
 				>
-					Toggle read-only: {!prefs.readOnly ? "OFF" : "ON"}
+					Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
 				</button>
 
 				{/* Editor */}
-				<Editor data={data} prefs={prefs} />
+				<Editor data={data} prefers={prefers} />
 
 			</div>
 		</div>
