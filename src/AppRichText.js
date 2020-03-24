@@ -55,7 +55,11 @@ const Markdown = ({ className, syntax, ...props }) => {
 }
 
 const Escape = ({ syntax, ...props }) => (
-	<Markdown syntax={syntax} />
+	<span>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
 )
 
 const Em = ({ syntax, ...props }) => (
@@ -233,13 +237,17 @@ function parseTextGFM(text) {
 		switch (true) {
 		// <Escape>
 		case char === "\\":
-			// No-op
-			data.push({
-				component: Escape,
-				syntax: [char],
-				children: null,
-			})
-			continue
+	 		if (index + 1 < text.length && text[index + 1].match(/[\W_]/)) {
+				// No-op
+				data.push({
+					component: Escape,
+					syntax: [char],
+					children: text[index + 1],
+				})
+				index++
+				continue
+			}
+			break
 		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
 			// ***Strong and em***
