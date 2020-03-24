@@ -373,22 +373,20 @@ const Editor = ({ data, prefers, ...props }) => {
 			{/* Debugger */}
 			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-					{stringify(
-						{
-							txt: {
-								data: txt,
-								characters: [...txt].length,
-								words: txt.split(/\s+/).filter(Boolean).length,
-							},
-							gfm: {
-								data: gfm,
-								characters: [...gfm].length,
-								words: gfm.split(/\s+/).filter(Boolean).length,
-							},
-							prefers,
-							data,
+					{stringify({
+						txt: {
+							data: txt,
+							characters: [...txt].length,
+							words: txt.split(/\s+/).filter(Boolean).length,
 						},
-					)}
+						gfm: {
+							data: gfm,
+							characters: [...gfm].length,
+							words: gfm.split(/\s+/).filter(Boolean).length,
+						},
+						prefers,
+						data,
+					})}
 				</div>
 			)}
 
@@ -416,31 +414,19 @@ const cmap = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 })()
 
-function destructure(component) {
-	// Guard non-objects:
-	if (!component || typeof component !== "object") {
-		return component
-	}
-	// Guard arrays:
-	if (Array.isArray(component)) {
-		return component.map(each => destructure(each))
-	}
-	// Guard non-React components:
-	if (!component.$$typeof && component.$$typeof !== Symbol.for("react.element")) {
-		return component
-	}
-	// React component:
-	return cmap[component.type]
-}
-
 function stringify(obj) {
 	const data = JSON.stringify(
 		obj,
 		(key, value) => {
-			if (key === "component") {
-				return destructure(value)
+			// Non-component:
+			if (key !== "component") {
+				return value
 			}
-			return value
+			// Component (guard React.memo):
+			if (value.type) {
+				value = value.type
+			}
+			return cmap[value]
 		},
 		"\t",
 	)
