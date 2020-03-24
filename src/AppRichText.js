@@ -13,7 +13,11 @@ function parseSyntax(syntax) {
 		s1 = syntax
 		s2 = syntax
 	} else if (Array.isArray(syntax)) {
-		;[s1, s2] = syntax
+		s1 = syntax[0]
+		// Guard end syntax:
+		if (syntax.length === 2) {
+			s2 = syntax[1]
+		}
 	}
 	return [s1, s2]
 }
@@ -451,19 +455,23 @@ const Editor = ({ data, prefs, ...props }) => {
 			for (const each of startNode.childNodes) {
 				// Text and break nodes:
 				if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-					console.log({ each })
+					if (each.nodeName === "BR") {
+						return ""
+					}
+					return each.nodeValue
 				// Element nodes:
 				} else if (each.nodeType === Node.ELEMENT_NODE) {
-					const { attributes } = each
-					if (attributes["data-block-syntax"] || attributes["data-inline-syntax"]) {
-						const { value } = attributes["data-block-syntax"] || attributes["data-inline-syntax"]
-						console.log({value})
-						const [start, end] = parseSyntax(JSON.parse(value))
-						console.log({ start, end })
+					let start = ""
+					let end = ""
+					const attrs = each.attributes
+					if (attrs["data-block-syntax"] || attrs["data-inline-syntax"]) {
+						const { value } = attrs["data-block-syntax"] || attrs["data-inline-syntax"]
+						;[start, end] = parseSyntax(JSON.parse(value))
 					}
-					recurse(each)
+					console.log(`${start}${recurse(each)}${end}`)
 				}
 			}
+			return ""
 		}
 		recurse(ref.current)
 		// console.log({ markdown })
