@@ -194,9 +194,9 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 		// NOTE: Use ... + 1 because of escape character
 		const offset = text.slice(index + syntax.length).search(searchRe) + 1 // text.slice(index + syntax.length).indexOf(syntax)
 		if (
-			// (syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
-			offset <= 0
-			// (syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
+			(syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
+			offset <= 0 ||
+			(syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
 		) {
 			return null
 		}
@@ -236,6 +236,8 @@ function parseTextGFM(text) {
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
+				// TODO: Can extract registerComponent(...)(...) to
+				// parseStrongAndEm(...)
 				const parsed = registerComponent(StrongAndEm, char.repeat(3))(text, index)
 				if (!parsed) {
 					// No-op
@@ -569,6 +571,26 @@ const App = props => {
 #### H4
 ##### H5
 ###### H6
+
+*oh*shit* -- OK
+**oh**shit** -- OK
+***oh***shit*** -- Not sure
+_oh_shit_ -- OK
+__oh__shit__ -- OK
+___oh___shit___ -- OK
+\`oh\`shit\` -- OK
+~oh~shit~ -- OK
+~~oh~~shit~~ -- OK
+
+* oh *
+** oh **
+*** oh ***
+_ oh _
+__ oh __
+___ oh ___
+\` oh \`
+~ oh ~
+~~ oh ~~
 
 _em **and**_ **strong** or ~strike~ or ~~strike~~
 
