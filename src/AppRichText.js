@@ -157,7 +157,8 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	// NOTE: Escape syntax for regex
 	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
-	const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
+	// const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
+	const searchRe = `[^\\\\]${escapedSyntax}` // FIXME: N/A code
 	const parse = (text, index) => {
 		// // NOTE: _ and ~ based syntax must be at the start and
 		// // end of a word to parse
@@ -201,7 +202,6 @@ function parseTextGFM(text) {
 		const char = text[index]
 		const charsToEnd = text.length - index
 		switch (true) {
-
 		// <Escape>
 		case char === "\\":
 			// No-op
@@ -211,7 +211,6 @@ function parseTextGFM(text) {
 				children: null,
 			})
 			continue
-
 		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
 			// ***Strong and em***
@@ -523,18 +522,29 @@ function stringify(obj) {
 }
 
 const App = props => {
-	const [value, setValue] = React.useState(`# This is a **header**
+	const [value, setValue] = React.useState(() => {
+		const cache = localStorage.getItem("codex-app-v2")
+		if (cache) {
+			const json = JSON.parse(cache)
+			return json.data
+		}
+		return `
+# This is a header
 ## This is a subheader
 ### H3
 #### H4
 ##### H5
 ###### H6
 
-_oh_test_
-
 _em **and**_ **strong** or ~strike~ or ~~strike~~
 
-_em_ **_and_ strong**`)
+_em_ **_and_ strong**
+`.trim()
+	})
+
+	React.useEffect(() => {
+		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
+	}, [value])
 
 	const data = React.useMemo(() => parseGFM(value), [value])
 
@@ -553,7 +563,7 @@ _em_ **_and_ strong**`)
 	// _em_ **_and_ strong**`)
 	// 	))
 
-	const [prefers /* , setPrefers */] = React.useState({
+	const [prefers] = React.useState({
 		readOnly: false,
 	})
 
