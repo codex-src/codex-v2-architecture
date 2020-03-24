@@ -502,7 +502,7 @@ const Editor = ({ data, prefers, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{true && (
+			{false && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify({
 						txt: {
@@ -558,7 +558,7 @@ function stringify(obj) {
 			if (value.type) {
 				value = value.type
 			}
-			return cmap[value]
+			return `<${cmap[value]}>`
 		},
 		"\t",
 	)
@@ -615,6 +615,24 @@ _em_ **_and_ strong**
 	const [prefers, setPrefers] = React.useState({
 		readOnly: false,
 	})
+
+	React.useEffect(() => {
+		const handler = e => {
+			if (!e.metaKey || e.keyCode !== 80) {
+				// No-op
+				return
+			}
+			e.preventDefault()
+			setPrefers(current => ({
+				...current,
+				readOnly: !prefers.readOnly,
+			}))
+		}
+		window.addEventListener("keydown", handler)
+		return () => {
+			window.removeEventListener("keydown", handler)
+		}
+	}, [prefers.readOnly])
 
 	return (
 		<div className="flex flex-row justify-center">
