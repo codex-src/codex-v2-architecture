@@ -371,7 +371,7 @@ _em_ **_and_ strong**`
 
 // Converts a data structure to plain text (GitHub Flavored
 // Markdown is an option).
-function convertToText(data, { markdown }) {
+function convertToText(data, options = { markdown: false }) {
 	let result = ""
 	// Recurse inline elements:
 	const recurse = children => {
@@ -384,9 +384,9 @@ function convertToText(data, { markdown }) {
 				result += each || ""
 				continue
 			}
-			result += (markdown && each.syntax) || ""
+			result += (options.markdown && each.syntax) || ""
 			recurse(each.children)
-			result += (markdown && each.syntax) || ""
+			result += (options.markdown && each.syntax) || ""
 		}
 	}
 	// Iterate block elements:
@@ -401,9 +401,9 @@ function convertToText(data, { markdown }) {
 		} else if (Array.isArray(syntax)) {
 			;[start, end] = syntax
 		}
-		result += (markdown && start) || ""
+		result += (options.markdown && start) || ""
 		recurse(each.children)
-		result += (markdown && end) || ""
+		result += (options.markdown && end) || ""
 		if (each !== data[data.length - 1]) {
 			result += "\n" // EOL
 		}
@@ -415,8 +415,15 @@ const EditorContext = React.createContext()
 
 // Renders an editor.
 const Editor = ({ data, prefs, ...props }) => {
-	const text = convertToText(data, { markdown: false })
-	const textGFM = convertToText(data, { markdown: true })
+	const ref = React.useRef()
+
+	const [txt, setTxt] = React.useState(() => convertToText(data))
+	const [gfm, setGFM] = React.useState(() => convertToText(data, { markdown: true }))
+
+	React.useEffect(() => {
+		setTxt(convertToText(data))
+		setGFM(convertToText(data, { markdown: true }))
+	}, [data])
 
 	const { Provider } = EditorContext
 	return (
@@ -425,9 +432,14 @@ const Editor = ({ data, prefs, ...props }) => {
 			{React.createElement(
 				"div",
 				{
+					ref,
+
 					className: "text-lg outline-none",
 
+					style: { caretColor: "black" },
+
 					contentEditable: !prefs.readOnly,
+					suppressContentEditableWarning: !prefs.readOnly,
 				},
 				data.map(({ component: Component, ...each }) => (
 					<Component key={each.id} id={each.id} syntax={each.syntax}>
@@ -436,13 +448,13 @@ const Editor = ({ data, prefs, ...props }) => {
 				)),
 			)}
 
-			<div className="py-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+			<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
 				{JSON.stringify(
 					{
-						text,
-						textGFM,
-						charCount: [...text].length,
-						wordCount: text.split(/\s+/).filter(Boolean).length,
+						txt,
+						gfm,
+						charCount: [...txt].length,
+						wordCount: txt.split(/\s+/).filter(Boolean).length,
 						prefs, // Takes precedence?
 						data,
 					},
@@ -468,22 +480,29 @@ const App = props => {
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="py-32 w-full max-w-3xl">
+
+				{/* Button markdown */}
 				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150"
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-150"
 					onPointerDown={e => e.preventDefault()}
-					onClick={e => setPrefs(current => ({ ...current, markdown: !current.markdown }))}
+					onClick={e => setPrefs({ ...prefs, markdown: !prefs.markdown })}
 				>
 					Toggle markdown: {!prefs.markdown ? "OFF" : "ON"}
 				</button>
+
+				{/* Button read-only */}
 				<span className="inline-block w-3" />
 				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg shadow transition duration-150"
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-150"
 					onPointerDown={e => e.preventDefault()}
-					onClick={e => setPrefs(current => ({ ...current, readOnly: !current.readOnly }))}
+					onClick={e => setPrefs({ ...prefs, readOnly: !prefs.readOnly })}
 				>
 					Toggle read-only: {!prefs.readOnly ? "OFF" : "ON"}
 				</button>
+
+				{/* Editor */}
 				<Editor data={data} prefs={prefs} />
+
 			</div>
 		</div>
 	)
