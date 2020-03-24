@@ -588,9 +588,12 @@ const App = props => {
 ##### H5
 ###### H6
 
+*oh*man*is*it*
+_oh_man_is_it_
+
 *oh*shit* -- OK
 **oh**shit** -- OK
-***oh***shit*** -- Not sure
+***oh***shit*** -- OK
 _oh_shit_ -- OK
 __oh__shit__ -- OK
 ___oh___shit___ -- OK
@@ -600,10 +603,10 @@ ___oh___shit___ -- OK
 
 * oh *
 ** oh **
-*** oh ***
+*** oh *** -- Not sure
 _ oh _
 __ oh __
-___ oh ___
+___ oh ___ -- Not sure
 \` oh \`
 ~ oh ~
 ~~ oh ~~
