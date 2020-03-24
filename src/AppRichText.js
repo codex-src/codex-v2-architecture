@@ -317,17 +317,12 @@ const EditorContext = React.createContext()
 const Editor = ({ data, prefs, ...props }) => {
 	const ref = React.useRef()
 
-	const [txt, setTxt] = React.useState(() => toString(data))
-	const [gfm, setGfm] = React.useState(() => toString(data, { markdown: true }))
+	const txt = React.useMemo(() => toString(data), [data])
+	const gfm = React.useMemo(() => toString(data, { markdown: true }), [data])
 
-	React.useEffect(() => {
-		setTxt(toString(data))
-		setGfm(toString(data, { markdown: true }))
-	}, [data])
-
-	React.useEffect(() => {
-		console.log(innerText(ref.current))
-	}, [data])
+	// React.useEffect(() => {
+	// 	console.log(innerText(ref.current))
+	// }, [data])
 
 	const { Provider } = EditorContext
 	return (
