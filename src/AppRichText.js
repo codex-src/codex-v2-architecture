@@ -453,28 +453,33 @@ const Editor = ({ data, prefs, ...props }) => {
 		let markdown = ""
 		const recurse = startNode => {
 			for (const each of startNode.childNodes) {
-				// Text and break nodes:
-				if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-					if (each.nodeName === "BR") {
-						return ""
-					}
-					return each.nodeValue
-				// Element nodes:
+				// <Markdown>
+				if (each.nodeType === Node.ELEMENT_NODE && each.getAttribute("data-markdown")) {
+					// No-op
+					continue
+				// Text and <br>
+				} else if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
+					markdown += each.nodeValue || ""
+					return
+				// <Block>
 				} else if (each.nodeType === Node.ELEMENT_NODE) {
 					let start = ""
 					let end = ""
-					const attrs = each.attributes
-					if (attrs["data-block-syntax"] || attrs["data-inline-syntax"]) {
-						const { value } = attrs["data-block-syntax"] || attrs["data-inline-syntax"]
-						;[start, end] = parseSyntax(JSON.parse(value))
+					if (each.getAttribute(["data-block-syntax"]) || each.getAttribute(["data-inline-syntax"])) {
+						const attribute = each.getAttribute(["data-block-syntax"]) || each.getAttribute(["data-inline-syntax"])
+						;[start, end] = parseSyntax(JSON.parse(attribute))
 					}
-					console.log(`${start}${recurse(each)}${end}`)
+					markdown += start
+					recurse(each)
+					markdown += end
+					if (each.getAttribute(["data-block-syntax"])) {
+						markdown += "\n"
+					}
 				}
 			}
-			return ""
 		}
 		recurse(ref.current)
-		// console.log({ markdown })
+		console.log({ markdown })
 	}, [data])
 
 	const { Provider } = EditorContext
