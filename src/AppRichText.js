@@ -510,9 +510,10 @@ const Editor = ({ data, prefers, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{false && (
+			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify({
+						title: txt.split("\n", 1)[0] || "Untitled",
 						txt: {
 							data: txt,
 							characters: [...txt].length,
