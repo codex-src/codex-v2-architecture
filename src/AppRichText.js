@@ -3,18 +3,25 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
+// Parses syntax into a start and end string.
+function parseSyntax(syntax) {
+	let s1 = "" // Start syntax
+	let s2 = "" // End syntax
+	if (syntax === null) {
+		return ["", ""]
+	} else if (typeof syntax === "string") {
+		s1 = syntax
+		s2 = syntax
+	} else if (Array.isArray(syntax)) {
+		;[s1, s2] = syntax
+	}
+	return [s1, s2]
+}
+
 const Markdown = ({ syntax, ...props }) => {
 	const { markdown } = React.useContext(EditorContext)
 
-	let start = ""
-	let end = ""
-	if (typeof syntax === "string") {
-		start = syntax
-		end = syntax
-	} else if (Array.isArray(syntax)) {
-		;[start, end] = syntax
-	}
-
+	const [start, end] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 			{(markdown && start) && (
@@ -127,15 +134,15 @@ const H6 = React.memo(({ id, syntax, ...props }) => (
 ))
 
 const Paragraph = React.memo(({ id, ...props }) => (
-	<Block id={id} data-type="p">
+	<Block id={id} type="p">
 		{props.children || (
 			<br />
 		)}
 	</Block>
 ))
 
-// Parses VDOM representations of spans to React components.
-function parseSpansReact(children) {
+// Parses VDOM representations to React components.
+function parseChildren(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -148,7 +155,7 @@ function parseSpansReact(children) {
 		const { component: Component } = each
 		components.push((
 			<Component key={components.length} syntax={each.syntax}>
-				{parseSpansReact(each.children)}
+				{parseChildren(each.children)}
 			</Component>
 		))
 	}
@@ -404,16 +411,7 @@ function convertToText(data, options = { markdown: false }) {
 	}
 	// Iterate block elements:
 	for (const each of data) {
-		// (Code based on <Markdown>)
-		const { syntax } = each
-		let start = ""
-		let end = ""
-		if (typeof syntax === "string") {
-			start = syntax
-			end = syntax
-		} else if (Array.isArray(syntax)) {
-			;[start, end] = syntax
-		}
+		const [start, end] = parseSyntax(each.syntax)
 		result += (options.markdown && start) || ""
 		recurse(each.children)
 		result += (options.markdown && end) || ""
@@ -425,6 +423,15 @@ function convertToText(data, options = { markdown: false }) {
 }
 
 const EditorContext = React.createContext()
+
+const SafeAttributeRe = /^("[^"]+"|\[\"[^"]+"\]|null)$/
+
+// if (!value.match(SafeAttributeRe)) {
+// 	throw new Error(
+// 		`Attribute data-(block|inline)-type=${value} is not safe for production; ` +
+// 		`use a string, array of strings, or null`,
+// 	)
+// }
 
 // Renders an editor.
 const Editor = ({ data, prefs, ...props }) => {
@@ -438,30 +445,29 @@ const Editor = ({ data, prefs, ...props }) => {
 		setGfm(convertToText(data, { markdown: true }))
 	}, [data])
 
-	// React.useEffect(() => {
-	// 	let markdown = ""
-	// 	const recurse = startNode => {
-	// 		for (const each of startNode.childNodes) {
-	// 			// Text and break nodes:
-	// 			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-	// 				markdown += each.nodeValue
-	// 			} else if (each.nodeType === Node.ELEMENT_NODE) {
-	// 				recurse(each)
-	// 				const attrs = each.attributes
-	// 				if (attrs.id && attr)
-	// 				// const syntax = each.getAttribute("data-syntax")
-	// 			}
-	// 		}
-	// 		// for (const childNode of root.childNodes) {
-	// 		// 	if (childNode.nodeType === Node.TEXT_NODE || (childNode.nodeType === Node.ELEMENT_NODE && childNode.nodeName === "BR")) {
-	// 		// 		markdown += node.nodeValue || ""
-	// 		// 	} else {
-	// 		// 	}
-	// 		// }
-	// 	}
-	// 	recurse(ref.current)
-	// 	console.log({ markdown })
-	// }, [data])
+	React.useEffect(() => {
+		let markdown = ""
+		const recurse = startNode => {
+			for (const each of startNode.childNodes) {
+				// Text and break nodes:
+				if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
+					console.log({ each })
+				// Element nodes:
+				} else if (each.nodeType === Node.ELEMENT_NODE) {
+					const { attributes } = each
+					if (attributes["data-block-syntax"] || attributes["data-inline-syntax"]) {
+						const { value } = attributes["data-block-syntax"] || attributes["data-inline-syntax"]
+						console.log({value})
+						const [start, end] = parseSyntax(JSON.parse(value))
+						console.log({ start, end })
+					}
+					recurse(each)
+				}
+			}
+		}
+		recurse(ref.current)
+		// console.log({ markdown })
+	}, [data])
 
 	const { Provider } = EditorContext
 	return (
@@ -482,7 +488,7 @@ const Editor = ({ data, prefs, ...props }) => {
 				},
 				data.map(({ component: Component, ...each }) => (
 					<Component key={each.id} id={each.id} syntax={each.syntax}>
-						{parseSpansReact(each.children)}
+						{parseChildren(each.children)}
 					</Component>
 				)),
 			)}
