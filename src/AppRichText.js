@@ -44,6 +44,10 @@ const Markdown = ({ syntax, ...props }) => {
 	)
 }
 
+const Escape = ({ syntax, ...props }) => (
+	<Markdown syntax={syntax} />
+)
+
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
 		<Markdown syntax={syntax}>
@@ -144,9 +148,15 @@ function parseTextGFM(gfm) {
 		const charsToEnd = gfm.length - index
 		switch (true) {
 		// \\
-		case !!index && gfm[index - 1] === "\\": // Coerce
+		case char === "\\": // Coerce
 			// No-op
-			break
+			data.push({
+				component: Escape,
+				syntax: [char],
+				children: null,
+			})
+			index++
+			continue
 		// Emphasis or strong (supports alternate syntax):
 		case char === "*" || char === "_":
 			// **Strong** or __strong__
