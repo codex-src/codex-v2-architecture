@@ -147,7 +147,7 @@ function parseTextGFM(gfm) {
 		// The number of characters to EOL:
 		const charsToEnd = gfm.length - index
 		switch (true) {
-		// \\
+		// \Escape
 		case char === "\\": // Coerce
 			// No-op
 			data.push({
@@ -155,15 +155,14 @@ function parseTextGFM(gfm) {
 				syntax: [char],
 				children: null,
 			})
-			index++
 			continue
 		// Emphasis or strong (supports alternate syntax):
 		case char === "*" || char === "_":
 			// **Strong** or __strong__
-			if (charsToEnd >= (4 + 1) && gfm.slice(index, index + 2) === char.repeat(2)) {
+			if (charsToEnd >= (2 + 1 + 2) && gfm.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0) {
+				if (offset <= 0 || gfm[index + offset] === "\\") {
 					// No-op
 					break
 				}
@@ -176,10 +175,10 @@ function parseTextGFM(gfm) {
 				index += syntax.length + offset - 1
 				continue
 			// _Emphasis_ or *emphasis*
-			} else if (charsToEnd >= (2 + 1)) {
+			} else if (charsToEnd >= (1 + 1 + 1)) {
 				const syntax = char.repeat(1)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0) {
+				if (offset <= 0 || gfm[index + offset] === "\\") {
 					// No-op
 					break
 				}
@@ -228,12 +227,11 @@ function parseGFM(gfm) {
 				(each.length >= 7 && each.slice(0, 7) === "###### ")
 			) {
 				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
-				const children = each.slice(syntax[0].length) // TODO
 				data.push({
 					id: uuidv4(),
 					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
-					children,
+					children: parseTextGFM(each.slice(syntax[0].length)),
 				})
 				continue
 			}
@@ -336,8 +334,6 @@ const EditorBlocks = ({ data, ...props }) => (
 const EditorContext = React.createContext()
 
 // Renders an editor.
-//
-// NOTE: Does not spread props
 const Editor = ({ data, prefers, ...props }) => {
 	const ref = React.useRef()
 
@@ -450,14 +446,14 @@ function stringify(obj) {
 
 const App = props => {
 	const [data] = React.useState(() => (
-		parseGFM(`# This is a header
+		parseGFM(`# This is a _header\\_
 ## This is a subheader
 ### H3
 #### H4
 ##### H5
 ###### H6
 
-_em \\**and**_ **strong**
+_em **and**_ **strong**
 
 _em_ **_and_ strong**`)
 	))
