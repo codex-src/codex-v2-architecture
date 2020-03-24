@@ -18,13 +18,13 @@ const Markdown = ({ syntax, ...props }) => {
 	return (
 		<React.Fragment>
 			{(markdown && start) && (
-				<span className="text-md-blue-a400">
+				<span className="text-md-blue-a400" data-markdown>
 					{start}
 				</span>
 			)}
 			{props.children}
 			{(markdown && end) && (
-				<span className="text-md-blue-a400">
+				<span className="text-md-blue-a400" data-markdown>
 					{end}
 				</span>
 			)}
@@ -33,19 +33,19 @@ const Markdown = ({ syntax, ...props }) => {
 }
 
 const Em = ({ syntax, ...props }) => (
-	<span className="italic" data-inline="em">
+	<Inline className="italic" type="em" syntax={syntax}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</span>
+	</Inline>
 )
 
 const Strong = ({ syntax, ...props }) => (
-	<span className="font-bold" data-inline="strong">
+	<Inline className="font-bold" type="em" syntax={syntax}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</span>
+	</Inline>
 )
 
 export const Block = ({ id, type, syntax, ...props }) => (
@@ -55,14 +55,27 @@ export const Block = ({ id, type, syntax, ...props }) => (
 		// DOM style:
 		style={{ whiteSpace: "pre-wrap" }}
 		// VDOM type:
-		data-type={type}
+		data-block-type={type}
 		// VDOM syntax:
-		data-syntax={JSON.stringify(syntax || null)} {...props}
+		data-block-syntax={JSON.stringify(syntax || null)}
+		// Etc.
+		{...props}
 	>
 		{props.children || (
 			<br />
 		)}
 	</div>
+)
+
+export const Inline = ({ type, syntax, ...props }) => (
+	<span
+		// VDOM type:
+		data-inline-type={type}
+		// VDOM syntax:
+		data-inline-syntax={JSON.stringify(syntax || null)} {...props}
+	>
+		{props.children}
+	</span>
 )
 
 const H1 = React.memo(({ id, syntax, ...props }) => (
@@ -418,17 +431,43 @@ const Editor = ({ data, prefs, ...props }) => {
 	const ref = React.useRef()
 
 	const [txt, setTxt] = React.useState(() => convertToText(data))
-	const [gfm, setGFM] = React.useState(() => convertToText(data, { markdown: true }))
+	const [gfm, setGfm] = React.useState(() => convertToText(data, { markdown: true }))
 
 	React.useEffect(() => {
 		setTxt(convertToText(data))
-		setGFM(convertToText(data, { markdown: true }))
+		setGfm(convertToText(data, { markdown: true }))
 	}, [data])
+
+	// React.useEffect(() => {
+	// 	let markdown = ""
+	// 	const recurse = startNode => {
+	// 		for (const each of startNode.childNodes) {
+	// 			// Text and break nodes:
+	// 			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
+	// 				markdown += each.nodeValue
+	// 			} else if (each.nodeType === Node.ELEMENT_NODE) {
+	// 				recurse(each)
+	// 				const attrs = each.attributes
+	// 				if (attrs.id && attr)
+	// 				// const syntax = each.getAttribute("data-syntax")
+	// 			}
+	// 		}
+	// 		// for (const childNode of root.childNodes) {
+	// 		// 	if (childNode.nodeType === Node.TEXT_NODE || (childNode.nodeType === Node.ELEMENT_NODE && childNode.nodeName === "BR")) {
+	// 		// 		markdown += node.nodeValue || ""
+	// 		// 	} else {
+	// 		// 	}
+	// 		// }
+	// 	}
+	// 	recurse(ref.current)
+	// 	console.log({ markdown })
+	// }, [data])
 
 	const { Provider } = EditorContext
 	return (
 		<Provider value={prefs}>
 
+			{/* Editor */}
 			{React.createElement(
 				"div",
 				{
@@ -448,6 +487,7 @@ const Editor = ({ data, prefs, ...props }) => {
 				)),
 			)}
 
+			{/* Debugger */}
 			<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
 				{JSON.stringify(
 					{
@@ -483,7 +523,7 @@ const App = props => {
 
 				{/* Button markdown */}
 				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-150"
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onPointerDown={e => e.preventDefault()}
 					onClick={e => setPrefs({ ...prefs, markdown: !prefs.markdown })}
 				>
@@ -493,7 +533,7 @@ const App = props => {
 				{/* Button read-only */}
 				<span className="inline-block w-3" />
 				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-150"
+					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onPointerDown={e => e.preventDefault()}
 					onClick={e => setPrefs({ ...prefs, readOnly: !prefs.readOnly })}
 				>
