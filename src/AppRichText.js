@@ -191,7 +191,7 @@ function parseTextGFM(text) {
 				children: null,
 			})
 			continue
-		// <Strong> or <Em>
+		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
@@ -466,8 +466,11 @@ const cmap = new Map()
 
 ;(() => {
 	// Inline components:
+	cmap[Escape] = "Escape"
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
+	cmap[StrongAndEm] = "StrongAndEm"
+	cmap[Strike] = "Strike"
 
 	// Block components:
 	cmap[Header.type] = "Header"
@@ -507,7 +510,7 @@ const App = props => {
 ##### H5
 ###### H6
 
-***strong and em*** _em **and**_ **strong** or ~strike~ or ~~strike\\~~
+\\*\\*\\*strong and em\\*\\*\\* _em **and**_ **strong** or ~strike~ or ~~strike\\~~
 
 _em_ **_and_ strong**`)
 	))
