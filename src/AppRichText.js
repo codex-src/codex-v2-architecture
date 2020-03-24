@@ -60,7 +60,6 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
-// Wrapper component for block elements.
 export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
@@ -314,14 +313,16 @@ function innerText(element) {
 
 // Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
-	data.map(({ component: Component, ...each }) => (
-		<Component key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
+	data.map(({ component: Block, ...each }) => (
+		<Block key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
 	))
 )
 
 const EditorContext = React.createContext()
 
 // Renders an editor.
+//
+// NOTE: Does not spread props
 const Editor = ({ data, prefers, ...props }) => {
 	const ref = React.useRef()
 
@@ -356,9 +357,13 @@ const Editor = ({ data, prefers, ...props }) => {
 				{
 					ref,
 
-					className: "text-lg outline-none",
+					className: props.className,
 
-					style: { caretColor: "black" },
+					style: {
+						outline: "none",
+						caretColor: "black",
+						...props.style,
+					},
 
 					contentEditable: !prefers.readOnly,
 					suppressContentEditableWarning: !prefers.readOnly,
@@ -366,26 +371,28 @@ const Editor = ({ data, prefers, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
-				{JSON.stringify(
-					{
-						txt: {
-							data: txt,
-							characters: [...txt].length,
-							words: txt.split(/\s+/).filter(Boolean).length,
+			{true && (
+				<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
+					{JSON.stringify(
+						{
+							txt: {
+								data: txt,
+								characters: [...txt].length,
+								words: txt.split(/\s+/).filter(Boolean).length,
+							},
+							gfm: {
+								data: gfm,
+								characters: [...gfm].length,
+								words: gfm.split(/\s+/).filter(Boolean).length,
+							},
+							prefers,
+							data,
 						},
-						gfm: {
-							data: gfm,
-							characters: [...gfm].length,
-							words: gfm.split(/\s+/).filter(Boolean).length,
-						},
-						prefers,
-						data,
-					},
-					null,
-					"\t",
-				)}
-			</div>
+						null,
+						"\t",
+					)}
+				</div>
+			)}
 
 		</React.Fragment>
 	)
@@ -423,7 +430,7 @@ _em_ **_and_ strong**`)
 				</button>
 
 				{/* Editor */}
-				<Editor data={data} prefers={prefers} />
+				<Editor className="px-6" data={data} prefers={prefers} />
 
 			</div>
 		</div>
