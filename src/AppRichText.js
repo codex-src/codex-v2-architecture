@@ -1,7 +1,10 @@
 import React from "react"
+import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
+
+const EditorContext = React.createContext()
 
 // Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
@@ -23,7 +26,10 @@ function parseSyntax(syntax) {
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
+	const res = React.useContext(EditorContext)
+	console.log({ res })
+
+	const readOnly = true
 
 	const [s1, s2] = parseSyntax(syntax)
 	return (
@@ -60,7 +66,7 @@ const Strong = ({ syntax, ...props }) => (
 )
 
 // Wrapper component for block elements.
-export const $Node = ({ id, type, syntax, ...props }) => (
+export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
 			<br />
@@ -68,64 +74,64 @@ export const $Node = ({ id, type, syntax, ...props }) => (
 	</div>
 )
 
-const Header = React.memo(({ id, syntax, ...props }) => (
+const Header = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-500 text-4xl">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const Subheader = React.memo(({ id, syntax, ...props }) => (
+const Subheader = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-500 text-2xl">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const H3 = React.memo(({ id, syntax, ...props }) => (
+const H3 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-600 text-xl">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const H4 = React.memo(({ id, syntax, ...props }) => (
+const H4 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-600 text-lg">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const H5 = React.memo(({ id, syntax, ...props }) => (
+const H5 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-600">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const H6 = React.memo(({ id, syntax, ...props }) => (
+const H6 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-600">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{toReact(data)}
 		</Markdown>
 	</$Node>
 ))
 
-const Paragraph = React.memo(({ id, ...props }) => (
+const Paragraph = React.memo(({ id, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id}>
-		{props.children || (
+		{toReact(data) || (
 			<br />
 		)}
 	</$Node>
@@ -311,18 +317,32 @@ function innerText(element) {
 	return str
 }
 
-const EditorContext = React.createContext()
+// Renders editor blocks.
+const EditorBlocks = ({ data, ...props }) => (
+	data.map(({ component: Component, ...each }) => (
+		<Component key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
+	))
+)
 
 // Renders an editor.
 const Editor = ({ data, prefs, ...props }) => {
 	const ref = React.useRef()
 
-	const txt = React.useMemo(() => toString(data), [data])
-	const gfm = React.useMemo(() => toString(data, { markdown: true }), [data])
+	// Rerender the DOM when data changes (use useLayoutEffect
+	// because of contenteditable):
+	React.useLayoutEffect(() => {
+		ReactDOM.render(<EditorBlocks data={data} />, ref.current)
+	}, [data])
 
-	// React.useEffect(() => {
-	// 	console.log(innerText(ref.current))
-	// }, [data])
+	const [txt, setTxt] = React.useState(() => toString(data))
+	const [gfm, setGfm] = React.useState(() => toString(data, { markdown: true }))
+
+	// Lazily recompute txt and gfm (do not use
+	// useLayoutEffect or useMemo):
+	React.useEffect(() => {
+		setTxt(toString(data))
+		setGfm(toString(data, { markdown: true }))
+	}, [data])
 
 	const { Provider } = EditorContext
 	return (
@@ -341,11 +361,8 @@ const Editor = ({ data, prefs, ...props }) => {
 					contentEditable: !prefs.readOnly,
 					suppressContentEditableWarning: !prefs.readOnly,
 				},
-				data.map(({ component: Component, ...each }) => (
-					<Component key={each.id} id={each.id} syntax={each.syntax}>
-						{toReact(each.children)}
-					</Component>
-				)),
+				// NOTE: Leave empty because of contenteditable; use
+				// useLayoutEffect and ReactDOM.render
 			)}
 
 			{/* Debugger */}
