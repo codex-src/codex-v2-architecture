@@ -64,6 +64,15 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
+const Strike = ({ syntax, ...props }) => (
+	<span className="line-through">
+		{/* FIXME */}
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
+)
+
 export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
@@ -147,7 +156,7 @@ function parseTextGFM(gfm) {
 		// The number of characters to EOL:
 		const charsToEnd = gfm.length - index
 		switch (true) {
-		// \Escape
+		// Escape:
 		case char === "\\": // Coerce
 			// No-op
 			data.push({
@@ -156,13 +165,13 @@ function parseTextGFM(gfm) {
 				children: null,
 			})
 			continue
-		// Emphasis or strong (supports alternate syntax):
+		// Emphasis or strong:
 		case char === "*" || char === "_":
 			// **Strong** or __strong__
-			if (charsToEnd >= (2 + 1 + 2) && gfm.slice(index, index + 2) === char.repeat(2)) {
+			if (charsToEnd >= "**x**".length && gfm.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + offset] === "\\") {
+				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
 					// No-op
 					break
 				}
@@ -175,16 +184,52 @@ function parseTextGFM(gfm) {
 				index += syntax.length + offset - 1
 				continue
 			// _Emphasis_ or *emphasis*
-			} else if (charsToEnd >= (1 + 1 + 1)) {
+			} else if (charsToEnd >= "*x*".length) {
 				const syntax = char.repeat(1)
 				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + offset] === "\\") {
+				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
 					// No-op
 					break
 				}
 				index += syntax.length
 				data.push({
 					component: Em,
+					syntax,
+					children: parseTextGFM(gfm.slice(index, index + offset)),
+				})
+				index += offset + syntax.length - 1
+				continue
+			}
+			break
+		// Strikethrough:
+		case char === "~":
+			// ~~Strike~~
+			if (charsToEnd >= "~~x~~".length && gfm.slice(index, index + 2) === char.repeat(2)) {
+				const syntax = char.repeat(2)
+				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+					// No-op
+					break
+				}
+				index += syntax.length
+				data.push({
+					component: Strike,
+					syntax,
+					children: parseTextGFM(gfm.slice(index, index + offset)),
+				})
+				index += syntax.length + offset - 1
+				continue
+			// ~Strike~
+			} else if (charsToEnd >= "~x~".length) {
+				const syntax = char.repeat(1)
+				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+					// No-op
+					break
+				}
+				index += syntax.length
+				data.push({
+					component: Strike,
 					syntax,
 					children: parseTextGFM(gfm.slice(index, index + offset)),
 				})
@@ -414,8 +459,6 @@ const cmap = new Map()
 	cmap[Strong] = "Strong"
 
 	// Block components:
-	//
-	// NOTE: Use X.type because of React.memo
 	cmap[Header.type] = "Header"
 	cmap[Subheader.type] = "Subheader"
 	cmap[H3.type] = "H3"
@@ -446,14 +489,14 @@ function stringify(obj) {
 
 const App = props => {
 	const [data] = React.useState(() => (
-		parseGFM(`# This is a _header\\_
+		parseGFM(`# This is a **header**
 ## This is a subheader
 ### H3
 #### H4
 ##### H5
 ###### H6
 
-_em **and**_ **strong**
+_em **and**_ **strong** or ~strike~ or ~~strike\\~~
 
 _em_ **_and_ strong**`)
 	))
