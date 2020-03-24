@@ -23,20 +23,20 @@ function parseSyntax(syntax) {
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const { markdown } = React.useContext(EditorContext)
+	const { readOnly } = React.useContext(EditorContext)
 
-	const [start, end] = parseSyntax(syntax)
+	const [s1, s2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
-			{(markdown && start) && (
-				<span className="text-md-blue-a400" data-markdown>
-					{start}
+			{s1 && (
+				<span className="text-md-blue-a400" style={{ display: readOnly && "none" }}>
+					{s1}
 				</span>
 			)}
 			{props.children}
-			{(markdown && end) && (
-				<span className="text-md-blue-a400" data-markdown>
-					{end}
+			{s2 && (
+				<span className="text-md-blue-a400" style={{ display: readOnly && "none" }}>
+					{s2}
 				</span>
 			)}
 		</React.Fragment>
@@ -44,105 +44,90 @@ const Markdown = ({ syntax, ...props }) => {
 }
 
 const Em = ({ syntax, ...props }) => (
-	<Inline className="italic" type="em" syntax={syntax}>
+	<span className="italic">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Inline>
+	</span>
 )
 
 const Strong = ({ syntax, ...props }) => (
-	<Inline className="font-bold" type="em" syntax={syntax}>
+	<span className="font-bold">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Inline>
+	</span>
 )
 
-export const Block = ({ id, type, syntax, ...props }) => (
-	<div
-		// DOM and VDOM ID:
-		id={id}
-		// DOM style:
-		style={{ whiteSpace: "pre-wrap" }}
-		// VDOM type:
-		data-block-type={type}
-		// VDOM syntax:
-		data-block-syntax={JSON.stringify(syntax || null)}
-		// Etc.
-		{...props}
-	>
+export const $Node = ({ id, type, syntax, ...props }) => (
+	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
 			<br />
 		)}
 	</div>
 )
 
-export const Inline = ({ type, syntax, ...props }) => (
-	<span
-		// VDOM type:
-		data-inline-type={type}
-		// VDOM syntax:
-		data-inline-syntax={JSON.stringify(syntax || null)} {...props}
-	>
-		{props.children}
-	</span>
-)
-
-const H1 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-500 text-4xl" type="h1" syntax={syntax}>
+const Header = React.memo(({ id, syntax, ...props }) => (
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-500 text-4xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
-const H2 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-500 text-2xl" type="h2" syntax={syntax}>
+const Subheader = React.memo(({ id, syntax, ...props }) => (
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-500 text-2xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
 const H3 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-600 text-xl" type="h3" syntax={syntax}>
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-600 text-xl">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
 const H4 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-600 text-lg" type="h4" syntax={syntax}>
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-600 text-lg">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
 const H5 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-600" type="h5" syntax={syntax}>
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-600">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
 const H6 = React.memo(({ id, syntax, ...props }) => (
-	<Block id={id} className="font-600" type="h6" syntax={syntax}>
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id} className="font-600">
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
-	</Block>
+	</$Node>
 ))
 
 const Paragraph = React.memo(({ id, ...props }) => (
-	<Block id={id} type="p">
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id}>
 		{props.children || (
 			<br />
 		)}
-	</Block>
+	</$Node>
 ))
 
 // Parses VDOM representations to React components.
@@ -225,12 +210,8 @@ function parseMarkdownText(text) {
 			data[data.length - 1] += char
 		}
 	}
-	// Return a string instead of an array:
-	if (data.length === 1) {
-		return data[0]
-	}
-	// Return an array:
-	return data
+	// Return a string or an array:
+	return !data.length ? data[0] : data
 }
 
 // Parses markdown (GFM) to a VDOM representation.
@@ -241,7 +222,7 @@ function parseMarkdown(text) {
 		const each = paragraphs[index] // Shorthand
 		// const char = each.charAt(0) // Shorthand
 		switch (each.charAt(0)) {
-		// H1:
+		// # Header:
 		case "#":
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
@@ -256,7 +237,7 @@ function parseMarkdown(text) {
 				data.push({
 					id: uuidv4(),
 					// NOTE: Use ... - 2 for zero-based and space
-					component: [H1, H2, H3, H4, H5, H6][syntax[0].length - 2],
+					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
 					children,
 				})
@@ -277,209 +258,75 @@ function parseMarkdown(text) {
 	return data
 }
 
-// Supposed to be a markdown (GFM) representation of data.
-const raw = `# This is a header
-## This is a subheader
-### H3
-#### H4
-##### H5
-###### H6
-
-_em **and**_ **strong**
-
-_em_ **_and_ strong**`
-
-// const data = [
-// 	{
-// 		id: uuidv4(),
-// 		component: H1,
-// 		syntax: ["# "],
-// 		children: "This is a header",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: H2,
-// 		syntax: ["## "],
-// 		children: "This is a subheader",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: H3,
-// 		syntax: ["### "],
-// 		children: "H3",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: H4,
-// 		syntax: ["#### "],
-// 		children: "H4",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: H5,
-// 		syntax: ["##### "],
-// 		children: "H5",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: H6,
-// 		syntax: ["###### "],
-// 		children: "H6",
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: Paragraph,
-// 		syntax: null,
-// 		children: null,
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: Paragraph,
-// 		syntax: null,
-// 		children: [
-// 			{
-// 				component: Em,
-// 				syntax: "_",
-// 				children: [
-// 					"em ",
-// 					{
-// 						component: Strong,
-// 						syntax: "**",
-// 						children: "and",
-// 					},
-// 				],
-// 			},
-// 			" ",
-// 			{
-// 				component: Strong,
-// 				syntax: "**",
-// 				children: "strong",
-// 			},
-// 		],
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: Paragraph,
-// 		syntax: null,
-// 		children: null,
-// 	},
-// 	{
-// 		id: uuidv4(),
-// 		component: Paragraph,
-// 		syntax: null,
-// 		children: [
-// 			{
-// 				component: Em,
-// 				syntax: "_",
-// 				children: "em",
-// 			},
-// 			" ",
-// 			{
-// 				component: Strong,
-// 				syntax: "**",
-// 				children: [
-// 					{
-// 						component: Em,
-// 						syntax: "_",
-// 						children: "and",
-// 					},
-// 					" strong",
-// 				],
-// 			},
-// 		],
-// 	},
-// ]
-
-// // TESTING
-// console.log(parseMarkdown(raw))
-
-// Converts a data structure to plain text (GitHub Flavored
-// Markdown is an option).
-function convertToText(data, options = { markdown: false }) {
-	let result = ""
+// Converts an editor data structure to plain text.
+function toString(data, { markdown } = { markdown: false }) {
+	let str = ""
 	// Recurse inline elements:
 	const recurse = children => {
 		if (children === null || typeof children === "string") {
-			result += children || ""
+			str += children || ""
 			return
 		}
 		for (const each of children) {
 			if (each === null || typeof each === "string") {
-				result += each || ""
+				str += each || ""
 				continue
 			}
-			result += (options.markdown && each.syntax) || ""
+			str += (markdown && each.syntax) || ""
 			recurse(each.children)
-			result += (options.markdown && each.syntax) || ""
+			str += (markdown && each.syntax) || ""
 		}
 	}
 	// Iterate block elements:
 	for (const each of data) {
-		const [start, end] = parseSyntax(each.syntax)
-		result += (options.markdown && start) || ""
+		const [s1, s2] = parseSyntax(each.syntax)
+		str += (markdown && s1) || ""
 		recurse(each.children)
-		result += (options.markdown && end) || ""
+		str += (markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
-			result += "\n" // EOL
+			str += "\n" // EOL
 		}
 	}
-	return result
+	return str
+}
+
+// Recursively reads from an element.
+function innerText(element) {
+	let str = ""
+	const recurse = element => {
+		for (const each of element.childNodes) {
+			// Text and <br>:
+			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
+				str += each.nodeValue || ""
+			// <Any>:
+			} else if (each.nodeType === Node.ELEMENT_NODE) {
+				recurse(each)
+				if (each.getAttribute("data-node") || each.getAttribute("data-compound-node")) {
+					str += "\n"
+				}
+			}
+		}
+	}
+	recurse(element)
+	return str
 }
 
 const EditorContext = React.createContext()
 
-const SafeAttributeRe = /^("[^"]+"|\[\"[^"]+"\]|null)$/
-
-// if (!value.match(SafeAttributeRe)) {
-// 	throw new Error(
-// 		`Attribute data-(block|inline)-type=${value} is not safe for production; ` +
-// 		`use a string, array of strings, or null`,
-// 	)
-// }
-
-// Renders an editor.
+// Renders a Codex editor.
 const Editor = ({ data, prefs, ...props }) => {
 	const ref = React.useRef()
 
-	const [txt, setTxt] = React.useState(() => convertToText(data))
-	const [gfm, setGfm] = React.useState(() => convertToText(data, { markdown: true }))
+	const [txt, setTxt] = React.useState(() => toString(data))
+	const [gfm, setGfm] = React.useState(() => toString(data, { markdown: true }))
 
 	React.useEffect(() => {
-		setTxt(convertToText(data))
-		setGfm(convertToText(data, { markdown: true }))
+		setTxt(toString(data))
+		setGfm(toString(data, { markdown: true }))
 	}, [data])
 
 	React.useEffect(() => {
-		let markdown = ""
-		const recurse = startNode => {
-			for (const each of startNode.childNodes) {
-				// <Markdown>
-				if (each.nodeType === Node.ELEMENT_NODE && each.getAttribute("data-markdown")) {
-					// No-op
-					continue
-				// Text and <br>
-				} else if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-					markdown += each.nodeValue || ""
-					return
-				// <Block>
-				} else if (each.nodeType === Node.ELEMENT_NODE) {
-					let start = ""
-					let end = ""
-					if (each.getAttribute(["data-block-syntax"]) || each.getAttribute(["data-inline-syntax"])) {
-						const attribute = each.getAttribute(["data-block-syntax"]) || each.getAttribute(["data-inline-syntax"])
-						;[start, end] = parseSyntax(JSON.parse(attribute))
-					}
-					markdown += start
-					recurse(each)
-					markdown += end
-					if (each.getAttribute(["data-block-syntax"])) {
-						markdown += "\n"
-					}
-				}
-			}
-		}
-		recurse(ref.current)
-		console.log({ markdown })
+		console.log(innerText(ref.current))
 	}, [data])
 
 	const { Provider } = EditorContext
@@ -510,11 +357,17 @@ const Editor = ({ data, prefs, ...props }) => {
 			<div className="my-6 h-64 whitespace-pre-wrap font-mono text-xs overflow-y-scroll" style={{ tabSize: 2 }}>
 				{JSON.stringify(
 					{
-						txt,
-						gfm,
-						charCount: [...txt].length,
-						wordCount: txt.split(/\s+/).filter(Boolean).length,
-						prefs, // Takes precedence?
+						txt: {
+							data: txt,
+							characters: [...txt].length,
+							words: txt.split(/\s+/).filter(Boolean).length,
+						},
+						gfm: {
+							data: gfm,
+							characters: [...gfm].length,
+							words: gfm.split(/\s+/).filter(Boolean).length,
+						},
+						prefs,
 						data,
 					},
 					null,
@@ -527,30 +380,28 @@ const Editor = ({ data, prefs, ...props }) => {
 }
 
 const App = props => {
-	const [data] = React.useState(() => {
-		return parseMarkdown(raw, { markdown: true })
-	})
+	const [data] = React.useState(() => (
+		parseMarkdown(`# This is a header
+## This is a subheader
+### H3
+#### H4
+##### H5
+###### H6
+
+_em **and**_ **strong**
+
+_em_ **_and_ strong**`)
+	))
 
 	const [prefs, setPrefs] = React.useState(() => ({
-		markdown: true,
-		readOnly: true,
+		readOnly: false,
 	}))
 
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="py-32 w-full max-w-3xl">
 
-				{/* Button markdown */}
-				<button
-					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onPointerDown={e => e.preventDefault()}
-					onClick={e => setPrefs({ ...prefs, markdown: !prefs.markdown })}
-				>
-					Toggle markdown: {!prefs.markdown ? "OFF" : "ON"}
-				</button>
-
-				{/* Button read-only */}
-				<span className="inline-block w-3" />
+				{/* Buttons */}
 				<button
 					className="my-6 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onPointerDown={e => e.preventDefault()}
