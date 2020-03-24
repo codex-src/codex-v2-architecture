@@ -23,22 +23,32 @@ function parseSyntax(syntax) {
 	return [s1, s2]
 }
 
-const Markdown = ({ syntax, ...props }) => {
-	const prefers = React.useContext(EditorContext)
+const Syntax = ({ className, readOnly, ...props }) => (
+	<span className={className || "text-md-blue-a400"} style={{ display: readOnly && "none" }}>
+		{props.children}
+	</span>
+)
+
+const Markdown = ({ className, syntax, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
 
 	const [s1, s2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 			{s1 && (
-				<span className="text-md-blue-a400" style={{ display: prefers.readOnly && "none" }}>
-					{s1}
-				</span>
+				<Syntax
+					className={className}
+					readOnly={readOnly}
+					children={s1}
+				/>
 			)}
 			{props.children}
 			{s2 && (
-				<span className="text-md-blue-a400" style={{ display: prefers.readOnly && "none" }}>
-					{s2}
-				</span>
+				<Syntax
+					className={className}
+					readOnly={readOnly}
+					children={s1}
+				/>
 			)}
 		</React.Fragment>
 	)
@@ -67,6 +77,14 @@ const Strong = ({ syntax, ...props }) => (
 const StrongAndEm = ({ syntax, ...props }) => (
 	<span className="font-semibold italic">
 		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
+)
+
+const Code = ({ syntax, ...props }) => (
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded">
+		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
 	</span>
@@ -263,6 +281,19 @@ function parseTextGFM(text) {
 			// ~Strike~
 			} else if (charsToEnd >= "~x~".length) {
 				const parsed = registerComponent(Strike, "~")(text, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.object)
+				index = parsed.x2
+				continue
+			}
+			break
+		// <Code>
+		case char === "`":
+			if (charsToEnd >= "`x`".length) {
+				const parsed = registerComponent(Code, "`")(text, index)
 				if (!parsed) {
 					// No-op
 					break
