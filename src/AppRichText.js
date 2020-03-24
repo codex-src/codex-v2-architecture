@@ -64,6 +64,14 @@ const Strong = ({ syntax, ...props }) => (
 	</span>
 )
 
+const StrongAndEm = ({ syntax, ...props }) => (
+	<span className="font-bold italic">
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
+)
+
 const Strike = ({ syntax, ...props }) => (
 	<span className="line-through">
 		{/* FIXME */}
@@ -145,17 +153,18 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 ))
 
 // Registers a component for parseTextGFM.
-function registerComponent(component, syntax) {
+function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	const parse = (text, index) => {
 		const offset = text.slice(index + syntax.length).indexOf(syntax)
 		if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
 			return null
 		}
 		index += syntax.length
+		const str = text.slice(index, index + offset)
 		const object = {
 			component,
 			syntax,
-			children: parseTextGFM(text.slice(index, index + offset)),
+			children: !recurse ? str : parseTextGFM(str),
 		}
 		index += syntax.length + offset - 1
 		return { object, goto: index }
@@ -170,13 +179,11 @@ function parseTextGFM(text) {
 	}
 	const data = []
 	for (let index = 0; index < text.length; index++) {
-		// The current character:
 		const char = text[index]
-		// The number of characters to EOL:
 		const charsToEnd = text.length - index
 		switch (true) {
 		// <Escape>
-		case char === "\\": // Coerce
+		case char === "\\":
 			// No-op
 			data.push({
 				component: Escape,
@@ -186,8 +193,18 @@ function parseTextGFM(text) {
 			continue
 		// <Strong> or <Em>
 		case char === "*" || char === "_":
+			// ***Strong and em***
+			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
+				const parsed = registerComponent(StrongAndEm, char.repeat(3))(text, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.object)
+				index = parsed.goto
+				continue
 			// **Strong** or __strong__
-			if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
+			} else if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
 				const parsed = registerComponent(Strong, char.repeat(2))(text, index)
 				if (!parsed) {
 					// No-op
@@ -490,7 +507,7 @@ const App = props => {
 ##### H5
 ###### H6
 
-_em **and**_ **strong** or ~strike~ or ~~strike\\~~
+***strong and em*** _em **and**_ **strong** or ~strike~ or ~~strike\\~~
 
 _em_ **_and_ strong**`)
 	))
