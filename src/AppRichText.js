@@ -144,17 +144,36 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 	</$Node>
 ))
 
+// Registers a component for parseTextGFM.
+function registerComponent(component, syntax) {
+	const parse = (text, index) => {
+		const offset = text.slice(index + syntax.length).indexOf(syntax)
+		if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+			return null
+		}
+		index += syntax.length
+		const object = {
+			component,
+			syntax,
+			children: parseTextGFM(text.slice(index, index + offset)),
+		}
+		index += syntax.length + offset // - 1
+		return { object, x2: index }
+	}
+	return parse
+}
+
 // Parses GFM text to a VDOM representation.
-function parseTextGFM(gfm) {
-	if (!gfm) {
+function parseTextGFM(text) {
+	if (!text) {
 		return null
 	}
 	const data = []
-	for (let index = 0; index < gfm.length; index++) {
+	for (let index = 0; index < text.length; index++) {
 		// The current character:
-		const char = gfm[index]
+		const char = text[index]
 		// The number of characters to EOL:
-		const charsToEnd = gfm.length - index
+		const charsToEnd = text.length - index
 		switch (true) {
 		// Escape:
 		case char === "\\": // Coerce
@@ -168,10 +187,10 @@ function parseTextGFM(gfm) {
 		// Emphasis or strong:
 		case char === "*" || char === "_":
 			// **Strong** or __strong__
-			if (charsToEnd >= "**x**".length && gfm.slice(index, index + 2) === char.repeat(2)) {
+			if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
-				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+				const offset = text.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
 					// No-op
 					break
 				}
@@ -179,15 +198,15 @@ function parseTextGFM(gfm) {
 				data.push({
 					component: Strong,
 					syntax,
-					children: parseTextGFM(gfm.slice(index, index + offset)),
+					children: parseTextGFM(text.slice(index, index + offset)),
 				})
 				index += syntax.length + offset - 1
 				continue
 			// _Emphasis_ or *emphasis*
 			} else if (charsToEnd >= "*x*".length) {
 				const syntax = char.repeat(1)
-				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+				const offset = text.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
 					// No-op
 					break
 				}
@@ -195,7 +214,7 @@ function parseTextGFM(gfm) {
 				data.push({
 					component: Em,
 					syntax,
-					children: parseTextGFM(gfm.slice(index, index + offset)),
+					children: parseTextGFM(text.slice(index, index + offset)),
 				})
 				index += offset + syntax.length - 1
 				continue
@@ -204,10 +223,10 @@ function parseTextGFM(gfm) {
 		// Strikethrough:
 		case char === "~":
 			// ~~Strike~~
-			if (charsToEnd >= "~~x~~".length && gfm.slice(index, index + 2) === char.repeat(2)) {
+			if (charsToEnd >= "~~x~~".length && text.slice(index, index + 2) === char.repeat(2)) {
 				const syntax = char.repeat(2)
-				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+				const offset = text.slice(index + syntax.length).indexOf(syntax)
+				if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
 					// No-op
 					break
 				}
@@ -215,25 +234,33 @@ function parseTextGFM(gfm) {
 				data.push({
 					component: Strike,
 					syntax,
-					children: parseTextGFM(gfm.slice(index, index + offset)),
+					children: parseTextGFM(text.slice(index, index + offset)),
 				})
 				index += syntax.length + offset - 1
 				continue
 			// ~Strike~
 			} else if (charsToEnd >= "~x~".length) {
-				const syntax = char.repeat(1)
-				const offset = gfm.slice(index + syntax.length).indexOf(syntax)
-				if (offset <= 0 || gfm[index + syntax.length + offset - 1] === "\\") {
+				const parsed = registerComponent(Strike, "~")(text, index)
+				if (!parsed) {
 					// No-op
 					break
 				}
-				index += syntax.length
-				data.push({
-					component: Strike,
-					syntax,
-					children: parseTextGFM(gfm.slice(index, index + offset)),
-				})
-				index += offset + syntax.length - 1
+				data.push(parsed.object)
+				index = parsed.x2 - 1
+
+				// const syntax = char.repeat(1)
+				// const offset = text.slice(index + syntax.length).indexOf(syntax)
+				// if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+				// 	// No-op
+				// 	break
+				// }
+				// index += syntax.length
+				// data.push({
+				// 	component: Strike,
+				// 	syntax,
+				// 	children: parseTextGFM(text.slice(index, index + offset)),
+				// })
+				// index += offset + syntax.length - 1
 				continue
 			}
 			break
@@ -254,9 +281,9 @@ function parseTextGFM(gfm) {
 }
 
 // Parses GFM to a VDOM representation.
-function parseGFM(gfm) {
+function parseGFM(text) {
 	const data = []
-	const paragraphs = gfm.split("\n")
+	const paragraphs = text.split("\n")
 	// NOTE: Use an index for multiline elements
 	for (let index = 0; index < paragraphs.length; index++) {
 		const each = paragraphs[index]
