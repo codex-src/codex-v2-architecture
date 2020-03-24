@@ -83,7 +83,7 @@ const StrongAndEm = ({ syntax, ...props }) => (
 )
 
 const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded">
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 roundedg">
 		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -591,15 +591,17 @@ _em_ **_and_ strong**
 			<div className="px-6 py-32 flex flex-row w-full max-w-6xl">
 
 				{/* LHS */}
-				<textarea
-					className="w-full outline-none"
-					value={value}
-					onChange={e => setValue(e.target.value)}
-				/>
+				<div className="w-1/2">
+					<textarea
+						className="w-full h-full outline-none"
+						value={value}
+						onChange={e => setValue(e.target.value)}
+					/>
+				</div>
 
 				{/* RHS */}
 				<div className="flex-shrink-0 w-6" />
-				<div className="w-full">
+				<div className="w-1/2">
 					<Editor
 						className="text-lg"
 						data={data}
