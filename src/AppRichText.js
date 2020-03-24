@@ -82,13 +82,21 @@ const StrongAndEm = ({ syntax, ...props }) => (
 	</span>
 )
 
-const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 roundedg">
-		<Markdown className="text-red-600" syntax={syntax}>
-			{props.children}
-		</Markdown>
-	</span>
-)
+const Code = ({ syntax, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	return (
+		<span className="py-px font-mono text-sm text-red-600 bg-red-100 roundedg">
+			<Markdown className="text-red-600" syntax={syntax}>
+				{!readOnly ? (
+					props.children
+				) : (
+					props.children.trim()
+				)}
+			</Markdown>
+		</span>
+	)
+}
 
 const Strike = ({ syntax, ...props }) => (
 	<span className="line-through">
@@ -295,7 +303,7 @@ function parseTextGFM(text) {
 		// <Code>
 		case char === "`":
 			if (charsToEnd >= "`x`".length) {
-				const parsed = registerComponent(Code, "`")(text, index)
+				const parsed = registerComponent(Code, "`", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -604,13 +612,23 @@ _em_ **_and_ strong**
 
 	const data = React.useMemo(() => parseGFM(value), [value])
 
-	const [prefers] = React.useState({
+	const [prefers, setPrefers] = React.useState({
 		readOnly: false,
 	})
 
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="px-6 py-32 flex flex-row w-full max-w-6xl">
+
+				<div className="p-3 fixed right-0 top-0">
+					<button
+						className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+						onPointerDown={e => e.preventDefault()}
+						onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
+					>
+						Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
+					</button>
+				</div>
 
 				{/* LHS */}
 				<div className="w-1/2">
@@ -635,13 +653,5 @@ _em_ **_and_ strong**
 		</div>
 	)
 }
-
-// <button
-// 	className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 	onPointerDown={e => e.preventDefault()}
-// 	onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
-// >
-// 	Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
-// </button>
 
 export default App
