@@ -44,9 +44,9 @@ const Markdown = ({ syntax, ...props }) => {
 	)
 }
 
-const Escape = ({ syntax, ...props }) => (
-	<Markdown syntax={syntax} />
-)
+// const Escape = ({ syntax, ...props }) => (
+// 	<Markdown syntax={syntax} />
+// )
 
 const Em = ({ syntax, ...props }) => (
 	<span className="italic">
@@ -74,7 +74,6 @@ const StrongAndEm = ({ syntax, ...props }) => (
 
 const Strike = ({ syntax, ...props }) => (
 	<span className="line-through">
-		{/* FIXME */}
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -156,7 +155,7 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 	const parse = (text, index) => {
 		const offset = text.slice(index + syntax.length).indexOf(syntax)
-		if (offset <= 0 || text[index + syntax.length + offset - 1] === "\\") {
+		if (offset <= 0) { // || text[index + syntax.length + offset - 1] === "\\") {
 			return null
 		}
 		index += syntax.length
@@ -167,7 +166,7 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 			children: !recurse ? str : parseTextGFM(str),
 		}
 		index += syntax.length + offset - 1
-		return { object, goto: index }
+		return { object, x2: index }
 	}
 	return parse
 }
@@ -182,15 +181,17 @@ function parseTextGFM(text) {
 		const char = text[index]
 		const charsToEnd = text.length - index
 		switch (true) {
-		// <Escape>
-		case char === "\\":
-			// No-op
-			data.push({
-				component: Escape,
-				syntax: [char],
-				children: null,
-			})
-			continue
+
+		// // <Escape>
+		// case char === "\\":
+		// 	// No-op
+		// 	data.push({
+		// 		component: Escape,
+		// 		syntax: [char],
+		// 		children: null,
+		// 	})
+		// 	continue
+
 		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
 			// ***Strong and em***
@@ -201,7 +202,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.goto
+				index = parsed.x2
 				continue
 			// **Strong** or __strong__
 			} else if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
@@ -211,7 +212,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.goto
+				index = parsed.x2
 				continue
 			// _Emphasis_ or *emphasis*
 			} else if (charsToEnd >= "*x*".length) {
@@ -221,7 +222,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.goto
+				index = parsed.x2
 				continue
 			}
 			break
@@ -235,7 +236,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.goto
+				index = parsed.x2
 				continue
 			// ~Strike~
 			} else if (charsToEnd >= "~x~".length) {
@@ -245,7 +246,7 @@ function parseTextGFM(text) {
 					break
 				}
 				data.push(parsed.object)
-				index = parsed.goto
+				index = parsed.x2
 				continue
 			}
 			break
@@ -466,7 +467,7 @@ const cmap = new Map()
 
 ;(() => {
 	// Inline components:
-	cmap[Escape] = "Escape"
+	// cmap[Escape] = "Escape"
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
 	cmap[StrongAndEm] = "StrongAndEm"
@@ -510,7 +511,7 @@ const App = props => {
 ##### H5
 ###### H6
 
-\\*\\*\\*strong and em\\*\\*\\* _em **and**_ **strong** or ~strike~ or ~~strike\\~~
+_em **and**_ **strong** or ~strike~ or ~~strike~~
 
 _em_ **_and_ strong**`)
 	))
