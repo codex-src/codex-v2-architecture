@@ -1,3 +1,4 @@
+import escape from "lodash/escape"
 import React from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
@@ -399,8 +400,8 @@ function toReact(children) {
 	return components
 }
 
-// Converts a VDOM representation to a plaintext string.
-function toPlaintext(data, { markdown } = { markdown: false }) {
+// Converts a VDOM representation to a plain text string.
+function toPlainText(data, { markdown } = { markdown: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
@@ -437,26 +438,28 @@ function toHTML(data) {
 	// Recurse children:
 	const recurse = children => {
 		if (children === null || typeof children === "string") {
-			str += children || `<br>`
+			str += escape(children) || "<br>"
 			return
 		}
 		for (const each of children) {
 			if (each === null || typeof each === "string") {
-				str += each || `<br>`
+				str += escape(each) || "<br>"
 				continue
 			}
-			const [start, end] = cmapHTML[each.component]
-			str += start
+			const [startTag, endTag] = cmapHTML[each.component]
+			str += startTag
 			recurse(each.children)
-			str += end
+			str += endTag
 		}
 	}
 	// Iterate top-level children:
 	for (const each of data) {
-		const [start, end] = cmapHTML[each.component.type] // NOTE: Use x.type because of React.memo
-		str += `${start}\n\t`
+		// NOTE: Use x.type because of React.memo or use
+		// each.component.type || each.component
+		const [startTag, endTag] = cmapHTML[each.component.type || each.component]
+		str += `${startTag}\n\t`
 		recurse(each.children)
-		str += `\n${end}`
+		str += `\n${endTag}`
 		if (each !== data[data.length - 1]) {
 			str += "\n" // EOL
 		}
@@ -581,26 +584,23 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: Add HTML?
 	React.useEffect(() => {
-		console.log(toHTML(state.data))
-
-		const txt = toPlaintext(state.data)
-		const gfm = toPlaintext(state.data, { markdown: true })
-		// Compute metrics:
-		// const bytes = txt.length
-		const characters = [...txt].length
-		const words = txt.split(/\s+/).filter(Boolean).length
+		const text = toPlainText(state.data)
+		const markdown = toPlainText(state.data, { markdown: true })
+		const html = toHTML(state.data)
+		const runes = [...text].length
+		const words = text.split(/\s+/).filter(Boolean).length
 		const duration = words / 250
 		setState(current => ({
 			...current,
-			txt: {
-				title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				data: txt,
-				// bytes,
-				characters,
+			text: {
+				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+				data: text,
+				runes,
 				words,
 				duration,
 			},
-			gfm,
+			markdown,
+			html,
 		}))
 	}, [
 		state.data,
@@ -609,7 +609,7 @@ const Editor = ({ state, setState, ...props }) => {
 
 	return (
 		// <React.Fragment>
-		<DocumentTitle title={!state.txt ? "Loading…" : state.txt.title}>
+		<DocumentTitle title={!state.text ? "Loading…" : state.text.title}>
 
 			{/* Editor */}
 			{React.createElement(
