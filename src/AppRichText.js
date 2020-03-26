@@ -90,7 +90,7 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<span className="py-px font-mono text-sm text-red-600 bg-red-100 roundedg">
+		<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded">
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -513,7 +513,7 @@ const Editor = ({ data, prefers, ...props }) => {
 			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify({
-						title: txt.split("\n", 1)[0] || "Untitled",
+						title: [...txt.split("\n", 1)[0]].slice(0, 100).join(),
 						txt: {
 							data: txt,
 							characters: [...txt].length,
