@@ -445,17 +445,18 @@ function toHTML(data) {
 				str += each || `<br>`
 				continue
 			}
-			// str += (markdown && each.syntax) || ""
+			const inline = cmapHTML[each.component]
+			str += `<${inline}>`
 			recurse(each.children)
-			// str += (markdown && each.syntax) || ""
+			str += `</${inline}>`
 		}
 	}
 	// Iterate top-level children:
 	for (const each of data) {
-		const html = cmapHTML[each.component.type]
-		str += `<${html}>\n\t`
+		const block = cmapHTML[each.component.type] // NOTE: Use x.type because of React.memo
+		str += `<${block}>\n\t`
 		recurse(each.children)
-		str += `\n</${html}>`
+		str += `\n</${block}>`
 		if (each !== data[data.length - 1]) {
 			str += "\n" // EOL
 		}
@@ -503,6 +504,7 @@ const cmapHTML = new Map()
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
 	cmap[StrongAndEm] = "StrongAndEm"
+	cmap[Code] = "Code"
 	cmap[Strike] = "Strike"
 
 	// Block components:
@@ -518,7 +520,8 @@ const cmapHTML = new Map()
 	cmapHTML[Escape] = "Escape" // ??
 	cmapHTML[Em] = "em"
 	cmapHTML[Strong] = "strong"
-	cmapHTML[StrongAndEm] = "strong+em" // ?
+	cmapHTML[StrongAndEm] = "strong+em" // ??
+	cmapHTML[Code] = "code"
 	cmapHTML[Strike] = "strike"
 
 	// Block components:
