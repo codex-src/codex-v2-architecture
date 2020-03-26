@@ -433,7 +433,7 @@ function toPlainText(data, { markdown } = { markdown: false }) {
 }
 
 // Converts a VDOM representation to an HTML string.
-function toHTML(data) {
+function toHTML(data, { indent } = { indent: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
@@ -457,9 +457,9 @@ function toHTML(data) {
 		// NOTE: Use x.type because of React.memo or use
 		// each.component.type || each.component
 		const [startTag, endTag] = cmapHTML[each.component.type || each.component]
-		str += `${startTag}\n\t`
+		str += `${startTag}${!indent ? "" : "\n\t"}`
 		recurse(each.children)
-		str += `\n${endTag}`
+		str += `${!indent ? "" : "\n"}${endTag}`
 		if (each !== data[data.length - 1]) {
 			str += "\n" // EOL
 		}
@@ -631,7 +631,7 @@ const Editor = ({ state, setState, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{true && (
+			{false && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify(state)}
 				</div>
@@ -705,6 +705,16 @@ _em_ **_and_ strong**
 			data: parseGFM(value),
 		}))
 	}, [value])
+
+	// DEBUG
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			console.log({ state })
+		}, 100)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state])
 
 	// Shortcuts:
 	React.useEffect(() => {
