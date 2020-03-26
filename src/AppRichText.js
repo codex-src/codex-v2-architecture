@@ -609,15 +609,14 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: Add HTML?
 	React.useEffect(() => {
-		const WPM = 250      // Words per minute
-		const WPS = WPM * 60 // Words per second
-
 		const text = toText(state.data)
 		const markdown = toText(state.data, { markdown: true })
 		const html = toHTML(state.data)
 		const runes = [...text].length
 		const words = text.split(/\s+/).filter(Boolean).length
-		const seconds = words / WPS // FIXME
+		// TODO: A better estimate uses runes / avg. characters
+		// per word / 250 * 60
+		const seconds = Math.round(words / 250 /* WPM */ * 60)
 		setState(current => ({
 			...current,
 			text: {
