@@ -119,6 +119,22 @@ export const $Node = ({ id, ...props }) => (
 	</div>
 )
 
+// // `newIDEpoch` creates a new ID epoch for URL hashes.
+// function newIDEpoch() {
+// 	const seen = {}
+// 	const newID = str => {
+// 		// Lowercase string without extraneous space and replace
+// 		// spaces with dashes e.g. `"hello,-world!"`.
+// 		const id = str.toLowerCase().replace(/[ \u{00a0}]+/gu, "-")
+// 		if (!seen[id]) {
+// 			seen[id] = 0
+// 		}
+// 		seen[id]++
+// 		return id + (seen[id] === 1 ? "" : `-${seen[id]}`)
+// 	}
+// 	return newID
+// }
+
 const Header = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-4xl leading-tight">
@@ -182,7 +198,8 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	</$Node>
 ))
 
-const Break = React.memo(({ id, syntax, data, ...props }) => {
+// NOTE: Does not accept data
+const Break = React.memo(({ id, syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
@@ -614,7 +631,7 @@ const Editor = ({ state, setState, ...props }) => {
 		// }, [state.data]),
 	}, [state])
 
-	// TODO: Add HTML?
+	// TODO: How does copy and paste work?
 	React.useEffect(() => {
 		const AVG_RUNES_PER_WORD = 6
 		const AVG_WORDS_PER_MINUTE = 250
