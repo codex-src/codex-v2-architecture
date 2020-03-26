@@ -462,30 +462,49 @@ const EditorBlocks = ({ data, ...props }) => (
 const EditorContext = React.createContext()
 
 // Renders an editor.
-const Editor = ({ data, prefers, ...props }) => {
+const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
 
 	// Rerender the DOM when data changes (use useLayoutEffect
 	// because of contenteditable):
+	//
+	// TODO: Use useMemo?
 	React.useLayoutEffect(() => {
+		// React.useCallback(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
-			<Provider value={prefers}>
-				<EditorBlocks data={data} />
+			// FIXME: Prevent useless rerenders to <Provider>?
+			<Provider value={state}>
+				<EditorBlocks data={state.data} />
 			</Provider>,
 			ref.current,
 		)
-	}, [data, prefers])
+		// }, [state.data]),
+	}, [state])
 
-	const [txt, setTxt] = React.useState(() => toString(data))
-	const [gfm, setGfm] = React.useState(() => toString(data, { markdown: true }))
-
-	// Lazily recompute txt and gfm (do not use
-	// useLayoutEffect or useMemo):
 	React.useEffect(() => {
-		setTxt(toString(data))
-		setGfm(toString(data, { markdown: true }))
-	}, [data])
+		// TODO: Add HTML and JSON?
+		const txt = toString(state.data)
+		const gfm = toString(state.data, { markdown: true })
+		setState(current => ({
+			...current,
+			title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+			txt: {
+				data: txt,
+				characters: [...txt].length,
+				words: txt.split(/\s+/).filter(Boolean).length,
+			},
+			// gfm: {
+			// 	data: gfm,
+			// 	characters: [...gfm].length,
+			// 	words: gfm.split(/\s+/).filter(Boolean).length,
+			// },
+			gfm,
+		}))
+	}, [
+		state.data,
+		setState,
+	])
 
 	return (
 		<React.Fragment>
@@ -504,29 +523,15 @@ const Editor = ({ data, prefers, ...props }) => {
 						...props.style,
 					},
 
-					contentEditable: !prefers.readOnly,
-					suppressContentEditableWarning: !prefers.readOnly,
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
 
 			{/* Debugger */}
-			{true && (
+			{false && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-					{stringify({
-						title: [...txt.split("\n", 1)[0]].slice(0, 100).join(""),
-						txt: {
-							data: txt,
-							characters: [...txt].length,
-							words: txt.split(/\s+/).filter(Boolean).length,
-						},
-						gfm: {
-							data: gfm,
-							characters: [...gfm].length,
-							words: gfm.split(/\s+/).filter(Boolean).length,
-						},
-						prefers,
-						data,
-					})}
+					{stringify(state)}
 				</div>
 			)}
 
@@ -575,6 +580,7 @@ function stringify(obj) {
 }
 
 const App = props => {
+	// <textarea> (1 of 2):
 	const [value, setValue] = React.useState(() => {
 		const cache = localStorage.getItem("codex-app-v2")
 		if (cache) {
@@ -618,16 +624,24 @@ _em_ **_and_ strong**
 `.trim()
 	})
 
+	// <textarea> (2 of 2):
 	React.useEffect(() => {
 		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
 	}, [value])
 
-	const data = React.useMemo(() => parseGFM(value), [value])
-
-	const [prefers, setPrefers] = React.useState({
+	const [state, setState] = React.useState(() => ({
 		readOnly: false,
-	})
+		data: parseGFM(value),
+	}))
 
+	React.useLayoutEffect(() => {
+		setState(current => ({
+			...current,
+			data: parseGFM(value),
+		}))
+	}, [value])
+
+	// Shortcuts:
 	React.useEffect(() => {
 		const handler = e => {
 			if (!e.metaKey || e.keyCode !== 80) {
@@ -635,16 +649,16 @@ _em_ **_and_ strong**
 				return
 			}
 			e.preventDefault()
-			setPrefers(current => ({
+			setState(current => ({
 				...current,
-				readOnly: !prefers.readOnly,
+				readOnly: !state.readOnly,
 			}))
 		}
 		window.addEventListener("keydown", handler)
 		return () => {
 			window.removeEventListener("keydown", handler)
 		}
-	}, [prefers.readOnly])
+	}, [state.readOnly])
 
 	return (
 		<div className="flex flex-row justify-center">
@@ -654,16 +668,16 @@ _em_ **_and_ strong**
 					<button
 						className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 						onPointerDown={e => e.preventDefault()}
-						onClick={e => setPrefers({ ...prefers, readOnly: !prefers.readOnly })}
+						onClick={e => setState({ ...state, readOnly: !state.readOnly })}
 					>
-						Toggle read-only: {!prefers.readOnly ? "OFF" : "ON"}
+						Toggle read-only: {!state.readOnly ? "OFF" : "ON"}
 					</button>
 				</div>
 
 				{/* LHS */}
-				<div className="w-1/2">
+				<div className="flex-shrink-0 w-1/2">
 					<textarea
-						className="w-full h-full outline-none"
+						className="w-full h-full resize-none outline-none"
 						value={value}
 						onChange={e => setValue(e.target.value)}
 					/>
@@ -671,11 +685,11 @@ _em_ **_and_ strong**
 
 				{/* RHS */}
 				<div className="flex-shrink-0 w-6" />
-				<div className="w-1/2">
+				<div className="flex-shrink-0 w-1/2">
 					<Editor
-						className="text-lg"
-						data={data}
-						prefers={prefers}
+						// className="text-lg"
+						state={state}
+						setState={setState}
 					/>
 				</div>
 
