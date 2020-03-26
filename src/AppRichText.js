@@ -191,7 +191,9 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
-				<hr className="inline-block w-full" />
+				// NOTE: Use 25% to center; 15% matches --- but not
+				// *** syntax
+				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
 		</$Node>
 	)
