@@ -33,22 +33,22 @@ const Syntax = ({ className, readOnly, ...props }) => (
 const Markdown = ({ className, syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [s1, s2] = parseSyntax(syntax)
+	const [start, end] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
-			{s1 && (
+			{start && (
 				<Syntax
 					className={className}
 					readOnly={readOnly}
-					children={s1}
+					children={start}
 				/>
 			)}
 			{props.children}
-			{s2 && (
+			{end && (
 				<Syntax
 					className={className}
 					readOnly={readOnly}
-					children={s1}
+					children={end}
 				/>
 			)}
 		</React.Fragment>
@@ -121,7 +121,7 @@ export const $Node = ({ id, ...props }) => (
 
 const Header = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-4xl">
+	<$Node id={id} className="font-medium text-4xl leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -130,7 +130,7 @@ const Header = React.memo(({ id, syntax, data, ...props }) => (
 
 const Subheader = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-2xl">
+	<$Node id={id} className="font-medium text-2xl leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -139,7 +139,7 @@ const Subheader = React.memo(({ id, syntax, data, ...props }) => (
 
 const H3 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-xl">
+	<$Node id={id} className="font-semibold text-xl leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -148,7 +148,7 @@ const H3 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H4 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-lg">
+	<$Node id={id} className="font-semibold text-lg leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -157,7 +157,7 @@ const H4 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H5 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold">
+	<$Node id={id} className="font-semibold leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
@@ -166,7 +166,7 @@ const H5 = React.memo(({ id, syntax, data, ...props }) => (
 
 const H6 = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold">
+	<$Node id={id} className="font-semibold leading-tight">
 		<Markdown syntax={syntax}>
 			{toReact(data)}
 		</Markdown>
