@@ -216,8 +216,8 @@ const Break = React.memo(({ id, syntax, ...props }) => {
 	)
 })
 
-// Registers a component for parseTextGFM.
-function registerComponent(component, syntax, { recurse } = { recurse: true }) {
+// Registers a type for parseTextGFM.
+function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// NOTE: Escape syntax for regex
 	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
 	// const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
@@ -240,7 +240,7 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 		index += syntax.length
 		const str = text.slice(index, index + offset)
 		const object = {
-			component,
+			type,
 			syntax,
 			children: !recurse ? str : parseTextGFM(str),
 		}
@@ -252,7 +252,7 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 
 // Parses GFM text to a VDOM representation.
 //
-// TODO: Can extract registerComponent(...)(...) to
+// TODO: Can extract registerType(...)(...) to
 // parseStrongAndEm(...)
 function parseTextGFM(text) {
 	if (!text) {
@@ -268,7 +268,7 @@ function parseTextGFM(text) {
 	 		if (index + 1 < text.length && text[index + 1].match(/[\W_]/)) {
 				// No-op
 				data.push({
-					component: Escape,
+					type: Escape,
 					syntax: [char],
 					children: text[index + 1],
 				})
@@ -280,7 +280,7 @@ function parseTextGFM(text) {
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
-				const parsed = registerComponent(StrongAndEm, char.repeat(3))(text, index)
+				const parsed = registerType(StrongAndEm, char.repeat(3))(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -290,7 +290,7 @@ function parseTextGFM(text) {
 				continue
 			// **Strong** or __strong__
 			} else if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
-				const parsed = registerComponent(Strong, char.repeat(2))(text, index)
+				const parsed = registerType(Strong, char.repeat(2))(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -300,7 +300,7 @@ function parseTextGFM(text) {
 				continue
 			// _Emphasis_ or *emphasis*
 			} else if (charsToEnd >= "*x*".length) {
-				const parsed = registerComponent(Em, char)(text, index)
+				const parsed = registerType(Em, char)(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -314,7 +314,7 @@ function parseTextGFM(text) {
 		case char === "~":
 			// ~~Strike~~
 			if (charsToEnd >= "~~x~~".length && text.slice(index, index + 2) === "~~") {
-				const parsed = registerComponent(Strike, "~~")(text, index)
+				const parsed = registerType(Strike, "~~")(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -324,7 +324,7 @@ function parseTextGFM(text) {
 				continue
 			// ~Strike~
 			} else if (charsToEnd >= "~x~".length) {
-				const parsed = registerComponent(Strike, "~")(text, index)
+				const parsed = registerType(Strike, "~")(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -337,7 +337,7 @@ function parseTextGFM(text) {
 		// <Code>
 		case char === "`":
 			if (charsToEnd >= "`x`".length) {
-				const parsed = registerComponent(Code, "`", { recurse: false })(text, index)
+				const parsed = registerType(Code, "`", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -387,7 +387,7 @@ function parseGFM(text) {
 				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
 				data.push({
 					id: uuidv4(),
-					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
+					type: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
 					children: parseTextGFM(each.slice(syntax[0].length)),
 				})
@@ -399,7 +399,7 @@ function parseGFM(text) {
 			if (each.length === 3 && each === char.repeat(3)) {
 				data.push({
 					id: uuidv4(),
-					component: Break,
+					type: Break,
 					syntax: [each],
 					children: null,
 				})
@@ -413,7 +413,7 @@ function parseGFM(text) {
 		// <Paragraph>
 		data.push({
 			id: uuidv4(),
-			component: Paragraph,
+			type: Paragraph,
 			syntax: null,
 			children: parseTextGFM(each),
 		})
@@ -432,11 +432,11 @@ function toReact(children) {
 			components.push(each)
 			continue
 		}
-		const { component: Component } = each
+		const { type: Type } = each
 		components.push((
-			<Component key={components.length} syntax={each.syntax}>
+			<Type key={components.length} syntax={each.syntax}>
 				{toReact(each.children)}
-			</Component>
+			</Type>
 		))
 	}
 	return components
@@ -489,7 +489,7 @@ function toHTML(data, { indent } = { indent: false }) {
 				str += escape(each) || "<br>"
 				continue
 			}
-			const [startTag, endTag] = cmapHTML[each.component]
+			const [startTag, endTag] = cmapHTML[each.type]
 			str += startTag
 			recurse(each.children)
 			str += endTag
@@ -498,10 +498,10 @@ function toHTML(data, { indent } = { indent: false }) {
 	// Iterate top-level children:
 	for (const each of data) {
 		// NOTE: Use x.type because of React.memo or use
-		// each.component.type || each.component
-		const [startTag, endTag] = cmapHTML[each.component.type || each.component]
+		// each.type.type || each.type
+		const [startTag, endTag] = cmapHTML[each.type.type || each.type]
 		str += `${startTag}${!indent ? "" : "\n\t"}`
-		if (each.component !== Break) {
+		if (each.type !== Break) {
 			recurse(each.children)
 		}
 		str += `${!indent ? "" : "\n"}${endTag}`
@@ -536,14 +536,14 @@ function toHTML(data, { indent } = { indent: false }) {
 
 // Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
-	data.map(({ component: Block, ...each }) => (
-		<Block key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
+	data.map(({ type: Type, ...each }) => (
+		<Type key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
 	))
 )
 
 const EditorContext = React.createContext()
 
-// Maps component references to names or HTML.
+// Maps type references to names or HTML.
 const cmap = new Map()
 const cmapHTML = new Map()
 
@@ -587,7 +587,7 @@ function stringify(obj) {
 		obj,
 		(key, value) => {
 			// Non-component:
-			if (key !== "component") {
+			if (key !== "type") {
 				return value
 			}
 			// Component (guard React.memo):
