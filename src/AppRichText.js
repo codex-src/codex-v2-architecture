@@ -519,7 +519,7 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 
 	// HTML:
-	cmapHTML[Escape] = "Escape" // ??
+	cmapHTML[Escape] = ["", ""] // ["<span class=\"escape\">", "</span>"]
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
@@ -709,6 +709,7 @@ _em_ **_and_ strong**
 	// DEBUG
 	React.useEffect(() => {
 		const id = setTimeout(() => {
+			// console.log(state.markdown)
 			console.log({ state })
 		}, 100)
 		return () => {
