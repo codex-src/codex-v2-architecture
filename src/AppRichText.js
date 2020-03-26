@@ -24,13 +24,13 @@ function parseSyntax(syntax) {
 	return [s1, s2]
 }
 
-const Syntax = ({ className, readOnly, ...props }) => (
-	<span className={className || "text-md-blue-a400"} style={{ display: readOnly && "none" }}>
+const Syntax = ({ className, style, readOnly, ...props }) => (
+	<span className={className || "text-md-blue-a400"} style={{ ...style, display: readOnly && "none" }}>
 		{props.children}
 	</span>
 )
 
-const Markdown = ({ className, syntax, ...props }) => {
+const Markdown = ({ className, style, syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	const [start, end] = parseSyntax(syntax)
@@ -56,6 +56,7 @@ const Markdown = ({ className, syntax, ...props }) => {
 }
 
 const Escape = ({ syntax, ...props }) => (
+	// NOTE: Can drop <span>
 	<span>
 		<Markdown syntax={syntax}>
 			{props.children}
@@ -119,73 +120,70 @@ export const $Node = ({ id, ...props }) => (
 	</div>
 )
 
-// // `newIDEpoch` creates a new ID epoch for URL hashes.
-// function newIDEpoch() {
-// 	const seen = {}
-// 	const newID = str => {
-// 		// Lowercase string without extraneous space and replace
-// 		// spaces with dashes e.g. `"hello,-world!"`.
-// 		const id = str.toLowerCase().replace(/[ \u{00a0}]+/gu, "-")
-// 		if (!seen[id]) {
-// 			seen[id] = 0
-// 		}
-// 		seen[id]++
-// 		return id + (seen[id] === 1 ? "" : `-${seen[id]}`)
-// 	}
-// 	return newID
-// }
-
-const Header = React.memo(({ id, syntax, data, ...props }) => (
+// NOTE: Accepts hash
+const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-4xl leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
-const Subheader = React.memo(({ id, syntax, data, ...props }) => (
+const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-2xl leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
-const H3 = React.memo(({ id, syntax, data, ...props }) => (
+const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold text-xl leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
-const H4 = React.memo(({ id, syntax, data, ...props }) => (
+const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold text-lg leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
-const H5 = React.memo(({ id, syntax, data, ...props }) => (
+const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
-const H6 = React.memo(({ id, syntax, data, ...props }) => (
+const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold leading-tight">
-		<Markdown syntax={syntax}>
-			{toReact(data)}
-		</Markdown>
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(data)}
+			</Markdown>
+		</a>
 	</$Node>
 ))
 
@@ -361,12 +359,34 @@ function parseTextGFM(text) {
 	return !data.length ? data[0] : data
 }
 
+// Creates a new hash epoch for URL hashes.
+function newHashEpoch() {
+	const hashes = {}
+	const newHash = str => {
+		// ALPHA / DIGIT / "-" / "." / "_" / "~"
+		//
+		// https://tools.ietf.org/html/rfc3986
+		const hash = str.toLowerCase()
+			.replace(/\s+/g, "-")
+			.replace(/[^\w\-\.\~]/g, "") // eslint-disable-line no-useless-escape
+		const seen = hashes[hash]
+		if (!seen) {
+			hashes[hash] = 0
+		}
+		hashes[hash]++
+		return hash + (!seen ? "" : `-${hashes[hash]}`)
+	}
+	return newHash
+}
+
 // Parses GFM to a VDOM representation.
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
 // parseTextHemingway (can support custom spellcheck, etc.)
 // TODO (2): Memoize data (somehow)
 function parseGFM(text) {
+	const newHash = newHashEpoch()
+
 	const data = []
 	const paragraphs = text.split("\n")
 	// NOTE: Use an index for multiline elements
@@ -374,7 +394,7 @@ function parseGFM(text) {
 		const each = paragraphs[index]
 		const char = each.charAt(0)
 		switch (true) {
-		// <Header>
+		// <H1>
 		case char === "#":
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
@@ -387,8 +407,11 @@ function parseGFM(text) {
 				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
 				data.push({
 					id: uuidv4(),
-					type: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
+					type: [H1, H2, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
+					// TODO: Upgrade to toText to create a hash based
+					// off of text, not markdown
+					hash: newHash(each.slice(syntax[0].length)),
 					children: parseTextGFM(each.slice(syntax[0].length)),
 				})
 				continue
@@ -537,7 +560,7 @@ function toHTML(data, { indent } = { indent: false }) {
 // Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
 	data.map(({ type: Type, ...each }) => (
-		<Type key={each.id} id={each.id} syntax={each.syntax} data={each.children} />
+		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
 	))
 )
 
@@ -556,8 +579,8 @@ const cmapHTML = new Map()
 	cmap[Code] = "Code"
 	cmap[Strike] = "Strike"
 
-	cmap[Header.type] = "Header"
-	cmap[Subheader.type] = "Subheader"
+	cmap[H1.type] = "H1"
+	cmap[H2.type] = "H2"
 	cmap[H3.type] = "H3"
 	cmap[H4.type] = "H4"
 	cmap[H5.type] = "H5"
@@ -572,8 +595,8 @@ const cmapHTML = new Map()
 	cmapHTML[Code] = ["<code>", "</code>"]
 	cmapHTML[Strike] = ["<strike>", "</strike>"]
 
-	cmapHTML[Header.type] = ["<h1>", "</h1>"]
-	cmapHTML[Subheader.type] = ["<h2>", "</h2>"]
+	cmapHTML[H1.type] = ["<h1>", "</h1>"]
+	cmapHTML[H2.type] = ["<h2>", "</h2>"]
 	cmapHTML[H3.type] = ["<h3>", "</h3>"]
 	cmapHTML[H4.type] = ["<h4>", "</h4>"]
 	cmapHTML[H5.type] = ["<h5>", "</h5>"]
