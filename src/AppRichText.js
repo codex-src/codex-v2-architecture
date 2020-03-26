@@ -173,7 +173,7 @@ const H6 = React.memo(({ id, syntax, data, ...props }) => (
 	</$Node>
 ))
 
-const Paragraph = React.memo(({ id, data, ...props }) => (
+const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id}>
 		{toReact(data) || (
@@ -182,7 +182,12 @@ const Paragraph = React.memo(({ id, data, ...props }) => (
 	</$Node>
 ))
 
-// || text[index + syntax.length + offset - 1] === "\\") {
+const Break = React.memo(({ id, syntax, data, ...props }) => (
+	// eslint-disable-next-line react/jsx-pascal-case
+	<$Node id={id}>
+		<Markdown syntax={syntax} />
+	</$Node>
+))
 
 // Registers a component for parseTextGFM.
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
@@ -194,14 +199,6 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 		searchRe = `[^\\\\]${escapedSyntax}( |$)`
 	}
 	const parse = (text, index) => {
-		// // NOTE: _ and ~ based syntax must be at the start and
-		// // end of a word to parse
-		// //
-		// // https://spec.commonmark.org/dingus
-		// if ((syntax[0] === "_" || syntax[0] === "~") && (!index || text[index] !== " ")) {
-		// 	return null
-		// }
-
 		// Get the nearest offset proceeded by a space or EOL:
 		//
 		// NOTE: Use ... + 1 because of escape character
@@ -337,15 +334,18 @@ function parseTextGFM(text) {
 }
 
 // Parses GFM to a VDOM representation.
+//
+// TODO: Memoize data (somehow)
 function parseGFM(text) {
 	const data = []
 	const paragraphs = text.split("\n")
 	// NOTE: Use an index for multiline elements
 	for (let index = 0; index < paragraphs.length; index++) {
 		const each = paragraphs[index]
-		switch (each.charAt(0)) {
+		const char = each.charAt(0)
+		switch (true) {
 		// <Header>
-		case "#":
+		case char === "#":
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
 				(each.length >= 3 && each.slice(0, 3) === "## ") ||
@@ -360,6 +360,18 @@ function parseGFM(text) {
 					component: [Header, Subheader, H3, H4, H5, H6][syntax[0].length - 2],
 					syntax,
 					children: parseTextGFM(each.slice(syntax[0].length)),
+				})
+				continue
+			}
+			break
+		// <Break>
+		case char === "-" || char === "*":
+			if (each.length === 3 && each === char.repeat(3)) {
+				data.push({
+					id: uuidv4(),
+					component: Break,
+					syntax: [each],
+					children: null,
 				})
 				continue
 			}
@@ -400,8 +412,8 @@ function toReact(children) {
 	return components
 }
 
-// Converts a VDOM representation to a plain text string.
-function toPlainText(data, { markdown } = { markdown: false }) {
+// Converts a VDOM representation to text.
+function toText(data, { markdown } = { markdown: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
@@ -467,26 +479,26 @@ function toHTML(data, { indent } = { indent: false }) {
 	return str
 }
 
-// Recursively reads from an element.
-function innerText(element) {
-	let str = ""
-	const recurse = element => {
-		for (const each of element.childNodes) {
-			// Text and <br>:
-			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-				str += each.nodeValue || ""
-			// <Any>:
-			} else if (each.nodeType === Node.ELEMENT_NODE) {
-				recurse(each)
-				if (each.getAttribute("data-node") || each.getAttribute("data-compound-node")) {
-					str += "\n"
-				}
-			}
-		}
-	}
-	recurse(element)
-	return str
-}
+// // Recursively reads from an element.
+// function innerText(element) {
+// 	let str = ""
+// 	const recurse = element => {
+// 		for (const each of element.childNodes) {
+// 			// Text and <br>:
+// 			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
+// 				str += each.nodeValue || ""
+// 			// <Any>:
+// 			} else if (each.nodeType === Node.ELEMENT_NODE) {
+// 				recurse(each)
+// 				if (each.getAttribute("data-node") || each.getAttribute("data-compound-node")) {
+// 					str += "\n"
+// 				}
+// 			}
+// 		}
+// 	}
+// 	recurse(element)
+// 	return str
+// }
 
 // Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
@@ -533,6 +545,7 @@ const cmapHTML = new Map()
 	cmapHTML[H5.type] = ["<h5>", "</h5>"]
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
+	cmapHTML[Break.type] = "<hr>" // FIXME: Leaf node
 })()
 
 function stringify(obj) {
@@ -584,12 +597,15 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: Add HTML?
 	React.useEffect(() => {
-		const text = toPlainText(state.data)
-		const markdown = toPlainText(state.data, { markdown: true })
+		const WPM = 250      // Words per minute
+		const WPS = WPM * 60 // Words per second
+
+		const text = toText(state.data)
+		const markdown = toText(state.data, { markdown: true })
 		const html = toHTML(state.data)
 		const runes = [...text].length
 		const words = text.split(/\s+/).filter(Boolean).length
-		const duration = words / 250
+		const seconds = words / WPS
 		setState(current => ({
 			...current,
 			text: {
@@ -597,7 +613,7 @@ const Editor = ({ state, setState, ...props }) => {
 				data: text,
 				runes,
 				words,
-				duration,
+				seconds,
 			},
 			markdown,
 			html,
@@ -658,6 +674,9 @@ const App = props => {
 ##### H5
 ###### H6
 
+---
+***
+
 *oh*man*is*it*
 _oh_man_is_it_
 
@@ -709,8 +728,7 @@ _em_ **_and_ strong**
 	// DEBUG
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			// console.log(state.markdown)
-			console.log({ state })
+			console.log(new Date(), { state })
 		}, 100)
 		return () => {
 			clearTimeout(id)
