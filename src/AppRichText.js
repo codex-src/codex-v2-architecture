@@ -399,8 +399,8 @@ function toReact(children) {
 	return components
 }
 
-// Converts a VDOM representation to a string.
-function toString(data, { markdown } = { markdown: false }) {
+// Converts a VDOM representation to a plaintext string.
+function toPlaintext(data, { markdown } = { markdown: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
@@ -424,6 +424,38 @@ function toString(data, { markdown } = { markdown: false }) {
 		str += (markdown && s1) || ""
 		recurse(each.children)
 		str += (markdown && s2) || ""
+		if (each !== data[data.length - 1]) {
+			str += "\n" // EOL
+		}
+	}
+	return str
+}
+
+// Converts a VDOM representation to an HTML string.
+function toHTML(data) {
+	let str = ""
+	// Recurse children:
+	const recurse = children => {
+		if (children === null || typeof children === "string") {
+			str += children || `<br>`
+			return
+		}
+		for (const each of children) {
+			if (each === null || typeof each === "string") {
+				str += each || `<br>`
+				continue
+			}
+			// str += (markdown && each.syntax) || ""
+			recurse(each.children)
+			// str += (markdown && each.syntax) || ""
+		}
+	}
+	// Iterate top-level children:
+	for (const each of data) {
+		const html = cmapHTML[each.component.type]
+		str += `<${html}>\n\t`
+		recurse(each.children)
+		str += `\n</${html}>`
 		if (each !== data[data.length - 1]) {
 			str += "\n" // EOL
 		}
@@ -461,8 +493,9 @@ const EditorBlocks = ({ data, ...props }) => (
 
 const EditorContext = React.createContext()
 
-// Maps component references to names.
+// Maps component references to names or HTML.
 const cmap = new Map()
+const cmapHTML = new Map()
 
 ;(() => {
 	// Inline components:
@@ -480,6 +513,22 @@ const cmap = new Map()
 	cmap[H5.type] = "H5"
 	cmap[H6.type] = "H6"
 	cmap[Paragraph.type] = "Paragraph"
+
+	// Inline components:
+	cmapHTML[Escape] = "Escape" // ??
+	cmapHTML[Em] = "em"
+	cmapHTML[Strong] = "strong"
+	cmapHTML[StrongAndEm] = "strong+em" // ?
+	cmapHTML[Strike] = "strike"
+
+	// Block components:
+	cmapHTML[Header.type] = "h1"
+	cmapHTML[Subheader.type] = "h2"
+	cmapHTML[H3.type] = "h3"
+	cmapHTML[H4.type] = "h4"
+	cmapHTML[H5.type] = "h5"
+	cmapHTML[H6.type] = "h6"
+	cmapHTML[Paragraph.type] = "p"
 })()
 
 function stringify(obj) {
@@ -529,18 +578,26 @@ const Editor = ({ state, setState, ...props }) => {
 		// }, [state.data]),
 	}, [state])
 
-	// TODO: Add HTML and JSON?
+	// TODO: Add HTML?
 	React.useEffect(() => {
-		const txt = toString(state.data)
-		const gfm = toString(state.data, { markdown: true })
+		console.log(toHTML(state.data))
+
+		const txt = toPlaintext(state.data)
+		const gfm = toPlaintext(state.data, { markdown: true })
+		// Compute metrics:
+		// const bytes = txt.length
+		const characters = [...txt].length
+		const words = txt.split(/\s+/).filter(Boolean).length
+		const duration = words / 250
 		setState(current => ({
 			...current,
 			txt: {
 				title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
 				data: txt,
-				characters: [...txt].length,
-				words: txt.split(/\s+/).filter(Boolean).length,
-				// TODO: duration (seconds or minutes?)
+				// bytes,
+				characters,
+				words,
+				duration,
 			},
 			gfm,
 		}))
@@ -573,7 +630,7 @@ const Editor = ({ state, setState, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{false && (
+			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify(state)}
 				</div>
