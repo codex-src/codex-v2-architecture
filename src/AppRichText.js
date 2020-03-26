@@ -191,7 +191,7 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
-				<hr />
+				<hr className="inline-block w-full" />
 			)}
 		</$Node>
 	)
@@ -232,6 +232,9 @@ function registerComponent(component, syntax, { recurse } = { recurse: true }) {
 }
 
 // Parses GFM text to a VDOM representation.
+//
+// TODO: Can extract registerComponent(...)(...) to
+// parseStrongAndEm(...)
 function parseTextGFM(text) {
 	if (!text) {
 		return null
@@ -258,8 +261,6 @@ function parseTextGFM(text) {
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
-				// TODO: Can extract registerComponent(...)(...) to
-				// parseStrongAndEm(...)
 				const parsed = registerComponent(StrongAndEm, char.repeat(3))(text, index)
 				if (!parsed) {
 					// No-op
@@ -343,7 +344,9 @@ function parseTextGFM(text) {
 
 // Parses GFM to a VDOM representation.
 //
-// TODO: Memoize data (somehow)
+// TODO (1): To support Hemingway, preprocess text? E.g.
+// parseTextHemingway (can support custom spellcheck, etc.)
+// TODO (2): Memoize data (somehow)
 function parseGFM(text) {
 	const data = []
 	const paragraphs = text.split("\n")
