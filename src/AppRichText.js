@@ -461,84 +461,6 @@ const EditorBlocks = ({ data, ...props }) => (
 
 const EditorContext = React.createContext()
 
-// Renders an editor.
-const Editor = ({ state, setState, ...props }) => {
-	const ref = React.useRef()
-
-	// Rerender the DOM when data changes (use useLayoutEffect
-	// because of contenteditable):
-	//
-	// TODO: Use useMemo?
-	React.useLayoutEffect(() => {
-		// React.useCallback(() => {
-		const { Provider } = EditorContext
-		ReactDOM.render(
-			// FIXME: Prevent useless rerenders to <Provider>?
-			<Provider value={state}>
-				<EditorBlocks data={state.data} />
-			</Provider>,
-			ref.current,
-		)
-		// }, [state.data]),
-	}, [state])
-
-	React.useEffect(() => {
-		// TODO: Add HTML and JSON?
-		const txt = toString(state.data)
-		const gfm = toString(state.data, { markdown: true })
-		setState(current => ({
-			...current,
-			title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-			txt: {
-				data: txt,
-				characters: [...txt].length,
-				words: txt.split(/\s+/).filter(Boolean).length,
-			},
-			// gfm: {
-			// 	data: gfm,
-			// 	characters: [...gfm].length,
-			// 	words: gfm.split(/\s+/).filter(Boolean).length,
-			// },
-			gfm,
-		}))
-	}, [
-		state.data,
-		setState,
-	])
-
-	return (
-		<React.Fragment>
-
-			{/* Editor */}
-			{React.createElement(
-				"div",
-				{
-					ref,
-
-					className: props.className,
-
-					style: {
-						outline: "none",
-						caretColor: "black",
-						...props.style,
-					},
-
-					contentEditable: !state.readOnly,
-					suppressContentEditableWarning: !state.readOnly,
-				},
-			)}
-
-			{/* Debugger */}
-			{false && (
-				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
-					{stringify(state)}
-				</div>
-			)}
-
-		</React.Fragment>
-	)
-}
-
 // Maps component references to names.
 const cmap = new Map()
 
@@ -577,6 +499,89 @@ function stringify(obj) {
 		"\t",
 	)
 	return data
+}
+
+const DocumentTitle = props => {
+	React.useEffect(() => {
+		document.title = props.title
+	}, [props.title])
+	return props.children
+}
+
+// Renders an editor.
+const Editor = ({ state, setState, ...props }) => {
+	const ref = React.useRef()
+
+	// Rerender the DOM when data changes (use useLayoutEffect
+	// because of contenteditable):
+	//
+	// TODO: Use useMemo?
+	React.useLayoutEffect(() => {
+		// React.useCallback(() => {
+		const { Provider } = EditorContext
+		ReactDOM.render(
+			// FIXME: Prevent useless rerenders to <Provider>?
+			<Provider value={state}>
+				<EditorBlocks data={state.data} />
+			</Provider>,
+			ref.current,
+		)
+		// }, [state.data]),
+	}, [state])
+
+	// TODO: Add HTML and JSON?
+	React.useEffect(() => {
+		const txt = toString(state.data)
+		const gfm = toString(state.data, { markdown: true })
+		setState(current => ({
+			...current,
+			txt: {
+				title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+				data: txt,
+				characters: [...txt].length,
+				words: txt.split(/\s+/).filter(Boolean).length,
+				// TODO: duration (seconds or minutes?)
+			},
+			gfm,
+		}))
+	}, [
+		state.data,
+		setState,
+	])
+
+	return (
+		// <React.Fragment>
+		<DocumentTitle title={!state.txt ? "Loading…" : state.txt.title}>
+
+			{/* Editor */}
+			{React.createElement(
+				"div",
+				{
+					ref,
+
+					className: props.className,
+
+					style: {
+						outline: "none",
+						caretColor: "black",
+						...props.style,
+					},
+
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
+				},
+			)}
+
+			{/* Debugger */}
+			{false && (
+				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+					{stringify(state)}
+				</div>
+			)}
+
+		</DocumentTitle>
+		// </React.Fragment>
+	)
 }
 
 const App = props => {
@@ -629,11 +634,13 @@ _em_ **_and_ strong**
 		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
 	}, [value])
 
+	// State (once):
 	const [state, setState] = React.useState(() => ({
 		readOnly: false,
 		data: parseGFM(value),
 	}))
 
+	// State (per update):
 	React.useLayoutEffect(() => {
 		setState(current => ({
 			...current,
