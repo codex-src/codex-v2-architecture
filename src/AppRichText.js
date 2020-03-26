@@ -112,6 +112,13 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
+const A = ({ syntax, ...props }) => (
+	// TODO: Use <span>?
+	<a className="underline text-md-blue-a400" href={props.children}>
+		{props.children}
+	</a>
+)
+
 export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
 		{props.children || (
@@ -120,7 +127,6 @@ export const $Node = ({ id, ...props }) => (
 	</div>
 )
 
-// NOTE: Accepts hash
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-4xl leading-tight">
@@ -196,8 +202,7 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	</$Node>
 ))
 
-// NOTE: Does not accept data
-const Break = React.memo(({ id, syntax, ...props }) => {
+const Break = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
@@ -342,6 +347,23 @@ function parseTextGFM(text) {
 				}
 				data.push(parsed.object)
 				index = parsed.x2
+				continue
+			}
+			break
+		// <A>
+		case char === "h":
+			if (charsToEnd >= "https://".length && text.slice(index, index + "https://".length) === "https://") {
+				const offset = text.slice(index + "https://".length).indexOf(" ")
+				if (offset <= 0) {
+					return null
+				}
+				console.log("test") // DEBUG
+				data.push({
+					type: A,
+					syntax: null,
+					children: text.slice(index, index + "https://".length + offset),
+				})
+				index += "https://".length + offset - 1
 				continue
 			}
 			break
@@ -578,6 +600,7 @@ const cmapHTML = new Map()
 	cmap[StrongAndEm] = "StrongAndEm"
 	cmap[Code] = "Code"
 	cmap[Strike] = "Strike"
+	cmap[A] = "A"
 
 	cmap[H1.type] = "H1"
 	cmap[H2.type] = "H2"
@@ -586,6 +609,7 @@ const cmapHTML = new Map()
 	cmap[H5.type] = "H5"
 	cmap[H6.type] = "H6"
 	cmap[Paragraph.type] = "Paragraph"
+	cmap[Break.type] = "Break"
 
 	// HTML:
 	cmapHTML[Escape] = ["", ""] // No-op OR <span class="escape">
@@ -594,6 +618,7 @@ const cmapHTML = new Map()
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
 	cmapHTML[Code] = ["<code>", "</code>"]
 	cmapHTML[Strike] = ["<strike>", "</strike>"]
+	cmapHTML[A] = ["<a href=\"TODO\">", "</a>"] // TODO: href
 
 	cmapHTML[H1.type] = ["<h1>", "</h1>"]
 	cmapHTML[H2.type] = ["<h2>", "</h2>"]
@@ -662,11 +687,10 @@ const Editor = ({ state, setState, ...props }) => {
 		const html = toHTML(state.data)
 		const runes = [...text].length
 		const words = text.split(/\s+/).filter(Boolean).length
-		// Naive implementation:
-		// const seconds = Math.ceil(words / AVG_WORDS_PER_MINUTE * 60)
 		const seconds = Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60)
 		setState(current => ({
 			...current,
+			// TODO: Convert to a rich data structure with nesting
 			tableOfContents: state.data.filter(each => (
 				each.type === H1 ||
 				each.type === H2 ||
@@ -714,7 +738,7 @@ const Editor = ({ state, setState, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{false && (
+			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify(state)}
 				</div>
