@@ -631,8 +631,6 @@ const DocumentTitle = props => {
 	return props.children
 }
 
-const VERSION_NUMBER = "2.0.0"
-
 // Renders an editor.
 const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
@@ -669,7 +667,14 @@ const Editor = ({ state, setState, ...props }) => {
 		const seconds = Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60)
 		setState(current => ({
 			...current,
-			version: VERSION_NUMBER,
+			tableOfContents: state.data.filter(each => (
+				each.type === H1 ||
+				each.type === H2 ||
+				each.type === H3 ||
+				each.type === H4 ||
+				each.type === H5 ||
+				each.type === H6
+			)),
 			text: {
 				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
 				data: text,
