@@ -513,7 +513,7 @@ const Editor = ({ data, prefers, ...props }) => {
 			{true && (
 				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
 					{stringify({
-						title: [...txt.split("\n", 1)[0]].slice(0, 100).join(),
+						title: [...txt.split("\n", 1)[0]].slice(0, 100).join(""),
 						txt: {
 							data: txt,
 							characters: [...txt].length,
