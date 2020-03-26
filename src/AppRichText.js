@@ -445,18 +445,18 @@ function toHTML(data) {
 				str += each || `<br>`
 				continue
 			}
-			const inline = cmapHTML[each.component]
-			str += `<${inline}>`
+			const [start, end] = cmapHTML[each.component]
+			str += start
 			recurse(each.children)
-			str += `</${inline}>`
+			str += end
 		}
 	}
 	// Iterate top-level children:
 	for (const each of data) {
-		const block = cmapHTML[each.component.type] // NOTE: Use x.type because of React.memo
-		str += `<${block}>\n\t`
+		const [start, end] = cmapHTML[each.component.type] // NOTE: Use x.type because of React.memo
+		str += `${start}\n\t`
 		recurse(each.children)
-		str += `\n</${block}>`
+		str += `\n${end}`
 		if (each !== data[data.length - 1]) {
 			str += "\n" // EOL
 		}
@@ -499,7 +499,7 @@ const cmap = new Map()
 const cmapHTML = new Map()
 
 ;(() => {
-	// Inline components:
+	// React:
 	cmap[Escape] = "Escape"
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
@@ -507,7 +507,6 @@ const cmapHTML = new Map()
 	cmap[Code] = "Code"
 	cmap[Strike] = "Strike"
 
-	// Block components:
 	cmap[Header.type] = "Header"
 	cmap[Subheader.type] = "Subheader"
 	cmap[H3.type] = "H3"
@@ -516,22 +515,21 @@ const cmapHTML = new Map()
 	cmap[H6.type] = "H6"
 	cmap[Paragraph.type] = "Paragraph"
 
-	// Inline components:
+	// HTML:
 	cmapHTML[Escape] = "Escape" // ??
-	cmapHTML[Em] = "em"
-	cmapHTML[Strong] = "strong"
-	cmapHTML[StrongAndEm] = "strong+em" // ??
-	cmapHTML[Code] = "code"
-	cmapHTML[Strike] = "strike"
+	cmapHTML[Em] = ["<em>", "</em>"]
+	cmapHTML[Strong] = ["<strong>", "</strong>"]
+	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
+	cmapHTML[Code] = ["<code>", "</code>"]
+	cmapHTML[Strike] = ["<strike>", "</strike>"]
 
-	// Block components:
-	cmapHTML[Header.type] = "h1"
-	cmapHTML[Subheader.type] = "h2"
-	cmapHTML[H3.type] = "h3"
-	cmapHTML[H4.type] = "h4"
-	cmapHTML[H5.type] = "h5"
-	cmapHTML[H6.type] = "h6"
-	cmapHTML[Paragraph.type] = "p"
+	cmapHTML[Header.type] = ["<h1>", "</h1>"]
+	cmapHTML[Subheader.type] = ["<h2>", "</h2>"]
+	cmapHTML[H3.type] = ["<h3>", "</h3>"]
+	cmapHTML[H4.type] = ["<h4>", "</h4>"]
+	cmapHTML[H5.type] = ["<h5>", "</h5>"]
+	cmapHTML[H6.type] = ["<h6>", "</h6>"]
+	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 })()
 
 function stringify(obj) {
