@@ -586,6 +586,8 @@ const DocumentTitle = props => {
 	return props.children
 }
 
+const VERSION_NUMBER = "2.0.0"
+
 // Renders an editor.
 const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
@@ -618,10 +620,11 @@ const Editor = ({ state, setState, ...props }) => {
 		const runes = [...text].length
 		const words = text.split(/\s+/).filter(Boolean).length
 		// Naive implementation:
-		// const seconds = Math.ceil(words / 250 /* WPM */ * 60)
+		// const seconds = Math.ceil(words / AVG_WORDS_PER_MINUTE * 60)
 		const seconds = Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60)
 		setState(current => ({
 			...current,
+			version: VERSION_NUMBER,
 			text: {
 				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
 				data: text,
