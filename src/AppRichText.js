@@ -182,12 +182,20 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	</$Node>
 ))
 
-const Break = React.memo(({ id, syntax, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id}>
-		<Markdown syntax={syntax} />
-	</$Node>
-))
+const Break = React.memo(({ id, syntax, data, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	return (
+		// eslint-disable-next-line react/jsx-pascal-case
+		<$Node id={id}>
+			{!readOnly ? (
+				<Markdown syntax={syntax} />
+			) : (
+				<hr />
+			)}
+		</$Node>
+	)
+})
 
 // Registers a component for parseTextGFM.
 function registerComponent(component, syntax, { recurse } = { recurse: true }) {
@@ -438,6 +446,7 @@ function toText(data, { markdown } = { markdown: false }) {
 		recurse(each.children)
 		str += (markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
+			// TODO: Can add dynamic support for \r\n here
 			str += "\n" // EOL
 		}
 	}
@@ -470,9 +479,12 @@ function toHTML(data, { indent } = { indent: false }) {
 		// each.component.type || each.component
 		const [startTag, endTag] = cmapHTML[each.component.type || each.component]
 		str += `${startTag}${!indent ? "" : "\n\t"}`
-		recurse(each.children)
+		if (each.component !== Break) {
+			recurse(each.children)
+		}
 		str += `${!indent ? "" : "\n"}${endTag}`
 		if (each !== data[data.length - 1]) {
+			// TODO: Can add dynamic support for \r\n here
 			str += "\n" // EOL
 		}
 	}
@@ -531,7 +543,7 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 
 	// HTML:
-	cmapHTML[Escape] = ["", ""] // ["<span class=\"escape\">", "</span>"]
+	cmapHTML[Escape] = ["", ""] // No-op OR <span class="escape">
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
@@ -545,7 +557,7 @@ const cmapHTML = new Map()
 	cmapHTML[H5.type] = ["<h5>", "</h5>"]
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
-	cmapHTML[Break.type] = "<hr>" // FIXME: Leaf node
+	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
 function stringify(obj) {
@@ -605,7 +617,7 @@ const Editor = ({ state, setState, ...props }) => {
 		const html = toHTML(state.data)
 		const runes = [...text].length
 		const words = text.split(/\s+/).filter(Boolean).length
-		const seconds = words / WPS
+		const seconds = words / WPS // FIXME
 		setState(current => ({
 			...current,
 			text: {
@@ -728,7 +740,7 @@ _em_ **_and_ strong**
 	// DEBUG
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			console.log(new Date(), { state })
+			console.log({ state })
 		}, 100)
 		return () => {
 			clearTimeout(id)
