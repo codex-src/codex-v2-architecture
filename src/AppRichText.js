@@ -115,7 +115,9 @@ const Strike = ({ syntax, ...props }) => (
 const A = ({ syntax, ...props }) => (
 	// TODO: Use <span>?
 	<a className="underline text-md-blue-a400" href={props.children}>
-		{props.children}
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
 	</a>
 )
 
@@ -253,6 +255,9 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 	return parse
 }
 
+const HTTPS = "https://"
+const HTTP = "http://"
+
 // Parses GFM text to a VDOM representation.
 //
 // TODO: Can extract registerType(...)(...) to
@@ -264,7 +269,7 @@ function parseTextGFM(text) {
 	const data = []
 	for (let index = 0; index < text.length; index++) {
 		const char = text[index]
-		const charsToEnd = text.length - index
+		const nchars = text.length - index
 		switch (true) {
 		// <Escape>
 		case char === "\\":
@@ -282,7 +287,7 @@ function parseTextGFM(text) {
 		// <StrongEm> or <Strong> or <Em>
 		case char === "*" || char === "_":
 			// ***Strong and em***
-			if (charsToEnd >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
+			if (nchars >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
 				const parsed = registerType(StrongAndEm, char.repeat(3))(text, index)
 				if (!parsed) {
 					// No-op
@@ -292,7 +297,7 @@ function parseTextGFM(text) {
 				index = parsed.x2
 				continue
 			// **Strong** or __strong__
-			} else if (charsToEnd >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
+			} else if (nchars >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
 				const parsed = registerType(Strong, char.repeat(2))(text, index)
 				if (!parsed) {
 					// No-op
@@ -302,7 +307,7 @@ function parseTextGFM(text) {
 				index = parsed.x2
 				continue
 			// _Emphasis_ or *emphasis*
-			} else if (charsToEnd >= "*x*".length) {
+			} else if (nchars >= "*x*".length) {
 				const parsed = registerType(Em, char)(text, index)
 				if (!parsed) {
 					// No-op
@@ -316,7 +321,7 @@ function parseTextGFM(text) {
 		// <Strike>
 		case char === "~":
 			// ~~Strike~~
-			if (charsToEnd >= "~~x~~".length && text.slice(index, index + 2) === "~~") {
+			if (nchars >= "~~x~~".length && text.slice(index, index + 2) === "~~") {
 				const parsed = registerType(Strike, "~~")(text, index)
 				if (!parsed) {
 					// No-op
@@ -326,7 +331,7 @@ function parseTextGFM(text) {
 				index = parsed.x2
 				continue
 			// ~Strike~
-			} else if (charsToEnd >= "~x~".length) {
+			} else if (nchars >= "~x~".length) {
 				const parsed = registerType(Strike, "~")(text, index)
 				if (!parsed) {
 					// No-op
@@ -339,7 +344,7 @@ function parseTextGFM(text) {
 			break
 		// <Code>
 		case char === "`":
-			if (charsToEnd >= "`x`".length) {
+			if (nchars >= "`x`".length) {
 				const parsed = registerType(Code, "`", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
@@ -351,19 +356,38 @@ function parseTextGFM(text) {
 			}
 			break
 		// <A>
+		//
+		// TODO: Punycode for URLs?
+		//
+		// https://stackoverflow.com/a/1547940
 		case char === "h":
-			if (charsToEnd >= "https://".length && text.slice(index, index + "https://".length) === "https://") {
-				const offset = text.slice(index + "https://".length).indexOf(" ")
-				if (offset <= 0) {
-					return null
+			// https://
+			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
+				let offset = text.slice(index + HTTPS.length).indexOf(" ")
+				if (offset === -1) {
+					// Set offset to EOL:
+					offset = nchars - HTTPS.length
 				}
-				console.log("test") // DEBUG
 				data.push({
 					type: A,
-					syntax: null,
-					children: text.slice(index, index + "https://".length + offset),
+					syntax: [HTTPS],
+					children: text.slice(index + HTTPS.length, index + HTTPS.length + offset),
 				})
-				index += "https://".length + offset - 1
+				index += HTTPS.length + offset - 1
+				continue
+			// http://
+			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
+				let offset = text.slice(index + HTTP.length).indexOf(" ")
+				if (offset === -1) {
+					// Set offset to EOL:
+					offset = nchars - HTTP.length
+				}
+				data.push({
+					type: A,
+					syntax: [HTTP],
+					children: text.slice(index + HTTP.length, index + HTTP.length + offset),
+				})
+				index += HTTP.length + offset - 1
 				continue
 			}
 			break
