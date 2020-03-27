@@ -92,7 +92,8 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded">
+		// NOTE: Do not use text-sm because of rem
+		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -425,7 +426,9 @@ function newHashEpoch() {
 		// ALPHA / DIGIT / "-" / "." / "_" / "~"
 		//
 		// https://tools.ietf.org/html/rfc3986
-		const hash = str.toLowerCase()
+		const hash = str
+			.toLowerCase()
+			.trim() // Remove extraneous whitespace
 			.replace(/\s+/g, "-")
 			.replace(/[^\w\-\.\~]/g, "") // eslint-disable-line no-useless-escape
 		const seen = hashes[hash]
@@ -523,6 +526,23 @@ function toReact(children) {
 	}
 	return components
 }
+
+// function toInnerText(data, { markdown } = { markdown: false }) {
+// 	if (children === null || typeof children === "string") {
+// 		str += children || ""
+// 		return
+// 	}
+// 	for (const each of children) {
+// 		if (each === null || typeof each === "string") {
+// 			str += each || ""
+// 			continue
+// 		}
+// 		const [s1, s2] = parseSyntax(each.syntax)
+// 		str += (markdown && s1) || ""
+// 		recurse(each.children)
+// 		str += (markdown && s2) || ""
+// 	}
+// }
 
 // Converts a VDOM representation to text.
 function toText(data, { markdown } = { markdown: false }) {
