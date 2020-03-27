@@ -112,11 +112,13 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
+// FIXME: Warning: validateDOMNesting(...): <a> cannot
+// appear as a descendant of <a>.
 const A = ({ syntax, ...props }) => (
 	// TODO: Use <span>?
-	<a className="underline text-md-blue-a400" href={props.children}>
-		<Markdown syntax={syntax}>
-			{props.children}
+	<a className="underline text-md-blue-a400" href={syntax + props.children}>
+		<Markdown syntax={!props.children || syntax}>
+			{props.children || syntax}
 		</Markdown>
 	</a>
 )
@@ -254,6 +256,11 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 	}
 	return parse
 }
+
+// const HTTPS  = "https://"  // eslint-disable-line no-multi-spaces
+// const HTTPSX = "https://x" // eslint-disable-line no-multi-spaces
+// const HTTP   = "http://"   // eslint-disable-line no-multi-spaces
+// const HTTPX  = "http://x"  // eslint-disable-line no-multi-spaces
 
 const HTTPS = "https://"
 const HTTP = "http://"
@@ -709,7 +716,7 @@ const Editor = ({ state, setState, ...props }) => {
 				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
 				runes: [...text].length,
 				words: text.split(/\s+/).filter(Boolean).length,
-				// seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
+				// clock: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
 			text,
 			markdown,
