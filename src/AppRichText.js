@@ -131,7 +131,7 @@ export const $Node = ({ id, ...props }) => (
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-4xl leading-tight">
+	<$Node id={id} className="font-medium text-4xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -142,7 +142,7 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-2xl leading-tight">
+	<$Node id={id} className="font-medium text-2xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -153,7 +153,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-xl leading-tight">
+	<$Node id={id} className="font-semibold text-xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -164,7 +164,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-lg leading-tight">
+	<$Node id={id} className="font-semibold text-lg leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -175,7 +175,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-tight">
+	<$Node id={id} className="font-semibold leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -186,7 +186,7 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-tight">
+	<$Node id={id} className="font-semibold leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -689,33 +689,29 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: How does copy and paste work?
 	React.useEffect(() => {
-		const AVG_RUNES_PER_WORD = 6
-		const AVG_WORDS_PER_MINUTE = 250
-
+		// const AVG_RUNES_PER_WORD = 6
+		// const AVG_WORDS_PER_MINUTE = 250
 		const text = toText(state.data)
 		const markdown = toText(state.data, { markdown: true })
 		const html = toHTML(state.data)
-		const runes = [...text].length
-		const words = text.split(/\s+/).filter(Boolean).length
-		const seconds = Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60)
 		setState(current => ({
 			...current,
-			// TODO: Convert to a rich data structure with nesting
-			tableOfContents: state.data.filter(each => (
-				each.type === H1 ||
-				each.type === H2 ||
-				each.type === H3 ||
-				each.type === H4 ||
-				each.type === H5 ||
-				each.type === H6
-			)),
-			text: {
+			// // TODO: Convert to a rich data structure with nesting
+			// tableOfContents: state.data.filter(each => (
+			// 	each.type === H1 ||
+			// 	each.type === H2 ||
+			// 	each.type === H3 ||
+			// 	each.type === H4 ||
+			// 	each.type === H5 ||
+			// 	each.type === H6
+			// )),
+			meta: {
 				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				data: text,
-				runes,
-				words,
-				seconds,
+				runes: [...text].length,
+				words: text.split(/\s+/).filter(Boolean).length,
+				// seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
+			text,
 			markdown,
 			html,
 		}))
@@ -726,7 +722,7 @@ const Editor = ({ state, setState, ...props }) => {
 
 	return (
 		// <React.Fragment>
-		<DocumentTitle title={!state.text ? "Loading…" : state.text.title}>
+		<DocumentTitle title={!state.meta ? "Loading…" : state.meta.title}>
 
 			{/* Editor */}
 			{React.createElement(

@@ -29,3 +29,7 @@
 .font-900 {
 	font-weight: 900;
 }
+
+.leading-base {
+	line-height: 1.15;
+}
