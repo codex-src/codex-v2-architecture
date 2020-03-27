@@ -597,7 +597,7 @@ function toHTML(data, { indent } = { indent: false }) {
 	// Iterate top-level children:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type] // Use each.type.type because of React.memo
-		str += typeof s1 !== "function" ? s1 : s1(each) + (!indent ? "" : "\n\t") // Compute HTML
+		str += (typeof s1 !== "function" ? s1 : s1(each)) + (!indent ? "" : "\n\t") // Compute HTML
 		if (each.type !== Break) { // TODO: Add context?
 			recurse(each.children)
 		}
@@ -717,7 +717,7 @@ const Editor = ({ state, setState, ...props }) => {
 		// const AVG_WORDS_PER_MINUTE = 250
 		const text = toText(state.data)
 		const markdown = toText(state.data, { markdown: true })
-		const html = toHTML(state.data)
+		const html = toHTML(state.data, { indent: true })
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
