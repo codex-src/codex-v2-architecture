@@ -136,7 +136,7 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-4xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -147,7 +147,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-medium text-2xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -158,7 +158,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold text-xl leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -169,7 +169,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold text-lg leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -180,7 +180,7 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -191,7 +191,7 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id} className="font-semibold leading-base">
 		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
+			<Markdown syntax={syntax[0].replace(" ", "\u00a0")}>
 				{toReact(data)}
 			</Markdown>
 		</a>
@@ -905,7 +905,7 @@ _em_ **_and_ strong**
 				<div className="flex-shrink-0 w-6" />
 				<div className="flex-shrink-0 w-1/2">
 					<Editor
-						// className="text-lg"
+						className="font-mono"
 						state={state}
 						setState={setState}
 					/>
