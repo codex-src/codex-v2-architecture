@@ -246,11 +246,12 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 			return null
 		}
 		index += syntax.length
-		const str = text.slice(index, index + offset)
 		const object = {
 			type,
 			syntax,
-			children: !recurse ? str : parseTextGFM(str),
+			children: !recurse
+				? text.slice(index, index + offset)
+				: parseTextGFM(text.slice(index, index + offset)),
 		}
 		index += syntax.length + offset - 1
 		return { object, x2: index }
@@ -258,13 +259,8 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 	return parse
 }
 
-// const HTTPS  = "https://"  // eslint-disable-line no-multi-spaces
-// const HTTPSX = "https://x" // eslint-disable-line no-multi-spaces
-// const HTTP   = "http://"   // eslint-disable-line no-multi-spaces
-// const HTTPX  = "http://x"  // eslint-disable-line no-multi-spaces
-
-const HTTPS = "https://"
-const HTTP = "http://"
+const HTTPS = "https://" // eslint-disable-line no-multi-spaces
+const HTTP  = "http://"  // eslint-disable-line no-multi-spaces
 
 // Parses GFM text to a VDOM representation.
 //
@@ -445,7 +441,7 @@ function newHashEpoch() {
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
 // parseTextHemingway (can support custom spellcheck, etc.)
-// TODO (2): Memoize data (somehow)
+// TODO (2): Memoize data or paragraphs
 function parseGFM(text) {
 	const newHash = newHashEpoch()
 
@@ -572,7 +568,7 @@ function toText(data, { markdown } = { markdown: false }) {
 		str += (markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
 			// TODO: Can add dynamic support for \r\n here
-			str += "\n" // EOL
+			str += "\n"
 		}
 	}
 	return str
@@ -592,25 +588,23 @@ function toHTML(data, { indent } = { indent: false }) {
 				str += escape(each) || "<br>"
 				continue
 			}
-			const [startTag, endTag] = cmapHTML[each.type]
-			str += startTag
+			const [s1, s2] = cmapHTML[each.type]
+			str += typeof s1 !== "function" ? s1 : s1(each) // Compute HTML
 			recurse(each.children)
-			str += endTag
+			str += s2
 		}
 	}
 	// Iterate top-level children:
 	for (const each of data) {
-		// NOTE: Use x.type because of React.memo or use
-		// each.type.type || each.type
-		const [startTag, endTag] = cmapHTML[each.type.type || each.type]
-		str += `${startTag}${!indent ? "" : "\n\t"}`
-		if (each.type !== Break) {
+		const [s1, s2] = cmapHTML[each.type.type] // Use each.type.type because of React.memo
+		str += typeof s1 !== "function" ? s1 : s1(each) + (!indent ? "" : "\n\t") // Compute HTML
+		if (each.type !== Break) { // TODO: Add context?
 			recurse(each.children)
 		}
-		str += `${!indent ? "" : "\n"}${endTag}`
+		str += (!indent ? "" : "\n") + s2
 		if (each !== data[data.length - 1]) {
 			// TODO: Can add dynamic support for \r\n here
-			str += "\n" // EOL
+			str += "\n"
 		}
 	}
 	return str
@@ -655,7 +649,10 @@ const cmapHTML = new Map()
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
 	cmapHTML[Code] = ["<code>", "</code>"]
 	cmapHTML[Strike] = ["<strike>", "</strike>"]
-	cmapHTML[A] = ["<a href=\"TODO\">", "</a>"] // TODO: href
+
+	// NOTE: Use href="..." not href='...' because " URLs
+	// expect " to be percent-encoded (e.g. %22)
+	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
 
 	cmapHTML[H1.type] = ["<h1>", "</h1>"]
 	cmapHTML[H2.type] = ["<h2>", "</h2>"]
