@@ -403,6 +403,11 @@ function parseTextGFM(text) {
 		}
 		data[data.length - 1] += char
 	}
+	// Return a string (one-off):
+	if (data.length === 1 && typeof data[0] === "string") {
+		return data[0]
+	}
+	// Return an array:
 	return data
 }
 
@@ -493,13 +498,11 @@ function parseGFM(text) {
 
 // Converts a VDOM representation to React components.
 function toReact(children) {
-	// FIXME: Can remove RHS
 	if (children === null || typeof children === "string") {
 		return children
 	}
 	const components = []
 	for (const each of children) {
-		// FIXME: Can remove RHS
 		if (each === null || typeof each === "string") {
 			components.push(each)
 			continue
@@ -519,13 +522,11 @@ function toText(data, { markdown } = { markdown: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
-		// FIXME: Can remove RHS
 		if (children === null || typeof children === "string") {
 			str += children || ""
 			return
 		}
 		for (const each of children) {
-			// FIXME: Can remove RHS
 			if (each === null || typeof each === "string") {
 				str += each || ""
 				continue
@@ -555,13 +556,11 @@ function toHTML(data, { indent } = { indent: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
-		// FIXME: Can remove RHS
 		if (children === null || typeof children === "string") {
 			str += escape(children) || "<br>"
 			return
 		}
 		for (const each of children) {
-			// FIXME: Can remove RHS
 			if (each === null || typeof each === "string") {
 				str += escape(each) || "<br>"
 				continue
