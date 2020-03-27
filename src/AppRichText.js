@@ -134,7 +134,7 @@ export const $Node = ({ id, ...props }) => (
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-4xl leading-base">
+	<$Node id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -145,7 +145,7 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-2xl leading-base">
+	<$Node id={id} className="font-medium text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -156,7 +156,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-xl leading-base">
+	<$Node id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -167,7 +167,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-lg leading-base">
+	<$Node id={id} className="font-semibold text-lg leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -178,7 +178,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-base">
+	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -189,7 +189,7 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-base">
+	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(data)}
@@ -226,21 +226,32 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 // Registers a type for parseInnerGFM.
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
-	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
-	let searchPattern = `[^\\\\]${escapedSyntax}`
-	// _Em_ or __strong and em__ cannot be nested:
+	let pattern = syntax.split("").map(each => `\\${each}`).join("")
+	let patternOffset = 0
 	if (syntax[0] === "_") {
-		// searchPattern = `[^\\\\]${escapedSyntax}( |$)`
-		searchPattern += "( |$)"
+		// https://github.github.com/gfm/#example-369
+		pattern = `[^\\\\]${pattern}([^a-zA-Z0-9]|$)`
+		patternOffset++
+	} else if (syntax[0] === "`") {
+		// No-op
+		//
+		// https://github.github.com/gfm/#example-348
+	} else {
+		pattern = `[^\\\\]${pattern}`
+		patternOffset++
 	}
 	const parse = (text, index) => {
-		// Get the nearest offset proceeded by a space or EOL:
+		// Guard: _Em_ and __strong and em__ cannot be nested:
 		//
-		// NOTE: Use ... + 1 because of escape character
-		const offset = text.slice(index + syntax.length).search(searchPattern) + 1 // text.slice(index + syntax.length).indexOf(syntax)
+		// https://github.github.com/gfm/#example-369
+		if (syntax[0] === "_" && index - 1 >= 0 && /\w/.test(text[index - 1])) {
+			return null
+		}
+		// Guard: Syntax (not `code`) cannot surround spaces:
+		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
-			(syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
 			offset <= 0 ||
+			(syntax !== "`" && text[index + syntax.length] === " ") ||           // Exempt code
 			(syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
 		) {
 			return null
@@ -636,7 +647,7 @@ const cmapHTML = new Map()
 	cmap[Break.type] = "Break"
 
 	// HTML:
-	cmapHTML[Escape] = ["", ""] // No-op OR <span class="escape">
+	cmapHTML[Escape] = ["", ""] // No-op (text is escaped)
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
