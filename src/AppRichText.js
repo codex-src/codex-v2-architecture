@@ -357,12 +357,13 @@ function parseTextGFM(text) {
 			break
 		// <A>
 		//
-		// TODO: Punycode for URLs?
+		// TODO: Use punycode for URLs?
 		//
 		// https://stackoverflow.com/a/1547940
 		case char === "h":
 			// https://
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
+				// TODO: Check other whitespace characters? E.g. \s
 				let offset = text.slice(index + HTTPS.length).indexOf(" ")
 				if (offset === -1) {
 					// Set offset to EOL:
@@ -377,6 +378,7 @@ function parseTextGFM(text) {
 				continue
 			// http://
 			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
+				// TODO: Check other whitespace characters? E.g. \s
 				let offset = text.slice(index + HTTP.length).indexOf(" ")
 				if (offset === -1) {
 					// Set offset to EOL:
@@ -401,8 +403,7 @@ function parseTextGFM(text) {
 		}
 		data[data.length - 1] += char
 	}
-	// Return a string or an array:
-	return !data.length ? data[0] : data
+	return data
 }
 
 // Creates a new hash epoch for URL hashes.
@@ -492,11 +493,13 @@ function parseGFM(text) {
 
 // Converts a VDOM representation to React components.
 function toReact(children) {
+	// FIXME: Can remove RHS
 	if (children === null || typeof children === "string") {
 		return children
 	}
 	const components = []
 	for (const each of children) {
+		// FIXME: Can remove RHS
 		if (each === null || typeof each === "string") {
 			components.push(each)
 			continue
@@ -516,18 +519,21 @@ function toText(data, { markdown } = { markdown: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
+		// FIXME: Can remove RHS
 		if (children === null || typeof children === "string") {
 			str += children || ""
 			return
 		}
 		for (const each of children) {
+			// FIXME: Can remove RHS
 			if (each === null || typeof each === "string") {
 				str += each || ""
 				continue
 			}
-			str += (markdown && each.syntax) || ""
+			const [s1, s2] = parseSyntax(each.syntax)
+			str += (markdown && s1) || ""
 			recurse(each.children)
-			str += (markdown && each.syntax) || ""
+			str += (markdown && s2) || ""
 		}
 	}
 	// Iterate top-level children:
@@ -549,11 +555,13 @@ function toHTML(data, { indent } = { indent: false }) {
 	let str = ""
 	// Recurse children:
 	const recurse = children => {
+		// FIXME: Can remove RHS
 		if (children === null || typeof children === "string") {
 			str += escape(children) || "<br>"
 			return
 		}
 		for (const each of children) {
+			// FIXME: Can remove RHS
 			if (each === null || typeof each === "string") {
 				str += escape(each) || "<br>"
 				continue
@@ -581,27 +589,6 @@ function toHTML(data, { indent } = { indent: false }) {
 	}
 	return str
 }
-
-// // Recursively reads from an element.
-// function innerText(element) {
-// 	let str = ""
-// 	const recurse = element => {
-// 		for (const each of element.childNodes) {
-// 			// Text and <br>:
-// 			if (each.nodeType === Node.TEXT_NODE || each.nodeName === "BR") {
-// 				str += each.nodeValue || ""
-// 			// <Any>:
-// 			} else if (each.nodeType === Node.ELEMENT_NODE) {
-// 				recurse(each)
-// 				if (each.getAttribute("data-node") || each.getAttribute("data-compound-node")) {
-// 					str += "\n"
-// 				}
-// 			}
-// 		}
-// 	}
-// 	recurse(element)
-// 	return str
-// }
 
 // Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
@@ -840,15 +827,15 @@ _em_ **_and_ strong**
 		}))
 	}, [value])
 
-	// DEBUG
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			console.log({ state })
-		}, 100)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [state])
+	// // DEBUG
+	// React.useEffect(() => {
+	// 	const id = setTimeout(() => {
+	// 		console.log({ state })
+	// 	}, 100)
+	// 	return () => {
+	// 		clearTimeout(id)
+	// 	}
+	// }, [state])
 
 	// Shortcuts:
 	React.useEffect(() => {
