@@ -504,12 +504,12 @@ function parseGFM(text) {
 
 // Converts a VDOM representation to React components.
 function toReact(children) {
-	if (children === null || typeof children === "string") {
+	if (children === null || typeof children === "string") { // TODO: Use Array.isArray?
 		return children
 	}
 	const components = []
 	for (const each of children) {
-		if (each === null || typeof each === "string") {
+		if (each === null || typeof each === "string") { // TODO: Use Array.isArray?
 			components.push(each)
 			continue
 		}
@@ -523,91 +523,87 @@ function toReact(children) {
 	return components
 }
 
-// function toInnerText(data, { markdown } = { markdown: false }) {
-// 	if (children === null || typeof children === "string") {
-// 		str += children || ""
-// 		return
-// 	}
-// 	for (const each of children) {
-// 		if (each === null || typeof each === "string") {
-// 			str += each || ""
-// 			continue
-// 		}
-// 		const [s1, s2] = parseSyntax(each.syntax)
-// 		str += (markdown && s1) || ""
-// 		recurse(each.children)
-// 		str += (markdown && s2) || ""
-// 	}
-// }
+// Converts a nested VDOM representation to text.
+function toInnerText(children, options = { markdown: false }) {
+	let text = ""
+	if (children === null || typeof children === "string") { // TODO: Use Array.isArray?
+		return children || ""
+	}
+	for (const each of children) {
+		if (each === null || typeof each === "string") { // TODO: Use Array.isArray?
+			text += each || ""
+			continue
+		}
+		const [s1, s2] = parseSyntax(each.syntax)
+		text += (options.markdown && s1) || ""
+		text += toInnerText(each.children, options)
+		text += (options.markdown && s2) || ""
+	}
+	return text
+}
 
 // Converts a VDOM representation to text.
-function toText(data, { markdown } = { markdown: false }) {
-	let str = ""
-	// Recurse children:
-	const recurse = children => {
-		if (children === null || typeof children === "string") {
-			str += children || ""
-			return
-		}
-		for (const each of children) {
-			if (each === null || typeof each === "string") {
-				str += each || ""
-				continue
-			}
-			const [s1, s2] = parseSyntax(each.syntax)
-			str += (markdown && s1) || ""
-			recurse(each.children)
-			str += (markdown && s2) || ""
-		}
-	}
-	// Iterate top-level children:
+//
+// TODO: Add default options
+function toText(data, options = { markdown: false }) {
+	let text = ""
+	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
-		str += (markdown && s1) || ""
-		recurse(each.children)
-		str += (markdown && s2) || ""
+		text += (options.markdown && s1) || ""
+		// Recurse on nested elements:
+		text += toInnerText(each.children, options)
+		text += (options.markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
 			// TODO: Can add dynamic support for \r\n here
-			str += "\n"
+			text += "\n"
 		}
 	}
-	return str
+	return text
+}
+
+// Converts a nested VDOM representation to HTML.
+function toInnerHTML(children, options = { indent: false }) {
+	let html = ""
+	if (children === null || typeof children === "string") {
+		return escape(children) || "<br>"
+	}
+	for (const each of children) {
+		if (each === null || typeof each === "string") {
+			html += escape(each) || "<br>"
+			continue
+		}
+		const [s1, s2] = cmapHTML[each.type]
+		html += typeof s1 !== "function" ? s1 : s1(each) // Compute HTML
+		html += toInnerHTML(each.children, options)
+		html += s2
+	}
+	return html
 }
 
 // Converts a VDOM representation to an HTML string.
-function toHTML(data, { indent } = { indent: false }) {
-	let str = ""
-	// Recurse children:
-	const recurse = children => {
-		if (children === null || typeof children === "string") {
-			str += escape(children) || "<br>"
-			return
-		}
-		for (const each of children) {
-			if (each === null || typeof each === "string") {
-				str += escape(each) || "<br>"
-				continue
-			}
-			const [s1, s2] = cmapHTML[each.type]
-			str += typeof s1 !== "function" ? s1 : s1(each) // Compute HTML
-			recurse(each.children)
-			str += s2
-		}
-	}
-	// Iterate top-level children:
+//
+// TODO: Add default options
+function toHTML(data, options = { indent: false }) {
+	let html = ""
+	// Iterate elements:
 	for (const each of data) {
-		const [s1, s2] = cmapHTML[each.type.type] // Use each.type.type because of React.memo
-		str += (typeof s1 !== "function" ? s1 : s1(each)) + (!indent ? "" : "\n\t") // Compute HTML
-		if (each.type !== Break) { // TODO: Add context?
-			recurse(each.children)
+		// NOTE: Use each.type.type because of React.memo
+		const [s1, s2] = cmapHTML[each.type.type]
+		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : "\n\t") // Compute HTML
+		// Recurse on nested elements:
+		//
+		// TODO: Can add context to remember each
+		if (each.type !== Break) {
+			html += toInnerHTML(each.children, options)
 		}
-		str += (!indent ? "" : "\n") + s2
+		html += (!options.indent ? "" : "\n") + s2
 		if (each !== data[data.length - 1]) {
 			// TODO: Can add dynamic support for \r\n here
-			str += "\n"
+			html += "\n"
 		}
 	}
-	return str
+	return html
 }
 
 // Renders editor blocks.
@@ -717,7 +713,7 @@ const Editor = ({ state, setState, ...props }) => {
 		// const AVG_WORDS_PER_MINUTE = 250
 		const text = toText(state.data)
 		const markdown = toText(state.data, { markdown: true })
-		const html = toHTML(state.data, { indent: true })
+		const html = toHTML(state.data /* , { indent: true } */)
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
