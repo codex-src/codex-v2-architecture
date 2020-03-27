@@ -216,8 +216,7 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
-				// NOTE: Use 25% to center; 15% matches --- but not
-				// *** syntax
+				// NOTE: 25% centers; 15% centers to --- syntax
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
 		</$Node>
@@ -226,18 +225,19 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 
 // Registers a type for parseTextGFM.
 function registerType(type, syntax, { recurse } = { recurse: true }) {
-	// NOTE: Escape syntax for regex
+	// Escape syntax for regex:
 	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
-	// const searchRe = `[^\\\\]${escapedSyntax}( |$)` // FIXME: N/A code
-	let searchRe = `[^\\\\]${escapedSyntax}`
+	let searchPattern = `[^\\\\]${escapedSyntax}`
+	// _Em_ or __strong and em__ cannot be nested:
 	if (syntax[0] === "_") {
-		searchRe = `[^\\\\]${escapedSyntax}( |$)`
+		// searchPattern = `[^\\\\]${escapedSyntax}( |$)`
+		searchPattern += "( |$)"
 	}
 	const parse = (text, index) => {
 		// Get the nearest offset proceeded by a space or EOL:
 		//
 		// NOTE: Use ... + 1 because of escape character
-		const offset = text.slice(index + syntax.length).search(searchRe) + 1 // text.slice(index + syntax.length).indexOf(syntax)
+		const offset = text.slice(index + syntax.length).search(searchPattern) + 1 // text.slice(index + syntax.length).indexOf(syntax)
 		if (
 			(syntax !== "`" && text[index + syntax.length] === " ") || // Exempt code
 			offset <= 0 ||
