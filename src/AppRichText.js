@@ -259,8 +259,8 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 	return parse
 }
 
-const HTTPS = "https://" // eslint-disable-line no-multi-spaces
-const HTTP  = "http://"  // eslint-disable-line no-multi-spaces
+const HTTPS = "https://"
+const HTTP = "http://"
 
 // Parses a nested VDOM representation to GFM text.
 //
@@ -505,12 +505,12 @@ function parseGFM(text) {
 
 // Converts a VDOM representation to React components.
 function toReact(children) {
-	if (children === null || typeof children === "string") { // TODO: Use Array.isArray?
+	if (children === null || typeof children === "string") {
 		return children
 	}
 	const components = []
 	for (const each of children) {
-		if (each === null || typeof each === "string") { // TODO: Use Array.isArray?
+		if (each === null || typeof each === "string") {
 			components.push(each)
 			continue
 		}
@@ -527,11 +527,11 @@ function toReact(children) {
 // Converts a nested VDOM representation to text.
 function toInnerText(children, options = { markdown: false }) {
 	let text = ""
-	if (children === null || typeof children === "string") { // TODO: Use Array.isArray?
+	if (children === null || typeof children === "string") {
 		return children || ""
 	}
 	for (const each of children) {
-		if (each === null || typeof each === "string") { // TODO: Use Array.isArray?
+		if (each === null || typeof each === "string") {
 			text += each || ""
 			continue
 		}
@@ -552,7 +552,6 @@ function toText(data, options = { markdown: false }) {
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
-		// Recurse on nested elements:
 		text += toInnerText(each.children, options)
 		text += (options.markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
@@ -592,7 +591,6 @@ function toHTML(data, options = { indent: false }) {
 		// NOTE: Use each.type.type because of React.memo
 		const [s1, s2] = cmapHTML[each.type.type]
 		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : "\n\t") // Compute HTML
-		// Recurse on nested elements:
 		if (each.type !== Break) {
 			html += toInnerHTML(each.children, options)
 		}
@@ -647,7 +645,7 @@ const cmapHTML = new Map()
 
 	// NOTE: Use href="..." not href='...' because " URLs
 	// expect " to be percent-encoded (e.g. %22)
-	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
+	cmapHTML[A] = [children => `<a href="${children.syntax + children.children}">`, "</a>"]
 
 	cmapHTML[H1.type] = ["<h1>", "</h1>"]
 	cmapHTML[H2.type] = ["<h2>", "</h2>"]
@@ -685,6 +683,9 @@ const DocumentTitle = props => {
 	return props.children
 }
 
+const AVG_RUNES_PER_WORD = 6
+const AVG_WORDS_PER_MINUTE = 250
+
 // Renders an editor.
 const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
@@ -708,9 +709,8 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: How does copy and paste work?
 	React.useEffect(() => {
-		// const AVG_RUNES_PER_WORD = 6
-		// const AVG_WORDS_PER_MINUTE = 250
 		const text = toText(state.data)
+		const runes = [...text].length // Precompute for seconds
 		const markdown = toText(state.data, { markdown: true })
 		const html = toHTML(state.data /* , { indent: true } */)
 		setState(current => ({
@@ -726,9 +726,9 @@ const Editor = ({ state, setState, ...props }) => {
 			// )),
 			meta: {
 				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				runes: [...text].length,
+				runes,
 				words: text.split(/\s+/).filter(Boolean).length,
-				// clock: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
+				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
 			text,
 			markdown,
