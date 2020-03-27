@@ -224,6 +224,8 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 })
 
 // Registers a type for parseInnerGFM.
+//
+// TODO: Update [^a-zA-Z0-9] -- https://github.github.com/gfm/#delimiter-run
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
@@ -272,6 +274,12 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 
 const HTTPS = "https://"
 const HTTP = "http://"
+
+// const parseStrongAndEm = registerType(StrongAndEm, char.repeat(3))
+// const parseStrong = registerType(Strong, char.repeat(2))
+// const parseEm = registerType(Em, char)
+// const parseStrike = registerType(Strike, "~~")
+// const parseCode = registerType(Code, "`", { recurse: false })
 
 // Parses a nested VDOM representation to GFM text.
 //
@@ -614,7 +622,6 @@ function toHTML(data, options = { indent: false }) {
 	return html
 }
 
-// Renders editor blocks.
 const EditorBlocks = ({ data, ...props }) => (
 	data.map(({ type: Type, ...each }) => (
 		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
@@ -668,6 +675,7 @@ const cmapHTML = new Map()
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
+// Stringifies a VDOM representation.
 function stringify(obj) {
 	const data = JSON.stringify(
 		obj,
@@ -687,6 +695,7 @@ function stringify(obj) {
 	return data
 }
 
+// Sets the document title (uses useEffect).
 const DocumentTitle = props => {
 	React.useEffect(() => {
 		document.title = props.title
@@ -697,7 +706,6 @@ const DocumentTitle = props => {
 const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
 
-// Renders an editor.
 const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
 
@@ -786,6 +794,8 @@ const Editor = ({ state, setState, ...props }) => {
 }
 
 const App = props => {
+	const ref = React.useRef()
+
 	// <textarea> (1 of 2):
 	const [value, setValue] = React.useState(() => {
 		const cache = localStorage.getItem("codex-app-v2")
@@ -883,7 +893,7 @@ _em_ **_and_ strong**
 
 	return (
 		<div className="flex flex-row justify-center">
-			<div className="px-6 py-32 flex flex-row w-full max-w-6xl">
+			<div className="px-6 py-32 flex flex-row">
 
 				<div className="p-3 fixed right-0 top-0">
 					<button
@@ -896,17 +906,29 @@ _em_ **_and_ strong**
 				</div>
 
 				{/* LHS */}
-				<div className="flex-shrink-0 w-1/2">
+				<div className="w-1/2">
 					<textarea
+						ref={ref}
 						className="w-full h-full resize-none outline-none"
 						value={value}
+						onKeyDown={e => {
+							if (e.keyCode !== 9) { // Tab
+								// No-op
+								return
+							}
+							e.preventDefault()
+							const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
+							ref.current.value = value.slice(0, pos1) + "\t" + value.slice(pos2)
+							ref.current.selectionStart = pos1 + 1
+							ref.current.selectionEnd = pos1 + 1
+						}}
 						onChange={e => setValue(e.target.value)}
 					/>
 				</div>
 
 				{/* RHS */}
 				<div className="flex-shrink-0 w-6" />
-				<div className="flex-shrink-0 w-1/2">
+				<div className="w-1/2">
 					<Editor
 						state={state}
 						setState={setState}
