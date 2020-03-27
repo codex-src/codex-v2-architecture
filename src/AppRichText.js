@@ -223,7 +223,7 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
-// Registers a type for parseTextGFM.
+// Registers a type for parseInnerGFM.
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
 	const escapedSyntax = syntax.split("").map(each => `\\${each}`).join("")
@@ -251,7 +251,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 			syntax,
 			children: !recurse
 				? text.slice(index, index + offset)
-				: parseTextGFM(text.slice(index, index + offset)),
+				: parseInnerGFM(text.slice(index, index + offset)),
 		}
 		index += syntax.length + offset - 1
 		return { object, x2: index }
@@ -262,11 +262,11 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 const HTTPS = "https://" // eslint-disable-line no-multi-spaces
 const HTTP  = "http://"  // eslint-disable-line no-multi-spaces
 
-// Parses GFM text to a VDOM representation.
+// Parses a nested VDOM representation to GFM text.
 //
 // TODO: Can extract registerType(...)(...) to
 // parseStrongAndEm(...)
-function parseTextGFM(text) {
+function parseInnerGFM(text) {
 	if (!text) {
 		return null
 	}
@@ -424,9 +424,12 @@ function newHashEpoch() {
 		// https://tools.ietf.org/html/rfc3986
 		const hash = str
 			.toLowerCase()
-			.trim() // Remove extraneous whitespace
-			.replace(/\s+/g, "-")
+			// Convert spaces and dashes to one dash
+			.replace(/(\s+|-+)/g, "-")
+			// Drop URL unsafe characters
 			.replace(/[^\w\-\.\~]/g, "") // eslint-disable-line no-useless-escape
+			// Trim dashes
+			.replace(/(^-+|-+$)/g, "")
 		const seen = hashes[hash]
 		if (!seen) {
 			hashes[hash] = 0
@@ -437,7 +440,7 @@ function newHashEpoch() {
 	return newHash
 }
 
-// Parses GFM to a VDOM representation.
+// Parses a VDOM representation to GFM text.
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
 // parseTextHemingway (can support custom spellcheck, etc.)
@@ -462,15 +465,13 @@ function parseGFM(text) {
 				(each.length >= 6 && each.slice(0, 6) === "##### ") ||
 				(each.length >= 7 && each.slice(0, 7) === "###### ")
 			) {
-				const syntax = [each.slice(0, each.indexOf(" ") + 1)]
+				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
 					id: uuidv4(),
-					type: [H1, H2, H3, H4, H5, H6][syntax[0].length - 2],
-					syntax,
-					// TODO: Upgrade to toText to create a hash based
-					// off of text, not markdown
-					hash: newHash(each.slice(syntax[0].length)),
-					children: parseTextGFM(each.slice(syntax[0].length)),
+					type: [H1, H2, H3, H4, H5, H6][syntax.length - 2],
+					syntax: [syntax],
+					hash: newHash(toInnerText(parseInnerGFM(each.slice(syntax.length)))),
+					children: parseInnerGFM(each.slice(syntax.length)),
 				})
 				continue
 			}
@@ -496,7 +497,7 @@ function parseGFM(text) {
 			id: uuidv4(),
 			type: Paragraph,
 			syntax: null,
-			children: parseTextGFM(each),
+			children: parseInnerGFM(each),
 		})
 	}
 	return data
@@ -592,8 +593,6 @@ function toHTML(data, options = { indent: false }) {
 		const [s1, s2] = cmapHTML[each.type.type]
 		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : "\n\t") // Compute HTML
 		// Recurse on nested elements:
-		//
-		// TODO: Can add context to remember each
 		if (each.type !== Break) {
 			html += toInnerHTML(each.children, options)
 		}
