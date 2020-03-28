@@ -155,7 +155,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		// NOTE (1): Do not use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="px-1 py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="p-1 font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -852,7 +852,7 @@ function toText(data, options = { markdown: false }) {
 		text += (options.markdown && s1) || ""
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
+		} else if (each.type === Blockquote) {
 			text += toText(each.children, options)
 		} else {
 			text += toInnerText(each.children, options)
@@ -884,23 +884,45 @@ function toInnerHTML(children) {
 	return html
 }
 
+// // Converts a VDOM representation to an HTML string.
+// function toHTML(data, __depth = 0) {
+// 	let html = ""
+// 	// Iterate elements:
+// 	for (const each of data) {
+// 		const [s1, s2] = cmapHTML[each.type.type || each.type]
+// 		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
+// 		if (each.type === Break) {
+// 			// No-op
+// 		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
+// 			html += toHTML(each.children, __depth + 1)
+// 		} else {
+// 			html += toInnerHTML(each.children)
+// 		}
+// 		html += `\n${"\t".repeat(__depth)}${s2}`
+// 		if (each !== data[data.length - 1]) {
+// 			html += `\n${"\t".repeat(__depth)}`
+// 		}
+// 	}
+// 	return html
+// }
+
 // Converts a VDOM representation to an HTML string.
-function toHTML(data, __depth = 0) {
+function toHTML(data) {
 	let html = ""
 	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
+		html += `${typeof s1 !== "function" ? s1 : s1(each)}`
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
-			html += toHTML(each.children, __depth + 1)
+		} else if (each.type === Blockquote) {
+			html += `\n\t${toHTML(each.children)}\n`
 		} else {
 			html += toInnerHTML(each.children)
 		}
-		html += `\n${"\t".repeat(__depth)}${s2}`
+		html += s2
 		if (each !== data[data.length - 1]) {
-			html += `\n${"\t".repeat(__depth)}`
+			html += "\n"
 		}
 	}
 	return html
@@ -961,7 +983,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = ["<pre>", "</pre>"] // FIXME: Use <pre><code>?
+	cmapHTML[CodeBlock.type] = ["<pre><code>", "</code></pre>"] // FIXME: Use <pre><code>?
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
@@ -983,10 +1005,14 @@ function stringify(obj) {
 }
 
 // Sets the document title (uses useEffect).
-const DocumentTitle = props => {
+const DocumentTitle = ({ title, ...props }) => {
 	React.useEffect(() => {
-		document.title = props.title
-	}, [props.title])
+		if (!title) {
+			// No-op
+			return
+		}
+		document.title = title
+	}, [title])
 	return props.children
 }
 
@@ -1036,8 +1062,8 @@ const Editor = ({ state, setState, ...props }) => {
 			markdown: `${markdown}\n`,
 			html: `${html}\n`,
 		}))
-		// console.log(html) // DEBUG
 		// console.log(text) // DEBUG
+		console.log(html) // DEBUG
 	}, [
 		state.data,
 		setState,
@@ -1228,7 +1254,7 @@ _em_ **_and_ strong**
 
 				{/* RHS */}
 				<div>
-					<DocumentTitle title={`Editing${!state.meta ? "…" : ` ${state.meta.title}`}`}>
+					<DocumentTitle title={state.meta && state.meta.title}>
 						<Editor
 							style={{ tabSize: 2 }}
 							state={state}
