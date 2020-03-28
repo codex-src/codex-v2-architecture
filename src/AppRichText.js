@@ -211,9 +211,7 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id}>
-		{toInnerReact(data) || (
-			<br />
-		)}
+		{toInnerReact(data)}
 	</$Node>
 ))
 
@@ -224,9 +222,7 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => (
 			// eslint-disable-next-line react/jsx-pascal-case
 			<$Node key={each.id}>
 				<Markdown syntax={each.syntax}>
-					{toInnerReact(each.children) || (
-						<br />
-					)}
+					{toInnerReact(each.children)}
 				</Markdown>
 			</$Node>
 		))}
@@ -440,16 +436,13 @@ function parseInnerGFM(text) {
 		// <A>
 		//
 		// TODO: Use punycode for URLs?
-		//
-		// https://stackoverflow.com/a/1547940
 		case char === "h":
 			// https://
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
 				// TODO: Check other whitespace characters? E.g. \s
 				let offset = text.slice(index + HTTPS.length).indexOf(" ")
 				if (offset === -1) {
-					// Set offset to EOL:
-					offset = nchars - HTTPS.length
+					offset = nchars - HTTPS.length // EOL
 				}
 				data.push({
 					type: A,
@@ -463,8 +456,7 @@ function parseInnerGFM(text) {
 				// TODO: Check other whitespace characters? E.g. \s
 				let offset = text.slice(index + HTTP.length).indexOf(" ")
 				if (offset === -1) {
-					// Set offset to EOL:
-					offset = nchars - HTTP.length
+					offset = nchars - HTTP.length // EOL
 				}
 				data.push({
 					type: A,
@@ -661,8 +653,6 @@ function toInnerText(children, options = { markdown: false }) {
 }
 
 // Converts a VDOM representation to text.
-//
-// TODO: Add default options
 function toText(data, options = { markdown: false }) {
 	let text = ""
 	// Iterate elements:
@@ -671,7 +661,7 @@ function toText(data, options = { markdown: false }) {
 		text += (options.markdown && s1) || ""
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) {
+		} else if (each.type === Blockquote) { // TODO: Add CodeBlock
 			text += toText(each.children, options)
 		} else {
 			text += toInnerText(each.children, options)
@@ -685,7 +675,7 @@ function toText(data, options = { markdown: false }) {
 }
 
 // Converts a nested VDOM representation to HTML.
-function toInnerHTML(children, options = { indent: false }) {
+function toInnerHTML(children) {
 	let html = ""
 	if (children === null || typeof children === "string") {
 		return escape(children) || "<br>"
@@ -697,29 +687,27 @@ function toInnerHTML(children, options = { indent: false }) {
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
 		html += typeof s1 !== "function" ? s1 : s1(each)
-		html += toInnerHTML(each.children, options)
+		html += toInnerHTML(each.children)
 		html += s2
 	}
 	return html
 }
 
 // Converts a VDOM representation to an HTML string.
-//
-// TODO: Add default options
-function toHTML(data, options = { indent: false }, __depth = 0) {
+function toHTML(data, __depth = 0) {
 	let html = ""
 	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : `\n${"\t".repeat(__depth + 1)}`)
+		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) {
-			html += toHTML(each.children, options, __depth + 1)
+		} else if (each.type === Blockquote) { // TODO: Add CodeBlock
+			html += toHTML(each.children, __depth + 1)
 		} else {
-			html += toInnerHTML(each.children, options)
+			html += toInnerHTML(each.children)
 		}
-		html += (!options.indent ? "" : `\n${"\t".repeat(__depth)}`) + s2
+		html += `\n${"\t".repeat(__depth)}${s2}`
 		if (each !== data[data.length - 1]) {
 			html += `\n${"\t".repeat(__depth)}`
 		}
@@ -833,7 +821,7 @@ const Editor = ({ state, setState, ...props }) => {
 		const text = toText(state.data)
 		const runes = [...text].length // Precompute for seconds
 		const markdown = toText(state.data, { markdown: true })
-		const html = toHTML(state.data, { indent: true })
+		const html = toHTML(state.data)
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
@@ -855,7 +843,8 @@ const Editor = ({ state, setState, ...props }) => {
 			markdown,
 			html,
 		}))
-		console.log(html)
+		console.log(html) // DEBUG
+		// console.log(text) // DEBUG
 	}, [
 		state.data,
 		setState,
