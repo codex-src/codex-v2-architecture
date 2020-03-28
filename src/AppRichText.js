@@ -5,12 +5,10 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-// Maps user-perceived languages to PrismJS languages.
+// Maps user-perceived languages to Prism languages.
 const langs = {}
 
-// Gets the language extension from a metadata string (e.g.
-// an info string).
-function getLang(metadata) {
+function getLanguage(metadata) {
 	const index = metadata.lastIndexOf(".")
 	if (index === -1 || index + 1 === metadata.length) {
 		return metadata
@@ -18,8 +16,7 @@ function getLang(metadata) {
 	return metadata.slice(index + 1)
 }
 
-// Returns an PrismJS parser function.
-function getPrismParser(lang) {
+function getLanguageParser(lang) {
 	if (!lang) {
 		return null
 	}
@@ -327,11 +324,10 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
-	// TODO: Cut metadata extension
 	React.useLayoutEffect(() => {
 		// Attempts to apply syntax highlighting.
 		const highlight = () => {
-			const parse = getPrismParser(getLang(metadata))
+			const parse = getLanguageParser(getLanguage(metadata))
 			if (!parse) {
 				// No-op
 				return
@@ -995,7 +991,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = [data => `<pre class="language-${getLang(data.metadata)}"><code>`, "</code></pre>"]
+	cmapHTML[CodeBlock.type] = [data => `<pre class="language-${getLanguage(data.metadata)}"><code>`, "</code></pre>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
@@ -1192,7 +1188,7 @@ _em_ **_and_ strong**
 		}))
 	}, [value])
 
-	// // Re-update state (PrismJS):
+	// // Re-update state (Prism):
 	// //
 	// // TODO: Move to <Editor>?
 	// React.useLayoutEffect(() => {
