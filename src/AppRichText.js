@@ -252,25 +252,23 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, infoString, data, ...props }) => (
-	<CompoundNode className="px-4 py-3 font-mono leading-snug bg-gray-100 rounded-sm" style={{ fontSize: "0.875em" }} spellCheck={false}>
+	<CompoundNode className="-mx-4 mb-4 px-6 py-4 font-mono leading-snug bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node className="text-md-blue-a400">
-			<Markdown syntax={[syntax]}>
-				{infoString}
-			</Markdown>
+		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
+			<Markdown syntax={[syntax + infoString]} />
 		</$Node>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node>
-			{data.join("\n")}
-			{data.length > 0 && (
-				<br />
-			)}
-			{/* {(data.length > 0 && !data[data.length - 1]) && ( */}
-			{/* 	<br /> */}
-			{/* )} */}
+		<$Node style={{ whiteSpace: "pre" }}>
+			{/* NOTE: Both margin-right or padding-right works */}
+			<span className="mr-4 inline-block">
+				{data.join("\n")}
+				{data.length > 0 && (
+					<br />
+				)}
+			</span>
 		</$Node>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node>
+		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
 			<Markdown syntax={[syntax]} />
 		</$Node>
 	</CompoundNode>
@@ -942,14 +940,17 @@ const Editor = ({ state, setState, ...props }) => {
 						...props.style,
 					},
 
-					// contentEditable: !state.readOnly,
-					// suppressContentEditableWarning: !state.readOnly,
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
 
 			{/* Debugger */}
 			{true && (
-				<div className="my-6 whitespace-pre-wrap font-mono text-xs" style={{ tabSize: 2 }}>
+				<div
+					className="my-6 whitespace-pre-wrap font-mono text-xs"
+					style={{ wordWrap: "break-word", tabSize: 2 }}
+				>
 					{stringify(state)}
 				</div>
 			)}
