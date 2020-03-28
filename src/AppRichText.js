@@ -669,7 +669,13 @@ function toText(data, options = { markdown: false }) {
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
-		text += toInnerText(each.children, options)
+		if (each.type === Break) {
+			// No-op
+		} else if (each.type === Blockquote) {
+			text += toText(each.children, options)
+		} else {
+			text += toInnerText(each.children, options)
+		}
 		text += (options.markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
 			text += "\n"
