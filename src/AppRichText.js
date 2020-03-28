@@ -356,18 +356,16 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 
 				{!html ? (
 					<span>
-						{data}{!data ? "" : <br />}
+						{data}{/* !data ? "" : <br /> */}
 					</span>
 				) : (
 					<span dangerouslySetInnerHTML={{
-						__html: html + (!html ? "" : `<br />`),
+						__html: html, // + (!html ? "" : `<br />`),
 					}} />
 				)}
-
-				{/* {data} */}
-				{/* {data.indexOf("\n") !== -1 && ( */}
-				{/* 	<br /> */}
-				{/* )} */}
+				{data && (
+					<br />
+				)}
 
 				{/* </span> */}
 			</$Node>
