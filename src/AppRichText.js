@@ -127,18 +127,14 @@ const A = ({ syntax, ...props }) => (
 // Higher-order component for block elements.
 export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
-		{props.children || (
-			<br />
-		)}
+		{props.children}
 	</div>
 )
 
 // Higher-order component for multiline block elements.
 export const CompoundNode = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-compound-node {...props}>
-		{props.children || (
-			<br />
-		)}
+		{props.children}
 	</div>
 )
 
@@ -211,23 +207,36 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id}>
-		{toInnerReact(data)}
+		{toInnerReact(data) || (
+			<br />
+		)}
 	</$Node>
 ))
 
 // NOTE: Compound component
-export const Blockquote = React.memo(({ id, syntax, data, ...props }) => (
-	<CompoundNode id={id}>
-		{data.map((each, index) => (
-			// eslint-disable-next-line react/jsx-pascal-case
-			<$Node key={each.id} id={each.id}>
-				<Markdown syntax={each.syntax}>
-					{toInnerReact(each.children)}
-				</Markdown>
-			</$Node>
-		))}
-	</CompoundNode>
-))
+export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	// TODO: Use ref to measure syntax?
+	const style = {
+		paddingLeft: "calc(14.27 / 16 * 1em)",
+		boxShadow: "-2px 0 var(--gray-600)",
+	}
+	return (
+		<CompoundNode id={id}>
+			{data.map((each, index) => (
+				// eslint-disable-next-line react/jsx-pascal-case
+				<$Node key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : style}>
+					<Markdown syntax={each.syntax}>
+						{toInnerReact(each.children) || (
+							<br />
+						)}
+					</Markdown>
+				</$Node>
+			))}
+		</CompoundNode>
+	)
+})
 
 const Break = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
