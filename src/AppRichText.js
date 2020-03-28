@@ -5,6 +5,71 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
+// Maps user-perceived languages to PrismJS languages.
+const langs = {}
+
+// Returns an executable PrismJS function.
+function getPrismJSLanguage(lang) {
+	if (!lang) {
+		return null
+	}
+	const exec = langs[lang]
+	if (!exec) {
+		return null
+	}
+	const highlight = str => {
+		return window.Prism.highlight(str, exec, lang)
+	}
+	return highlight
+}
+
+// langs.jsx = window.Prism && window.Prism.languages["jsx"]
+// langs.tsx = window.Prism && window.Prism.languages["tsx"]
+document.addEventListener("DOMContentLoaded", e => {
+	if (!window.Prism || !window.Prism.languages) {
+		// No-op
+		return
+	}
+	/* eslint-disable no-multi-spaces */
+	//
+	// TODO: Use try-catch statement?
+	langs.bash       = window.Prism.languages.bash
+	langs.c          = window.Prism.languages.c
+	langs.cpp        = window.Prism.languages.cpp
+	langs.css        = window.Prism.languages.css
+	langs.d          = window.Prism.languages.d
+	langs.diff       = window.Prism.languages.diff
+	langs.docker     = window.Prism.languages.docker
+	langs.dockerfile = window.Prism.languages.dockerfile
+	langs.git        = window.Prism.languages.git
+	langs.go         = window.Prism.languages.go
+	langs.gql        = window.Prism.languages.graphql // Added
+	langs.graphql    = window.Prism.languages.graphql
+	langs.htm        = window.Prism.languages.html    // Added
+	langs.html       = window.Prism.languages.html
+	langs.http       = window.Prism.languages.http
+	langs.js         = window.Prism.languages.jsx     // Uses jsx
+	langs.json       = window.Prism.languages.json
+	langs.kotlin     = window.Prism.languages.kotlin
+	langs.php        = window.Prism.languages.php
+	langs.py         = window.Prism.languages.py
+	langs.rb         = window.Prism.languages.rb
+	langs.ruby       = window.Prism.languages.ruby
+	langs.rust       = window.Prism.languages.rust
+	langs.sass       = window.Prism.languages.sass
+	langs.sh         = window.Prism.languages["shell-session"] // Uses shell-session
+	langs.shell      = window.Prism.languages["shell-session"] // Uses shell-session
+	langs.sql        = window.Prism.languages.sql
+	langs.svg        = window.Prism.languages.svg
+	langs.swift      = window.Prism.languages.swift
+	langs.ts         = window.Prism.languages.tsx     // Uses tsx
+	langs.wasm       = window.Prism.languages.wasm
+	langs.xml        = window.Prism.languages.xml
+	langs.yaml       = window.Prism.languages.yaml
+	langs.yml        = window.Prism.languages.yml
+	/* eslint-enable no-multi-spaces */
+})
+
 // Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
 	let s1 = "" // Start syntax
@@ -33,23 +98,19 @@ const Syntax = ({ className, style, readOnly, ...props }) => (
 const Markdown = ({ className, style, syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [start, end] = parseSyntax(syntax)
+	const [startSyntax, endSyntax] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
-			{start && (
-				<Syntax
-					className={className}
-					readOnly={readOnly}
-					children={start}
-				/>
+			{startSyntax && (
+				<Syntax className={className} readOnly={readOnly}>
+					{startSyntax}
+				</Syntax>
 			)}
 			{props.children}
-			{end && (
-				<Syntax
-					className={className}
-					readOnly={readOnly}
-					children={end}
-				/>
+			{endSyntax && (
+				<Syntax className={className} readOnly={readOnly}>
+					{endSyntax}
+				</Syntax>
 			)}
 		</React.Fragment>
 	)
@@ -94,7 +155,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		// NOTE (1): Do not use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="py-px font-mono text-red-600 bg-red-100 rounded-sm" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -250,28 +311,82 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
-// <span className="mr-4 inline-block">
+// const CodeBlock = React.memo(props => {
+// 	let html = ""
+// 	const lang = getPrismLang(props.lang)
+// 	if (lang) {
+// 		try {
+// 			html = window.Prism.highlight(props.children, lang, props.lang)
+// 		} catch (e) {
+// 			console.warn(e)
+// 		}
+// 	}
+// 	const className = `language-${props.lang}`
+// 	return (
+// 		<div style={{ ...stylex.parse("m-x:-24 p-x:24 b:white"), boxShadow: "0px 0px 1px hsl(var(--gray))" }}>
+// 			<Markdown style={stylex.parse("c:gray")} start={`\`\`\`${props.lang}`} end="```">
+// 				{!html ? (
+// 					<code>
+// 						{props.children}
+// 					</code>
+// 				) : (
+// 					<code className={className} dangerouslySetInnerHTML={{
+// 						__html: html,
+// 					}} />
+// 				)}
+// 			</Markdown>
+// 		</div>
+// 	)
+// })
 
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => (
-	<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
-		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
-			<Markdown syntax={[syntax + info]} />
-		</$Node>
-		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node style={{ whiteSpace: "pre" }}>
-			{data.join("\n")}
-			{data.length > 0 && (
-				<br />
-			)}
-		</$Node>
-		{/* eslint-disable-next-line react/jsx-pascal-case */}
-		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
-			<Markdown syntax={[syntax]} />
-		</$Node>
-	</CompoundNode>
-))
+export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => {
+	let html = ""
+	const highlight = getPrismJSLanguage(info)
+	if (highlight) {
+		try {
+			html = highlight(data)
+		} catch (e) {
+			console.error(e)
+		}
+	}
+
+	return (
+		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
+			{/* eslint-disable-next-line react/jsx-pascal-case */}
+			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
+				<Markdown syntax={[syntax + info]} />
+			</$Node>
+			{/* eslint-disable-next-line react/jsx-pascal-case */}
+			<$Node style={{ whiteSpace: "pre" }}>
+				{/* <span className="mr-4 inline-block"> */}
+
+				{!html ? (
+					// No syntax highlighting:
+					<span>
+						{data}
+					</span>
+				) : (
+					// Syntax highlighting:
+					<span dangerouslySetInnerHTML={{
+						__html: html,
+					}} />
+				)}
+
+				{/* {data} */}
+				{/* {data.indexOf("\n") !== -1 && ( */}
+				{/* 	<br /> */}
+				{/* )} */}
+
+				{/* </span> */}
+			</$Node>
+			{/* eslint-disable-next-line react/jsx-pascal-case */}
+			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
+				<Markdown syntax={[syntax]} />
+			</$Node>
+		</CompoundNode>
+	)
+})
 
 const Break = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
@@ -548,6 +663,22 @@ function newHashEpoch() {
 	return newHash
 }
 
+// // List
+// // { regex: /^((?:\t*[*+\-•] .*\n?)*\t*[*+\-•] .*)/,
+// { regex: /^((?:\t*[*•] .*\n?)*\t*[*•] .*)/,
+// parse: (offset, key, matches) =>
+// 	<List key={key} children={parseList(offset, matches[1])} /> },
+//
+// // List isNumbered
+// { regex: /^((?:\t*\d+[.)] .*\n?)*\t*\d+[.)] .*)/,
+// parse: (offset, key, matches) =>
+// 	<List key={key} isNumbered children={parseList(offset, matches[1], true)} /> },
+//
+// // Checklist
+// { regex: /^((?:\t*[+-] .*\n?)*\t*[+-] .*)/,
+// parse: (offset, key, matches) =>
+// 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
+
 // Parses a VDOM representation to GFM text.
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
@@ -649,7 +780,7 @@ function parseGFM(text) {
 					type: CodeBlock,
 					syntax: "```",
 					info: each.slice(3),
-					children: body.slice(x1 + 1, x2 - 1),
+					children: body.slice(x1 + 1, x2 - 1).join("\n"),
 				})
 				index = x2 - 1
 				continue
@@ -916,7 +1047,7 @@ const Editor = ({ state, setState, ...props }) => {
 			markdown: `${markdown}\n`,
 			html: `${html}\n`,
 		}))
-		console.log(html) // DEBUG
+		// console.log(html) // DEBUG
 		// console.log(text) // DEBUG
 	}, [
 		state.data,
@@ -1016,13 +1147,17 @@ _em_ **_and_ strong**
 		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
 	}, [value])
 
-	// State (once):
+	// Create state:
+	//
+	// TODO: Move to <Editor>?
 	const [state, setState] = React.useState(() => ({
 		readOnly: false,
 		data: parseGFM(value),
 	}))
 
-	// State (per update):
+	// Update state:
+	//
+	// TODO: Move to <Editor>?
 	React.useLayoutEffect(() => {
 		setState(current => ({
 			...current,
@@ -1030,15 +1165,21 @@ _em_ **_and_ strong**
 		}))
 	}, [value])
 
-	// // DEBUG
-	// React.useEffect(() => {
-	// 	const id = setTimeout(() => {
-	// 		console.log({ state })
-	// 	}, 100)
-	// 	return () => {
-	// 		clearTimeout(id)
+	// // Re-update state (PrismJS):
+	// //
+	// // TODO: Move to <Editor>?
+	// React.useLayoutEffect(() => {
+	// 	const handler = e => {
+	// 		setState(current => ({
+	// 			...current,
+	// 			data: parseGFM(value),
+	// 		}))
 	// 	}
-	// }, [state])
+	// 	document.addEventListener("DOMContentLoaded", handler)
+	// 	return () => {
+	// 		document.removeEventListener("DOMContentLoaded", handler)
+	// 	}
+	// }, [])
 
 	// Shortcuts:
 	React.useEffect(() => {
