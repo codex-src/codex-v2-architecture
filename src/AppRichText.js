@@ -8,6 +8,16 @@ import "./AppRichText.css"
 // Maps user-perceived languages to PrismJS languages.
 const langs = {}
 
+// Gets the language extension from a metadata string (e.g.
+// an info string).
+function getLang(metadata) {
+	const index = metadata.lastIndexOf(".")
+	if (index === -1 || index + 1 === metadata.length) {
+		return metadata
+	}
+	return metadata.slice(index + 1)
+}
+
 // Returns an PrismJS parser function.
 function getPrismParser(lang) {
 	if (!lang) {
@@ -49,6 +59,7 @@ document.addEventListener("DOMContentLoaded", e => {
 	langs.html       = window.Prism.languages.html
 	langs.http       = window.Prism.languages.http
 	langs.js         = window.Prism.languages.jsx     // Uses jsx
+	langs.jsx        = window.Prism.languages.jsx
 	langs.json       = window.Prism.languages.json
 	langs.kotlin     = window.Prism.languages.kotlin
 	langs.php        = window.Prism.languages.php
@@ -63,6 +74,7 @@ document.addEventListener("DOMContentLoaded", e => {
 	langs.svg        = window.Prism.languages.svg
 	langs.swift      = window.Prism.languages.swift
 	langs.ts         = window.Prism.languages.tsx     // Uses tsx
+	langs.tsx        = window.Prism.languages.tsx
 	langs.wasm       = window.Prism.languages.wasm
 	langs.xml        = window.Prism.languages.xml
 	langs.yaml       = window.Prism.languages.yaml
@@ -319,7 +331,7 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 	React.useLayoutEffect(() => {
 		// Attempts to apply syntax highlighting.
 		const highlight = () => {
-			const parse = getPrismParser(metadata)
+			const parse = getPrismParser(getLang(metadata))
 			if (!parse) {
 				// No-op
 				return
@@ -973,7 +985,7 @@ const cmapHTML = new Map()
 
 	// NOTE: Use href="..." not href='...' because " URLs
 	// expect " to be percent-encoded (e.g. %22)
-	cmapHTML[A] = [children => `<a href="${children.syntax + children.children}">`, "</a>"]
+	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
 
 	cmapHTML[H1.type] = ["<h1>", "</h1>"]
 	cmapHTML[H2.type] = ["<h2>", "</h2>"]
@@ -983,7 +995,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = ["<pre><code>", "</code></pre>"] // FIXME: Use <pre><code>?
+	cmapHTML[CodeBlock.type] = [data => `<pre class="language-${getLang(data.metadata)}"><code>`, "</code></pre>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
