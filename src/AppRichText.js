@@ -93,7 +93,7 @@ const Code = ({ syntax, ...props }) => {
 
 	return (
 		// NOTE: Do not use text-sm; uses rem instead of em
-		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="py-px font-mono text-red-600 bg-red-100 rounded-sm" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
