@@ -92,7 +92,7 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// NOTE: Do not use text-sm because of rem
+		// NOTE: Do not use text-sm; uses rem instead of em
 		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
@@ -216,23 +216,56 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
-				// NOTE: 25% centers; 15% centers to --- syntax
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
 		</$Node>
 	)
 })
 
+
+// Returns whether a character is an ASCII whitespace
+// character as defined by the GFM spec.
+//
+// https://github.github.com/gfm/#whitespace-character
+function isASCIIWhitespace(char) {
+	const ok = (
+		char === "\u0020" ||
+		char === "\u0009" ||
+		char === "\u000a" ||
+		char === "\u000b" ||
+		char === "\u000c" ||
+		char === "\u000d"
+	)
+	return ok
+}
+
+// Returns whether a character is an ASCII punctuation
+// character as defined by the GFM spec.
+//
+// Covers: <start> !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ <end>
+//
+// https://github.github.com/gfm/#ascii-punctuation-character
+function isASCIIPunctuation(char) {
+	const ok = (
+		(char >= "\u0021" && char <= "\u002f") ||
+		(char >= "\u003a" && char <= "\u0040") ||
+		(char >= "\u005b" && char <= "\u0060") ||
+		(char >= "\u007b" && char <= "\u007e")
+	)
+	return ok
+}
+
 // Registers a type for parseInnerGFM.
 //
-// TODO: Update [^a-zA-Z0-9] -- https://github.github.com/gfm/#delimiter-run
+// TODO: Update [^a-zA-Z0-9] to ‘ASCII punctuation
+// character’ -- https://github.github.com/gfm/#ascii-punctuation-character
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
 	if (syntax[0] === "_") {
 		// https://github.github.com/gfm/#example-369
-		pattern = `[^\\\\]${pattern}([^a-zA-Z0-9]|$)`
+		pattern = `[^\\\\]${pattern}(\\s|[\\u0021-\\u002f\\u003a-\\u0040\\u005b-\\u0060\\u007b-\\u007e]|$)`
 		patternOffset++
 	} else if (syntax[0] === "`") {
 		// No-op
@@ -246,7 +279,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		// Guard: _Em_ and __strong and em__ cannot be nested:
 		//
 		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && index - 1 >= 0 && /\w/.test(text[index - 1])) {
+		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(text[index - 1]) && !isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
 		// Guard: Syntax (not `code`) cannot surround spaces:
