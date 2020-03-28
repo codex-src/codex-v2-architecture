@@ -672,7 +672,6 @@ function toText(data, options = { markdown: false }) {
 		text += toInnerText(each.children, options)
 		text += (options.markdown && s2) || ""
 		if (each !== data[data.length - 1]) {
-			// TODO: Can add dynamic support for \r\n here
 			text += "\n"
 		}
 	}
@@ -691,7 +690,7 @@ function toInnerHTML(children, options = { indent: false }) {
 			continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += typeof s1 !== "function" ? s1 : s1(each) // Compute HTML
+		html += typeof s1 !== "function" ? s1 : s1(each)
 		html += toInnerHTML(each.children, options)
 		html += s2
 	}
@@ -701,19 +700,22 @@ function toInnerHTML(children, options = { indent: false }) {
 // Converts a VDOM representation to an HTML string.
 //
 // TODO: Add default options
-function toHTML(data, options = { indent: false }) {
+function toHTML(data, options = { indent: false }, __depth = 0) {
 	let html = ""
 	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : "\n\t") // Compute HTML
-		if (each.type !== Break) {
+		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : `\n${"\t".repeat(__depth + 1)}`)
+		if (each.type === Break) {
+			// No-op
+		} else if (each.type === Blockquote) {
+			html += toHTML(each.children, options, __depth + 1)
+		} else {
 			html += toInnerHTML(each.children, options)
 		}
-		html += (!options.indent ? "" : "\n") + s2
+		html += (!options.indent ? "" : `\n${"\t".repeat(__depth)}`) + s2
 		if (each !== data[data.length - 1]) {
-			// TODO: Can add dynamic support for \r\n here
-			html += "\n"
+			html += `\n${"\t".repeat(__depth)}`
 		}
 	}
 	return html
@@ -721,6 +723,8 @@ function toHTML(data, options = { indent: false }) {
 
 const EditorBlocks = ({ data, ...props }) => (
 	data.map(({ type: Type, ...each }) => (
+		// NOTE: props.children (on any component) cannot be an
+		// object; rename to data
 		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
 	))
 )
@@ -823,7 +827,7 @@ const Editor = ({ state, setState, ...props }) => {
 		const text = toText(state.data)
 		const runes = [...text].length // Precompute for seconds
 		const markdown = toText(state.data, { markdown: true })
-		const html = toHTML(state.data /* , { indent: true } */)
+		const html = toHTML(state.data, { indent: true })
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
@@ -845,6 +849,7 @@ const Editor = ({ state, setState, ...props }) => {
 			markdown,
 			html,
 		}))
+		console.log(html)
 	}, [
 		state.data,
 		setState,
