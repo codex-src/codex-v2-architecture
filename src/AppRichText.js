@@ -124,8 +124,18 @@ const A = ({ syntax, ...props }) => (
 	</a>
 )
 
+// Higher-order component for block elements.
 export const $Node = ({ id, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
+		{props.children || (
+			<br />
+		)}
+	</div>
+)
+
+// Higher-order component for multiline block elements.
+export const CompoundNode = ({ id, ...props }) => (
+	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-compound-node {...props}>
 		{props.children || (
 			<br />
 		)}
@@ -137,7 +147,7 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -148,7 +158,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-medium text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -159,7 +169,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -170,7 +180,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold text-lg leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -181,7 +191,7 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -192,7 +202,7 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(data)}
+				{toInnerReact(data)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -201,10 +211,26 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 	// eslint-disable-next-line react/jsx-pascal-case
 	<$Node id={id}>
-		{toReact(data) || (
+		{toInnerReact(data) || (
 			<br />
 		)}
 	</$Node>
+))
+
+// NOTE: Compound component
+export const Blockquote = React.memo(({ id, syntax, data, ...props }) => (
+	<CompoundNode id={id}>
+		{data.map((each, index) => (
+			// eslint-disable-next-line react/jsx-pascal-case
+			<$Node key={each.id}>
+				<Markdown syntax={each.syntax}>
+					{toInnerReact(each.children) || (
+						<br />
+					)}
+				</Markdown>
+			</$Node>
+		))}
+	</CompoundNode>
 ))
 
 const Break = React.memo(({ id, syntax, data, ...props }) => {
@@ -221,7 +247,6 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 		</$Node>
 	)
 })
-
 
 // Returns whether a character is an ASCII whitespace
 // character as defined by the GFM spec.
@@ -316,8 +341,9 @@ const HTTP = "http://"
 
 // Parses a nested VDOM representation to GFM text.
 //
-// TODO: Can extract registerType(...)(...) to
+// TODO (1): Can extract registerType(...)(...) to
 // parseStrongAndEm(...)
+// TODO (2): Parse emojis here -- not parseGFM
 function parseInnerGFM(text) {
 	if (!text) {
 		return null
@@ -496,15 +522,15 @@ function newHashEpoch() {
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
 // parseTextHemingway (can support custom spellcheck, etc.)
-// TODO (2): Memoize data or paragraphs
+// TODO (2): Cache data or body?
 function parseGFM(text) {
 	const newHash = newHashEpoch()
 
 	const data = []
-	const paragraphs = text.split("\n")
+	const body = text.split("\n")
 	// NOTE: Use an index for multiline elements
-	for (let index = 0; index < paragraphs.length; index++) {
-		const each = paragraphs[index]
+	for (let index = 0; index < body.length; index++) {
+		const each = body[index]
 		const char = each.charAt(0)
 		switch (true) {
 		// <H1>
@@ -525,6 +551,44 @@ function parseGFM(text) {
 					hash: newHash(toInnerText(parseInnerGFM(each.slice(syntax.length)))),
 					children: parseInnerGFM(each.slice(syntax.length)),
 				})
+				continue
+			}
+			break
+		// <Blockquote>
+		case char === ">":
+			if (
+				// Is blockquote:
+				(each.length >= 2 && each.slice(0, 2) === "> ") ||
+				(each.length === 1 && each === ">")
+			) {
+				const x1 = index
+				let x2 = x1
+				x2++
+				while (x2 < body.length) {
+					if (
+						// Is **not** blockquote:
+						(body[x2].length < 2 || body[x2].slice(0, 2) !== "> ") &&
+						(body[x2].length !== 1 || body[x2] !== ">")
+					) {
+						// FIXME
+						x2-- // Decrement -- one too many
+						break
+					}
+					x2++
+				}
+				const range = body.slice(x1, x2 + 1)
+				data.push({
+					id: uuidv4(),
+					type: Blockquote,
+					syntax: null,
+					children: range.map((each, index) => ({
+						id: index,
+						type: Paragraph, // FIXME: Use Node?
+						syntax: [each.slice(0, 2)],
+						children: parseInnerGFM(each.slice(2)),
+					})),
+				})
+				index = x2
 				continue
 			}
 			break
@@ -555,8 +619,9 @@ function parseGFM(text) {
 	return data
 }
 
-// Converts a VDOM representation to React components.
-function toReact(children) {
+// Converts a nested VDOM representation to renderable React
+// components.
+function toInnerReact(children) {
 	if (children === null || typeof children === "string") {
 		return children
 	}
@@ -569,7 +634,7 @@ function toReact(children) {
 		const { type: Type } = each
 		components.push((
 			<Type key={components.length} syntax={each.syntax}>
-				{toReact(each.children)}
+				{toInnerReact(each.children)}
 			</Type>
 		))
 	}
@@ -625,7 +690,7 @@ function toInnerHTML(children, options = { indent: false }) {
 			html += escape(each) || "<br>"
 			continue
 		}
-		const [s1, s2] = cmapHTML[each.type]
+		const [s1, s2] = cmapHTML[each.type.type || each.type]
 		html += typeof s1 !== "function" ? s1 : s1(each) // Compute HTML
 		html += toInnerHTML(each.children, options)
 		html += s2
@@ -640,8 +705,7 @@ function toHTML(data, options = { indent: false }) {
 	let html = ""
 	// Iterate elements:
 	for (const each of data) {
-		// NOTE: Use each.type.type because of React.memo
-		const [s1, s2] = cmapHTML[each.type.type]
+		const [s1, s2] = cmapHTML[each.type.type || each.type]
 		html += (typeof s1 !== "function" ? s1 : s1(each)) + (!options.indent ? "" : "\n\t") // Compute HTML
 		if (each.type !== Break) {
 			html += toInnerHTML(each.children, options)
@@ -684,6 +748,7 @@ const cmapHTML = new Map()
 	cmap[H5.type] = "H5"
 	cmap[H6.type] = "H6"
 	cmap[Paragraph.type] = "Paragraph"
+	cmap[Blockquote.type] = "Blockquote"
 	cmap[Break.type] = "Break"
 
 	// HTML:
@@ -705,6 +770,7 @@ const cmapHTML = new Map()
 	cmapHTML[H5.type] = ["<h5>", "</h5>"]
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
+	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
@@ -945,7 +1011,7 @@ _em_ **_and_ strong**
 						}
 						e.preventDefault()
 						const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
-						ref.current.value = value.slice(0, pos1) + "\t" + value.slice(pos2)
+						ref.current.value = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
 						ref.current.selectionStart = pos1 + 1
 						ref.current.selectionEnd = pos1 + 1
 					}}
