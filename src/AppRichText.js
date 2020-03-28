@@ -250,6 +250,8 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
+// <span className="mr-4 inline-block">
+
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => (
 	<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
@@ -259,13 +261,10 @@ export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => (
 		</$Node>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
 		<$Node style={{ whiteSpace: "pre" }}>
-			{/* NOTE: Both margin-right or padding-right works */}
-			<span className="mr-4 inline-block">
-				{data.join("\n")}
-				{data.length > 0 && (
-					<br />
-				)}
-			</span>
+			{data.join("\n")}
+			{data.length > 0 && (
+				<br />
+			)}
 		</$Node>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
 		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
@@ -635,7 +634,7 @@ function parseGFM(text) {
 				// Iterate to end syntax:
 				while (x2 < body.length) {
 					if (body[x2].length === 3 && body[x2] === "```") {
-						x2++ // Iterate once past end
+						// No-op
 						break
 					}
 					x2++
@@ -644,6 +643,7 @@ function parseGFM(text) {
 					index = x1
 					break
 				}
+				x2++ // Iterate once past end
 				data.push({
 					id: uuidv4(),
 					type: CodeBlock,
