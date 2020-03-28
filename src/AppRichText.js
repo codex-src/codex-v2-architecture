@@ -143,7 +143,9 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -154,7 +156,9 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-medium text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -165,7 +169,9 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -176,7 +182,9 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold text-lg leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -187,7 +195,9 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
@@ -198,7 +208,9 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<$Node id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toInnerReact(data)}
+				{toInnerReact(data) || (
+					<br />
+				)}
 			</Markdown>
 		</a>
 	</$Node>
