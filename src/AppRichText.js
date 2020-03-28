@@ -220,7 +220,7 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => (
 	<CompoundNode id={id}>
 		{data.map((each, index) => (
 			// eslint-disable-next-line react/jsx-pascal-case
-			<$Node key={each.id}>
+			<$Node key={each.id} id={each.id}>
 				<Markdown syntax={each.syntax}>
 					{toInnerReact(each.children)}
 				</Markdown>
@@ -515,6 +515,7 @@ function newHashEpoch() {
 // TODO (1): To support Hemingway, preprocess text? E.g.
 // parseTextHemingway (can support custom spellcheck, etc.)
 // TODO (2): Cache data or body?
+// TODO (3): Change API to be ID-aware
 function parseGFM(text) {
 	const newHash = newHashEpoch()
 
@@ -573,8 +574,9 @@ function parseGFM(text) {
 					id: uuidv4(),
 					type: Blockquote,
 					syntax: null,
-					children: range.map((each, index) => ({
-						id: index,
+					children: range.map(each => ({
+						// id: index,
+						id: uuidv4(),
 						type: Paragraph, // FIXME: Use Node?
 						syntax: [each.slice(0, 2)],
 						children: parseInnerGFM(each.slice(2)),
