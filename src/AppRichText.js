@@ -849,9 +849,9 @@ const Editor = ({ state, setState, ...props }) => {
 				words: text.split(/\s+/).filter(Boolean).length,
 				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
-			text,
-			markdown,
-			html,
+			text: `${text}\n`,
+			markdown: `${markdown}\n`,
+			html: `${html}\n`,
 		}))
 		console.log(html) // DEBUG
 		// console.log(text) // DEBUG
