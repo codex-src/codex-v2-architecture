@@ -321,6 +321,7 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 })
 
 // NOTE: Compound component
+// TODO: Add a transition delay to colors?
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
