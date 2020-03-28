@@ -680,15 +680,12 @@ function stringify(obj) {
 	const data = JSON.stringify(
 		obj,
 		(key, value) => {
-			// Non-component:
+			// Non-React component:
 			if (key !== "type") {
 				return value
 			}
-			// Component (guard React.memo):
-			if (value.type) {
-				value = value.type
-			}
-			return `<${cmap[value]}>`
+			// React component (guard React.memo):
+			return `<${cmap[value.type || value]}>`
 		},
 		"\t",
 	)
@@ -711,19 +708,15 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// Rerender the DOM when data changes (use useLayoutEffect
 	// because of contenteditable):
-	//
-	// TODO: Use useMemo?
 	React.useLayoutEffect(() => {
-		// React.useCallback(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
-			// FIXME: Prevent useless rerenders to <Provider>?
+			// TODO: Prevent useless rerenders to <Provider>?
 			<Provider value={state}>
 				<EditorBlocks data={state.data} />
 			</Provider>,
 			ref.current,
 		)
-		// }, [state.data]),
 	}, [state])
 
 	// TODO: How does copy and paste work?
@@ -893,8 +886,9 @@ _em_ **_and_ strong**
 
 	return (
 		<div className="flex flex-row justify-center">
-			<div className="px-6 py-32 flex flex-row">
+			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
 
+				{/* Read-only button: */}
 				<div className="p-3 fixed right-0 top-0">
 					<button
 						className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -906,30 +900,29 @@ _em_ **_and_ strong**
 				</div>
 
 				{/* LHS */}
-				<div className="w-1/2">
-					<textarea
-						ref={ref}
-						className="w-full h-full resize-none outline-none"
-						value={value}
-						onKeyDown={e => {
-							if (e.keyCode !== 9) { // Tab
-								// No-op
-								return
-							}
-							e.preventDefault()
-							const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
-							ref.current.value = value.slice(0, pos1) + "\t" + value.slice(pos2)
-							ref.current.selectionStart = pos1 + 1
-							ref.current.selectionEnd = pos1 + 1
-						}}
-						onChange={e => setValue(e.target.value)}
-					/>
-				</div>
+				<textarea
+					ref={ref}
+					className="w-full h-full resize-none outline-none"
+					style={{ tabSize: 2 }}
+					value={value}
+					onKeyDown={e => {
+						if (e.keyCode !== 9) { // Tab
+							// No-op
+							return
+						}
+						e.preventDefault()
+						const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
+						ref.current.value = value.slice(0, pos1) + "\t" + value.slice(pos2)
+						ref.current.selectionStart = pos1 + 1
+						ref.current.selectionEnd = pos1 + 1
+					}}
+					onChange={e => setValue(e.target.value)}
+				/>
 
 				{/* RHS */}
-				<div className="flex-shrink-0 w-6" />
-				<div className="w-1/2">
+				<div>
 					<Editor
+						style={{ tabSize: 2 }}
 						state={state}
 						setState={setState}
 					/>
