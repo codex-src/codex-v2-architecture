@@ -251,11 +251,11 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 })
 
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, infoString, data, ...props }) => (
-	<CompoundNode className="-mx-4 mb-4 px-6 py-4 font-mono leading-snug bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
+export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => (
+	<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
 		<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
-			<Markdown syntax={[syntax + infoString]} />
+			<Markdown syntax={[syntax + info]} />
 		</$Node>
 		{/* eslint-disable-next-line react/jsx-pascal-case */}
 		<$Node style={{ whiteSpace: "pre" }}>
@@ -648,7 +648,7 @@ function parseGFM(text) {
 					id: uuidv4(),
 					type: CodeBlock,
 					syntax: "```",
-					infoString: each.slice(3),
+					info: each.slice(3),
 					children: body.slice(x1 + 1, x2 - 1),
 				})
 				index = x2 - 1
