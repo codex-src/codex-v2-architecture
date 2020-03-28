@@ -92,7 +92,8 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// NOTE: Do not use text-sm; uses rem instead of em
+		// NOTE (1): Do not use text-sm; uses rem instead of em
+		// NOTE (2): Use verticalAlign: 1 because of <Strike>
 		<span className="py-px font-mono text-red-600 bg-red-100 rounded-sm" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
@@ -125,15 +126,15 @@ const A = ({ syntax, ...props }) => (
 )
 
 // Higher-order component for block elements.
-export const $Node = ({ id, ...props }) => (
-	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-node {...props}>
+export const $Node = ({ id, style, ...props }) => (
+	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
 		{props.children}
 	</div>
 )
 
 // Higher-order component for multiline block elements.
-export const CompoundNode = ({ id, ...props }) => (
-	<div id={id} style={{ whiteSpace: "pre-wrap" }} data-compound-node {...props}>
+export const CompoundNode = ({ id, style, ...props }) => (
+	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
 		{props.children}
 	</div>
 )
@@ -249,6 +250,32 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
+// NOTE: Compound component
+export const CodeBlock = React.memo(({ id, syntax, infoString, data, ...props }) => (
+	<CompoundNode className="px-4 py-3 font-mono leading-snug bg-gray-100 rounded-sm" style={{ fontSize: "0.875em" }} spellCheck={false}>
+		{/* eslint-disable-next-line react/jsx-pascal-case */}
+		<$Node className="text-md-blue-a400">
+			<Markdown syntax={[syntax]}>
+				{infoString}
+			</Markdown>
+		</$Node>
+		{/* eslint-disable-next-line react/jsx-pascal-case */}
+		<$Node>
+			{data.join("\n")}
+			{data.length > 0 && (
+				<br />
+			)}
+			{/* {(data.length > 0 && !data[data.length - 1]) && ( */}
+			{/* 	<br /> */}
+			{/* )} */}
+		</$Node>
+		{/* eslint-disable-next-line react/jsx-pascal-case */}
+		<$Node>
+			<Markdown syntax={[syntax]} />
+		</$Node>
+	</CompoundNode>
+))
+
 const Break = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
@@ -349,17 +376,11 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 const HTTPS = "https://"
 const HTTP = "http://"
 
-// const parseStrongAndEm = registerType(StrongAndEm, char.repeat(3))
-// const parseStrong = registerType(Strong, char.repeat(2))
-// const parseEm = registerType(Em, char)
-// const parseStrike = registerType(Strike, "~~")
-// const parseCode = registerType(Code, "`", { recurse: false })
-
 // Parses a nested VDOM representation to GFM text.
 //
 // TODO (1): Can extract registerType(...)(...) to
 // parseStrongAndEm(...)
-// TODO (2): Parse emojis here -- not parseGFM
+// TODO (2): Parse 😀 here -- not GFM (e.g. !index)
 function parseInnerGFM(text) {
 	if (!text) {
 		return null
@@ -570,39 +591,69 @@ function parseGFM(text) {
 		// <Blockquote>
 		case char === ">":
 			if (
-				// Is blockquote:
 				(each.length >= 2 && each.slice(0, 2) === "> ") ||
 				(each.length === 1 && each === ">")
 			) {
 				const x1 = index
 				let x2 = x1
 				x2++
+				// Iterate to end syntax:
 				while (x2 < body.length) {
 					if (
-						// Is **not** blockquote:
 						(body[x2].length < 2 || body[x2].slice(0, 2) !== "> ") &&
 						(body[x2].length !== 1 || body[x2] !== ">")
 					) {
-						// FIXME
-						x2-- // Decrement -- one too many
+						// No-op
 						break
 					}
 					x2++
 				}
-				const range = body.slice(x1, x2 + 1)
 				data.push({
 					id: uuidv4(),
 					type: Blockquote,
 					syntax: null,
-					children: range.map(each => ({
-						// id: index,
+					children: body.slice(x1, x2).map(each => ({
 						id: uuidv4(),
-						type: Paragraph, // FIXME: Use Node?
+						type: Paragraph,
 						syntax: [each.slice(0, 2)],
 						children: parseInnerGFM(each.slice(2)),
 					})),
 				})
-				index = x2
+				index = x2 - 1
+				continue
+			}
+			break
+		// <CodeBlock>
+		case char === "`":
+			// TODO: Check GFM spec for backticks, etc.
+			if (
+				each.length >= 3 &&
+				each.slice(0, 3) === "```" &&
+				index + 1 < body.length
+			) {
+				const x1 = index
+				let x2 = x1
+				x2++
+				// Iterate to end syntax:
+				while (x2 < body.length) {
+					if (body[x2].length === 3 && body[x2] === "```") {
+						x2++ // Iterate once past end
+						break
+					}
+					x2++
+				}
+				if (x2 === body.length) { // Unterminated
+					index = x1
+					break
+				}
+				data.push({
+					id: uuidv4(),
+					type: CodeBlock,
+					syntax: "```",
+					infoString: each.slice(3),
+					children: body.slice(x1 + 1, x2 - 1),
+				})
+				index = x2 - 1
 				continue
 			}
 			break
@@ -683,7 +734,7 @@ function toText(data, options = { markdown: false }) {
 		text += (options.markdown && s1) || ""
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) { // TODO: Add CodeBlock
+		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
 			text += toText(each.children, options)
 		} else {
 			text += toInnerText(each.children, options)
@@ -724,7 +775,7 @@ function toHTML(data, __depth = 0) {
 		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) { // TODO: Add CodeBlock
+		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
 			html += toHTML(each.children, __depth + 1)
 		} else {
 			html += toInnerHTML(each.children)
@@ -769,6 +820,7 @@ const cmapHTML = new Map()
 	cmap[H6.type] = "H6"
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
+	cmap[CodeBlock.type] = "CodeBlock"
 	cmap[Break.type] = "Break"
 
 	// HTML:
@@ -791,6 +843,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
+	cmapHTML[CodeBlock.type] = ["<pre>", "</pre>"] // FIXME: Use <pre><code>?
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
@@ -873,8 +926,7 @@ const Editor = ({ state, setState, ...props }) => {
 	])
 
 	return (
-		// <React.Fragment>
-		<DocumentTitle title={!state.meta ? "Loading…" : state.meta.title}>
+		<React.Fragment>
 
 			{/* Editor */}
 			{React.createElement(
@@ -902,10 +954,11 @@ const Editor = ({ state, setState, ...props }) => {
 				</div>
 			)}
 
-		</DocumentTitle>
-		// </React.Fragment>
+		</React.Fragment>
 	)
 }
+
+const KEY_CODE_TAB = 9
 
 const App = props => {
 	const ref = React.useRef()
@@ -1027,7 +1080,7 @@ _em_ **_and_ strong**
 					style={{ tabSize: 2 }}
 					value={value}
 					onKeyDown={e => {
-						if (e.keyCode !== 9) { // Tab
+						if (e.keyCode !== KEY_CODE_TAB) {
 							// No-op
 							return
 						}
@@ -1044,11 +1097,13 @@ _em_ **_and_ strong**
 
 				{/* RHS */}
 				<div>
-					<Editor
-						style={{ tabSize: 2 }}
-						state={state}
-						setState={setState}
-					/>
+					<DocumentTitle title={`Editing${!state.meta ? "…" : ` ${state.meta.title}`}`}>
+						<Editor
+							style={{ tabSize: 2 }}
+							state={state}
+							setState={setState}
+						/>
+					</DocumentTitle>
 				</div>
 
 			</div>
