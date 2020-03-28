@@ -8,8 +8,8 @@ import "./AppRichText.css"
 // Maps user-perceived languages to PrismJS languages.
 const langs = {}
 
-// Returns an executable PrismJS function.
-function getPrismJSLanguage(lang) {
+// Returns an PrismJS parser function.
+function getPrismParser(lang) {
 	if (!lang) {
 		return null
 	}
@@ -155,7 +155,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		// NOTE (1): Do not use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="px-1 py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -311,65 +311,56 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
-// const CodeBlock = React.memo(props => {
-// 	let html = ""
-// 	const lang = getPrismLang(props.lang)
-// 	if (lang) {
-// 		try {
-// 			html = window.Prism.highlight(props.children, lang, props.lang)
-// 		} catch (e) {
-// 			console.warn(e)
-// 		}
-// 	}
-// 	const className = `language-${props.lang}`
-// 	return (
-// 		<div style={{ ...stylex.parse("m-x:-24 p-x:24 b:white"), boxShadow: "0px 0px 1px hsl(var(--gray))" }}>
-// 			<Markdown style={stylex.parse("c:gray")} start={`\`\`\`${props.lang}`} end="```">
-// 				{!html ? (
-// 					<code>
-// 						{props.children}
-// 					</code>
-// 				) : (
-// 					<code className={className} dangerouslySetInnerHTML={{
-// 						__html: html,
-// 					}} />
-// 				)}
-// 			</Markdown>
-// 		</div>
-// 	)
-// })
-
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, info, data, ...props }) => {
-	let html = ""
-	const highlight = getPrismJSLanguage(info)
-	if (highlight) {
-		try {
-			html = highlight(data)
-		} catch (e) {
-			console.error(e)
+export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
+	const [html, setHTML] = React.useState("")
+
+	// TODO: Cut metadata extension
+	React.useLayoutEffect(() => {
+		// Attempts to apply syntax highlighting.
+		const highlight = () => {
+			const parse = getPrismParser(metadata)
+			if (!parse) {
+				// No-op
+				return
+			}
+			try {
+				setHTML(parse(data))
+			} catch (error) {
+				console.error(error)
+			}
 		}
-	}
+		const handler = e => {
+			if (html) {
+				// No-op
+				return
+			}
+			highlight()
+		}
+		highlight() // Once
+		document.addEventListener("DOMContentLoaded", handler)
+		return () => {
+			document.removeEventListener("DOMContentLoaded", handler)
+		}
+	}, [metadata, data, html])
 
 	return (
 		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
-				<Markdown syntax={[syntax + info]} />
+				<Markdown syntax={[syntax + metadata]} />
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node style={{ whiteSpace: "pre" }}>
 				{/* <span className="mr-4 inline-block"> */}
 
 				{!html ? (
-					// No syntax highlighting:
 					<span>
-						{data}
+						{data}{!data ? "" : <br />}
 					</span>
 				) : (
-					// Syntax highlighting:
 					<span dangerouslySetInnerHTML={{
-						__html: html,
+						__html: html + (!html ? "" : `<br />`),
 					}} />
 				)}
 
@@ -779,7 +770,7 @@ function parseGFM(text) {
 					id: uuidv4(),
 					type: CodeBlock,
 					syntax: "```",
-					info: each.slice(3),
+					metadata: each.slice(3),
 					children: body.slice(x1 + 1, x2 - 1).join("\n"),
 				})
 				index = x2 - 1
