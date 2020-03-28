@@ -1011,9 +1011,11 @@ _em_ **_and_ strong**
 						}
 						e.preventDefault()
 						const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
-						ref.current.value = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
+						const newValue = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
+						ref.current.value = newValue
 						ref.current.selectionStart = pos1 + 1
 						ref.current.selectionEnd = pos1 + 1
+						setValue(newValue)
 					}}
 					onChange={e => setValue(e.target.value)}
 				/>
