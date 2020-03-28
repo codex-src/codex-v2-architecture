@@ -93,7 +93,7 @@ const Code = ({ syntax, ...props }) => {
 
 	return (
 		// NOTE: Do not use text-sm; uses rem instead of em
-		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ fontSize: "0.875em" }}>
+		<span className="py-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -106,7 +106,7 @@ const Code = ({ syntax, ...props }) => {
 }
 
 const Strike = ({ syntax, ...props }) => (
-	<span className="line-through">
+	<span className="line-through text-gray-500" style={{ "--md-blue-a400": "currentColor" }}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -217,16 +217,15 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	// TODO: Use ref to measure syntax?
-	const style = {
-		paddingLeft: "calc(14.27 / 16 * 1em)",
-		boxShadow: "-2px 0 var(--gray-600)",
-	}
+	// TODO: Use a ref to measure syntax? <CompoundNode>,
+	// <$Node>, and <Markdown> do not use React.forwardRef and
+	// <Markdown> uses <React.Fragment>
+	const readOnlyStyle = { paddingLeft: "calc(14.27 / 16 * 1em)", boxShadow: "-2px 0 var(--gray-600)" }
 	return (
 		<CompoundNode id={id}>
 			{data.map((each, index) => (
 				// eslint-disable-next-line react/jsx-pascal-case
-				<$Node key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : style}>
+				<$Node key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : readOnlyStyle}>
 					<Markdown syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -879,8 +878,8 @@ const Editor = ({ state, setState, ...props }) => {
 						...props.style,
 					},
 
-					contentEditable: !state.readOnly,
-					suppressContentEditableWarning: !state.readOnly,
+					// contentEditable: !state.readOnly,
+					// suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
 

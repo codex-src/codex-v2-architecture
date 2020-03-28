@@ -133,8 +133,8 @@
 }
 
 .text-md-blue-a200 {
-	color: #448aff;
+	color: var(--md-blue-a200);
 }
 .text-md-blue-a400 {
-	color: #2979ff;
+	color: var(--md-blue-a400);
 }
