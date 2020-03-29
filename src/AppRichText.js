@@ -1128,10 +1128,6 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// Rerender the DOM when data changes:
 	React.useLayoutEffect(() => {
-		if (!state.data) {
-			// No-op
-			return
-		}
 		const { Provider } = EditorContext
 		ReactDOM.render(
 			// TODO: Prevent useless rerenders to <Provider>?
@@ -1142,42 +1138,36 @@ const Editor = ({ state, setState, ...props }) => {
 		)
 	}, [state])
 
-	// React.useEffect(() => {
-	// 	if (!state.data) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const text = toText(state.data)
-	// 	const runes = [...text].length // Precompute for seconds
-	// 	const markdown = toText(state.data, { markdown: true }) // TODO: Use value?
-	// 	const html = toHTML(state.data)
-	// 	setState(current => ({
-	// 		...current,
-	// 		// // TODO: Convert to a rich data structure with nesting
-	// 		// tableOfContents: state.data.filter(each => (
-	// 		// 	each.type === H1 ||
-	// 		// 	each.type === H2 ||
-	// 		// 	each.type === H3 ||
-	// 		// 	each.type === H4 ||
-	// 		// 	each.type === H5 ||
-	// 		// 	each.type === H6
-	// 		// )),
-	// 		meta: {
-	// 			title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-	// 			runes,
-	// 			words: text.split(/\s+/).filter(Boolean).length,
-	// 			seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
-	// 		},
-	// 		text,
-	// 		markdown,
-	// 		html,
-	// 	}))
-	// 	// console.log(text) // DEBUG
-	// 	// console.log(html) // DEBUG
-	// }, [
-	// 	state.data,
-	// 	setState,
-	// ])
+	React.useEffect(() => {
+		const text = toText(state.data)
+		const runes = [...text].length // Precompute for seconds
+		// const markdown = toText(state.data, { markdown: true })
+		// const html = toHTML(state.data)
+		setState(current => ({
+			...current,
+			// // TODO: Convert to a rich data structure with nesting
+			// tableOfContents: state.data.filter(each => (
+			// 	each.type === H1 ||
+			// 	each.type === H2 ||
+			// 	each.type === H3 ||
+			// 	each.type === H4 ||
+			// 	each.type === H5 ||
+			// 	each.type === H6
+			// )),
+			meta: {
+				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+				runes: [...text].length,
+				words: text.split(/\s+/).filter(Boolean).length,
+				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
+			},
+			// text,
+			// markdown,
+			// html,
+		}))
+	}, [
+		state.data,
+		setState,
+	])
 
 	return (
 		React.createElement(
@@ -1263,8 +1253,7 @@ _em_ **_and_ strong**
 		renderMode: "md", // E.g. "txt" || "md" || "html" || "json"
 		stylesheet: "type", // E.g. "type" || "mono"
 		readOnly: false,
-		// value,
-		// data: parseGFM(value),
+		data: parseGFM(value),
 	}))
 
 	// Update state:
