@@ -317,7 +317,7 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 		const [lang, parse] = match
 		try {
 			setLang(lang)
-			setHTML(window.Prism.highlight(data, parse, lang)) // Use try for parse
+			setHTML(window.Prism.highlight(data, parse, lang))
 		} catch (error) {
 			console.error(error)
 		}
@@ -359,41 +359,36 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 		const [lang, parse] = match
 		try {
 			setLang(lang)
-			setHTML(window.Prism.highlight(data, parse, lang)) // Use try for parse
+			setHTML(window.Prism.highlight(data, parse, lang))
 		} catch (error) {
 			console.error(error)
 		}
 	}, [metadata, data])
 
-	// NOTE: Use a ternary operator because of $Node; don’t
-	// overwrite white-space: pre-wrap
-	const whiteSpaceStyle = { whiteSpace: !readOnly ? "pre-wrap" : "pre" }
 	return (
-		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
+		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400" style={whiteSpaceStyle}>
+			<$Node className="text-md-blue-a400">
 				<Markdown syntax={[syntax + metadata]} />
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node style={whiteSpaceStyle}>
-				<span className={!readOnly ? null : "mr-4 inline-block"}>
-					{!html ? (
-						data
-					) : (
-						<span
-							className={!lang ? null : `language-${lang}`}
-							dangerouslySetInnerHTML={{
-								__html: html,
-							}}
-						/>
-					)}
-					{data && (
-						<br />
-					)}
-				</span>
+			<$Node>
+				{!html ? (
+					data
+				) : (
+					<span
+						className={!lang ? null : `language-${lang}`}
+						dangerouslySetInnerHTML={{
+							__html: html,
+						}}
+					/>
+				)}
+				{data && (
+					<br />
+				)}
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400" style={whiteSpaceStyle}>
+			<$Node className="text-md-blue-a400">
 				<Markdown syntax={[syntax]} />
 			</$Node>
 		</CompoundNode>
