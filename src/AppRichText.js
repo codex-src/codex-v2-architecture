@@ -924,16 +924,16 @@ function toInnerHTML(children) {
 // }
 
 // Converts a VDOM representation to an HTML string.
-function toHTML(data) {
+function toHTML(data, __depth = 0) {
 	let html = ""
 	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += `${typeof s1 !== "function" ? s1 : s1(each)}`
+		html += "\t".repeat(__depth) + (typeof s1 !== "function" ? s1 : s1(each))
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote) {
-			html += `\n\t${toHTML(each.children)}\n`
+			html += `\n${toHTML(each.children, __depth + 1)}\n`
 		} else {
 			html += toInnerHTML(each.children)
 		}
@@ -992,12 +992,13 @@ const cmapHTML = new Map()
 	// expect " to be percent-encoded (e.g. %22)
 	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
 
-	cmapHTML[H1.type] = ["<h1>", "</h1>"]
-	cmapHTML[H2.type] = ["<h2>", "</h2>"]
-	cmapHTML[H3.type] = ["<h3>", "</h3>"]
-	cmapHTML[H4.type] = ["<h4>", "</h4>"]
-	cmapHTML[H5.type] = ["<h5>", "</h5>"]
-	cmapHTML[H6.type] = ["<h6>", "</h6>"]
+	// FIXME: Add hash IDs
+	cmapHTML[H1.type] = [data => `<a><h1 id="${data.hash}" href="#${data.hash}">`, "</h1></a>"]
+	cmapHTML[H2.type] = [data => `<a><h2 id="${data.hash}" href="#${data.hash}">`, "</h2></a>"]
+	cmapHTML[H3.type] = [data => `<a><h3 id="${data.hash}" href="#${data.hash}">`, "</h3></a>"]
+	cmapHTML[H4.type] = [data => `<a><h4 id="${data.hash}" href="#${data.hash}">`, "</h4></a>"]
+	cmapHTML[H5.type] = [data => `<a><h5 id="${data.hash}" href="#${data.hash}">`, "</h5></a>"]
+	cmapHTML[H6.type] = [data => `<a><h6 id="${data.hash}" href="#${data.hash}">`, "</h6></a>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
