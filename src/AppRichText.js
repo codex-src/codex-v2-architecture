@@ -327,40 +327,18 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
-	// NOTE: Use refs because of DOMContentLoaded
-	const metadataRef = React.useRef(metadata)
-	const dataRef = React.useRef(data)
-
-	React.useLayoutEffect(() => {
-		// Attempts to apply syntax highlighting for a given
-		// language based on metadata.
-		const applyHighlight = () => {
-			const highlight = getLanguageParser(getLanguage(metadataRef.current))
-			if (!highlight) {
-				// No-op
-				return
-			}
-			try {
-				// TODO: Set htmlRef.current?
-				setHTML(highlight(dataRef.current))
-			} catch (error) {
-				console.error(error)
-			}
+	React.useEffect(() => {
+		const highlight = getLanguageParser(getLanguage(metadata))
+		if (!highlight) {
+			// No-op
+			return
 		}
-		const handler = e => {
-			// TODO: Check htmlRef.current?
-			if (html) {
-				// No-op
-				return
-			}
-			applyHighlight()
+		try {
+			setHTML(highlight(data))
+		} catch (error) {
+			console.error(error)
 		}
-		applyHighlight() // Once
-		document.addEventListener("DOMContentLoaded", handler)
-		return () => {
-			document.removeEventListener("DOMContentLoaded", handler)
-		}
-	}, [metadata, data, html])
+	}, [metadata, data])
 
 	return (
 		<div className="-mx-4 mb-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
@@ -387,40 +365,53 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 
 	const [html, setHTML] = React.useState("")
 
-	// NOTE: Use refs because of DOMContentLoaded
-	const metadataRef = React.useRef(metadata)
-	const dataRef = React.useRef(data)
+	//	// NOTE: Use refs because of DOMContentLoaded
+	//	const metadataRef = React.useRef(metadata)
+	//	const dataRef = React.useRef(data)
+	//
+	//	React.useLayoutEffect(() => {
+	//		// Attempts to apply syntax highlighting for a given
+	//		// language based on metadata.
+	//		const applyHighlight = () => {
+	//			const highlight = getLanguageParser(getLanguage(metadataRef.current))
+	//			if (!highlight) {
+	//				// No-op
+	//				return
+	//			}
+	//			try {
+	//				// TODO: Set htmlRef.current?
+	//				setHTML(highlight(dataRef.current))
+	//			} catch (error) {
+	//				console.error(error)
+	//			}
+	//		}
+	//		const handler = e => {
+	//			// TODO: Check htmlRef.current?
+	//			if (html) {
+	//				// No-op
+	//				return
+	//			}
+	//			applyHighlight()
+	//		}
+	//		applyHighlight() // Once
+	//		document.addEventListener("DOMContentLoaded", handler)
+	//		return () => {
+	//			document.removeEventListener("DOMContentLoaded", handler)
+	//		}
+	//	}, [metadata, data, html])
 
-	React.useLayoutEffect(() => {
-		// Attempts to apply syntax highlighting for a given
-		// language based on metadata.
-		const applyHighlight = () => {
-			const highlight = getLanguageParser(getLanguage(metadataRef.current))
-			if (!highlight) {
-				// No-op
-				return
-			}
-			try {
-				// TODO: Set htmlRef.current?
-				setHTML(highlight(dataRef.current))
-			} catch (error) {
-				console.error(error)
-			}
+	React.useEffect(() => {
+		const highlight = getLanguageParser(getLanguage(metadata))
+		if (!highlight) {
+			// No-op
+			return
 		}
-		const handler = e => {
-			// TODO: Check htmlRef.current?
-			if (html) {
-				// No-op
-				return
-			}
-			applyHighlight()
+		try {
+			setHTML(highlight(data))
+		} catch (error) {
+			console.error(error)
 		}
-		applyHighlight() // Once
-		document.addEventListener("DOMContentLoaded", handler)
-		return () => {
-			document.removeEventListener("DOMContentLoaded", handler)
-		}
-	}, [metadata, data, html])
+	}, [metadata, data])
 
 	// NOTE: Use a ternary operator because of $Node; don’t
 	// overwrite white-space: pre-wrap
@@ -1250,26 +1241,41 @@ _em_ **_and_ strong**
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
-		renderMode: "md", // E.g. "txt" || "md" || "html" || "json"
+		renderMode: "md",   // E.g. "txt" || "md" || "html" || "json"
 		stylesheet: "type", // E.g. "type" || "mono"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
 
-	// Update state:
-	React.useLayoutEffect(() => {
-		// const id = setTimeout(() => {
-		setState(current => ({
-			...current,
-			data: parseGFM(value),
-		}))
-		// }, 50)
-		// return () => {
-		// 	clearTimeout(id)
-		// }
+	// Update state (debounce 25ms):
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			setState(current => ({
+				...current,
+				data: parseGFM(value),
+			}))
+		}, 25)
+		return () => {
+			clearTimeout(id)
+		}
 	}, [value])
 
-	// Shortcuts:
+	const [text, setText] = React.useState(() => toText(state.data))
+	const [html, setHTML] = React.useState(() => toHTML(state.data))
+	const [json, setJSON] = React.useState(() => toJSON(state.data))
+
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			setText(toText(state.data))
+			setHTML(toHTML(state.data))
+			setJSON(toJSON(state.data))
+		}, 25)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state.data])
+
+	// Read-only shortcut:
 	React.useEffect(() => {
 		const handler = e => {
 			if (!e.metaKey || e.keyCode !== 80) {
@@ -1352,6 +1358,7 @@ _em_ **_and_ strong**
 				{/* LHS */}
 				<textarea
 					ref={ref}
+					// FIXME: Add min-height
 					className="w-full h-full resize-none outline-none"
 					style={{ tabSize: 2 }}
 					value={value}
@@ -1379,17 +1386,9 @@ _em_ **_and_ strong**
 							<CodeBlockStandalone
 								style={{ tabSize: 2 }}
 								metadata="txt"
-								data={toText(state.data)}
+								data={text}
 							/>
 						)}
-						{/* Markdown */}
-						{/* {state.renderMode === "markdown" && ( */}
-						{/* 	<CodeBlockStandalone */}
-						{/* 		style={{ tabSize: 2 }} */}
-						{/* 		metadata="md" */}
-						{/* 		data={toText(state.data, { markdown: true })} */}
-						{/* 	/> */}
-						{/* )} */}
 						{/* WYSIWYG markdown */}
 						{state.renderMode === "md" && (
 							<Editor
@@ -1397,7 +1396,6 @@ _em_ **_and_ strong**
 								style={{ tabSize: 2, fontSize: state.stylesheet === "type" ? null : "0.875em" }}
 								state={state}
 								setState={setState}
-								value={value}
 							/>
 						)}
 						{/* HTML */}
@@ -1405,7 +1403,7 @@ _em_ **_and_ strong**
 							<CodeBlockStandalone
 								style={{ tabSize: 2 }}
 								metadata="html"
-								data={toHTML(state.data)}
+								data={html}
 							/>
 						)}
 						{/* JSON */}
@@ -1413,7 +1411,7 @@ _em_ **_and_ strong**
 							<CodeBlockStandalone
 								style={{ tabSize: 2 }}
 								metadata="json"
-								data={toJSON(state.data)}
+								data={json}
 							/>
 						)}
 					</DocumentTitle>
