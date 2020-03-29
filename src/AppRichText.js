@@ -324,7 +324,7 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 	}, [metadata, data])
 
 	return (
-		<div className="-mx-4 mb-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
+		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
 			{!html ? (
 				data
 			) : (
@@ -345,7 +345,7 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
-	const { stylesheet, readOnly } = React.useContext(EditorContext)
+	const { stylesheet } = React.useContext(EditorContext)
 
 	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
@@ -366,7 +366,7 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 	}, [metadata, data])
 
 	return (
-		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
+		<CompoundNode className="-mx-4 my-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node className="text-md-blue-a400">
 				<Markdown syntax={[syntax + metadata]} />
@@ -1181,8 +1181,8 @@ _em_ **_and_ strong**
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
-		renderMode: "md",   // E.g. "txt" || "md" || "html" || "json"
-		stylesheet: "type", // E.g. "type" || "mono"
+		renderMode: "interactive-markdown", // E.g. "text" || "interactive-markdown" || "html" || "json"
+		stylesheet: "type",                 // E.g. "type" || "mono"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1235,8 +1235,8 @@ _em_ **_and_ strong**
 	}, [state.readOnly])
 
 	return (
-		<div className="flex flex-row justify-center">
-			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
+		<div className="flex flex-row justify-center min-h-full">
+			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full min-h-full">
 
 				{/* Read-only button: */}
 				<div className="-my-1 p-3 fixed right-0 top-0">
@@ -1245,14 +1245,14 @@ _em_ **_and_ strong**
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "txt" })}
+								onClick={e => setState({ ...state, renderMode: "text" })}
 							>
-								Plain text
+								Text
 							</button>
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "md" })}
+								onClick={e => setState({ ...state, renderMode: "interactive-markdown" })}
 							>
 								Markdown
 							</button>
@@ -1272,7 +1272,7 @@ _em_ **_and_ strong**
 							</button>
 						</div>
 						<div className="-mx-1 my-1 flex flex-row">
-							{state.renderMode === "md" && (
+							{state.renderMode === "interactive-markdown" && (
 								<React.Fragment>
 									<button
 										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -1321,16 +1321,16 @@ _em_ **_and_ strong**
 				{/* RHS */}
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
-						{/* Plain text */}
-						{state.renderMode === "txt" && (
+						{/* Text */}
+						{state.renderMode === "text" && (
 							<CodeBlockStandalone
 								style={{ tabSize: 2 }}
-								metadata="txt"
+								metadata="text"
 								data={text}
 							/>
 						)}
-						{/* WYSIWYG markdown */}
-						{state.renderMode === "md" && (
+						{/* Narkdown */}
+						{state.renderMode === "interactive-markdown" && (
 							<Editor
 								className={state.stylesheet === "type" ? null : "font-mono"}
 								style={{ tabSize: 2, fontSize: state.stylesheet === "type" ? null : "0.875em" }}

@@ -25,9 +25,9 @@
 	color: #905;
 }
 /* Added */
-.language-diff .token.deleted {
-	background: #9051;
-}
+/* .language-diff .token.deleted { */
+/* 	background: #9051; */
+/* } */
 
 .token.selector,
 .token.attr-name,
@@ -38,9 +38,9 @@
 	color: #690;
 }
 /* Added */
-.language-diff .token.inserted {
-	background: #6901;
-}
+/* .language-diff .token.inserted { */
+/* 	background: #6901; */
+/* } */
 
 .token.operator,
 .token.entity,
