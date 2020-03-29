@@ -180,14 +180,14 @@ const A = ({ syntax, ...props }) => (
 )
 
 // Higher-order component for block elements.
-export const $Node = ({ id, style, ...props }) => (
+const $Node = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
 		{props.children}
 	</div>
 )
 
 // Higher-order component for multiline block elements.
-export const CompoundNode = ({ id, style, ...props }) => (
+const CompoundNode = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
 		{props.children}
 	</div>
@@ -281,7 +281,7 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 ))
 
 // NOTE: Compound component
-export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
+const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	// TODO: Dynamically compute syntax width for padding-left
@@ -303,8 +303,8 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 })
 
 // Near-copy of <CodeBlock> used for rendering as a
-// standalone component.
-export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => {
+// standalone component. Doesn’t use React.memo.
+const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
@@ -340,11 +340,11 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 			)}
 		</div>
 	)
-})
+}
 
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
-export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
+const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { stylesheet } = React.useContext(EditorContext)
 
 	const [lang, setLang] = React.useState("")
@@ -1131,45 +1131,32 @@ const App = props => {
 		const cache = localStorage.getItem("codex-app-v2")
 		if (cache) {
 			const json = JSON.parse(cache)
-			return json.data
+			if (json.data) {
+				return json.data
+			}
 		}
 		return `
-# This is a header
-## This is a subheader
-### H3
-#### H4
-##### H5
-###### H6
+# Hello, world!
 
----
-***
+_What in the hell am I looking at?_
 
-*oh*man*is*it*
-_oh_man_is_it_
+This is a technical prototype for the new editor for https://opencodex.dev. **The left-hand side is a \`<textarea>\` you can type into and the right-hand side renders gorgeous React! 👀** This prototype specifically parses GitHub Flavored Markdown into _multiple_ data types, including \`text\`, \`html\`, and \`json\`.
 
-*oh*shit* -- OK
-**oh**shit** -- OK
-***oh***shit*** -- OK
-_oh_shit_ -- OK
-__oh__shit__ -- OK
-___oh___shit___ -- OK
-\`oh\`shit\` -- OK
-~oh~shit~ -- OK
-~~oh~~shit~~ -- OK
+Syntax highlighting is also supported using PrismJS. Simply open a code block and type!
 
-* oh *
-** oh **
-*** oh *** -- Not sure
-_ oh _
-__ oh __
-___ oh ___ -- Not sure
-\` oh \`
-~ oh ~
-~~ oh ~~
+\`\`\`go
+package main
 
-_em **and**_ **strong** or ~strike~ or ~~strike~~
+import "fmt"
 
-_em_ **_and_ strong**
+func main() {
+	fmt.Println("hello, world!")
+}
+\`\`\`
+
+Crazy, huh?
+
+**Try pressing the \`Text\`, \`Markdown\`, \`HTML\` and \`JSON\` buttons at the top; these convert the parsed markdown data structure to various formats.** This may help you better understand what’s going on behind the hood.
 `.trim()
 	})
 
@@ -1181,8 +1168,8 @@ _em_ **_and_ strong**
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
-		renderMode: "interactive-markdown", // E.g. "text" || "interactive-markdown" || "html" || "json"
-		stylesheet: "type",                 // E.g. "type" || "mono"
+		renderMode: "markdown", // E.g. "text" || "markdown" || "html" || "json"
+		stylesheet: "type",     // E.g. "type" || "mono"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1235,8 +1222,8 @@ _em_ **_and_ strong**
 	}, [state.readOnly])
 
 	return (
-		<div className="flex flex-row justify-center min-h-full">
-			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full min-h-full">
+		<div className="flex flex-row justify-center">
+			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
 
 				{/* Read-only button: */}
 				<div className="-my-1 p-3 fixed right-0 top-0">
@@ -1252,7 +1239,7 @@ _em_ **_and_ strong**
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "interactive-markdown" })}
+								onClick={e => setState({ ...state, renderMode: "markdown" })}
 							>
 								Markdown
 							</button>
@@ -1272,7 +1259,7 @@ _em_ **_and_ strong**
 							</button>
 						</div>
 						<div className="-mx-1 my-1 flex flex-row">
-							{state.renderMode === "interactive-markdown" && (
+							{state.renderMode === "markdown" && (
 								<React.Fragment>
 									<button
 										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -1299,7 +1286,7 @@ _em_ **_and_ strong**
 				<textarea
 					ref={ref}
 					// FIXME: Add min-height
-					className="w-full h-full resize-none outline-none"
+					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
 					style={{ tabSize: 2 }}
 					value={value}
 					onKeyDown={e => {
@@ -1331,7 +1318,7 @@ _em_ **_and_ strong**
 							/>
 						)}
 						{/* Narkdown */}
-						{state.renderMode === "interactive-markdown" && (
+						{state.renderMode === "markdown" && (
 							<Editor
 								className={state.stylesheet === "type" ? null : "font-mono"}
 								style={{ tabSize: 2, fontSize: state.stylesheet === "type" ? null : "0.875em" }}
