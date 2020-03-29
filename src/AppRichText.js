@@ -1104,8 +1104,8 @@ const Editor = ({ state, setState, ...props }) => {
 						...props.style,
 					},
 
-					contentEditable: !state.readOnly,
-					suppressContentEditableWarning: !state.readOnly,
+					// contentEditable: !state.readOnly,
+					// suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
 
@@ -1184,6 +1184,8 @@ _em_ **_and_ strong**
 	//
 	// TODO: Move to <Editor>?
 	const [state, setState] = React.useState(() => ({
+		// TODO: Use new Enum pattern
+		renderMode: "wysiwyg-markdown", // E.g. "plain-text" || "markdown" || "wysiwyg-markdown" || "html" || "json"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1197,22 +1199,6 @@ _em_ **_and_ strong**
 			data: parseGFM(value),
 		}))
 	}, [value])
-
-	// // Re-update state (Prism):
-	// //
-	// // TODO: Move to <Editor>?
-	// React.useLayoutEffect(() => {
-	// 	const handler = e => {
-	// 		setState(current => ({
-	// 			...current,
-	// 			data: parseGFM(value),
-	// 		}))
-	// 	}
-	// 	document.addEventListener("DOMContentLoaded", handler)
-	// 	return () => {
-	// 		document.removeEventListener("DOMContentLoaded", handler)
-	// 	}
-	// }, [])
 
 	// Shortcuts:
 	React.useEffect(() => {
@@ -1242,36 +1228,36 @@ _em_ **_and_ strong**
 					<div className="-mx-1 my-1 flex flex-row">
 						<button
 							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							// onPointerDown={e => e.preventDefault()}
-							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, renderMode: "plain-text" })}
 						>
 							Plain text
 						</button>
 						<button
 							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							// onPointerDown={e => e.preventDefault()}
-							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, renderMode: "markdown" })}
 						>
 							Markdown
 						</button>
 						<button
 							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							// onPointerDown={e => e.preventDefault()}
-							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, renderMode: "wysiwyg-markdown" })}
 						>
-							WYSIWYG
+							WYSIWYG markdown
 						</button>
 						<button
 							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							// onPointerDown={e => e.preventDefault()}
-							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, renderMode: "html" })}
 						>
 							HTML
 						</button>
 						<button
 							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							// onPointerDown={e => e.preventDefault()}
-							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, renderMode: "json" })}
 						>
 							JSON
 						</button>
@@ -1312,11 +1298,52 @@ _em_ **_and_ strong**
 				{/* RHS */}
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
-						<Editor
-							style={{ tabSize: 2 }}
-							state={state}
-							setState={setState}
-						/>
+
+						{/* Plain text */}
+						{state.renderMode === "plain-text" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={state}
+								setState={setState}
+							/>
+						)}
+
+						{/* Markdown */}
+						{state.renderMode === "markdown" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={state}
+								setState={setState}
+							/>
+						)}
+
+						{/* WYSIWYG markdown */}
+						{state.renderMode === "wysiwyg-markdown" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={state}
+								setState={setState}
+							/>
+						)}
+
+						{/* HTML */}
+						{state.renderMode === "html" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={state}
+								setState={setState}
+							/>
+						)}
+
+						{/* JSON */}
+						{state.renderMode === "json" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={state}
+								setState={setState}
+							/>
+						)}
+
 					</DocumentTitle>
 				</div>
 
