@@ -37,9 +37,9 @@ document.addEventListener("DOMContentLoaded", e => {
 		// No-op
 		return
 	}
-	/* eslint-disable no-multi-spaces */
-	//
 	// TODO: Use try-catch statement?
+	//
+	/* eslint-disable no-multi-spaces */
 	langs.bash       = window.Prism.languages.bash
 	langs.c          = window.Prism.languages.c
 	langs.cpp        = window.Prism.languages.cpp
@@ -341,8 +341,8 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 				return
 			}
 			try {
-				setHTML(highlight(dataRef.current))
 				// TODO: Set htmlRef.current?
+				setHTML(highlight(dataRef.current))
 			} catch (error) {
 				console.error(error)
 			}
@@ -1040,20 +1040,21 @@ const AVG_WORDS_PER_MINUTE = 250
 const Editor = ({ state, setState, value, ...props }) => {
 	const ref = React.useRef()
 
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			setState(current => ({
-				...current,
-				data: parseGFM(value),
-			}))
-		}, 50)
-		return () => {
-			clearTimeout(id)
-		}
+	// TODO: Debounce typing for demo?
+	React.useLayoutEffect(() => {
+		// const id = setTimeout(() => {
+		setState(current => ({
+			...current,
+			data: parseGFM(value),
+		}))
+		// }, 50)
+		// return () => {
+		// 	clearTimeout(id)
+		// }
 	}, [value, setState])
 
 	// Rerender the DOM when data changes:
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (!state.data) {
 			// No-op
 			return
@@ -1076,7 +1077,7 @@ const Editor = ({ state, setState, value, ...props }) => {
 		}
 		const text = toText(state.data)
 		const runes = [...text].length // Precompute for seconds
-		const markdown = toText(state.data, { markdown: true }) // TODO: Can use value here
+		const markdown = toText(state.data, { markdown: true }) // TODO: Use value?
 		const html = toHTML(state.data)
 		setState(current => ({
 			...current,
@@ -1129,14 +1130,14 @@ const Editor = ({ state, setState, value, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{false && (
-				<div
-					className="my-6 whitespace-pre-wrap font-mono text-xs"
-					style={{ wordWrap: "break-word", tabSize: 2 }}
-				>
-					{stringify(state)}
-				</div>
-			)}
+			{/* {false && ( */}
+			{/* 	<div */}
+			{/* 		className="my-6 whitespace-pre-wrap font-mono text-xs" */}
+			{/* 		style={{ wordWrap: "break-word", tabSize: 2 }} */}
+			{/* 	> */}
+			{/* 		{stringify(state)} */}
+			{/* 	</div> */}
+			{/* )} */}
 
 		</React.Fragment>
 	)
@@ -1305,7 +1306,29 @@ _em_ **_and_ strong**
 				{/* RHS */}
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
-
+						{/* Plain text */}
+						{state.renderMode === "plain-text" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={{ ...state, readOnly: true }}
+								setState={setState}
+								// eslint-disable-next-line prefer-template
+								value={"```" + state.meta.title + ".txt\n" + state.text + "\n```"}
+							/>
+						)}
+						{/* Markdown */}
+						{state.renderMode === "markdown" && (
+							<Editor
+								style={{ tabSize: 2 }}
+								state={{ ...state, readOnly: true }}
+								setState={setState}
+								// NOTE: Don’t use state.markdown! Recurses
+								// infinitely. You’ve been warned.
+								//
+								// eslint-disable-next-line prefer-template
+								value={"```" + state.meta.title + ".txt\n" + value + "\n```"}
+							/>
+						)}
 						{/* WYSIWYG markdown */}
 						{state.renderMode === "wysiwyg-markdown" && (
 							<Editor
@@ -1315,7 +1338,6 @@ _em_ **_and_ strong**
 								value={value}
 							/>
 						)}
-
 					</DocumentTitle>
 				</div>
 
@@ -1324,40 +1346,24 @@ _em_ **_and_ strong**
 	)
 }
 
-// {/* Plain text */}
-// {state.renderMode === "plain-text" && (
-// 	<Editor
-// 		style={{ tabSize: 2 }}
-// 		state={state}
-// 		setState={setState}
-// 	/>
-// )}
-//
-// {/* Markdown */}
-// {state.renderMode === "markdown" && (
-// 	<Editor
-// 		style={{ tabSize: 2 }}
-// 		state={state}
-// 		setState={setState}
-// 	/>
-// )}
-//
-//
 // {/* HTML */}
 // {state.renderMode === "html" && (
 // 	<Editor
 // 		style={{ tabSize: 2 }}
-// 		state={state}
+// 		state={{ ...state, readOnly: true }}
 // 		setState={setState}
+// 		// eslint-disable-next-line prefer-template
+// 		value={"```" + state.meta.title + ".html\n" + state.html + "\n```"}
 // 	/>
 // )}
-//
 // {/* JSON */}
 // {state.renderMode === "json" && (
 // 	<Editor
 // 		style={{ tabSize: 2 }}
-// 		state={state}
+// 		state={{ ...state, readOnly: true }}
 // 		setState={setState}
+// 		// eslint-disable-next-line prefer-template
+// 		value={"```" + state.meta.title + ".json\n" + stringify(state.data) + "\n```"}
 // 	/>
 // )}
 
