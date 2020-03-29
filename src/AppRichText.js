@@ -1000,7 +1000,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = ["<h6>", "</h6>"]
 	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = [data => `<pre class="language-${getLanguage(data.metadata)}"><code>`, "</code></pre>"]
+	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
