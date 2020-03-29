@@ -1238,14 +1238,53 @@ _em_ **_and_ strong**
 			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
 
 				{/* Read-only button: */}
-				<div className="p-3 fixed right-0 top-0">
-					<button
-						className="px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-						onPointerDown={e => e.preventDefault()}
-						onClick={e => setState({ ...state, readOnly: !state.readOnly })}
-					>
-						Toggle read-only: {!state.readOnly ? "OFF" : "ON"}
-					</button>
+				<div className="-my-1 p-3 fixed right-0 top-0">
+					<div className="-mx-1 my-1 flex flex-row">
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							// onPointerDown={e => e.preventDefault()}
+							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							Plain text
+						</button>
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							// onPointerDown={e => e.preventDefault()}
+							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							Markdown
+						</button>
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							// onPointerDown={e => e.preventDefault()}
+							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							WYSIWYG
+						</button>
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							// onPointerDown={e => e.preventDefault()}
+							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							HTML
+						</button>
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							// onPointerDown={e => e.preventDefault()}
+							// onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							JSON
+						</button>
+					</div>
+					<div className="-mx-1 my-1 flex flex-row justify-end">
+						<button
+							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+							onPointerDown={e => e.preventDefault()}
+							onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+						>
+							Toggle read-only: {!state.readOnly ? "OFF" : "ON"}
+						</button>
+					</div>
 				</div>
 
 				{/* LHS */}
