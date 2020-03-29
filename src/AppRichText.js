@@ -362,19 +362,20 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 		}
 	}, [metadata, data, html])
 
+	// NOTE: Use a ternary operator because of $Node; don’t
+	// overwrite white-space: pre-wrap
+	const whiteSpaceStyle = { whiteSpace: !readOnly ? "pre-wrap" : "pre" }
 	return (
 		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
+			<$Node className="text-md-blue-a400" style={whiteSpaceStyle}>
 				<Markdown syntax={[syntax + metadata]} />
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node style={{ whiteSpace: !readOnly ? "pre-wrap" : "pre" /* NOTE: Don’t overwrite white-space: pre-wrap */ }}>
+			<$Node style={whiteSpaceStyle}>
 				<span className={readOnly && "mr-4 inline-block"}>
 					{!html ? (
-						<span>
-							{data}
-						</span>
+						data
 					) : (
 						<span dangerouslySetInnerHTML={{
 							__html: html,
@@ -386,7 +387,7 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 				</span>
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
+			<$Node className="text-md-blue-a400" style={whiteSpaceStyle}>
 				<Markdown syntax={[syntax]} />
 			</$Node>
 		</CompoundNode>
