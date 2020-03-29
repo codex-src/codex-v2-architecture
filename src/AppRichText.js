@@ -5,9 +5,11 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-// Maps user-perceived languages to Prism languages.
-const langs = {}
+// Maps user-perceived language extensions to PrismJS
+// languages.
+const languages = {}
 
+// Extracts a language extension from a metadata string.
 function getLanguage(metadata) {
 	const index = metadata.lastIndexOf(".")
 	if (index === -1 || index + 1 === metadata.length) {
@@ -16,66 +18,48 @@ function getLanguage(metadata) {
 	return metadata.slice(index + 1)
 }
 
-function getLanguageParser(lang) {
-	if (!lang) {
-		return null
-	}
-	const exec = langs[lang]
-	if (!exec) {
-		return null
-	}
-	const highlight = str => {
-		return window.Prism.highlight(str, exec, lang)
-	}
-	return highlight
-}
-
 document.addEventListener("DOMContentLoaded", e => {
 	if (!window.Prism || !window.Prism.languages) {
 		// No-op
 		return
 	}
-	// TODO: Use try-catch statement?
-	//
 	/* eslint-disable no-multi-spaces */
-	langs.bash       = window.Prism.languages.bash
-	langs.c          = window.Prism.languages.c
-	langs.cpp        = window.Prism.languages.cpp
-	langs.css        = window.Prism.languages.css
-	langs.d          = window.Prism.languages.d
-	langs.diff       = window.Prism.languages.diff
-	langs.docker     = window.Prism.languages.docker
-	langs.dockerfile = window.Prism.languages.dockerfile
-	langs.git        = window.Prism.languages.git
-	langs.go         = window.Prism.languages.go
-	langs.gql        = window.Prism.languages.graphql // Added
-	langs.graphql    = window.Prism.languages.graphql
-	langs.htm        = window.Prism.languages.html    // Added
-	langs.html       = window.Prism.languages.html
-	langs.http       = window.Prism.languages.http
-	langs.js         = window.Prism.languages.jsx     // Uses jsx
-	langs.json       = window.Prism.languages.json
-	langs.jsx        = window.Prism.languages.jsx
-	langs.kotlin     = window.Prism.languages.kotlin
-	// langs.markdown   = window.Prism.languages.md
-	// langs.md         = window.Prism.languages.md   // Uses md
-	langs.php        = window.Prism.languages.php
-	langs.py         = window.Prism.languages.py
-	langs.rb         = window.Prism.languages.rb
-	langs.ruby       = window.Prism.languages.ruby
-	langs.rust       = window.Prism.languages.rust
-	langs.sass       = window.Prism.languages.sass
-	langs.sh         = window.Prism.languages["shell-session"] // Uses shell-session
-	langs.shell      = window.Prism.languages["shell-session"] // Uses shell-session
-	langs.sql        = window.Prism.languages.sql
-	langs.svg        = window.Prism.languages.svg
-	langs.swift      = window.Prism.languages.swift
-	langs.ts         = window.Prism.languages.tsx     // Uses tsx
-	langs.tsx        = window.Prism.languages.tsx
-	langs.wasm       = window.Prism.languages.wasm
-	langs.xml        = window.Prism.languages.xml
-	langs.yaml       = window.Prism.languages.yaml
-	langs.yml        = window.Prism.languages.yml
+	languages.bash       = ["bash", window.Prism.languages.bash]
+	languages.c          = ["c", window.Prism.languages.c]
+	languages.cpp        = ["cpp", window.Prism.languages.cpp]
+	languages.css        = ["css", window.Prism.languages.css]
+	languages.d          = ["d", window.Prism.languages.d]
+	languages.diff       = ["diff", window.Prism.languages.diff]
+	languages.docker     = ["docker", window.Prism.languages.docker]
+	languages.dockerfile = ["dockerfile", window.Prism.languages.dockerfile]
+	languages.git        = ["git", window.Prism.languages.git]
+	languages.go         = ["go", window.Prism.languages.go]
+	// languages.gql     = ["graphql", window.Prism.languages.graphql]
+	languages.graphql    = ["graphql", window.Prism.languages.graphql]
+	// languages.htm     = ["html", window.Prism.languages.html]
+	languages.html       = ["html", window.Prism.languages.html]
+	languages.http       = ["http", window.Prism.languages.http]
+	languages.js         = ["jsx", window.Prism.languages.jsx]
+	languages.json       = ["json", window.Prism.languages.json]
+	languages.jsx        = ["jsx", window.Prism.languages.jsx] // Uses jsx
+	languages.kotlin     = ["kotlin", window.Prism.languages.kotlin]
+	languages.php        = ["php", window.Prism.languages.php]
+	languages.py         = ["py", window.Prism.languages.py]
+	languages.rb         = ["rb", window.Prism.languages.rb]
+	languages.ruby       = ["ruby", window.Prism.languages.ruby]
+	languages.rust       = ["rust", window.Prism.languages.rust]
+	languages.sass       = ["sass", window.Prism.languages.sass]
+	languages.sh         = ["shell-session", window.Prism.languages["shell-session"]]
+	// languages.shell   = ["shell-session", window.Prism.languages["shell-session"]]
+	languages.sql        = ["sql", window.Prism.languages.sql]
+	languages.svg        = ["svg", window.Prism.languages.svg]
+	languages.swift      = ["swift", window.Prism.languages.swift]
+	languages.ts         = ["tsx", window.Prism.languages.tsx] // Uses tsx
+	languages.tsx        = ["tsx", window.Prism.languages.tsx]
+	languages.wasm       = ["wasm", window.Prism.languages.wasm]
+	languages.xml        = ["xml", window.Prism.languages.xml]
+	languages.yaml       = ["yaml", window.Prism.languages.yaml]
+	languages.yml        = ["yml", window.Prism.languages.yml]
 	/* eslint-enable no-multi-spaces */
 })
 
@@ -321,16 +305,19 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 // Near-copy of <CodeBlock> used for rendering as a
 // standalone component.
 export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => {
+	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const highlight = getLanguageParser(getLanguage(metadata))
-		if (!highlight) {
+		const match = languages[getLanguage(metadata)]
+		if (!match) {
 			// No-op
 			return
 		}
+		const [lang, parse] = match
 		try {
-			setHTML(highlight(data))
+			setLang(lang)
+			setHTML(window.Prism.highlight(data, parse, lang)) // Use try for parse
 		} catch (error) {
 			console.error(error)
 		}
@@ -338,18 +325,19 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 
 	return (
 		<div className="-mx-4 mb-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
-			{/* <span className="mr-4 inline-block"> */}
 			{!html ? (
 				data
 			) : (
-				<span dangerouslySetInnerHTML={{
-					__html: html,
-				}} />
+				<span
+					className={!lang ? null : `language-${lang}`}
+					dangerouslySetInnerHTML={{
+						__html: html,
+					}}
+				/>
 			)}
 			{data && (
 				<br />
 			)}
-			{/* </span> */}
 		</div>
 	)
 })
@@ -359,51 +347,19 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { stylesheet, readOnly } = React.useContext(EditorContext)
 
+	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
-	//	// NOTE: Use refs because of DOMContentLoaded
-	//	const metadataRef = React.useRef(metadata)
-	//	const dataRef = React.useRef(data)
-	//
-	//	React.useLayoutEffect(() => {
-	//		// Attempts to apply syntax highlighting for a given
-	//		// language based on metadata.
-	//		const applyHighlight = () => {
-	//			const highlight = getLanguageParser(getLanguage(metadataRef.current))
-	//			if (!highlight) {
-	//				// No-op
-	//				return
-	//			}
-	//			try {
-	//				// TODO: Set htmlRef.current?
-	//				setHTML(highlight(dataRef.current))
-	//			} catch (error) {
-	//				console.error(error)
-	//			}
-	//		}
-	//		const handler = e => {
-	//			// TODO: Check htmlRef.current?
-	//			if (html) {
-	//				// No-op
-	//				return
-	//			}
-	//			applyHighlight()
-	//		}
-	//		applyHighlight() // Once
-	//		document.addEventListener("DOMContentLoaded", handler)
-	//		return () => {
-	//			document.removeEventListener("DOMContentLoaded", handler)
-	//		}
-	//	}, [metadata, data, html])
-
 	React.useEffect(() => {
-		const highlight = getLanguageParser(getLanguage(metadata))
-		if (!highlight) {
+		const match = languages[getLanguage(metadata)]
+		if (!match) {
 			// No-op
 			return
 		}
+		const [lang, parse] = match
 		try {
-			setHTML(highlight(data))
+			setLang(lang)
+			setHTML(window.Prism.highlight(data, parse, lang)) // Use try for parse
 		} catch (error) {
 			console.error(error)
 		}
@@ -424,9 +380,12 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 					{!html ? (
 						data
 					) : (
-						<span dangerouslySetInnerHTML={{
-							__html: html,
-						}} />
+						<span
+							className={!lang ? null : `language-${lang}`}
+							dangerouslySetInnerHTML={{
+								__html: html,
+							}}
+						/>
 					)}
 					{data && (
 						<br />
