@@ -974,13 +974,13 @@ function toJSON(data) {
 	return json
 }
 
-const EditorBlocks = ({ data, ...props }) => (
-	data.map(({ type: Type, ...each }) => (
-		// NOTE: props.children (on any component) cannot be an
-		// object; rename to data
-		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
-	))
-)
+// const EditorBlocks = ({ data, ...props }) => (
+// 	data.map(({ type: Type, ...each }) => (
+// 		// NOTE: props.children (on any component) cannot be an
+// 		// object; rename to data
+// 		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
+// 	))
+// )
 
 const EditorContext = React.createContext()
 
@@ -1010,7 +1010,7 @@ const cmapHTML = new Map()
 	cmap[Break.type] = "Break"
 
 	// HTML:
-	cmapHTML[Escape] = ["", ""] // No-op (text is escaped)
+	cmapHTML[Escape] = ["", ""] // No-op
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
@@ -1059,24 +1059,29 @@ const DocumentTitle = ({ title, ...props }) => {
 const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
 
-const Editor = ({ state, setState, ...props }) => {
+// TODO: Add value to state (needed for backspace)
+const Editor = ({ className, style, state, setState, ...props }) => {
 	const ref = React.useRef()
 
-	// Rerender the DOM when data changes:
+	// Rerender the DOM when state.data changes:
 	React.useLayoutEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
 			// TODO: Prevent useless rerenders to <Provider>?
 			<Provider value={state}>
-				<EditorBlocks data={state.data} />
+				{state.data.map(({ type: Type, ...each }) => (
+					// NOTE: props.children (on any component) cannot
+					// be an object; rename to data
+					<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
+				))}
 			</Provider>,
 			ref.current,
 		)
 	}, [state])
 
 	React.useEffect(() => {
-		const txt = toText(state.data)
-		const runes = [...txt].length // Precompute for seconds
+		const text = toText(state.data)
+		const runes = [...text].length // Precompute for seconds
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
@@ -1089,9 +1094,9 @@ const Editor = ({ state, setState, ...props }) => {
 			// 	each.type === H6
 			// )),
 			meta: {
-				title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				runes: [...txt].length,
-				words: txt.split(/\s+/).filter(Boolean).length,
+				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+				runes: [...text].length,
+				words: text.split(/\s+/).filter(Boolean).length,
 				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
 		}))
@@ -1106,12 +1111,12 @@ const Editor = ({ state, setState, ...props }) => {
 			{
 				ref,
 
-				className: props.className,
+				className: className,
 
 				style: {
 					outline: "none",
 					caretColor: "black",
-					...props.style,
+					...style,
 				},
 
 				// contentEditable: !state.readOnly,
