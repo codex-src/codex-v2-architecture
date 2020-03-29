@@ -30,8 +30,6 @@ function getLanguageParser(lang) {
 	return highlight
 }
 
-// langs.jsx = window.Prism && window.Prism.languages["jsx"]
-// langs.tsx = window.Prism && window.Prism.languages["tsx"]
 document.addEventListener("DOMContentLoaded", e => {
 	if (!window.Prism || !window.Prism.languages) {
 		// No-op
@@ -60,7 +58,7 @@ document.addEventListener("DOMContentLoaded", e => {
 	langs.jsx        = window.Prism.languages.jsx
 	langs.kotlin     = window.Prism.languages.kotlin
 	// langs.markdown   = window.Prism.languages.md
-	// langs.md         = window.Prism.languages.md      // Uses md
+	// langs.md         = window.Prism.languages.md   // Uses md
 	langs.php        = window.Prism.languages.php
 	langs.py         = window.Prism.languages.py
 	langs.rb         = window.Prism.languages.rb
@@ -302,9 +300,7 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
 export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	// TODO: Use a ref to measure syntax? <CompoundNode>,
-	// <$Node>, and <Markdown> do not use React.forwardRef and
-	// <Markdown> uses <React.Fragment>
+	// TODO: Dynamically compute syntax width for padding-left
 	const readOnlyStyle = { paddingLeft: "calc(14.27 / 16 * 1em)", boxShadow: "-2px 0 var(--gray-600)" }
 	return (
 		<CompoundNode id={id}>
@@ -343,16 +339,16 @@ export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => 
 	return (
 		<div className="-mx-4 mb-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
 			{/* <span className="mr-4 inline-block"> */}
-				{!html ? (
-					data
-				) : (
-					<span dangerouslySetInnerHTML={{
-						__html: html,
-					}} />
-				)}
-				{data && (
-					<br />
-				)}
+			{!html ? (
+				data
+			) : (
+				<span dangerouslySetInnerHTML={{
+					__html: html,
+				}} />
+			)}
+			{data && (
+				<br />
+			)}
 			{/* </span> */}
 		</div>
 	)
@@ -952,28 +948,6 @@ function toInnerHTML(children) {
 	return html
 }
 
-// // Converts a VDOM representation to an HTML string.
-// function toHTML(data, __depth = 0) {
-// 	let html = ""
-// 	// Iterate elements:
-// 	for (const each of data) {
-// 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-// 		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
-// 		if (each.type === Break) {
-// 			// No-op
-// 		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
-// 			html += toHTML(each.children, __depth + 1)
-// 		} else {
-// 			html += toInnerHTML(each.children)
-// 		}
-// 		html += `\n${"\t".repeat(__depth)}${s2}`
-// 		if (each !== data[data.length - 1]) {
-// 			html += `\n${"\t".repeat(__depth)}`
-// 		}
-// 	}
-// 	return html
-// }
-
 // Converts a VDOM representation to an HTML string.
 function toHTML(data, __depth = 0) {
 	let html = ""
@@ -984,7 +958,7 @@ function toHTML(data, __depth = 0) {
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote) {
-			html += `\n${toHTML(each.children /* , __depth + 1 */)}\n`
+			html += `\n${toHTML(each.children).split("\n").map(each => `\t${each}`).join("\n")}\n`
 		} else {
 			html += toInnerHTML(each.children)
 		}
@@ -1104,19 +1078,6 @@ const AVG_WORDS_PER_MINUTE = 250
 const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
 
-	// // TODO: Debounce typing for demo?
-	// React.useLayoutEffect(() => {
-	// 	// const id = setTimeout(() => {
-	// 	setState(current => ({
-	// 		...current,
-	// 		data: parseGFM(value),
-	// 	}))
-	// 	// }, 50)
-	// 	// return () => {
-	// 	// 	clearTimeout(id)
-	// 	// }
-	// }, [value, setState])
-
 	// Rerender the DOM when data changes:
 	React.useLayoutEffect(() => {
 		const { Provider } = EditorContext
@@ -1130,10 +1091,8 @@ const Editor = ({ state, setState, ...props }) => {
 	}, [state])
 
 	React.useEffect(() => {
-		const text = toText(state.data)
-		const runes = [...text].length // Precompute for seconds
-		// const markdown = toText(state.data, { markdown: true })
-		// const html = toHTML(state.data)
+		const txt = toText(state.data)
+		const runes = [...txt].length // Precompute for seconds
 		setState(current => ({
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
@@ -1146,14 +1105,11 @@ const Editor = ({ state, setState, ...props }) => {
 			// 	each.type === H6
 			// )),
 			meta: {
-				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				runes: [...text].length,
-				words: text.split(/\s+/).filter(Boolean).length,
+				title: [...txt.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+				runes: [...txt].length,
+				words: txt.split(/\s+/).filter(Boolean).length,
 				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
-			// text,
-			// markdown,
-			// html,
 		}))
 	}, [
 		state.data,
@@ -1340,7 +1296,7 @@ _em_ **_and_ strong**
 										onClick={e => setState({ ...state, readOnly: !state.readOnly })}
 									>
 										{/* Coerce to a string: */}
-										Toggle read-only: {("" + state.readOnly)}
+										Toggle read-only: {(`${state.readOnly}`)}
 									</button>
 									<button
 										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
