@@ -1324,7 +1324,8 @@ _em_ **_and_ strong**
 						{/* Text */}
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
-								style={{ tabSize: 2 }}
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="text"
 								data={text}
 							/>
@@ -1341,7 +1342,8 @@ _em_ **_and_ strong**
 						{/* HTML */}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
-								style={{ tabSize: 2 }}
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="html"
 								data={html}
 							/>
@@ -1349,7 +1351,8 @@ _em_ **_and_ strong**
 						{/* JSON */}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
-								style={{ tabSize: 2 }}
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="json"
 								data={json}
 							/>
