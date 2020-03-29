@@ -1077,6 +1077,13 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			</Provider>,
 			ref.current,
 		)
+		// ReactDOM.render(
+		// 	// id, syntax, hash, data, ...props
+		// 	<Provider value={state}>
+		// 		<H1 id="abc-123-xyz"syntax={["# "]} hash="hello" data="hello" />
+		// 	</Provider>,
+		// 	ref.current,
+		// )
 	}, [state])
 
 	React.useEffect(() => {
