@@ -56,9 +56,11 @@ document.addEventListener("DOMContentLoaded", e => {
 	langs.html       = window.Prism.languages.html
 	langs.http       = window.Prism.languages.http
 	langs.js         = window.Prism.languages.jsx     // Uses jsx
-	langs.jsx        = window.Prism.languages.jsx
 	langs.json       = window.Prism.languages.json
+	langs.jsx        = window.Prism.languages.jsx
 	langs.kotlin     = window.Prism.languages.kotlin
+	// langs.markdown   = window.Prism.languages.md
+	// langs.md         = window.Prism.languages.md      // Uses md
 	langs.php        = window.Prism.languages.php
 	langs.py         = window.Prism.languages.py
 	langs.rb         = window.Prism.languages.rb
@@ -320,10 +322,68 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
+// Near-copy of <CodeBlock> used for rendering as a
+// standalone component.
+export const CodeBlockStandalone = React.memo(({ metadata, data, ...props }) => {
+	const [html, setHTML] = React.useState("")
+
+	// NOTE: Use refs because of DOMContentLoaded
+	const metadataRef = React.useRef(metadata)
+	const dataRef = React.useRef(data)
+
+	React.useLayoutEffect(() => {
+		// Attempts to apply syntax highlighting for a given
+		// language based on metadata.
+		const applyHighlight = () => {
+			const highlight = getLanguageParser(getLanguage(metadataRef.current))
+			if (!highlight) {
+				// No-op
+				return
+			}
+			try {
+				// TODO: Set htmlRef.current?
+				setHTML(highlight(dataRef.current))
+			} catch (error) {
+				console.error(error)
+			}
+		}
+		const handler = e => {
+			// TODO: Check htmlRef.current?
+			if (html) {
+				// No-op
+				return
+			}
+			applyHighlight()
+		}
+		applyHighlight() // Once
+		document.addEventListener("DOMContentLoaded", handler)
+		return () => {
+			document.removeEventListener("DOMContentLoaded", handler)
+		}
+	}, [metadata, data, html])
+
+	return (
+		<div className="-mx-4 mb-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
+			{/* <span className="mr-4 inline-block"> */}
+				{!html ? (
+					data
+				) : (
+					<span dangerouslySetInnerHTML={{
+						__html: html,
+					}} />
+				)}
+				{data && (
+					<br />
+				)}
+			{/* </span> */}
+		</div>
+	)
+})
+
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
+	const { stylesheet, readOnly } = React.useContext(EditorContext)
 
 	const [html, setHTML] = React.useState("")
 
@@ -366,7 +426,7 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 	// overwrite white-space: pre-wrap
 	const whiteSpaceStyle = { whiteSpace: !readOnly ? "pre-wrap" : "pre" }
 	return (
-		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: "0.875em" }} spellCheck={false}>
+		<CompoundNode className="-mx-4 mb-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg overflow-x-scroll scrolling-touch" style={{ whiteSpace: "pre", fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node className="text-md-blue-a400" style={whiteSpaceStyle}>
 				<Markdown syntax={[syntax + metadata]} />
@@ -929,11 +989,11 @@ function toHTML(data, __depth = 0) {
 	// Iterate elements:
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += "\t".repeat(__depth) + (typeof s1 !== "function" ? s1 : s1(each))
+		html += /* "\t".repeat(__depth) + */ (typeof s1 !== "function" ? s1 : s1(each))
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote) {
-			html += `\n${toHTML(each.children, __depth + 1)}\n`
+			html += `\n${toHTML(each.children /* , __depth + 1 */)}\n`
 		} else {
 			html += toInnerHTML(each.children)
 		}
@@ -943,6 +1003,26 @@ function toHTML(data, __depth = 0) {
 		}
 	}
 	return html
+}
+
+// Converts a VDOM representation to a JSON string.
+//
+// FIXME: Don’t store React types in VDOM -- then toJSON can
+// be deleted
+function toJSON(data) {
+	const json = JSON.stringify(
+		data,
+		(key, value) => {
+			// Non-React component:
+			if (key !== "type") {
+				return value
+			}
+			// React component (guard React.memo):
+			return `<${cmap[value.type || value]}>`
+		},
+		"\t",
+	)
+	return json
 }
 
 const EditorBlocks = ({ data, ...props }) => (
@@ -992,35 +1072,28 @@ const cmapHTML = new Map()
 	// expect " to be percent-encoded (e.g. %22)
 	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
 
-	// FIXME: Add hash IDs
-	cmapHTML[H1.type] = [data => `<a><h1 id="${data.hash}" href="#${data.hash}">`, "</h1></a>"]
-	cmapHTML[H2.type] = [data => `<a><h2 id="${data.hash}" href="#${data.hash}">`, "</h2></a>"]
-	cmapHTML[H3.type] = [data => `<a><h3 id="${data.hash}" href="#${data.hash}">`, "</h3></a>"]
-	cmapHTML[H4.type] = [data => `<a><h4 id="${data.hash}" href="#${data.hash}">`, "</h4></a>"]
-	cmapHTML[H5.type] = [data => `<a><h5 id="${data.hash}" href="#${data.hash}">`, "</h5></a>"]
-	cmapHTML[H6.type] = [data => `<a><h6 id="${data.hash}" href="#${data.hash}">`, "</h6></a>"]
-	cmapHTML[Paragraph.type] = ["<p>", "</p>"]
+	// cmapHTML[H1.type] = [data => `<a href="#${data.hash}"><h1 id="${data.hash}">`, "</h1></a>"]
+	// cmapHTML[H2.type] = [data => `<a href="#${data.hash}"><h2 id="${data.hash}">`, "</h2></a>"]
+	// cmapHTML[H3.type] = [data => `<a href="#${data.hash}"><h3 id="${data.hash}">`, "</h3></a>"]
+	// cmapHTML[H4.type] = [data => `<a href="#${data.hash}"><h4 id="${data.hash}">`, "</h4></a>"]
+	// cmapHTML[H5.type] = [data => `<a href="#${data.hash}"><h5 id="${data.hash}">`, "</h5></a>"]
+	// cmapHTML[H6.type] = [data => `<a href="#${data.hash}"><h6 id="${data.hash}">`, "</h6></a>"]
+	// cmapHTML[Paragraph.type] = ["<p>", "</p>"]
+	// cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
+	// cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
+	// cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
+
+	cmapHTML[H1.type] = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
+	cmapHTML[H2.type] = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
+	cmapHTML[H3.type] = [data => `<a href="#${data.hash}">\n\t<h3 id="${data.hash}">\n\t\t`, "\n\t</h3>\n</a>"]
+	cmapHTML[H4.type] = [data => `<a href="#${data.hash}">\n\t<h4 id="${data.hash}">\n\t\t`, "\n\t</h4>\n</a>"]
+	cmapHTML[H5.type] = [data => `<a href="#${data.hash}">\n\t<h5 id="${data.hash}">\n\t\t`, "\n\t</h5>\n</a>"]
+	cmapHTML[H6.type] = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
+	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
-
-// Stringifies a VDOM representation.
-function stringify(obj) {
-	const data = JSON.stringify(
-		obj,
-		(key, value) => {
-			// Non-React component:
-			if (key !== "type") {
-				return value
-			}
-			// React component (guard React.memo):
-			return `<${cmap[value.type || value]}>`
-		},
-		"\t",
-	)
-	return data
-}
 
 // Sets the document title (uses useEffect).
 const DocumentTitle = ({ title, ...props }) => {
@@ -1037,21 +1110,21 @@ const DocumentTitle = ({ title, ...props }) => {
 const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
 
-const Editor = ({ state, setState, value, ...props }) => {
+const Editor = ({ state, setState, ...props }) => {
 	const ref = React.useRef()
 
-	// TODO: Debounce typing for demo?
-	React.useLayoutEffect(() => {
-		// const id = setTimeout(() => {
-		setState(current => ({
-			...current,
-			data: parseGFM(value),
-		}))
-		// }, 50)
-		// return () => {
-		// 	clearTimeout(id)
-		// }
-	}, [value, setState])
+	// // TODO: Debounce typing for demo?
+	// React.useLayoutEffect(() => {
+	// 	// const id = setTimeout(() => {
+	// 	setState(current => ({
+	// 		...current,
+	// 		data: parseGFM(value),
+	// 	}))
+	// 	// }, 50)
+	// 	// return () => {
+	// 	// 	clearTimeout(id)
+	// 	// }
+	// }, [value, setState])
 
 	// Rerender the DOM when data changes:
 	React.useLayoutEffect(() => {
@@ -1069,77 +1142,61 @@ const Editor = ({ state, setState, value, ...props }) => {
 		)
 	}, [state])
 
-	// TODO: How does copy and paste work?
-	React.useEffect(() => {
-		if (!state.data) {
-			// No-op
-			return
-		}
-		const text = toText(state.data)
-		const runes = [...text].length // Precompute for seconds
-		const markdown = toText(state.data, { markdown: true }) // TODO: Use value?
-		const html = toHTML(state.data)
-		setState(current => ({
-			...current,
-			// // TODO: Convert to a rich data structure with nesting
-			// tableOfContents: state.data.filter(each => (
-			// 	each.type === H1 ||
-			// 	each.type === H2 ||
-			// 	each.type === H3 ||
-			// 	each.type === H4 ||
-			// 	each.type === H5 ||
-			// 	each.type === H6
-			// )),
-			meta: {
-				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				runes,
-				words: text.split(/\s+/).filter(Boolean).length,
-				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
-			},
-			text,
-			markdown,
-			html,
-		}))
-		// console.log(text) // DEBUG
-		// console.log(html) // DEBUG
-	}, [
-		state.data,
-		setState,
-	])
+	// React.useEffect(() => {
+	// 	if (!state.data) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	const text = toText(state.data)
+	// 	const runes = [...text].length // Precompute for seconds
+	// 	const markdown = toText(state.data, { markdown: true }) // TODO: Use value?
+	// 	const html = toHTML(state.data)
+	// 	setState(current => ({
+	// 		...current,
+	// 		// // TODO: Convert to a rich data structure with nesting
+	// 		// tableOfContents: state.data.filter(each => (
+	// 		// 	each.type === H1 ||
+	// 		// 	each.type === H2 ||
+	// 		// 	each.type === H3 ||
+	// 		// 	each.type === H4 ||
+	// 		// 	each.type === H5 ||
+	// 		// 	each.type === H6
+	// 		// )),
+	// 		meta: {
+	// 			title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
+	// 			runes,
+	// 			words: text.split(/\s+/).filter(Boolean).length,
+	// 			seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
+	// 		},
+	// 		text,
+	// 		markdown,
+	// 		html,
+	// 	}))
+	// 	// console.log(text) // DEBUG
+	// 	// console.log(html) // DEBUG
+	// }, [
+	// 	state.data,
+	// 	setState,
+	// ])
 
 	return (
-		<React.Fragment>
+		React.createElement(
+			"div",
+			{
+				ref,
 
-			{/* Editor */}
-			{React.createElement(
-				"div",
-				{
-					ref,
+				className: props.className,
 
-					className: props.className,
-
-					style: {
-						outline: "none",
-						caretColor: "black",
-						...props.style,
-					},
-
-					// contentEditable: !state.readOnly,
-					// suppressContentEditableWarning: !state.readOnly,
+				style: {
+					outline: "none",
+					caretColor: "black",
+					...props.style,
 				},
-			)}
 
-			{/* Debugger */}
-			{/* {false && ( */}
-			{/* 	<div */}
-			{/* 		className="my-6 whitespace-pre-wrap font-mono text-xs" */}
-			{/* 		style={{ wordWrap: "break-word", tabSize: 2 }} */}
-			{/* 	> */}
-			{/* 		{stringify(state)} */}
-			{/* 	</div> */}
-			{/* )} */}
-
-		</React.Fragment>
+				// contentEditable: !state.readOnly,
+				// suppressContentEditableWarning: !state.readOnly,
+			},
+		)
 	)
 }
 
@@ -1200,13 +1257,28 @@ _em_ **_and_ strong**
 		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
 	}, [value])
 
+	// Create state:
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
-		renderMode: "wysiwyg-markdown", // E.g. "plain-text" || "markdown" || "wysiwyg-markdown" || "html" || "json"
+		renderMode: "md", // E.g. "txt" || "md" || "html" || "json"
+		stylesheet: "type", // E.g. "type" || "mono"
 		readOnly: false,
 		// value,
 		// data: parseGFM(value),
 	}))
+
+	// Update state:
+	React.useLayoutEffect(() => {
+		// const id = setTimeout(() => {
+		setState(current => ({
+			...current,
+			data: parseGFM(value),
+		}))
+		// }, 50)
+		// return () => {
+		// 	clearTimeout(id)
+		// }
+	}, [value])
 
 	// Shortcuts:
 	React.useEffect(() => {
@@ -1233,51 +1305,58 @@ _em_ **_and_ strong**
 
 				{/* Read-only button: */}
 				<div className="-my-1 p-3 fixed right-0 top-0">
-					<div className="-mx-1 my-1 flex flex-row">
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, renderMode: "plain-text" })}
-						>
-							Plain text
-						</button>
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, renderMode: "markdown" })}
-						>
-							Markdown
-						</button>
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, renderMode: "wysiwyg-markdown" })}
-						>
-							WYSIWYG markdown
-						</button>
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, renderMode: "html" })}
-						>
-							HTML
-						</button>
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, renderMode: "json" })}
-						>
-							JSON
-						</button>
-					</div>
-					<div className="-mx-1 my-1 flex flex-row justify-end">
-						<button
-							className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-							onPointerDown={e => e.preventDefault()}
-							onClick={e => setState({ ...state, readOnly: !state.readOnly })}
-						>
-							Toggle read-only: {!state.readOnly ? "OFF" : "ON"}
-						</button>
+					<div className="flex flex-col items-end">
+						<div className="-mx-1 my-1 flex flex-row">
+							<button
+								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+								onPointerDown={e => e.preventDefault()}
+								onClick={e => setState({ ...state, renderMode: "txt" })}
+							>
+								Plain text
+							</button>
+							<button
+								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+								onPointerDown={e => e.preventDefault()}
+								onClick={e => setState({ ...state, renderMode: "md" })}
+							>
+								Markdown
+							</button>
+							<button
+								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+								onPointerDown={e => e.preventDefault()}
+								onClick={e => setState({ ...state, renderMode: "html" })}
+							>
+								HTML
+							</button>
+							<button
+								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+								onPointerDown={e => e.preventDefault()}
+								onClick={e => setState({ ...state, renderMode: "json" })}
+							>
+								JSON
+							</button>
+						</div>
+						<div className="-mx-1 my-1 flex flex-row">
+							{state.renderMode === "md" && (
+								<React.Fragment>
+									<button
+										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+										onPointerDown={e => e.preventDefault()}
+										onClick={e => setState({ ...state, readOnly: !state.readOnly })}
+									>
+										{/* Coerce to a string: */}
+										Toggle read-only: {("" + state.readOnly)}
+									</button>
+									<button
+										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+										onPointerDown={e => e.preventDefault()}
+										onClick={e => setState({ ...state, stylesheet: state.stylesheet !== "type" ? "type" : "mono" })}
+									>
+										Toggle stylesheet: "{state.stylesheet}"
+									</button>
+								</React.Fragment>
+							)}
+						</div>
 					</div>
 				</div>
 
@@ -1307,35 +1386,45 @@ _em_ **_and_ strong**
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{/* Plain text */}
-						{state.renderMode === "plain-text" && (
-							<Editor
+						{state.renderMode === "txt" && (
+							<CodeBlockStandalone
 								style={{ tabSize: 2 }}
-								state={{ ...state, readOnly: true }}
-								setState={setState}
-								// eslint-disable-next-line prefer-template
-								value={"```" + state.meta.title + ".txt\n" + state.text + "\n```"}
+								metadata="txt"
+								data={toText(state.data)}
 							/>
 						)}
 						{/* Markdown */}
-						{state.renderMode === "markdown" && (
-							<Editor
-								style={{ tabSize: 2 }}
-								state={{ ...state, readOnly: true }}
-								setState={setState}
-								// NOTE: Don’t use state.markdown! Recurses
-								// infinitely. You’ve been warned.
-								//
-								// eslint-disable-next-line prefer-template
-								value={"```" + state.meta.title + ".txt\n" + value + "\n```"}
-							/>
-						)}
+						{/* {state.renderMode === "markdown" && ( */}
+						{/* 	<CodeBlockStandalone */}
+						{/* 		style={{ tabSize: 2 }} */}
+						{/* 		metadata="md" */}
+						{/* 		data={toText(state.data, { markdown: true })} */}
+						{/* 	/> */}
+						{/* )} */}
 						{/* WYSIWYG markdown */}
-						{state.renderMode === "wysiwyg-markdown" && (
+						{state.renderMode === "md" && (
 							<Editor
-								style={{ tabSize: 2 }}
+								className={state.stylesheet === "type" ? null : "font-mono"}
+								style={{ tabSize: 2, fontSize: state.stylesheet === "type" ? null : "0.875em" }}
 								state={state}
 								setState={setState}
 								value={value}
+							/>
+						)}
+						{/* HTML */}
+						{state.renderMode === "html" && (
+							<CodeBlockStandalone
+								style={{ tabSize: 2 }}
+								metadata="html"
+								data={toHTML(state.data)}
+							/>
+						)}
+						{/* JSON */}
+						{state.renderMode === "json" && (
+							<CodeBlockStandalone
+								style={{ tabSize: 2 }}
+								metadata="json"
+								data={toJSON(state.data)}
 							/>
 						)}
 					</DocumentTitle>
@@ -1345,26 +1434,5 @@ _em_ **_and_ strong**
 		</div>
 	)
 }
-
-// {/* HTML */}
-// {state.renderMode === "html" && (
-// 	<Editor
-// 		style={{ tabSize: 2 }}
-// 		state={{ ...state, readOnly: true }}
-// 		setState={setState}
-// 		// eslint-disable-next-line prefer-template
-// 		value={"```" + state.meta.title + ".html\n" + state.html + "\n```"}
-// 	/>
-// )}
-// {/* JSON */}
-// {state.renderMode === "json" && (
-// 	<Editor
-// 		style={{ tabSize: 2 }}
-// 		state={{ ...state, readOnly: true }}
-// 		setState={setState}
-// 		// eslint-disable-next-line prefer-template
-// 		value={"```" + state.meta.title + ".json\n" + stringify(state.data) + "\n```"}
-// 	/>
-// )}
 
 export default App
