@@ -1031,18 +1031,33 @@ const DocumentTitle = ({ title, ...props }) => {
 		}
 		document.title = title
 	}, [title])
-	return props.children
+	return props.children || null
 }
 
 const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
 
-const Editor = ({ state, setState, ...props }) => {
+const Editor = ({ state, setState, value, ...props }) => {
 	const ref = React.useRef()
 
-	// Rerender the DOM when data changes (use useLayoutEffect
-	// because of contenteditable):
-	React.useLayoutEffect(() => {
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			setState(current => ({
+				...current,
+				data: parseGFM(value),
+			}))
+		}, 50)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [value, setState])
+
+	// Rerender the DOM when data changes:
+	React.useEffect(() => {
+		if (!state.data) {
+			// No-op
+			return
+		}
 		const { Provider } = EditorContext
 		ReactDOM.render(
 			// TODO: Prevent useless rerenders to <Provider>?
@@ -1055,9 +1070,13 @@ const Editor = ({ state, setState, ...props }) => {
 
 	// TODO: How does copy and paste work?
 	React.useEffect(() => {
+		if (!state.data) {
+			// No-op
+			return
+		}
 		const text = toText(state.data)
 		const runes = [...text].length // Precompute for seconds
-		const markdown = toText(state.data, { markdown: true })
+		const markdown = toText(state.data, { markdown: true }) // TODO: Can use value here
 		const html = toHTML(state.data)
 		setState(current => ({
 			...current,
@@ -1076,12 +1095,12 @@ const Editor = ({ state, setState, ...props }) => {
 				words: text.split(/\s+/).filter(Boolean).length,
 				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
 			},
-			text: `${text}\n`,
-			markdown: `${markdown}\n`,
-			html: `${html}\n`,
+			text,
+			markdown,
+			html,
 		}))
 		// console.log(text) // DEBUG
-		console.log(html) // DEBUG
+		// console.log(html) // DEBUG
 	}, [
 		state.data,
 		setState,
@@ -1180,25 +1199,13 @@ _em_ **_and_ strong**
 		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
 	}, [value])
 
-	// Create state:
-	//
-	// TODO: Move to <Editor>?
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
 		renderMode: "wysiwyg-markdown", // E.g. "plain-text" || "markdown" || "wysiwyg-markdown" || "html" || "json"
 		readOnly: false,
-		data: parseGFM(value),
+		// value,
+		// data: parseGFM(value),
 	}))
-
-	// Update state:
-	//
-	// TODO: Move to <Editor>?
-	React.useLayoutEffect(() => {
-		setState(current => ({
-			...current,
-			data: parseGFM(value),
-		}))
-	}, [value])
 
 	// Shortcuts:
 	React.useEffect(() => {
@@ -1299,48 +1306,13 @@ _em_ **_and_ strong**
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
 
-						{/* Plain text */}
-						{state.renderMode === "plain-text" && (
-							<Editor
-								style={{ tabSize: 2 }}
-								state={state}
-								setState={setState}
-							/>
-						)}
-
-						{/* Markdown */}
-						{state.renderMode === "markdown" && (
-							<Editor
-								style={{ tabSize: 2 }}
-								state={state}
-								setState={setState}
-							/>
-						)}
-
 						{/* WYSIWYG markdown */}
 						{state.renderMode === "wysiwyg-markdown" && (
 							<Editor
 								style={{ tabSize: 2 }}
 								state={state}
 								setState={setState}
-							/>
-						)}
-
-						{/* HTML */}
-						{state.renderMode === "html" && (
-							<Editor
-								style={{ tabSize: 2 }}
-								state={state}
-								setState={setState}
-							/>
-						)}
-
-						{/* JSON */}
-						{state.renderMode === "json" && (
-							<Editor
-								style={{ tabSize: 2 }}
-								state={state}
-								setState={setState}
+								value={value}
 							/>
 						)}
 
@@ -1351,5 +1323,42 @@ _em_ **_and_ strong**
 		</div>
 	)
 }
+
+// {/* Plain text */}
+// {state.renderMode === "plain-text" && (
+// 	<Editor
+// 		style={{ tabSize: 2 }}
+// 		state={state}
+// 		setState={setState}
+// 	/>
+// )}
+//
+// {/* Markdown */}
+// {state.renderMode === "markdown" && (
+// 	<Editor
+// 		style={{ tabSize: 2 }}
+// 		state={state}
+// 		setState={setState}
+// 	/>
+// )}
+//
+//
+// {/* HTML */}
+// {state.renderMode === "html" && (
+// 	<Editor
+// 		style={{ tabSize: 2 }}
+// 		state={state}
+// 		setState={setState}
+// 	/>
+// )}
+//
+// {/* JSON */}
+// {state.renderMode === "json" && (
+// 	<Editor
+// 		style={{ tabSize: 2 }}
+// 		state={state}
+// 		setState={setState}
+// 	/>
+// )}
 
 export default App
