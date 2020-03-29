@@ -373,7 +373,7 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node style={whiteSpaceStyle}>
-				<span className={readOnly && "mr-4 inline-block"}>
+				<span className={!readOnly ? null : "mr-4 inline-block"}>
 					{!html ? (
 						data
 					) : (
