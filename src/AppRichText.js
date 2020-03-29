@@ -948,6 +948,28 @@ function toInnerHTML(children) {
 	return html
 }
 
+// // Converts a VDOM representation to an HTML string.
+// function toHTML(data, __depth = 0) {
+// 	let html = ""
+// 	// Iterate elements:
+// 	for (const each of data) {
+// 		const [s1, s2] = cmapHTML[each.type.type || each.type]
+// 		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
+// 		if (each.type === Break) {
+// 			// No-op
+// 		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
+// 			html += toHTML(each.children, __depth + 1)
+// 		} else {
+// 			html += toInnerHTML(each.children)
+// 		}
+// 		html += `\n${"\t".repeat(__depth)}${s2}`
+// 		if (each !== data[data.length - 1]) {
+// 			html += `\n${"\t".repeat(__depth)}`
+// 		}
+// 	}
+// 	return html
+// }
+
 // Converts a VDOM representation to an HTML string.
 function toHTML(data, __depth = 0) {
 	let html = ""
@@ -958,7 +980,15 @@ function toHTML(data, __depth = 0) {
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote) {
-			html += `\n${toHTML(each.children).split("\n").map(each => `\t${each}`).join("\n")}\n`
+			html += (
+				// eslint-disable-next-line prefer-template
+				"\n" +
+				toHTML(each.children)
+					.split("\n")
+					.map(each => `\t${each}`)
+					.join("\n") +
+				"\n"
+			)
 		} else {
 			html += toInnerHTML(each.children)
 		}
