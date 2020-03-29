@@ -162,9 +162,9 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// NOTE (1): Do not use text-sm; uses rem instead of em
+		// NOTE (1): Don’t use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="p-1 font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="p-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -323,30 +323,39 @@ export const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
 export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
 	const [html, setHTML] = React.useState("")
 
+	// NOTE: Use refs because of DOMContentLoaded
+	const metadataRef = React.useRef(metadata)
+	const dataRef = React.useRef(data)
+
 	React.useLayoutEffect(() => {
-		// Attempts to apply syntax highlighting.
-		const highlight = () => {
-			const parse = getLanguageParser(getLanguage(metadata))
-			if (!parse) {
+		// Attempts to apply syntax highlighting for a given
+		// language based on metadata.
+		const applyHighlight = () => {
+			const highlight = getLanguageParser(getLanguage(metadataRef.current))
+			if (!highlight) {
 				// No-op
 				return
 			}
 			try {
-				setHTML(parse(data))
+				setHTML(highlight(dataRef.current))
+				// TODO: Set htmlRef.current?
 			} catch (error) {
 				console.error(error)
 			}
 		}
 		const handler = e => {
+			// TODO: Check htmlRef.current?
 			if (html) {
 				// No-op
 				return
 			}
-			highlight()
+			applyHighlight()
 		}
-		highlight() // Once
+		applyHighlight() // Once
 		document.addEventListener("DOMContentLoaded", handler)
 		return () => {
 			document.removeEventListener("DOMContentLoaded", handler)
@@ -360,23 +369,21 @@ export const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) =
 				<Markdown syntax={[syntax + metadata]} />
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node style={{ whiteSpace: "pre" }}>
-				{/* <span className="mr-4 inline-block"> */}
-
-				{!html ? (
-					<span>
-						{data}{/* !data ? "" : <br /> */}
-					</span>
-				) : (
-					<span dangerouslySetInnerHTML={{
-						__html: html, // + (!html ? "" : `<br />`),
-					}} />
-				)}
-				{data && (
-					<br />
-				)}
-
-				{/* </span> */}
+			<$Node style={{ whiteSpace: !readOnly ? "pre-wrap" : "pre" /* NOTE: Don’t overwrite white-space: pre-wrap */ }}>
+				<span className={readOnly && "mr-4 inline-block"}>
+					{!html ? (
+						<span>
+							{data}
+						</span>
+					) : (
+						<span dangerouslySetInnerHTML={{
+							__html: html,
+						}} />
+					)}
+					{data && (
+						<br />
+					)}
+				</span>
 			</$Node>
 			{/* eslint-disable-next-line react/jsx-pascal-case */}
 			<$Node className="text-md-blue-a400" style={{ whiteSpace: "pre" }}>
@@ -1101,7 +1108,7 @@ const Editor = ({ state, setState, ...props }) => {
 			)}
 
 			{/* Debugger */}
-			{true && (
+			{false && (
 				<div
 					className="my-6 whitespace-pre-wrap font-mono text-xs"
 					style={{ wordWrap: "break-word", tabSize: 2 }}
