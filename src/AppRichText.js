@@ -5,7 +5,7 @@ import uuidv4 from "uuid/v4"
 
 import "./AppRichText.css"
 
-// Maps user-perceived language extensions to PrismJS
+// Maps user-perceived language extensions to Prism
 // languages.
 const languages = {}
 
@@ -483,6 +483,14 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 const HTTPS = "https://"
 const HTTP = "http://"
 
+// Matches a URL -- cannot terminate with a non-alphanumeric
+// character.
+//
+// https://tools.ietf.org/html/rfc3986
+//
+// eslint-disable-next-line no-useless-escape
+const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+)\w/
+
 // Parses a nested VDOM representation to GFM text.
 //
 // TODO (1): Can extract registerType(...)(...) to
@@ -582,15 +590,13 @@ function parseInnerGFM(text) {
 			}
 			break
 		// <A>
-		//
-		// TODO: Use punycode for URLs?
 		case char === "h":
 			// https://
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
-				// TODO: Check other whitespace characters? E.g. \s
-				let offset = text.slice(index + HTTPS.length).indexOf(" ")
-				if (offset === -1) {
-					offset = nchars - HTTPS.length // EOL
+				const matches = urlSafeRe.exec(text.slice(index + HTTPS.length))
+				let offset = 0
+				if (matches) {
+					offset = matches[0].length
 				}
 				data.push({
 					type: A,
@@ -601,10 +607,10 @@ function parseInnerGFM(text) {
 				continue
 			// http://
 			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
-				// TODO: Check other whitespace characters? E.g. \s
-				let offset = text.slice(index + HTTP.length).indexOf(" ")
-				if (offset === -1) {
-					offset = nchars - HTTP.length // EOL
+				const matches = urlSafeRe.exec(text.slice(index + HTTPS.length))
+				let offset = 0
+				if (matches) {
+					offset = matches[0].length
 				}
 				data.push({
 					type: A,
