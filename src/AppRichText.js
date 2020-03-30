@@ -180,22 +180,21 @@ const A = ({ syntax, ...props }) => (
 )
 
 // Higher-order component for block elements.
-const $Node = ({ id, style, ...props }) => (
+const NodeHOC = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
 		{props.children}
 	</div>
 )
 
 // Higher-order component for multiline block elements.
-const CompoundNode = ({ id, style, ...props }) => (
+const CompoundNodeHOC = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
 		{props.children}
 	</div>
 )
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-3xl leading-tight">
+	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -203,12 +202,11 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-medium text-2xl leading-tight">
+	<NodeHOC id={id} className="font-medium text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -216,12 +214,11 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-xl leading-tight">
+	<NodeHOC id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -229,12 +226,11 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold text-lg leading-tight">
+	<NodeHOC id={id} className="font-semibold text-lg leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -242,12 +238,11 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-tight">
+	<NodeHOC id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -255,12 +250,11 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id} className="font-semibold leading-tight">
+	<NodeHOC id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -268,16 +262,15 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 				)}
 			</Markdown>
 		</a>
-	</$Node>
+	</NodeHOC>
 ))
 
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
-	// eslint-disable-next-line react/jsx-pascal-case
-	<$Node id={id}>
+	<NodeHOC id={id}>
 		{toInnerReact(data) || (
 			<br />
 		)}
-	</$Node>
+	</NodeHOC>
 ))
 
 // NOTE: Compound component
@@ -287,18 +280,17 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	// TODO: Dynamically compute syntax width for padding-left
 	const readOnlyStyle = { paddingLeft: "calc(14.27 / 16 * 1em)", boxShadow: "-2px 0 var(--gray-600)" }
 	return (
-		<CompoundNode id={id}>
+		<CompoundNodeHOC id={id}>
 			{data.map((each, index) => (
-				// eslint-disable-next-line react/jsx-pascal-case
-				<$Node key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : readOnlyStyle}>
+				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : readOnlyStyle}>
 					<Markdown syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
 						)}
 					</Markdown>
-				</$Node>
+				</NodeHOC>
 			))}
-		</CompoundNode>
+		</CompoundNodeHOC>
 	)
 })
 
@@ -366,13 +358,11 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<CompoundNode className="-mx-4 my-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
-			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400">
+		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
+			<NodeHOC className="text-md-blue-a400">
 				<Markdown syntax={[syntax + metadata]} />
-			</$Node>
-			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node>
+			</NodeHOC>
+			<NodeHOC>
 				{!html ? (
 					data
 				) : (
@@ -386,12 +376,11 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 				{data && (
 					<br />
 				)}
-			</$Node>
-			{/* eslint-disable-next-line react/jsx-pascal-case */}
-			<$Node className="text-md-blue-a400">
+			</NodeHOC>
+			<NodeHOC className="text-md-blue-a400">
 				<Markdown syntax={[syntax]} />
-			</$Node>
-		</CompoundNode>
+			</NodeHOC>
+		</CompoundNodeHOC>
 	)
 })
 
@@ -399,14 +388,13 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// eslint-disable-next-line react/jsx-pascal-case
-		<$Node id={id}>
+		<NodeHOC id={id}>
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
-		</$Node>
+		</NodeHOC>
 	)
 })
 
@@ -1069,21 +1057,12 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 		ReactDOM.render(
 			// TODO: Prevent useless rerenders to <Provider>?
 			<Provider value={state}>
-				{state.data.map(({ type: Type, ...each }) => (
-					// NOTE: props.children (on any component) cannot
-					// be an object; rename to data
-					<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
+				{state.data.map(({ type: Type, children: data, ...props }) => (
+					<Type key={props.id} data={data} {...props} />
 				))}
 			</Provider>,
 			ref.current,
 		)
-		// ReactDOM.render(
-		// 	// id, syntax, hash, data, ...props
-		// 	<Provider value={state}>
-		// 		<H1 id="abc-123-xyz"syntax={["# "]} hash="hello" data="hello" />
-		// 	</Provider>,
-		// 	ref.current,
-		// )
 	}, [state])
 
 	React.useEffect(() => {
@@ -1118,7 +1097,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			{
 				ref,
 
-				className: className,
+				className,
 
 				style: {
 					outline: "none",
