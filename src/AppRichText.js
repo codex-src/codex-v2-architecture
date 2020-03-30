@@ -483,13 +483,13 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 const HTTPS = "https://"
 const HTTP = "http://"
 
-// Matches a URL -- cannot terminate with a non-alphanumeric
-// character.
+// Matches a URL terminated by an alphanumeric (word) or
+// forward-slash character.
 //
 // https://tools.ietf.org/html/rfc3986
 //
 // eslint-disable-next-line no-useless-escape
-const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+)\w/
+const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*)[\w\/]/
 
 // Parses a nested VDOM representation to GFM text.
 //
