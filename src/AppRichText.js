@@ -320,18 +320,12 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 
 	return (
 		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
-			{!html ? (
-				data
+			{html ? (
+				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
+					__html: html,
+				}} />
 			) : (
-				<span
-					className={!lang ? null : `language-${lang}`}
-					dangerouslySetInnerHTML={{
-						__html: html,
-					}}
-				/>
-			)}
-			{data && (
-				<br />
+				data
 			)}
 		</div>
 	)
@@ -366,18 +360,12 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 				<Markdown syntax={[syntax + metadata]} />
 			</NodeHOC>
 			<NodeHOC>
-				{!html ? (
-					data
+				{html ? (
+					<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
+						__html: html,
+					}} />
 				) : (
-					<span
-						className={!lang ? null : `language-${lang}`}
-						dangerouslySetInnerHTML={{
-							__html: html,
-						}}
-					/>
-				)}
-				{data && (
-					<br />
+					data
 				)}
 			</NodeHOC>
 			<NodeHOC className="text-md-blue-a400">
@@ -790,13 +778,19 @@ function parseGFM(text) {
 					break
 				}
 				x2++ // Iterate once past end
+				const metadata = each.slice(3)
 				data.push({
 					id: uuidv4(),
 					type: CodeBlock,
 					syntax: "```",
-					metadata: each.slice(3),
-					children: body.slice(x1 + 1, x2 - 1).join("\n"),
+					metadata,
+					children: body
+						.slice(x1, x2)
+						.join("\n")
+						.slice(3 + metadata.length, -3) // Trim syntax and metadata
+						.slice(1),                      // Trim start paragraph
 				})
+				console.log((x2 - 1) - (x1 + 1))
 				index = x2 - 1
 				continue
 			}
@@ -981,14 +975,6 @@ function toJSON(data) {
 	)
 	return json
 }
-
-// const EditorBlocks = ({ data, ...props }) => (
-// 	data.map(({ type: Type, ...each }) => (
-// 		// NOTE: props.children (on any component) cannot be an
-// 		// object; rename to data
-// 		<Type key={each.id} {...{ ...each, children: undefined }} data={each.children} />
-// 	))
-// )
 
 const EditorContext = React.createContext()
 
