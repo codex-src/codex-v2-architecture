@@ -456,7 +456,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(text[index - 1]) && !isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
-		// Guard: Syntax (not `code`) cannot surround spaces:
+		// Guard: (Some) syntax cannot surround spaces:
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
 			offset <= 0 ||
@@ -830,7 +830,6 @@ function parseGFM(text) {
 						.slice(3 + metadata.length, -3) // Trim syntax and metadata
 						.slice(1),                      // Trim start paragraph
 				})
-				console.log((x2 - 1) - (x1 + 1))
 				index = x2 - 1
 				continue
 			}
@@ -1055,7 +1054,7 @@ const cmapHTML = new Map()
 
 	// NOTE: Use href="..." not href='...' because " URLs
 	// expect " to be percent-encoded (e.g. %22)
-	cmapHTML[A] = [data => `<a href="${data.syntax + data.children}">`, "</a>"]
+	cmapHTML[A] = [data => `<a href="${data.href}">`, "</a>"]
 
 	// cmapHTML[H1.type] = [data => `<a href="#${data.hash}"><h1 id="${data.hash}">`, "</h1></a>"]
 	// cmapHTML[H2.type] = [data => `<a href="#${data.hash}"><h2 id="${data.hash}">`, "</h2></a>"]
