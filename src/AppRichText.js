@@ -154,7 +154,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		// NOTE (1): Don’t use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="p-px font-mono text-red-600 bg-red-100 rounded" style={{ verticalAlign: 1, fontSize: "0.875em" }}>
+		<span className="p-px font-mono text-red-600 bg-red-100 rounded" style={{ /* verticalAlign: 1, */ fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -174,8 +174,8 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
-const A = ({ syntax, ...props }) => (
-	<a className="underline text-md-blue-a400" href={syntax + props.children}>
+const A = ({ syntax, href, ...props }) => (
+	<a className="underline text-md-blue-a400" href={href}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
@@ -271,7 +271,8 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 	const emojis = (
 		data &&
-		data.length <= 3 &&
+		Array.isArray(data) &&
+		data.length <= 3 && // Not needed
 		data.every(each => each.emoji)
 	)
 	return (
@@ -459,8 +460,8 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
 			offset <= 0 ||
-			(syntax !== "`" && text[index + syntax.length] === " ") ||           // Exempt code
-			(syntax !== "`" && text[index + syntax.length + offset - 1] === " ") // Exempt code
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length] === " ") ||           // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length + offset - 1] === " ") // Exempt <Code> and <A>
 		) {
 			return null
 		}
@@ -587,7 +588,7 @@ function parseInnerGFM(text) {
 				continue
 			}
 			break
-		// <A>
+		// <A> (Naked)
 		case char === "h":
 			// https://
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
@@ -596,10 +597,12 @@ function parseInnerGFM(text) {
 				if (matches) {
 					offset = matches[0].length
 				}
+				const children = text.slice(index + HTTPS.length, index + HTTPS.length + offset)
 				data.push({
 					type: A,
 					syntax: [HTTPS],
-					children: text.slice(index + HTTPS.length, index + HTTPS.length + offset),
+					href: HTTPS + children,
+					children,
 				})
 				index += HTTPS.length + offset - 1
 				continue
@@ -610,12 +613,42 @@ function parseInnerGFM(text) {
 				if (matches) {
 					offset = matches[0].length
 				}
+				const children = text.slice(index + HTTP.length, index + HTTP.length + offset)
 				data.push({
 					type: A,
 					syntax: [HTTP],
-					children: text.slice(index + HTTP.length, index + HTTP.length + offset),
+					href: HTTP + children,
+					children,
 				})
 				index += HTTP.length + offset - 1
+				continue
+			}
+			break
+		// <A>
+		case char === "[":
+			if (nchars >= "[x](x)".length) {
+				const lhs = registerType(null, "]")(text, index)
+				if (!lhs) {
+					// No-op
+					break
+				}
+				// Check ( syntax:
+				if (lhs.x2 + 1 < text.length && text[lhs.x2 + 1] !== "(") {
+					// No-op
+					break
+				}
+				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2 + 1)
+				if (!rhs) {
+					// No-op
+					break
+				}
+				data.push({
+					type: A,
+					syntax: ["[", `](${rhs.object.children})`],
+					href: rhs.object.children,
+					children: lhs.object.children,
+				})
+				index = rhs.x2
 				continue
 			}
 			break
