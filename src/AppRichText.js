@@ -1,3 +1,4 @@
+import * as emojiTrie from "emoji-trie"
 import escape from "lodash/escape"
 import React from "react"
 import ReactDOM from "react-dom"
@@ -109,13 +110,18 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 	)
 }
 
-const Escape = ({ syntax, ...props }) => (
-	// NOTE: Can drop <span>
-	<span>
-		<Markdown syntax={syntax}>
-			{props.children}
-		</Markdown>
+// NOTE: Doesn’t use <Markdown>
+const Emoji = ({ emoji, ...props }) => (
+	<span style={{ verticalAlign: "-15%", fontSize: "130%", lineHeight: 1 }} aria-label={emoji.description} role="img">
+		{props.children}
 	</span>
+)
+
+// NOTE: Doesn’t use <span>
+const Escape = ({ syntax, ...props }) => (
+	<Markdown syntax={syntax}>
+		{props.children}
+	</Markdown>
 )
 
 const Em = ({ syntax, ...props }) => (
@@ -168,10 +174,7 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
-// FIXME: Warning: validateDOMNesting(...): <a> cannot
-// appear as a descendant of <a>.
 const A = ({ syntax, ...props }) => (
-	// TODO: Use <span>?
 	<a className="underline text-md-blue-a400" href={syntax + props.children}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
@@ -622,7 +625,18 @@ function parseInnerGFM(text) {
 			}
 			break
 		default:
-			// No-op
+			// 😀
+			const emoji = emojiTrie.atStart(text.slice(index)) // eslint-disable-line no-case-declarations
+			if (emoji) {
+				data.push({
+					type: Emoji,
+					syntax: null,
+					emoji,
+					children: emoji.emoji,
+				})
+				index += emoji.emoji.length - 1
+				continue
+			}
 			break
 		}
 		if (!data.length || typeof data[data.length - 1] !== "string") {
@@ -826,10 +840,10 @@ function toInnerReact(children) {
 			components.push(each)
 			continue
 		}
-		const { type: Type } = each
+		const { type: Type, ...props } = each
 		components.push((
-			<Type key={components.length} syntax={each.syntax}>
-				{toInnerReact(each.children)}
+			<Type key={components.length} {...props}>
+				{toInnerReact(props.children)}
 			</Type>
 		))
 	}
@@ -984,6 +998,7 @@ const cmapHTML = new Map()
 
 ;(() => {
 	// React:
+	cmap[Emoji] = "Emoji"
 	cmap[Escape] = "Escape"
 	cmap[Em] = "Em"
 	cmap[Strong] = "Strong"
@@ -1004,6 +1019,7 @@ const cmapHTML = new Map()
 	cmap[Break.type] = "Break"
 
 	// HTML:
+	cmapHTML[Emoji] = ["", ""] // No-op
 	cmapHTML[Escape] = ["", ""] // No-op
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
