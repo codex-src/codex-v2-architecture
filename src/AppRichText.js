@@ -645,7 +645,7 @@ function parseInnerGFM(text) {
 				data.push({
 					type: A,
 					syntax: ["[", `](${rhs.object.children})`],
-					href: rhs.object.children,
+					href: rhs.object.children.trim(),
 					children: lhs.object.children,
 				})
 				index = rhs.x2
