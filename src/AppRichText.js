@@ -1019,7 +1019,7 @@ const cmapHTML = new Map()
 	cmap[Break.type] = "Break"
 
 	// HTML:
-	cmapHTML[Emoji] = ["", ""] // No-op
+	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, `</span>`]
 	cmapHTML[Escape] = ["", ""] // No-op
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
