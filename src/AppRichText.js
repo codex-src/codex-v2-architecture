@@ -112,7 +112,7 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 
 // NOTE: Doesn’t use <Markdown>
 const Emoji = ({ emoji, ...props }) => (
-	<span style={{ verticalAlign: "-15%", fontSize: "130%", lineHeight: 1 }} aria-label={emoji.description} role="img">
+	<span className="emoji" aria-label={emoji.description} role="img">
 		{props.children}
 	</span>
 )
@@ -268,13 +268,20 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const Paragraph = React.memo(({ id, syntax, data, ...props }) => (
-	<NodeHOC id={id}>
-		{toInnerReact(data) || (
-			<br />
-		)}
-	</NodeHOC>
-))
+const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
+	const emojis = (
+		data &&
+		data.length <= 3 &&
+		data.every(each => each.emoji)
+	)
+	return (
+		<NodeHOC id={id} className={!emojis ? null : `emojis-${data.length}`}>
+			{toInnerReact(data) || (
+				<br />
+			)}
+		</NodeHOC>
+	)
+})
 
 // NOTE: Compound component
 const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
@@ -1313,7 +1320,7 @@ Crazy, huh?
 								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="text"
-								data={text}
+								data={`${text}\n`}
 							/>
 						)}
 						{/* Narkdown */}
@@ -1331,7 +1338,7 @@ Crazy, huh?
 								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="html"
-								data={html}
+								data={`${html}\n`}
 							/>
 						)}
 						{/* JSON */}
@@ -1340,7 +1347,7 @@ Crazy, huh?
 								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
 								metadata="json"
-								data={json}
+								data={`${json}\n`}
 							/>
 						)}
 					</DocumentTitle>
