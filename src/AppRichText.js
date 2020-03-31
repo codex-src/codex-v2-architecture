@@ -362,7 +362,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
+		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
 			<NodeHOC className="text-md-blue-a400">
 				<Markdown syntax={[syntax + metadata]} />
 			</NodeHOC>
