@@ -36,13 +36,13 @@ function parseSyntax(syntax) {
 	return [s1, s2]
 }
 
-const Syntax = ({ className, style, readOnly, ...props }) => (
-	<span className={className || "text-md-blue-a400"} /* style={{ ...style, display: readOnly && "none" }} */>
+const Syntax = ({ className, ...props }) => (
+	<span className={className || "text-md-blue-a400"} {...props}>
 		{props.children}
 	</span>
 )
 
-const Markdown = ({ className, style, syntax, ...props }) => {
+const Markdown = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	const [startSyntax, endSyntax] = parseSyntax(syntax)
@@ -50,7 +50,7 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 		<React.Fragment>
 			{!readOnly && (
 				startSyntax && (
-					<Syntax className={className} readOnly={readOnly}>
+					<Syntax readOnly={readOnly} {...props}>
 						{startSyntax}
 					</Syntax>
 				)
@@ -58,7 +58,7 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 			{props.children}
 			{!readOnly && (
 				endSyntax && (
-					<Syntax className={className} readOnly={readOnly}>
+					<Syntax readOnly={readOnly} {...props}>
 						{endSyntax}
 					</Syntax>
 				)
@@ -67,14 +67,12 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 	)
 }
 
-// NOTE: Doesn’t use <Markdown>
 const Emoji = ({ emoji, ...props }) => (
 	<span className="emoji" aria-label={emoji.description} role="img">
 		{props.children}
 	</span>
 )
 
-// NOTE: Doesn’t use <span>
 const Escape = ({ syntax, ...props }) => (
 	<Markdown syntax={syntax}>
 		{props.children}
@@ -109,9 +107,8 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// NOTE (1): Don’t use text-sm; uses rem instead of em
-		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="p-px font-mono text-red-600 bg-red-100 rounded subpixel-antialiased" style={{ /* verticalAlign: 1, */ fontSize: "0.875em" }}>
+		// NOTE: Don’t use text-sm; uses rem instead of em
+		<span className="p-px font-mono text-red-600 bg-red-100 rounded subpixel-antialiased" style={{ fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -139,14 +136,12 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
-// Higher-order component for block elements.
 const NodeHOC = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
 		{props.children}
 	</div>
 )
 
-// Higher-order component for multiline block elements.
 const CompoundNodeHOC = ({ id, style, ...props }) => (
 	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
 		{props.children}
@@ -154,18 +149,6 @@ const CompoundNodeHOC = ({ id, style, ...props }) => (
 )
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-4xl leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
-		</a>
-	</NodeHOC>
-))
-
-const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
@@ -177,8 +160,8 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-2xl leading-tight">
+const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
+	<NodeHOC id={id} className="font-medium text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -189,7 +172,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
+const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<NodeHOC id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
@@ -201,8 +184,20 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
+const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<NodeHOC id={id} className="font-semibold text-lg leading-tight">
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toInnerReact(data) || (
+					<br />
+				)}
+			</Markdown>
+		</a>
+	</NodeHOC>
+))
+
+const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
+	<NodeHOC id={id} className="font-semibold leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -262,34 +257,6 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
-const CodeBlockStandalone = ({ metadata, data, ...props }) => {
-	const [lang, setLang] = React.useState("")
-	const [html, setHTML] = React.useState("")
-
-	React.useEffect(() => {
-		const match = Prism[getLanguage(metadata)]
-		if (!match) {
-			// No-op
-			return
-		}
-		const [lang, parser] = match
-		setLang(lang)
-		setHTML(window.Prism.highlight(data, parser, lang))
-	}, [metadata, data])
-
-	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
-			{html ? (
-				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
-					__html: html,
-				}} />
-			) : (
-				data
-			)}
-		</div>
-	)
-}
-
 // NOTE: Compound component
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
@@ -298,12 +265,12 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const match = Prism[getLanguage(metadata)]
-		if (!match) {
+		const lang = getLanguage(metadata)
+		const parser = Prism[lang]
+		if (!parser) {
 			// No-op
 			return
 		}
-		const [lang, parser] = match
 		setLang(lang)
 		setHTML(window.Prism.highlight(data, parser, lang))
 	}, [metadata, data])
@@ -338,6 +305,34 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	)
 })
 
+const CodeBlockStandalone = ({ metadata, data, ...props }) => {
+	const [lang, setLang] = React.useState("")
+	const [html, setHTML] = React.useState("")
+
+	React.useEffect(() => {
+		const lang = getLanguage(metadata)
+		const parser = Prism[lang]
+		if (!parser) {
+			// No-op
+			return
+		}
+		setLang(lang)
+		setHTML(window.Prism.highlight(data, parser, lang))
+	}, [metadata, data])
+
+	return (
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
+			{html ? (
+				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
+					__html: html,
+				}} />
+			) : (
+				data
+			)}
+		</div>
+	)
+}
+
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
@@ -350,7 +345,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 			) : (
 				<div className="absolute inset-0" style={{ opacity: readOnly && !hover ? "0%" : "100%" }}>
 					<div className="px-8 flex flex-row justify-center items-end h-full">
-						<div className="mb-2 px-2 py-1 bg-white rounded shadow-hero truncate">
+						<div className="my-2 px-2 py-1 bg-white rounded shadow-hero truncate">
 							<Markdown syntax={syntax}>
 								{toInnerReact(data)}
 							</Markdown>
@@ -358,7 +353,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 					</div>
 				</div>
 			)}
-			<img className="mx-auto" style={{ minHeight: "4.5em" }} src={src} alt={alt} />
+			<img className="mx-auto" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
 		</NodeHOC>
 	)
 })
@@ -472,14 +467,7 @@ const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)
 
 // Parses a nested VDOM representation to GFM text.
 //
-// TODO (1): Can extract registerType(...)(...) to
-// parseStrongAndEm(...)
-// TODO (2): Negate nested syntax? E.g. *HELLO `WORLD*`
-//
-// By far the trickiest part of inline parsing is handling
-// emphasis, strong emphasis, links, and images.
-//
-// https://github.github.com/gfm/#delimiter-stack
+// TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInnerGFM(text) {
 	if (!text) {
 		return null
@@ -719,11 +707,6 @@ function newHashEpoch() {
 // 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
 
 // Parses a VDOM representation to GFM text.
-//
-// TODO (1): To support Hemingway, preprocess text? E.g.
-// parseTextHemingway (can support custom spellcheck, etc.)
-// TODO (2): Cache data or body?
-// TODO (3): Change API to be ID-aware
 function parseGFM(text) {
 	const newHash = newHashEpoch()
 
@@ -840,7 +823,8 @@ function parseGFM(text) {
 			break
 		// <Image>
 		//
-		// NOTE: Uses parseInnerGFM pattern for parsing
+		// TODO: Move to parseInnerGFM to support
+		// [![Image](a:href)](b:href) syntax?
 		case char === "!":
 			// ![Image](href)
 			if (nchars >= "![](x)".length) {
@@ -870,27 +854,6 @@ function parseGFM(text) {
 				continue
 			}
 			break
-
-			// // eslint-disable-next-line no-useless-escape
-			// const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
-			//
-			// // <Image>
-			// case char === "!":
-			// 	// ![Image](href)
-			// 	if (nchars >= "![](x)".length && imageRe.test(each)) {
-			// 		const matches = imageRe.exec(each)
-			// 		data.push({
-			// 			id: uuidv4(),
-			// 			type: Image,
-			// 			syntax: ["![", `](${matches[2]})`],
-			// 			src: matches[2],
-			// 			alt: toInnerText(parseInnerGFM(matches[1])),
-			// 			children: parseInnerGFM(matches[1]),
-			// 		})
-			// 		continue
-			// 	}
-			// 	break
-
 		// <Break>
 		case char === "-" || char === "*":
 			// --- or ***
@@ -1000,28 +963,6 @@ function toInnerHTML(children) {
 	}
 	return html
 }
-
-// // Converts a VDOM representation to an HTML string.
-// function toHTML(data, __depth = 0) {
-// 	let html = ""
-// 	// Iterate elements:
-// 	for (const each of data) {
-// 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-// 		html += `${typeof s1 !== "function" ? s1 : s1(each)}\n${"\t".repeat(__depth + 1)}`
-// 		if (each.type === Break) {
-// 			// No-op
-// 		} else if (each.type === Blockquote) { // TODO: Add CodeBlock?
-// 			html += toHTML(each.children, __depth + 1)
-// 		} else {
-// 			html += toInnerHTML(each.children)
-// 		}
-// 		html += `\n${"\t".repeat(__depth)}${s2}`
-// 		if (each !== data[data.length - 1]) {
-// 			html += `\n${"\t".repeat(__depth)}`
-// 		}
-// 	}
-// 	return html
-// }
 
 // Converts a VDOM representation to an HTML string.
 function toHTML(data, __depth = 0) {

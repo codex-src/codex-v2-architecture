@@ -100,13 +100,53 @@
 	--md-blue-a700: #2962ff;
 }
 
+.pb-2\/1 {
+	padding-bottom: 200%;
+}
+.pb-16\/9 {
+	padding-bottom: 177.7778%;
+}
+.pb-16\/10 {
+	padding-bottom: 160%;
+}
+.pb-3\/2 {
+	padding-bottom: 150%;
+}
+.pb-4\/3 {
+	padding-bottom: 133.3333%;
+}
+.pb-5\/4 {
+	padding-bottom: 125%;
+}
+.pb-1\/1 {
+	padding-bottom: 100%;
+}
+.pb-4\/5 {
+	padding-bottom: 80%;
+}
+.pb-3\/4 {
+	padding-bottom: 75%;
+}
+.pb-2\/3 {
+	padding-bottom: 66.6667%;
+}
+.pb-10\/16 {
+	padding-bottom: 62.5%;
+}
+.pb-9\/16 {
+	padding-bottom: 56.25%;
+}
+.pb-1\/2 {
+	padding-bottom: 50%;
+}
+
 .line-through > .font-mono {
 	vertical-align: 1px;
 }
 
 .emoji {
-	vertical-align: -12.5%;
-	font-size: 125%;
+	vertical-align: -10%;
+	font-size: 120%;
 	line-height: 1;
 }
 .emojis-1 {
