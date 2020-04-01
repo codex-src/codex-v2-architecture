@@ -321,8 +321,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		// NOTE: Use rounded-lg-xl for <CodeBlockStandalone>
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg subpixel-antialiased" {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
 				<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -353,9 +352,8 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		// NOTE (1): Doesn’t use py-* because of <Markdown>
-		// NOTE (2): Use rounded-lg for <CodeBlock>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		// NOTE: Doesn’t use py-* because of <Markdown>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
