@@ -305,8 +305,6 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	)
 })
 
-// Near-copy of <CodeBlock> used for rendering as a
-// standalone component. Doesn’t use React.memo.
 const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	const [language, setLanguage] = React.useState("")
 	const [html, setHTML] = React.useState("")
@@ -336,7 +334,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-// TODO: Add a transition delay to colors?
+// NOTE: Compound component
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
@@ -631,7 +629,7 @@ function parseInnerGFM(text) {
 				continue
 			}
 			break
-		// <A> (Naked)
+		// <A> (1 of 2)
 		case char === "h":
 			// https://
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
@@ -651,7 +649,7 @@ function parseInnerGFM(text) {
 				continue
 			// http://
 			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
-				const matches = urlSafeRe.exec(text.slice(index + HTTPS.length))
+				const matches = urlSafeRe.exec(text.slice(index + HTTP.length))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
@@ -667,7 +665,7 @@ function parseInnerGFM(text) {
 				continue
 			}
 			break
-		// <A>
+		// <A> (2 of 2)
 		case char === "[":
 			if (nchars >= "[x](x)".length) {
 				const lhs = registerType(null, "]")(text, index)
@@ -717,11 +715,10 @@ function parseInnerGFM(text) {
 		}
 		data[data.length - 1] += char
 	}
-	// Return a string (one-off):
+	// Return a string or an array of objects:
 	if (data.length === 1 && typeof data[0] === "string") {
 		return data[0]
 	}
-	// Return an array:
 	return data
 }
 
@@ -787,6 +784,12 @@ function parseGFM(text) {
 		switch (true) {
 		// <H1>
 		case char === "#":
+			// # Header
+			// ## Subheader
+			// ### H3
+			// #### H4
+			// ##### H5
+			// ###### H6
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "# ") ||
 				(each.length >= 3 && each.slice(0, 3) === "## ") ||
@@ -808,6 +811,7 @@ function parseGFM(text) {
 			break
 		// <Blockquote>
 		case char === ">":
+			// > Blockquote
 			if (
 				(each.length >= 2 && each.slice(0, 2) === "> ") ||
 				(each.length === 1 && each === ">")
@@ -843,6 +847,9 @@ function parseGFM(text) {
 			break
 		// <CodeBlock>
 		case char === "`":
+			// ```
+			// Code block
+			// ```
 			if (
 				each.length >= 3 &&
 				each.slice(0, 3) === "```" &&
@@ -883,6 +890,7 @@ function parseGFM(text) {
 			break
 		// <Break>
 		case char === "-" || char === "*":
+			// ---
 			if (each.length === 3 && each === char.repeat(3)) {
 				data.push({
 					id: uuidv4(),
@@ -895,6 +903,7 @@ function parseGFM(text) {
 			break
 		// <Image>
 		case char === "!":
+			// ![Image](href)
 			if (each.length >= "![](x)".length && imageRe.test(each)) {
 				const matches = imageRe.exec(each)
 				data.push({
@@ -1323,7 +1332,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
 
 				{/* Read-only button: */}
-				<div className="-my-1 p-3 fixed right-0 top-0">
+				<div className="-my-1 p-3 fixed right-0 top-0 z-30">
 					<div className="flex flex-col items-end">
 						<div className="-mx-1 my-1 flex flex-row">
 							<button
