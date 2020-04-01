@@ -197,7 +197,7 @@ const CompoundNodeHOC = ({ id, style, ...props }) => (
 )
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
+	<NodeHOC id={id} className="font-medium text-4xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -209,7 +209,7 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-2xl leading-tight">
+	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -221,7 +221,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-xl leading-tight">
+	<NodeHOC id={id} className="font-semibold text-2xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -233,7 +233,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-lg leading-tight">
+	<NodeHOC id={id} className="font-semibold text-xl leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -245,7 +245,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold leading-tight">
+	<NodeHOC id={id} className="font-semibold text-lg leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -272,7 +272,7 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 	const emojis = (
 		data &&
 		Array.isArray(data) &&
-		data.length <= 3 && // Not needed
+		// data.length <= 3 && // Not needed
 		data.every(each => each.emoji)
 	)
 	return (
@@ -306,7 +306,7 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 })
 
 const CodeBlockStandalone = ({ metadata, data, ...props }) => {
-	const [language, setLanguage] = React.useState("")
+	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
@@ -315,15 +315,15 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [language, parser] = match
-		setLanguage(language)
-		setHTML(window.Prism.highlight(data, parser, language))
+		const [lang, parser] = match
+		setLang(lang)
+		setHTML(window.Prism.highlight(data, parser, lang))
 	}, [metadata, data])
 
 	return (
 		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
-				<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
+				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 					__html: html,
 				}} />
 			) : (
@@ -337,7 +337,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [language, setLanguage] = React.useState("")
+	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
@@ -346,9 +346,9 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [language, parser] = match
-		setLanguage(language)
-		setHTML(window.Prism.highlight(data, parser, language))
+		const [lang, parser] = match
+		setLang(lang)
+		setHTML(window.Prism.highlight(data, parser, lang))
 	}, [metadata, data])
 
 	return (
@@ -363,7 +363,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			</NodeHOC>
 			<NodeHOC>
 				{html ? (
-					<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
+					<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 						__html: html,
 					}} />
 				) : (
@@ -378,20 +378,6 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 				)}
 			</NodeHOC>
 		</CompoundNodeHOC>
-	)
-})
-
-const Break = React.memo(({ id, syntax, data, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
-
-	return (
-		<NodeHOC id={id}>
-			{!readOnly ? (
-				<Markdown syntax={syntax} />
-			) : (
-				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
-			)}
-		</NodeHOC>
 	)
 })
 
@@ -416,6 +402,20 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 				</div>
 			)}
 			<img className="mx-auto" style={{ minHeight: "4.5em" }} src={src} alt={alt} />
+		</NodeHOC>
+	)
+})
+
+const Break = React.memo(({ id, syntax, data, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	return (
+		<NodeHOC id={id}>
+			{!readOnly ? (
+				<Markdown syntax={syntax} />
+			) : (
+				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
+			)}
 		</NodeHOC>
 	)
 })
@@ -886,19 +886,6 @@ function parseGFM(text) {
 				continue
 			}
 			break
-		// <Break>
-		case char === "-" || char === "*":
-			// ---
-			if (each.length === 3 && each === char.repeat(3)) {
-				data.push({
-					id: uuidv4(),
-					type: Break,
-					syntax: [each],
-					children: null,
-				})
-				continue
-			}
-			break
 		// <Image>
 		case char === "!":
 			// ![Image](href)
@@ -911,6 +898,19 @@ function parseGFM(text) {
 					src: matches[2],
 					alt: toInnerText(parseInnerGFM(matches[1])),
 					children: parseInnerGFM(matches[1]),
+				})
+				continue
+			}
+			break
+		// <Break>
+		case char === "-" || char === "*":
+			// ---
+			if (each.length === 3 && each === char.repeat(3)) {
+				data.push({
+					id: uuidv4(),
+					type: Break,
+					syntax: [each],
+					children: null,
 				})
 				continue
 			}
@@ -1110,8 +1110,8 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
-	cmap[Break.type] = "Break"
 	cmap[Image.type] = "Image"
+	cmap[Break.type] = "Break"
 
 	// HTML:
 	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
@@ -1132,8 +1132,8 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
-	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
+	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
 
 // Sets the document title (uses useEffect).
@@ -1414,6 +1414,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 						)}
 						{state.renderMode === "markdown" && (
 							<Editor
+								className="text-lg"
 								style={{ tabSize: 2 }}
 								state={state}
 								setState={setState}
