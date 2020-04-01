@@ -175,7 +175,7 @@ const Strike = ({ syntax, ...props }) => (
 )
 
 const A = ({ syntax, href, ...props }) => (
-	<a className="text-md-blue-a400" href={href}>
+	<a className="underline text-md-blue-a400" href={href}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
@@ -308,7 +308,7 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 // Near-copy of <CodeBlock> used for rendering as a
 // standalone component. Doesn’t use React.memo.
 const CodeBlockStandalone = ({ metadata, data, ...props }) => {
-	const [lang, setLang] = React.useState("")
+	const [language, setLanguage] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
@@ -317,15 +317,16 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [lang, parser] = match
-		setLang(lang)
-		setHTML(window.Prism.highlight(data, parser, lang))
+		const [language, parser] = match
+		setLanguage(language)
+		setHTML(window.Prism.highlight(data, parser, language))
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
+		// NOTE: Use rounded-lg-xl for <CodeBlockStandalone>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
-				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
+				<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
 					__html: html,
 				}} />
 			) : (
@@ -340,7 +341,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const { /* stylesheet, */ readOnly } = React.useContext(EditorContext)
 
-	const [lang, setLang] = React.useState("")
+	const [language, setLanguage] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
@@ -349,14 +350,15 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [lang, parser] = match
-		setLang(lang)
-		setHTML(window.Prism.highlight(data, parser, lang))
+		const [language, parser] = match
+		setLanguage(language)
+		setHTML(window.Prism.highlight(data, parser, language))
 	}, [metadata, data])
 
 	return (
-		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		// NOTE (1): Doesn’t use py-* because of <Markdown>
+		// NOTE (2): Use rounded-lg for <CodeBlock>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
@@ -366,7 +368,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			</NodeHOC>
 			<NodeHOC>
 				{html ? (
-					<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
+					<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
 						__html: html,
 					}} />
 				) : (
