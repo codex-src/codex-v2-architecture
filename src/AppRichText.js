@@ -317,17 +317,13 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [lang, parse] = match
-		try {
-			setLang(lang)
-			setHTML(window.Prism.highlight(data, parse, lang))
-		} catch (error) {
-			console.error(error)
-		}
+		const [lang, parser] = match
+		setLang(lang)
+		setHTML(window.Prism.highlight(data, parser, lang))
 	}, [metadata, data])
 
 	return (
-		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg subpixel-antialiased" {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
 				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -353,18 +349,14 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			// No-op
 			return
 		}
-		const [lang, parse] = match
-		try {
-			setLang(lang)
-			setHTML(window.Prism.highlight(data, parse, lang))
-		} catch (error) {
-			console.error(error)
-		}
+		const [lang, parser] = match
+		setLang(lang)
+		setHTML(window.Prism.highlight(data, parser, lang))
 	}, [metadata, data])
 
 	return (
-		<CompoundNodeHOC className="!mx-6 my-2 px-6 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
-		{/* <CompoundNodeHOC className="!mx-6 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug !bg-gray-50 border rounded" spellCheck={false}> */}
+		// NOTE: Doesn’t use py-* because of <Markdown>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
