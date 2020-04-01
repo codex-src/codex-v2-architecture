@@ -84,7 +84,7 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, style, readOnly, ...props }) => (
-	<span className={className || "text-md-blue-a400"} style={{ ...style, display: readOnly && "none" }}>
+	<span className={className || "text-md-blue-a400"} /* style={{ ...style, display: readOnly && "none" }} */>
 		{props.children}
 	</span>
 )
@@ -95,16 +95,20 @@ const Markdown = ({ className, style, syntax, ...props }) => {
 	const [startSyntax, endSyntax] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
-			{startSyntax && (
-				<Syntax className={className} readOnly={readOnly}>
-					{startSyntax}
-				</Syntax>
+			{!readOnly && (
+				startSyntax && (
+					<Syntax className={className} readOnly={readOnly}>
+						{startSyntax}
+					</Syntax>
+				)
 			)}
 			{props.children}
-			{endSyntax && (
-				<Syntax className={className} readOnly={readOnly}>
-					{endSyntax}
-				</Syntax>
+			{!readOnly && (
+				endSyntax && (
+					<Syntax className={className} readOnly={readOnly}>
+						{endSyntax}
+					</Syntax>
+				)
 			)}
 		</React.Fragment>
 	)
@@ -270,7 +274,7 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 	const emojis = (
-		data &&
+		data && // Not needed?
 		Array.isArray(data) &&
 		// data.length <= 3 && // Not needed
 		data.every(each => each.emoji)
@@ -355,11 +359,11 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 		// NOTE: Doesn’t use py-* because of <Markdown>
 		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				{!readOnly ? (
-					<Markdown syntax={[syntax + metadata]} />
-				) : (
-					<br />
-				)}
+				<Markdown syntax={[syntax + metadata]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
 			</NodeHOC>
 			<NodeHOC>
 				{html ? (
@@ -371,11 +375,11 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 				)}
 			</NodeHOC>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				{!readOnly ? (
-					<Markdown syntax={[syntax]} />
-				) : (
-					<br />
-				)}
+				<Markdown syntax={[syntax]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
 			</NodeHOC>
 		</CompoundNodeHOC>
 	)
