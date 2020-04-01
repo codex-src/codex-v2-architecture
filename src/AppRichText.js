@@ -154,7 +154,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		// NOTE (1): Don’t use text-sm; uses rem instead of em
 		// NOTE (2): Use verticalAlign: 1 because of <Strike>
-		<span className="p-px font-mono text-red-600 bg-red-100 rounded" style={{ /* verticalAlign: 1, */ fontSize: "0.875em" }}>
+		<span className="p-px font-mono text-red-600 bg-red-100 rounded subpixel-antialiased" style={{ /* verticalAlign: 1, */ fontSize: "0.875em" }}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -327,7 +327,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
+		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
 				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -363,8 +363,9 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" /* style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} */ spellCheck={false}>
-			<NodeHOC className="-mt-2 leading-none text-md-blue-a400">
+		<CompoundNodeHOC className="!mx-6 my-2 px-6 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		{/* <CompoundNodeHOC className="!mx-6 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug !bg-gray-50 border rounded" spellCheck={false}> */}
+			<NodeHOC className="text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
 				) : (
@@ -380,7 +381,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 					data
 				)}
 			</NodeHOC>
-			<NodeHOC className="-mb-2 leading-none text-md-blue-a400">
+			<NodeHOC className="text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax]} />
 				) : (
@@ -1215,6 +1216,8 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 	)
 }
 
+const LOCALSTORAGE_KEY = "codex-app-v2.1"
+
 const KEY_CODE_TAB = 9
 
 const App = props => {
@@ -1222,7 +1225,7 @@ const App = props => {
 
 	// <textarea> (1 of 2):
 	const [value, setValue] = React.useState(() => {
-		const cache = localStorage.getItem("codex-app-v2")
+		const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 		if (cache) {
 			const json = JSON.parse(cache)
 			if (json.data) {
@@ -1264,14 +1267,13 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 
 	// <textarea> (2 of 2):
 	React.useEffect(() => {
-		localStorage.setItem("codex-app-v2", JSON.stringify({ data: value }))
+		localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data: value }))
 	}, [value])
 
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
 		renderMode: "markdown", // E.g. "text" || "markdown" || "html" || "json"
-		// stylesheet: "type",  // E.g. "type" || "mono"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1368,16 +1370,8 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 										onPointerDown={e => e.preventDefault()}
 										onClick={e => setState({ ...state, readOnly: !state.readOnly })}
 									>
-										{/* Coerce to a string: */}
 										Toggle read-only: {(`${state.readOnly}`)}
 									</button>
-									{/* <button */}
-									{/* 	className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-									{/* 	onPointerDown={e => e.preventDefault()} */}
-									{/* 	onClick={e => setState({ ...state, stylesheet: state.stylesheet !== "type" ? "type" : "mono" })} */}
-									{/* > */}
-									{/* 	Toggle stylesheet: "{state.stylesheet}" */}
-									{/* </button> */}
 								</React.Fragment>
 							)}
 						</div>
@@ -1410,7 +1404,6 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 				{/* RHS */}
 				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
-						{/* Text */}
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
 								// Overwrite my-*:
@@ -1419,16 +1412,13 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 								data={`${text}\n`}
 							/>
 						)}
-						{/* Narkdown */}
 						{state.renderMode === "markdown" && (
 							<Editor
-								// className={state.stylesheet === "type" ? null : "font-mono"}
-								style={{ tabSize: 2, /* fontSize: state.stylesheet === "type" ? null : "0.875em" */ }}
+								style={{ tabSize: 2 }}
 								state={state}
 								setState={setState}
 							/>
 						)}
-						{/* HTML */}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
 								// Overwrite my-*:
@@ -1437,7 +1427,6 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 								data={`${html}\n`}
 							/>
 						)}
-						{/* JSON */}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
 								// Overwrite my-*:
