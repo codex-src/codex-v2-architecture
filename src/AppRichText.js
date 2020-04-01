@@ -354,7 +354,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
 		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
-			<NodeHOC className="text-md-blue-a200">
+			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
 				) : (
@@ -370,7 +370,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 					data
 				)}
 			</NodeHOC>
-			<NodeHOC className="text-md-blue-a200">
+			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax]} />
 				) : (
