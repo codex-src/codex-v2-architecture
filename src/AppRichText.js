@@ -353,7 +353,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-md shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
@@ -1327,7 +1327,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 
 	return (
 		<div className="flex flex-row justify-center">
-			<div className="px-6 py-32 grid grid-cols-2 gap-6 w-full">
+			<div className="px-6 py-32 grid grid-cols-2 gap-12 w-full">
 
 				{/* Read-only button: */}
 				<div className="-my-1 p-3 fixed right-0 top-0 z-30">
