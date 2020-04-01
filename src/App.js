@@ -1,68 +1,21 @@
 import * as emojiTrie from "emoji-trie"
 import escape from "lodash/escape"
+import Prism from "./Prism"
 import React from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
-import "./AppRichText.css"
-
-// Maps user-perceived language extensions to Prism
-// languages.
-const languages = {}
+import "./App.css"
 
 // Extracts a language extension from a metadata string.
 function getLanguage(metadata) {
+	metadata = metadata.toLowerCase()
 	const index = metadata.lastIndexOf(".")
 	if (index === -1 || index + 1 === metadata.length) {
 		return metadata
 	}
 	return metadata.slice(index + 1)
 }
-
-document.addEventListener("DOMContentLoaded", e => {
-	if (!window.Prism || !window.Prism.languages) {
-		// No-op
-		return
-	}
-	/* eslint-disable no-multi-spaces */
-	languages.bash       = ["bash", window.Prism.languages.bash]
-	languages.c          = ["c", window.Prism.languages.c]
-	languages.cpp        = ["cpp", window.Prism.languages.cpp]
-	languages.css        = ["css", window.Prism.languages.css]
-	languages.d          = ["d", window.Prism.languages.d]
-	languages.diff       = ["diff", window.Prism.languages.diff]
-	languages.docker     = ["docker", window.Prism.languages.docker]
-	languages.dockerfile = ["dockerfile", window.Prism.languages.dockerfile]
-	languages.git        = ["git", window.Prism.languages.git]
-	languages.go         = ["go", window.Prism.languages.go]
-	// languages.gql     = ["graphql", window.Prism.languages.graphql]
-	languages.graphql    = ["graphql", window.Prism.languages.graphql]
-	// languages.htm     = ["html", window.Prism.languages.html]
-	languages.html       = ["html", window.Prism.languages.html]
-	languages.http       = ["http", window.Prism.languages.http]
-	languages.js         = ["jsx", window.Prism.languages.jsx]
-	languages.json       = ["json", window.Prism.languages.json]
-	languages.jsx        = ["jsx", window.Prism.languages.jsx] // Uses jsx
-	languages.kotlin     = ["kotlin", window.Prism.languages.kotlin]
-	languages.php        = ["php", window.Prism.languages.php]
-	languages.py         = ["py", window.Prism.languages.py]
-	languages.rb         = ["rb", window.Prism.languages.rb]
-	languages.ruby       = ["ruby", window.Prism.languages.ruby]
-	languages.rust       = ["rust", window.Prism.languages.rust]
-	languages.sass       = ["sass", window.Prism.languages.sass]
-	languages.sh         = ["shell-session", window.Prism.languages["shell-session"]]
-	// languages.shell   = ["shell-session", window.Prism.languages["shell-session"]]
-	languages.sql        = ["sql", window.Prism.languages.sql]
-	languages.svg        = ["svg", window.Prism.languages.svg]
-	languages.swift      = ["swift", window.Prism.languages.swift]
-	languages.ts         = ["tsx", window.Prism.languages.tsx] // Uses tsx
-	languages.tsx        = ["tsx", window.Prism.languages.tsx]
-	languages.wasm       = ["wasm", window.Prism.languages.wasm]
-	languages.xml        = ["xml", window.Prism.languages.xml]
-	languages.yaml       = ["yaml", window.Prism.languages.yaml]
-	languages.yml        = ["yml", window.Prism.languages.yml]
-	/* eslint-enable no-multi-spaces */
-})
 
 // Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
@@ -314,7 +267,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const match = languages[getLanguage(metadata)]
+		const match = Prism[getLanguage(metadata)]
 		if (!match) {
 			// No-op
 			return
@@ -345,7 +298,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const match = languages[getLanguage(metadata)]
+		const match = Prism[getLanguage(metadata)]
 		if (!match) {
 			// No-op
 			return
