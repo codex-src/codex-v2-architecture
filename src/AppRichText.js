@@ -388,7 +388,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [hover, setHover] = React.useState(() => readOnly)
+	const [hover, setHover] = React.useState(() => false)
 
 	return (
 		<NodeHOC id={id} className="relative" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
@@ -519,14 +519,7 @@ const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)
 
 // Parses a nested VDOM representation to GFM text.
 //
-// TODO (1): Can extract registerType(...)(...) to
-// parseStrongAndEm(...)
-// TODO (2): Negate nested syntax? E.g. *HELLO `WORLD*`
-//
-// By far the trickiest part of inline parsing is handling
-// emphasis, strong emphasis, links, and images.
-//
-// https://github.github.com/gfm/#delimiter-stack
+// TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInnerGFM(text) {
 	if (!text) {
 		return null
