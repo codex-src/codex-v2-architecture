@@ -342,7 +342,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
-	const { stylesheet, readOnly } = React.useContext(EditorContext)
+	const { /* stylesheet, */ readOnly } = React.useContext(EditorContext)
 
 	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
@@ -363,7 +363,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
+		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" /* style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} */ spellCheck={false}>
 			<NodeHOC className="-mt-2 leading-none text-md-blue-a400">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
@@ -502,7 +502,12 @@ const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*)[\
 //
 // TODO (1): Can extract registerType(...)(...) to
 // parseStrongAndEm(...)
-// TODO (2): Parse 😀 here -- not GFM (e.g. !index)
+// TODO (2): Negate nested syntax? E.g. *HELLO `WORLD*`
+//
+// By far the trickiest part of inline parsing is handling
+// emphasis, strong emphasis, links, and images.
+//
+// https://github.github.com/gfm/#delimiter-stack
 function parseInnerGFM(text) {
 	if (!text) {
 		return null
@@ -1227,7 +1232,7 @@ Crazy, huh?
 	const [state, setState] = React.useState(() => ({
 		// TODO: Use new Enum pattern
 		renderMode: "markdown", // E.g. "text" || "markdown" || "html" || "json"
-		stylesheet: "type",     // E.g. "type" || "mono"
+		// stylesheet: "type",  // E.g. "type" || "mono"
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1327,13 +1332,13 @@ Crazy, huh?
 										{/* Coerce to a string: */}
 										Toggle read-only: {(`${state.readOnly}`)}
 									</button>
-									<button
-										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-										onPointerDown={e => e.preventDefault()}
-										onClick={e => setState({ ...state, stylesheet: state.stylesheet !== "type" ? "type" : "mono" })}
-									>
-										Toggle stylesheet: "{state.stylesheet}"
-									</button>
+									{/* <button */}
+									{/* 	className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
+									{/* 	onPointerDown={e => e.preventDefault()} */}
+									{/* 	onClick={e => setState({ ...state, stylesheet: state.stylesheet !== "type" ? "type" : "mono" })} */}
+									{/* > */}
+									{/* 	Toggle stylesheet: "{state.stylesheet}" */}
+									{/* </button> */}
 								</React.Fragment>
 							)}
 						</div>
@@ -1378,8 +1383,8 @@ Crazy, huh?
 						{/* Narkdown */}
 						{state.renderMode === "markdown" && (
 							<Editor
-								className={state.stylesheet === "type" ? null : "font-mono"}
-								style={{ tabSize: 2, fontSize: state.stylesheet === "type" ? null : "0.875em" }}
+								// className={state.stylesheet === "type" ? null : "font-mono"}
+								style={{ tabSize: 2, /* fontSize: state.stylesheet === "type" ? null : "0.875em" */ }}
 								state={state}
 								setState={setState}
 							/>
