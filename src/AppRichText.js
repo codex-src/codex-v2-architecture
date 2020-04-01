@@ -687,8 +687,8 @@ function parseInnerGFM(text) {
 				}
 				data.push({
 					type: A,
-					// syntax: ["[", `](${rhs.object.children})`], // FIXME
-					syntax: ["[", "](…)"],
+					// syntax: ["[", "](…)"],
+					syntax: ["[", `](${rhs.object.children})`],
 					href: rhs.object.children.trim(),
 					children: lhs.object.children,
 				})
@@ -915,13 +915,11 @@ function parseGFM(text) {
 				data.push({
 					id: uuidv4(),
 					type: Image,
-					// syntax: ["[", `](${rhs.object.children})`], // FIXME
-					syntax: ["![", "](…)"],
+					syntax: ["![", `](${rhs.object.children})`],
 					src: rhs.object.children,
 					alt: toInnerText(lhs.object.children),
 					children: lhs.object.children,
 				})
-				index = rhs.x2
 				continue
 			}
 			break
