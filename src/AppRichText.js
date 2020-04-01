@@ -321,7 +321,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
 			{html ? (
 				<span className={!language ? null : `language-${language}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -353,7 +353,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
