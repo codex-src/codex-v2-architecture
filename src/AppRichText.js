@@ -476,7 +476,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		pattern = `[^\\\\]${pattern}`
 		patternOffset++
 	}
-	const parse = (text, index) => {
+	const parse = (text, index, { minChars } = { minChars: 1 }) => {
 		// Guard: _Em_ and __strong and em__ cannot be nested:
 		//
 		// https://github.github.com/gfm/#example-369
@@ -486,7 +486,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		// Guard: (Some) syntax cannot surround spaces:
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
-			offset <= 0 ||
+			offset < minChars ||
 			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length] === " ") ||           // Exempt <Code> and <A>
 			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length + offset - 1] === " ") // Exempt <Code> and <A>
 		) {
@@ -676,11 +676,11 @@ function parseInnerGFM(text) {
 					break
 				}
 				// Check ( syntax:
-				if (lhs.x2 + 1 < text.length && text[lhs.x2 + 1] !== "(") {
+				if (lhs.x2 + "]".length < text.length && text[lhs.x2 + "]".length] !== "(") {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2 + 1)
+				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2 + "]".length)
 				if (!rhs) {
 					// No-op
 					break
@@ -783,6 +783,7 @@ function parseGFM(text) {
 	for (let index = 0; index < body.length; index++) {
 		const each = body[index]
 		const char = each.charAt(0)
+		const nchars = text.length - index
 		switch (true) {
 		// <H1>
 		case char === "#":
@@ -793,12 +794,12 @@ function parseGFM(text) {
 			// ##### H5
 			// ###### H6
 			if (
-				(each.length >= 2 && each.slice(0, 2) === "# ") ||
-				(each.length >= 3 && each.slice(0, 3) === "## ") ||
-				(each.length >= 4 && each.slice(0, 4) === "### ") ||
-				(each.length >= 5 && each.slice(0, 5) === "#### ") ||
-				(each.length >= 6 && each.slice(0, 6) === "##### ") ||
-				(each.length >= 7 && each.slice(0, 7) === "###### ")
+				(nchars >= 2 && each.slice(0, 2) === "# ") ||
+				(nchars >= 3 && each.slice(0, 3) === "## ") ||
+				(nchars >= 4 && each.slice(0, 4) === "### ") ||
+				(nchars >= 5 && each.slice(0, 5) === "#### ") ||
+				(nchars >= 6 && each.slice(0, 6) === "##### ") ||
+				(nchars >= 7 && each.slice(0, 7) === "###### ")
 			) {
 				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
@@ -815,8 +816,8 @@ function parseGFM(text) {
 		case char === ">":
 			// > Blockquote
 			if (
-				(each.length >= 2 && each.slice(0, 2) === "> ") ||
-				(each.length === 1 && each === ">")
+				(nchars >= 2 && each.slice(0, 2) === "> ") ||
+				(nchars === 1 && each === ">")
 			) {
 				const x1 = index
 				let x2 = x1
@@ -853,7 +854,7 @@ function parseGFM(text) {
 			// Code block
 			// ```
 			if (
-				each.length >= 3 &&
+				nchars >= 3 &&
 				each.slice(0, 3) === "```" &&
 				each.slice(3).indexOf("`") === -1 && // Negate backticks
 				index + 1 < body.length
@@ -891,25 +892,61 @@ function parseGFM(text) {
 			}
 			break
 		// <Image>
+		//
+		// NOTE: Uses parseInnerGFM pattern for parsing
 		case char === "!":
 			// ![Image](href)
-			if (each.length >= "![](x)".length && imageRe.test(each)) {
-				const matches = imageRe.exec(each)
+			if (nchars >= "![](x)".length) {
+				const lhs = registerType(null, "]")(each, "!".length, { minChars: 0 })
+				if (!lhs) {
+					// No-op
+					break
+				}
+				// Check ( syntax:
+				if (lhs.x2 + "]".length < nchars && each[lhs.x2 + 1] !== "(") {
+					// No-op
+					break
+				}
+				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2 + "]".length)
+				if (!rhs) {
+					// No-op
+					break
+				}
 				data.push({
 					id: uuidv4(),
 					type: Image,
-					syntax: ["![", `](${matches[2]})`],
-					src: matches[2],
-					alt: toInnerText(parseInnerGFM(matches[1])),
-					children: parseInnerGFM(matches[1]),
+					// syntax: ["[", `](${rhs.object.children})`], // FIXME
+					syntax: ["![", "](…)"],
+					src: rhs.object.children,
+					alt: toInnerText(lhs.object.children),
+					children: lhs.object.children,
 				})
+				index = rhs.x2
 				continue
 			}
 			break
+
+		// // <Image>
+		// case char === "!":
+		// 	// ![Image](href)
+		// 	if (nchars >= "![](x)".length && imageRe.test(each)) {
+		// 		const matches = imageRe.exec(each)
+		// 		data.push({
+		// 			id: uuidv4(),
+		// 			type: Image,
+		// 			syntax: ["![", `](${matches[2]})`],
+		// 			src: matches[2],
+		// 			alt: toInnerText(parseInnerGFM(matches[1])),
+		// 			children: parseInnerGFM(matches[1]),
+		// 		})
+		// 		continue
+		// 	}
+		// 	break
+
 		// <Break>
 		case char === "-" || char === "*":
 			// ---
-			if (each.length === 3 && each === char.repeat(3)) {
+			if (nchars === 3 && each === char.repeat(3)) {
 				data.push({
 					id: uuidv4(),
 					type: Break,
