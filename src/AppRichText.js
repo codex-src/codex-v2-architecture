@@ -336,10 +336,9 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-// NOTE: Compound component
 // TODO: Add a transition delay to colors?
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
-	const { /* stylesheet, */ readOnly } = React.useContext(EditorContext)
+	const { readOnly } = React.useContext(EditorContext)
 
 	const [language, setLanguage] = React.useState("")
 	const [html, setHTML] = React.useState("")
@@ -689,7 +688,7 @@ function parseInnerGFM(text) {
 				data.push({
 					type: A,
 					// syntax: ["[", `](${rhs.object.children})`], // FIXME
-					syntax: ["[", `](…)`],
+					syntax: ["[", "](…)"],
 					href: rhs.object.children.trim(),
 					children: lhs.object.children,
 				})
@@ -896,7 +895,7 @@ function parseGFM(text) {
 			break
 		// <Image>
 		case char === "!":
-			if (each.length >= `![](x)`.length && imageRe.test(each)) {
+			if (each.length >= "![](x)".length && imageRe.test(each)) {
 				const matches = imageRe.exec(each)
 				data.push({
 					id: uuidv4(),
@@ -1108,7 +1107,7 @@ const cmapHTML = new Map()
 	cmap[Image.type] = "Image"
 
 	// HTML:
-	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, `</span>`]
+	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
 	cmapHTML[Escape] = ["", ""] // No-op
 	cmapHTML[Em] = ["<em>", "</em>"]
 	cmapHTML[Strong] = ["<strong>", "</strong>"]
