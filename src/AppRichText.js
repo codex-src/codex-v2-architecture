@@ -327,7 +327,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
+		<div className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" {...props}>
 			{html ? (
 				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -363,7 +363,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" /* style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} */ spellCheck={false}>
+		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" /* style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} */ spellCheck={false}>
 			<NodeHOC className="-mt-2 leading-none text-md-blue-a400">
 				{!readOnly ? (
 					<Markdown syntax={[syntax + metadata]} />
@@ -401,6 +401,31 @@ const Break = React.memo(({ id, syntax, data, ...props }) => {
 			) : (
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
+		</NodeHOC>
+	)
+})
+
+const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	const [hover, setHover] = React.useState(() => readOnly)
+
+	return (
+		<NodeHOC id={id} className="relative" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
+			{readOnly && !data ? (
+				null
+			) : (
+				<div className="absolute inset-0" style={{ opacity: readOnly && !hover ? "0%" : "100%" }}>
+					<div className="px-8 flex flex-row justify-center items-end h-full">
+						<div className="mb-2 px-2 py-1 bg-white rounded shadow-hero truncate">
+							<Markdown syntax={syntax}>
+								{toInnerReact(data)}
+							</Markdown>
+						</div>
+					</div>
+				</div>
+			)}
+			<img className="mx-auto" style={{ minHeight: "4.5em" }} src={src} alt={alt} />
 		</NodeHOC>
 	)
 })
@@ -747,6 +772,9 @@ function newHashEpoch() {
 // parse: (offset, key, matches) =>
 // 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
 
+// eslint-disable-next-line no-useless-escape
+const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
+
 // Parses a VDOM representation to GFM text.
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
@@ -867,6 +895,21 @@ function parseGFM(text) {
 					type: Break,
 					syntax: [each],
 					children: null,
+				})
+				continue
+			}
+			break
+		// <Image>
+		case char === "!":
+			if (each.length >= `![](x)`.length && imageRe.test(each)) {
+				const matches = imageRe.exec(each)
+				data.push({
+					id: uuidv4(),
+					type: Image,
+					syntax: ["![", `](${matches[2]})`],
+					src: matches[2],
+					alt: toInnerText(parseInnerGFM(matches[1])),
+					children: parseInnerGFM(matches[1]),
 				})
 				continue
 			}
@@ -1067,6 +1110,7 @@ const cmapHTML = new Map()
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
 	cmap[Break.type] = "Break"
+	cmap[Image.type] = "Image"
 
 	// HTML:
 	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, `</span>`]
@@ -1076,21 +1120,7 @@ const cmapHTML = new Map()
 	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
 	cmapHTML[Code] = ["<code>", "</code>"]
 	cmapHTML[Strike] = ["<strike>", "</strike>"]
-
-	// NOTE: Use href="..." not href='...' because " URLs
-	// expect " to be percent-encoded (e.g. %22)
 	cmapHTML[A] = [data => `<a href="${data.href}">`, "</a>"]
-
-	// cmapHTML[H1.type] = [data => `<a href="#${data.hash}"><h1 id="${data.hash}">`, "</h1></a>"]
-	// cmapHTML[H2.type] = [data => `<a href="#${data.hash}"><h2 id="${data.hash}">`, "</h2></a>"]
-	// cmapHTML[H3.type] = [data => `<a href="#${data.hash}"><h3 id="${data.hash}">`, "</h3></a>"]
-	// cmapHTML[H4.type] = [data => `<a href="#${data.hash}"><h4 id="${data.hash}">`, "</h4></a>"]
-	// cmapHTML[H5.type] = [data => `<a href="#${data.hash}"><h5 id="${data.hash}">`, "</h5></a>"]
-	// cmapHTML[H6.type] = [data => `<a href="#${data.hash}"><h6 id="${data.hash}">`, "</h6></a>"]
-	// cmapHTML[Paragraph.type] = ["<p>", "</p>"]
-	// cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	// cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
-	// cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 
 	cmapHTML[H1.type] = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
 	cmapHTML[H2.type] = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
@@ -1102,6 +1132,7 @@ const cmapHTML = new Map()
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
+	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 })()
 
 // Sets the document title (uses useEffect).
@@ -1217,7 +1248,15 @@ func main() {
 }
 \`\`\`
 
-Crazy, huh?
+Why stop there?! Why not images! ⚡️
+
+![**Star Wars**](https://camo.githubusercontent.com/aa4f8ab810278debb3b3bc2a2dc46819650aa11e/68747470733a2f2f6d2e6d656469612d616d617a6f6e2e636f6d2f696d616765732f4d2f4d5635424e7a49344e6d466b4e6a45744e6d51774d4330305a5442684c546b774f4759744e6a6731595455794f57593359325534586b4579586b46716347646551585a335a584e735a586b402e5f56315f55583437375f4352302c302c3437372c3236385f414c5f2e6a7067)
+
+Or emojis?!
+
+😂
+
+Even [links](https://google.com) are supported now. Crazy, huh?
 
 **Try pressing the \`Text\`, \`Markdown\`, \`HTML\` and \`JSON\` buttons at the top; these convert the parsed markdown data structure to various formats.** This may help you better understand what’s going on behind the hood.
 `.trim()
