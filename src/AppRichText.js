@@ -765,9 +765,6 @@ function newHashEpoch() {
 // parse: (offset, key, matches) =>
 // 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
 
-// eslint-disable-next-line no-useless-escape
-const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
-
 // Parses a VDOM representation to GFM text.
 //
 // TODO (1): To support Hemingway, preprocess text? E.g.
@@ -783,7 +780,7 @@ function parseGFM(text) {
 	for (let index = 0; index < body.length; index++) {
 		const each = body[index]
 		const char = each.charAt(0)
-		const nchars = text.length - index
+		const nchars = each.length
 		switch (true) {
 		// <H1>
 		case char === "#":
@@ -924,6 +921,9 @@ function parseGFM(text) {
 			}
 			break
 
+		// // eslint-disable-next-line no-useless-escape
+		// const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
+		//
 		// // <Image>
 		// case char === "!":
 		// 	// ![Image](href)
@@ -943,7 +943,7 @@ function parseGFM(text) {
 
 		// <Break>
 		case char === "-" || char === "*":
-			// ---
+			// --- or ***
 			if (nchars === 3 && each === char.repeat(3)) {
 				data.push({
 					id: uuidv4(),
