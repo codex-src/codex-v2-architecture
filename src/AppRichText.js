@@ -585,7 +585,18 @@ function parseInnerGFM(text) {
 			break
 		// <Code>
 		case char === "`":
-			if (nchars >= "`x`".length) {
+			// ```Code```
+			if (nchars >= "```x```".length) {
+				const parsed = registerType(Code, "```", { recurse: false })(text, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.object)
+				index = parsed.x2
+				continue
+			// `Code`
+			} else if (nchars >= "`x`".length) {
 				const parsed = registerType(Code, "`", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
