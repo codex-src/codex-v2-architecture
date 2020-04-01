@@ -293,7 +293,7 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	// TODO: Dynamically compute syntax width for padding-left
-	const readOnlyStyle = { paddingLeft: "calc(14.27 / 16 * 1em)", boxShadow: "-2px 0 var(--gray-600)" }
+	const readOnlyStyle = { paddingLeft: "1.4ch", boxShadow: "-2px 0 var(--gray-600)" }
 	return (
 		<CompoundNodeHOC id={id}>
 			{data.map((each, index) => (
@@ -515,7 +515,7 @@ const HTTP = "http://"
 // https://tools.ietf.org/html/rfc3986
 //
 // eslint-disable-next-line no-useless-escape
-const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*)[\w\/]/
+const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/
 
 // Parses a nested VDOM representation to GFM text.
 //
@@ -878,11 +878,8 @@ function parseGFM(text) {
 					type: CodeBlock,
 					syntax: "```",
 					metadata,
-					children: body
-						.slice(x1, x2)
-						.join("\n")
-						.slice(3 + metadata.length, -3) // Trim syntax and metadata
-						.slice(1),                      // Trim start paragraph
+					// Trim syntax and start paragraph:
+					children: body.slice(x1, x2).join("\n").slice(3 + metadata.length, -3).slice(1),
 				})
 				index = x2 - 1
 				continue
@@ -921,25 +918,25 @@ function parseGFM(text) {
 			}
 			break
 
-		// // eslint-disable-next-line no-useless-escape
-		// const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
-		//
-		// // <Image>
-		// case char === "!":
-		// 	// ![Image](href)
-		// 	if (nchars >= "![](x)".length && imageRe.test(each)) {
-		// 		const matches = imageRe.exec(each)
-		// 		data.push({
-		// 			id: uuidv4(),
-		// 			type: Image,
-		// 			syntax: ["![", `](${matches[2]})`],
-		// 			src: matches[2],
-		// 			alt: toInnerText(parseInnerGFM(matches[1])),
-		// 			children: parseInnerGFM(matches[1]),
-		// 		})
-		// 		continue
-		// 	}
-		// 	break
+			// // eslint-disable-next-line no-useless-escape
+			// const imageRe = /^\!\[(|.*[^\\])\]\((.*[^\\])\)$/
+			//
+			// // <Image>
+			// case char === "!":
+			// 	// ![Image](href)
+			// 	if (nchars >= "![](x)".length && imageRe.test(each)) {
+			// 		const matches = imageRe.exec(each)
+			// 		data.push({
+			// 			id: uuidv4(),
+			// 			type: Image,
+			// 			syntax: ["![", `](${matches[2]})`],
+			// 			src: matches[2],
+			// 			alt: toInnerText(parseInnerGFM(matches[1])),
+			// 			children: parseInnerGFM(matches[1]),
+			// 		})
+			// 		continue
+			// 	}
+			// 	break
 
 		// <Break>
 		case char === "-" || char === "*":
