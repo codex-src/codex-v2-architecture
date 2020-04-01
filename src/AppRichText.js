@@ -175,7 +175,7 @@ const Strike = ({ syntax, ...props }) => (
 )
 
 const A = ({ syntax, href, ...props }) => (
-	<a className="underline text-md-blue-a400" href={href}>
+	<a className="text-md-blue-a400" href={href}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
@@ -342,7 +342,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 // NOTE: Compound component
 // TODO: Add a transition delay to colors?
 const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
-	const { stylesheet } = React.useContext(EditorContext)
+	const { stylesheet, readOnly } = React.useContext(EditorContext)
 
 	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
@@ -364,8 +364,12 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		<CompoundNodeHOC className="-mx-4 my-2 px-6 py-4 font-mono text-sm leading-snug bg-white rounded-lg-xl shadow-hero-lg" style={{ fontSize: stylesheet !== "type" ? null : "0.875em" }} spellCheck={false}>
-			<NodeHOC className="text-md-blue-a400">
-				<Markdown syntax={[syntax + metadata]} />
+			<NodeHOC className="-mt-2 leading-none text-md-blue-a400">
+				{!readOnly ? (
+					<Markdown syntax={[syntax + metadata]} />
+				) : (
+					<br />
+				)}
 			</NodeHOC>
 			<NodeHOC>
 				{html ? (
@@ -376,8 +380,12 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 					data
 				)}
 			</NodeHOC>
-			<NodeHOC className="text-md-blue-a400">
-				<Markdown syntax={[syntax]} />
+			<NodeHOC className="-mb-2 leading-none text-md-blue-a400">
+				{!readOnly ? (
+					<Markdown syntax={[syntax]} />
+				) : (
+					<br />
+				)}
 			</NodeHOC>
 		</CompoundNodeHOC>
 	)
@@ -644,7 +652,8 @@ function parseInnerGFM(text) {
 				}
 				data.push({
 					type: A,
-					syntax: ["[", `](${rhs.object.children})`],
+					// syntax: ["[", `](${rhs.object.children})`], // FIXME
+					syntax: ["[", `](…)`],
 					href: rhs.object.children.trim(),
 					children: lhs.object.children,
 				})
@@ -796,10 +805,10 @@ function parseGFM(text) {
 			break
 		// <CodeBlock>
 		case char === "`":
-			// TODO: Check GFM spec for backticks, etc.
 			if (
 				each.length >= 3 &&
 				each.slice(0, 3) === "```" &&
+				each.slice(3).indexOf("`") === -1 && // Negate backticks
 				index + 1 < body.length
 			) {
 				const x1 = index
