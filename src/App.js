@@ -1046,10 +1046,10 @@ function toInnerText(children, options = { markdown: false }) {
 		if (each === null || typeof each === "string") {
 			text += each || ""
 			continue
-		// List:
-		} else if (Array.isArray(each)) {
-			text += toInnerText(each, options)
-			continue
+		// // List:
+		// } else if (Array.isArray(each)) {
+		// 	text += toInnerText(each, options)
+		// 	continue
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
@@ -1064,11 +1064,11 @@ function toText(data, options = { markdown: false }) {
 	let text = ""
 	// Iterate elements:
 	for (const each of data) {
-		// List:
- 		if (Array.isArray(each)) {
-			text += toText(each, options)
-			continue
-		}
+		// // List:
+ 		// if (Array.isArray(each)) {
+		// 	text += toText(each, options)
+		// 	continue
+		// }
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
 		if (each.type === Break) {
@@ -1096,10 +1096,10 @@ function toInnerHTML(children) {
 		if (each === null || typeof each === "string") {
 			html += escape(each) || "<br>"
 			continue
-		// List:
-		} else if (Array.isArray(each)) {
-			html += toInnerHTML(each)
-			continue
+		// // List:
+		// } else if (Array.isArray(each)) {
+		// 	html += toInnerHTML(each)
+		// 	continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
 		html += typeof s1 !== "function" ? s1 : s1(each)
@@ -1209,8 +1209,8 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
-	cmapHTML[ListItem.type] = ["<li>\t", "\n</li>"]
-	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
+	cmapHTML[ListItem.type] = ["<li>\n\t", "\n</li>"]
+	cmapHTML[List.type] = ["<ul>", "</ul>"]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
