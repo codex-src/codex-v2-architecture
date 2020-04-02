@@ -1208,7 +1208,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension ? "" : ` class="language-${data.metadata.extension.toLowerCase()}"`}><code>`, "</code></pre>"]
+	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
 	cmapHTML[ListItem.type] = ["<li>\t", "\n</li>"]
 	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
@@ -1287,7 +1287,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 				].filter(Boolean).join(" "),
 
 				style: {
-					// wordWrap: "break-word",
+					// wordWrap: "break-word", // Not working
 					caretColor: "black",
 					outline: "none",
 					...style,
@@ -1513,9 +1513,8 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
-								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="text"
+								metadata={parseMetadata("text")}
 								data={`${text}\n`}
 							/>
 						)}
@@ -1529,17 +1528,15 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 						)}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
-								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="html"
+								metadata={parseMetadata("html")}
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
-								// Overwrite my-*:
 								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="json"
+								metadata={parseMetadata("json")}
 								data={`${json}\n`}
 							/>
 						)}
