@@ -140,8 +140,8 @@
 	padding-bottom: 50%;
 }
 
-.codex-editor.feature-read-only ul li::before {
-	margin-right: 0.5em; /* FIXME: Use em? */
+.codex-editor.feature-read-only ul > li::before {
+	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
 	content: "•";
@@ -149,11 +149,12 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor.feature-read-only ol {
+.codex-editor.feature-read-only ol,
+.codex-editor.feature-read-only ul {
 	counter-reset: number;
 }
-.codex-editor.feature-read-only ol li::before {
-	margin-right: 0.5rem; /* FIXME: Use em? */
+.codex-editor.feature-read-only ol > li::before {
+	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
 	counter-increment: number;

@@ -127,17 +127,23 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
-const NodeHOC = ({ id, style, ...props }) => (
-	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
-		{props.children}
-	</div>
-)
+const NodeHOC = ({ id, tag, style, ...props }) => {
+	const Tag = tag || "div"
+	return (
+		<Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
+			{props.children}
+		</Tag>
+	)
+}
 
-const CompoundNodeHOC = ({ id, style, ...props }) => (
-	<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
-		{props.children}
-	</div>
-)
+const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
+	const Tag = tag || "div"
+	return (
+		<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
+			{props.children}
+		</div>
+	)
+}
 
 const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
@@ -329,26 +335,22 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 }
 
 const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
-	<NodeHOC>
-		<li className="-ml-5 my-2 flex flex-row">
-			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
-			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
-				<div>
-					{toInnerReact(data)}
-				</div>
-			</Markdown>
-		</li>
+	<NodeHOC tag="li" className="-ml-5 my-2 flex flex-row">
+		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
+		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
+			<div>
+				{toInnerReact(data)}
+			</div>
+		</Markdown>
 	</NodeHOC>
 ))
 
 // NOTE: Compound component
-const List = React.memo(({ id, tag: Tag, depth, data, ...props }) => (
-	<NodeHOC id={id} className={!depth ? "-my-2" : null}>
-		<Tag className="ml-5">
-			{data.map(({ type: Type, children: data, ...each }) => (
-				<Type key={each.id} data={data} {...each} />
-			))}
-		</Tag>
+const List = React.memo(({ id, tag, depth, data, ...props }) => (
+	<NodeHOC tag={tag} className={!depth ? "ml-5 -my-2" : "ml-5"}>
+		{data.map(({ type: Type, children: data, ...each }) => (
+			<Type key={each.id} data={data} {...each} />
+		))}
 	</NodeHOC>
 ))
 
@@ -719,7 +721,8 @@ const NumberedRe = /^(\t*\d+\. )(.*)$/
 // const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 /* eslint-enable no-useless-escape */
 
-// Parses a nested data structure.
+// Parses an unnumbered or numbered VDOM representation from
+// a range of paragraphs.
 function parseList(range) {
 	const data = {
 		type: List,
