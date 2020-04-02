@@ -266,7 +266,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={{ ...tabSize(2), fontSize: "0.875em" }} spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={tabSize(2)} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				<Markdown syntax={[syntax + metadata.raw]}>
 					{readOnly && (
@@ -313,7 +313,7 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ ...tabSize(2), fontSize: "0.875em", ...style }} {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ ...tabSize(2), ...style }} {...props}>
 			{html ? (
 				<span
 					className={!lang ? null : `language-${lang}`}
@@ -328,12 +328,11 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	)
 }
 
-// FIXME: Remove depth -- move to data
 const Item = React.memo(({ syntax, depth, data, ...props }) => (
 	<NodeHOC>
 		<li className="-ml-5 my-2 flex flex-row">
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
-			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
+			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
 				<div>
 					{toInnerReact(data)}
 				</div>
@@ -723,27 +722,27 @@ const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
 	const children = []
 	for (const each of data) {
-		const [, pre, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
+		const [, depth, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
 		let scope = children // TODO: Rename to ref?
-		let depth = 0
-		while (depth < pre.length) {
+		let deep = 0
+		while (deep < depth.length) {
 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
 				scope.push({
 					type: List,
 					tag: !numbered ? "ul" : "ol",
 					id: uuidv4(),
-					depth: depth + 1,
+					depth: deep + 1,
 					children: [],
 				})
 			}
 			scope = scope[scope.length - 1].children
-			depth++
+			deep++
 		}
 		scope.push({
 			type: Item,
 			id: uuidv4(),
-			syntax: [syntax],
-			depth: depth + 1,
+			syntax: [depth + syntax],
+			depth: deep + 1,
 			children: parseInnerGFM(substr),
 		})
 	}
@@ -1025,7 +1024,7 @@ function toInnerText(children, options = { markdown: false }) {
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			text += toInnerText(each)
+			text += toInnerText(each, options)
 			continue
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
@@ -1376,7 +1375,13 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			setText(toText(state.data))
+			setText(toText(state.data)) // Test no-markdown output
+			// setHTML(`<article class="codex-output">\n${
+			// 	toHTML(state.data)
+			// 		.split("\n")
+			// 		.map(each => `\t${each}`)
+			// 		.join("\n")
+			// }\n</article>`)
 			setHTML(toHTML(state.data))
 			setJSON(toJSON(state.data))
 		}, 25)
@@ -1469,7 +1474,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 					ref={ref}
 					// FIXME: Add min-height
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
-					style={{ ...tabSize(2) }}
+					style={tabSize(2)}
 					value={value}
 					onKeyDown={e => {
 						if (e.keyCode !== KEY_CODE_TAB) {
