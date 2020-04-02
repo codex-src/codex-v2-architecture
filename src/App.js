@@ -334,27 +334,24 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-const Recurse = React.memo(({ parsed, ...props }) => (
-	<ul className="ml-5">
-		{parsed.map((each, index) => (
-			!Array.isArray(each) ? (
-				<li key={index} className="-ml-5 my-2 flex flex-row">
-					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
-						<div>
-							{toInnerReact(each.children)}
-						</div>
-					</Markdown>
-				</li>
-			) : (
-				<Recurse key={index} parsed={each} />
-			)
-		))}
-	</ul>
-))
-
-const List = React.memo(({ id, parsed, ...props }) => (
-	<NodeHOC id={id} className="-my-2">
-		<Recurse parsed={parsed} />
+// NOTE: __depth is an internal parameter
+const List = React.memo(({ id, parsed, __depth, data, ...props }) => (
+	<NodeHOC id={id} className={!__depth ? "-my-2" : null}>
+		<ul className="ml-5">
+			{parsed.map((each, index) => (
+				!Array.isArray(each) ? (
+					<li key={index} className="-ml-5 my-2 flex flex-row">
+						<Markdown className="mr-2 text-md-blue-a400" /* style={{ fontFeatureSettings: "'tnum'" }} */ syntax={each.syntax}>
+							<div>
+								{toInnerReact(each.children)}
+							</div>
+						</Markdown>
+					</li>
+				) : (
+					<List key={index} id={index} parsed={each} __depth={(__depth || 0) + 1} />
+				)
+			))}
+		</ul>
 	</NodeHOC>
 ))
 
@@ -599,7 +596,7 @@ function parseInnerGFM(text) {
 			break
 		// <A> (1 of 2)
 		case char === "h":
-			// https://
+			// https://etc
 			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
 				const matches = urlSafeRe.exec(text.slice(index + HTTPS.length))
 				let offset = 0
@@ -615,7 +612,7 @@ function parseInnerGFM(text) {
 				})
 				index += HTTPS.length + offset - 1
 				continue
-			// http://
+			// http://etc
 			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
 				const matches = urlSafeRe.exec(text.slice(index + HTTP.length))
 				let offset = 0
@@ -635,6 +632,7 @@ function parseInnerGFM(text) {
 			break
 		// <A> (2 of 2)
 		case char === "[":
+			// [Anchor](href)
 			if (nchars >= "[x](x)".length) {
 				const lhs = registerType(null, "]")(text, index)
 				if (!lhs) {
@@ -750,7 +748,7 @@ function newHashEpoch() {
 function parseList(data, syntax, { numbered, checked } = { numbered: false, checked: false }) {
 	const parsed = []
 	for (const each of data) {
-		const [, tabs, syntax, substr] = each.match(/(\t*)(- )(.*)/)
+		const [, tabs, syntax, substr] = each.match(/(\t*)([\-\+\*] )(.*)/)
 		let scope = parsed // TODO: Rename to ref?
 		let depth = 0
 		while (depth < tabs.length) {
@@ -881,16 +879,17 @@ function parseGFM(text) {
 				continue
 			}
 			break
-
-		case char === "\t" || char === "-":
-			// - Unnumbered
-			if (nchars >= 2 && /^\t*- /.test(each)) {
+		case char === "\t" || char === "-" || char === "+" || char === "*":
+			// - List
+			//
+			// eslint-disable-line no-useless-escape
+			if (nchars >= 2 && /^\t*[\-\+\*] /.test(each)) {
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
-					if (body[x2].length < 2 || !/^\t*- /.test(body[x2])) {
+					if (body[x2].length < 2 || !/^\t*[\-\+\*] /.test(body[x2])) {
 						// No-op
 						break
 					}
@@ -1249,7 +1248,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 				className: [
 					"codex-editor",
 					className,
-					state.readOnly && "flag-read-only",
+					state.readOnly && "feature-read-only",
 				].filter(Boolean).join(" "),
 
 				style: {

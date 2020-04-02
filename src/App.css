@@ -140,8 +140,7 @@
 	padding-bottom: 50%;
 }
 
-.codex-editor.flag-read-only ul li::before {
-	/* margin-left: -1.15em; */
+.codex-editor.feature-read-only ul li::before {
 	flex-shrink: 0;
 	display: inline-flex;
 	width: 1.15em;
