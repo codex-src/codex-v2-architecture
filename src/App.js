@@ -223,9 +223,9 @@ const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
 
 const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 	const emojis = (
-		data && // Not needed?
+		data &&
 		Array.isArray(data) &&
-		// data.length <= 3 && // Not needed
+		data.length <= 3 &&
 		data.every(each => each.emoji)
 	)
 	return (
@@ -241,12 +241,10 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	// TODO: Dynamically compute syntax width for padding-left
-	const readOnlyStyle = { paddingLeft: 23.88, boxShadow: "-2px 0 var(--gray-600)" }
 	return (
-		<CompoundNodeHOC id={id}>
+		<CompoundNodeHOC id={id} style={{ boxShadow: !readOnly ? null : "inset 2px 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : readOnlyStyle}>
+				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={{ paddingLeft: !readOnly ? null : 23.88 }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -337,34 +335,34 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 // TODO: Use __depth instead of tabs?
 const ListItem = React.memo(({ tabs, syntax, data, ...props }) => (
 	// <NodeHOC>
-		<li className="-ml-5 my-2 flex flex-row">
-			<Syntax className="hidden">{tabs}</Syntax>
-			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
-				<div>
-					{toInnerReact(data)}
-				</div>
-			</Markdown>
-		</li>
+	<li className="-ml-5 my-2 flex flex-row">
+		<Syntax className="hidden">{tabs}</Syntax>
+		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
+			<div>
+				{toInnerReact(data)}
+			</div>
+		</Markdown>
+	</li>
 	// </NodeHOC>
 ))
 
 // NOTE: __depth is an internal parameter
 const List = React.memo(({ id, numbered, data, __depth, ...props }) => (
 	// <NodeHOC id={id} className={!__depth ? "-my-2" : null}>
-		React.createElement(
-			!numbered ? "ul" : "ol",
-			{
-				"className": "ml-5",
-				"data-node": true, // FIXME
-			},
-			data.map((each, index) => (
-				!Array.isArray(each) ? (
-					<ListItem key={index} {...each} data={each.children} />
-				) : (
-					<List key={index} id={index} numbered={numbered} data={each} __depth={(__depth || 0) + 1} />
-				)
-			)),
-		) // }
+	React.createElement(
+		!numbered ? "ul" : "ol",
+		{
+			"className": "ml-5",
+			"data-node": true, // FIXME
+		},
+		data.map((each, index) => (
+			!Array.isArray(each) ? (
+				<ListItem key={index} {...each} data={each.children} />
+			) : (
+				<List key={index} id={index} numbered={numbered} data={each} __depth={(__depth || 0) + 1} />
+			)
+		)),
+	) // }
 	// </NodeHOC>
 ))
 
@@ -759,7 +757,7 @@ function newHashEpoch() {
 
 /* eslint-disable no-useless-escape */
 const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)/
-const NumberedRe = /^(\t*)(\d\. )(.*)/
+const NumberedRe = /^(\t*)(\d+\. )(.*)/
 /* eslint-enable no-useless-escape */
 
 // Parses a nested data structure.

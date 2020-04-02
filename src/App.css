@@ -141,10 +141,9 @@
 }
 
 .codex-editor.feature-read-only ul li::before {
+	margin-right: 0.53rem; /* FIXME: Use em? */
 	flex-shrink: 0;
 	display: inline-flex;
-	width: 1.15em;
-	/*content: "•\00a0\00a0";*/
 	content: "•";
 	color: var(--md-blue-a400);
 }
