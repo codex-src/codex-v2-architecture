@@ -334,32 +334,38 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-const ListItem = React.memo(({ data, ...props }) => (
-	<NodeHOC>
+// TODO: Use __depth instead of tabs?
+const ListItem = React.memo(({ tabs, syntax, data, ...props }) => (
+	// <NodeHOC>
 		<li className="-ml-5 my-2 flex flex-row">
-			<Syntax className="hidden">{/* FIXME */}</Syntax>
-			<Markdown className="mr-2 text-md-blue-a400" /* style={{ fontFeatureSettings: "'tnum'" }} */ syntax={data.syntax}>
+			<Syntax className="hidden">{tabs}</Syntax>
+			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
 				<div>
-					{toInnerReact(data.children)}
+					{toInnerReact(data)}
 				</div>
 			</Markdown>
 		</li>
-	</NodeHOC>
+	// </NodeHOC>
 ))
 
 // NOTE: __depth is an internal parameter
-const List = React.memo(({ id, data, __depth, ...props }) => (
-	<NodeHOC id={id} className={!__depth ? "-my-2" : null}>
-		<ul className="ml-5">
-			{data.map((each, index) => (
+const List = React.memo(({ id, numbered, data, __depth, ...props }) => (
+	// <NodeHOC id={id} className={!__depth ? "-my-2" : null}>
+		React.createElement(
+			!numbered ? "ul" : "ol",
+			{
+				"className": "ml-5",
+				"data-node": true, // FIXME
+			},
+			data.map((each, index) => (
 				!Array.isArray(each) ? (
-					<ListItem key={index} data={each} />
+					<ListItem key={index} {...each} data={each.children} />
 				) : (
-					<List key={index} id={index} data={each} __depth={(__depth || 0) + 1} />
+					<List key={index} id={index} numbered={numbered} data={each} __depth={(__depth || 0) + 1} />
 				)
-			))}
-		</ul>
-	</NodeHOC>
+			)),
+		) // }
+	// </NodeHOC>
 ))
 
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
@@ -751,14 +757,17 @@ function newHashEpoch() {
 // const UnnumberedRe = /^(\t*)([*+\-•])( .*)/
 // const NumberedRe   = /^(\t*)(\d+[).])( .*)/
 
+const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)/
+const NumberedRe = /^(\t*)(\d\. )(.*)/
+
 // Parses a nested data structure.
 //
 // TODO: Add UUID
-function parseList(data, syntax, { numbered, checked } = { numbered: false, checked: false }) {
+function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
 	const parsed = []
 	for (const each of data) {
 		// eslint-disable-next-line no-useless-escape
-		const [, tabs, syntax, substr] = each.match(/(\t*)([\-\+\*] )(.*)/)
+		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
 		let scope = parsed // TODO: Rename to ref?
 		let depth = 0
 		while (depth < tabs.length) {
@@ -769,10 +778,9 @@ function parseList(data, syntax, { numbered, checked } = { numbered: false, chec
 			depth++
 		}
 		const children = parseInnerGFM(substr)
-		// FIXME
 		scope.push({
 			type: ListItem,
-			tabs,
+			tabs, // Takes precedence
 			syntax: [syntax],
 			children,
 		})
@@ -896,18 +904,18 @@ function parseGFM(text) {
 			}
 			break
 		// <List>
-		case char === "\t" || char === "-" || char === "+" || char === "*":
+		case char === "\t" || char === "-" || char === "+" || char === "*" || char >= "0" && char <= "9":
 			// - List
 			//
 			// eslint-disable-next-line no-useless-escape
-			if (nchars >= 2 && /^\t*[\-\+\*] /.test(each)) {
+			if (nchars >= 2 && UnnumberedRe.test(each)) {
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
 					// eslint-disable-next-line no-useless-escape
-					if (body[x2].length < 2 || !/^\t*[\-\+\*] /.test(body[x2])) {
+					if (body[x2].length < 2 || !UnnumberedRe.test(body[x2])) {
 						// No-op
 						break
 					}
@@ -916,8 +924,32 @@ function parseGFM(text) {
 				data.push({
 					type: List,
 					id: uuidv4(),
-					syntax: ["- "],
+					syntax: null,
+					numbered: false,
 					children: parseList(body.slice(x1, x2)),
+				})
+				index = x2 - 1
+				continue
+			// 1. List
+			} else if (nchars >= 3 && NumberedRe.test(each)) {
+				const x1 = index
+				let x2 = x1
+				x2++
+				// Iterate to end syntax:
+				while (x2 < body.length) {
+					// eslint-disable-next-line no-useless-escape
+					if (body[x2].length < 2 || !NumberedRe.test(body[x2])) {
+						// No-op
+						break
+					}
+					x2++
+				}
+				data.push({
+					type: List,
+					id: uuidv4(),
+					syntax: null,
+					numbered: true,
+					children: parseList(body.slice(x1, x2), { numbered: true }),
 				})
 				index = x2 - 1
 				continue
@@ -1155,8 +1187,8 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
-	cmap[List.type] = "List"
 	cmap[ListItem.type] = "ListItem"
+	cmap[List.type] = "List"
 	cmap[Image.type] = "Image"
 	cmap[Break.type] = "Break"
 
@@ -1179,8 +1211,8 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
-	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
 	cmapHTML[ListItem.type] = ["\t<li>\n\t\t", "\n\t</li>\n"]
+	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
