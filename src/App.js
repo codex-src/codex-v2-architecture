@@ -883,7 +883,12 @@ function parseGFM(text) {
 			break
 
 		// <List>
-		case char === "\t" || char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9"):
+		case char === "\t" || (
+			(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) && (
+				each !== "---" && // Negate break
+				each !== "***"    // Negate break
+			)
+		):
 			// - List
 			if (nchars >= 2 && UnnumberedRe.test(each)) {
 				const x1 = index
@@ -932,7 +937,6 @@ function parseGFM(text) {
 				continue
 			}
 			break
-
 		// <Image>
 		//
 		// TODO: Move to parseInnerGFM to support
