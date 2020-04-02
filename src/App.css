@@ -141,19 +141,17 @@
 }
 
 .codex-editor.feature-read-only ul li::before {
-	margin-right: 0.53rem; /* FIXME: Use em? */
+	margin-right: 0.5em; /* FIXME: Use em? */
 	flex-shrink: 0;
 	display: inline-flex;
 	content: "•";
+	width: 0.65em;
 	color: var(--md-blue-a400);
 }
 
 .codex-editor.feature-read-only ol {
 	counter-reset: number;
-	/*display: list-item;*/
-	/*list-style-type: decimal;*/
 }
-
 .codex-editor.feature-read-only ol li::before {
 	margin-right: 0.5rem; /* FIXME: Use em? */
 	flex-shrink: 0;

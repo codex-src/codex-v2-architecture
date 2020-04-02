@@ -332,38 +332,60 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-// TODO: Use __depth instead of tabs?
-const ListItem = React.memo(({ tabs, syntax, data, ...props }) => (
-	// <NodeHOC>
-	<li className="-ml-5 my-2 flex flex-row">
-		<Syntax className="hidden">{tabs}</Syntax>
-		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
-			<div>
-				{toInnerReact(data)}
-			</div>
-		</Markdown>
-	</li>
-	// </NodeHOC>
+// FIXME: Remove depth -- move to data
+const ListItem = React.memo(({ syntax, data, ...props }) => (
+	<NodeHOC>
+		<li className="-ml-5 my-2 flex flex-row">
+			<Syntax className="hidden">{"\t".repeat(props.depth)}</Syntax>
+			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
+				<div>
+					{toInnerReact(data)}
+				</div>
+			</Markdown>
+		</li>
+	</NodeHOC>
 ))
 
-// NOTE: __depth is an internal parameter
-const List = React.memo(({ id, numbered, data, __depth, ...props }) => (
-	// <NodeHOC id={id} className={!__depth ? "-my-2" : null}>
-	React.createElement(
-		!numbered ? "ul" : "ol",
-		{
-			"className": "ml-5",
-			"data-node": true, // FIXME
-		},
-		data.map((each, index) => (
-			!Array.isArray(each) ? (
-				<ListItem key={index} {...each} data={each.children} />
-			) : (
-				<List key={index} id={index} numbered={numbered} data={each} __depth={(__depth || 0) + 1} />
-			)
-		)),
-	) // }
-	// </NodeHOC>
+const List = React.memo(({ id, tag: Type, data, ...props }) => (
+	<NodeHOC id={id} className={!props.depth ? "-my-2" : null}>
+		<Type className="ml-5">
+			{data.map((each, index) => (
+				!Array.isArray(each.children) ? (
+					<NodeHOC key={index}>
+						<li className="-ml-5 my-2 flex flex-row">
+							<Syntax className="hidden">{"\t".repeat(0)}</Syntax>
+							<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={each.syntax}>
+								<div>
+									{toInnerReact(each.children)}
+								</div>
+							</Markdown>
+						</li>
+					</NodeHOC>
+
+					// toInnerReact(each.children)
+				) : (
+					<List key={index} id={index} tag={Type} data={each.children} />
+				)
+			))}
+
+			{/* 	!Array.isArray(each) ? ( */}
+			{/* 		<ListItem */}
+			{/* 			key={index} */}
+			{/* 			syntax={each.syntax} */}
+			{/* 			data={each.children} */}
+			{/* 			depth={props.depth || 0} */}
+			{/* 		/> */}
+			{/* 	) : ( */}
+			{/* 		<List */}
+			{/* 			key={index} */}
+			{/* 			tag={Type} */}
+			{/* 			data={each} */}
+			{/* 			depth={(props.depth || 0) + 1} */}
+			{/* 		/> */}
+			{/* 	) */}
+			{/* ))} */}
+		</Type>
+	</NodeHOC>
 ))
 
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
@@ -391,7 +413,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	)
 })
 
-const Break = React.memo(({ id, syntax, data, ...props }) => {
+const Break = React.memo(({ id, syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
@@ -740,25 +762,39 @@ function newHashEpoch() {
 // parse: (offset, key, matches) =>
 // 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
 
-// // `UnnumberedRe` supports:
-// //
-// // * Item
-// // + Item
-// // - Item
-// // • Item
-// //
-// // and `NumberedRe` supports:
-// //
-// // 1) Item
-// // 1. Item
-// //
-// const UnnumberedRe = /^(\t*)([*+\-•])( .*)/
-// const NumberedRe   = /^(\t*)(\d+[).])( .*)/
-
 /* eslint-disable no-useless-escape */
-const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)/
-const NumberedRe = /^(\t*)(\d+\. )(.*)/
+const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)$/
+const NumberedRe = /^(\t*)(\d+\. )(.*)$/
+const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 /* eslint-enable no-useless-escape */
+
+// // Parses a nested data structure.
+// //
+// // TODO: Add UUID
+// function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
+// 	const parsed = []
+// 	for (const each of data) {
+// 		// eslint-disable-next-line no-useless-escape
+// 		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
+// 		let scope = parsed // TODO: Rename to ref?
+// 		let depth = 0
+// 		while (depth < tabs.length) {
+// 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
+// 				scope.push([])
+// 			}
+// 			scope = scope[scope.length - 1]
+// 			depth++
+// 		}
+// 		const children = parseInnerGFM(substr)
+// 		scope.push({
+// 			type: ListItem,
+// 			tabs, // Takes precedence
+// 			syntax: [syntax],
+// 			children,
+// 		})
+// 	}
+// 	return parsed
+// }
 
 // Parses a nested data structure.
 //
@@ -772,21 +808,34 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 		let depth = 0
 		while (depth < tabs.length) {
 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
-				scope.push([])
+				scope.push({
+					type: List,
+					syntax: null,
+					children: [],
+				})
 			}
-			scope = scope[scope.length - 1]
+			scope = scope[scope.length - 1].children
 			depth++
 		}
-		const children = parseInnerGFM(substr)
 		scope.push({
 			type: ListItem,
 			tabs, // Takes precedence
 			syntax: [syntax],
-			children,
+			children: parseInnerGFM(substr),
 		})
 	}
 	return parsed
 }
+
+// const data2 = `- a
+// - b
+// 	- c
+// 		- d
+// 		- e
+// 	- f
+// - g
+// 	- h`.split("\n")
+// console.log(parseList2(data2))
 
 // Parses a VDOM representation to GFM text.
 function parseGFM(text) {
@@ -925,7 +974,7 @@ function parseGFM(text) {
 					type: List,
 					id: uuidv4(),
 					syntax: null,
-					numbered: false,
+					tag: "ul",
 					children: parseList(body.slice(x1, x2)),
 				})
 				index = x2 - 1
@@ -948,7 +997,7 @@ function parseGFM(text) {
 					type: List,
 					id: uuidv4(),
 					syntax: null,
-					numbered: true,
+					tag: "ol",
 					children: parseList(body.slice(x1, x2), { numbered: true }),
 				})
 				index = x2 - 1
