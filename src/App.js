@@ -334,27 +334,23 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-const Recurse = React.memo(({ parsed, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
-
-	return (
-		<ul className="ml-5" data-read-only={readOnly || null}>
-			{parsed.map((each, index) => (
-				!Array.isArray(each) ? (
-					<li key={index} className="-ml-5 my-2 flex flex-row">
-						<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
-							<div>
-								{toInnerReact(each.children)}
-							</div>
-						</Markdown>
-					</li>
-				) : (
-					<Recurse key={index} parsed={each} />
-				)
-			))}
-		</ul>
-	)
-})
+const Recurse = React.memo(({ parsed, ...props }) => (
+	<ul className="ml-5">
+		{parsed.map((each, index) => (
+			!Array.isArray(each) ? (
+				<li key={index} className="-ml-5 my-2 flex flex-row">
+					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
+						<div>
+							{toInnerReact(each.children)}
+						</div>
+					</Markdown>
+				</li>
+			) : (
+				<Recurse key={index} parsed={each} />
+			)
+		))}
+	</ul>
+))
 
 const List = React.memo(({ id, parsed, ...props }) => (
 	<NodeHOC id={id} className="-my-2">
@@ -1250,7 +1246,11 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			{
 				ref,
 
-				className,
+				className: [
+					"codex-editor",
+					className,
+					state.readOnly && "flag-read-only",
+				].filter(Boolean).join(" "),
 
 				style: {
 					// wordWrap: "break-word",

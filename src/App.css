@@ -140,7 +140,8 @@
 	padding-bottom: 50%;
 }
 
-ul[data-read-only] li::before {
+.codex-editor.flag-read-only ul li::before {
+	/* margin-left: -1.15em; */
 	flex-shrink: 0;
 	display: inline-flex;
 	width: 1.15em;
