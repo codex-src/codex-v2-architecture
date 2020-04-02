@@ -334,21 +334,28 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
+const ListItem = React.memo(({ data, ...props }) => (
+	<NodeHOC>
+		<li className="-ml-5 my-2 flex flex-row">
+			<Syntax className="hidden">{/* FIXME */}</Syntax>
+			<Markdown className="mr-2 text-md-blue-a400" /* style={{ fontFeatureSettings: "'tnum'" }} */ syntax={data.syntax}>
+				<div>
+					{toInnerReact(data.children)}
+				</div>
+			</Markdown>
+		</li>
+	</NodeHOC>
+))
+
 // NOTE: __depth is an internal parameter
-const List = React.memo(({ id, parsed, __depth, data, ...props }) => (
+const List = React.memo(({ id, data, __depth, ...props }) => (
 	<NodeHOC id={id} className={!__depth ? "-my-2" : null}>
 		<ul className="ml-5">
-			{parsed.map((each, index) => (
+			{data.map((each, index) => (
 				!Array.isArray(each) ? (
-					<li key={index} className="-ml-5 my-2 flex flex-row">
-						<Markdown className="mr-2 text-md-blue-a400" /* style={{ fontFeatureSettings: "'tnum'" }} */ syntax={each.syntax}>
-							<div>
-								{toInnerReact(each.children)}
-							</div>
-						</Markdown>
-					</li>
+					<ListItem key={index} data={each} />
 				) : (
-					<List key={index} id={index} parsed={each} __depth={(__depth || 0) + 1} />
+					<List key={index} id={index} data={each} __depth={(__depth || 0) + 1} />
 				)
 			))}
 		</ul>
@@ -745,9 +752,12 @@ function newHashEpoch() {
 // const NumberedRe   = /^(\t*)(\d+[).])( .*)/
 
 // Parses a nested data structure.
+//
+// TODO: Add UUID
 function parseList(data, syntax, { numbered, checked } = { numbered: false, checked: false }) {
 	const parsed = []
 	for (const each of data) {
+		// eslint-disable-next-line no-useless-escape
 		const [, tabs, syntax, substr] = each.match(/(\t*)([\-\+\*] )(.*)/)
 		let scope = parsed // TODO: Rename to ref?
 		let depth = 0
@@ -759,7 +769,13 @@ function parseList(data, syntax, { numbered, checked } = { numbered: false, chec
 			depth++
 		}
 		const children = parseInnerGFM(substr)
-		scope.push({ syntax: [<><span className="hidden">{tabs}</span>{syntax}</>], children })
+		// FIXME
+		scope.push({
+			type: ListItem,
+			tabs,
+			syntax: [syntax],
+			children,
+		})
 	}
 	return parsed
 }
@@ -794,8 +810,8 @@ function parseGFM(text) {
 			) {
 				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
-					id: uuidv4(),
 					type: [H1, H2, H3, H4, H5, H6][syntax.length - 2],
+					id: uuidv4(),
 					syntax: [syntax],
 					hash: newHash(toInnerText(parseInnerGFM(each.slice(syntax.length)))),
 					children: parseInnerGFM(each.slice(syntax.length)),
@@ -825,12 +841,12 @@ function parseGFM(text) {
 					x2++
 				}
 				data.push({
-					id: uuidv4(),
 					type: Blockquote,
+					id: uuidv4(),
 					syntax: null,
 					children: body.slice(x1, x2).map(each => ({
-						id: uuidv4(),
 						type: Paragraph,
+						id: uuidv4(), // TODO: Use index?
 						syntax: [each.slice(0, 2)],
 						children: parseInnerGFM(each.slice(2)),
 					})),
@@ -868,8 +884,8 @@ function parseGFM(text) {
 				x2++ // Iterate once past end
 				const metadata = each.slice(3)
 				data.push({
-					id: uuidv4(),
 					type: CodeBlock,
+					id: uuidv4(),
 					syntax: "```",
 					metadata,
 					// Trim syntax and start paragraph:
@@ -879,61 +895,34 @@ function parseGFM(text) {
 				continue
 			}
 			break
+		// <List>
 		case char === "\t" || char === "-" || char === "+" || char === "*":
 			// - List
 			//
-			// eslint-disable-line no-useless-escape
+			// eslint-disable-next-line no-useless-escape
 			if (nchars >= 2 && /^\t*[\-\+\*] /.test(each)) {
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
+					// eslint-disable-next-line no-useless-escape
 					if (body[x2].length < 2 || !/^\t*[\-\+\*] /.test(body[x2])) {
 						// No-op
 						break
 					}
 					x2++
 				}
-				const parsed = parseList(body.slice(x1, x2))
 				data.push({
-					id: uuidv4(),
 					type: List,
+					id: uuidv4(),
 					syntax: ["- "],
-					parsed,
-					children: null, // ??
-					// children: body.slice(x1, x2).map(each => ({
-					// 	id: uuidv4(),
-					// 	type: Paragraph,
-					// 	syntax: [each.slice(0, 2)],
-					// 	children: parseInnerGFM(each.slice(2)),
-					// })),
+					children: parseList(body.slice(x1, x2)),
 				})
 				index = x2 - 1
 				continue
 			}
 			break
-
-			// // > Blockquote
-			// if (
-			// 	(nchars >= 2 && each.slice(0, 2) === "> ") ||
-			// 	(nchars === 1 && each === ">")
-			// ) {
-			// 	const x1 = index
-			// 	let x2 = x1
-			// 	x2++
-			// 	// Iterate to end syntax:
-			// 	while (x2 < body.length) {
-			// 		if (
-			// 			(body[x2].length < 2 || body[x2].slice(0, 2) !== "> ") &&
-			// 			(body[x2].length !== 1 || body[x2] !== ">")
-			// 		) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		x2++
-			// 	}
-
 		// <Image>
 		//
 		// TODO: Move to parseInnerGFM to support
@@ -957,8 +946,8 @@ function parseGFM(text) {
 					break
 				}
 				data.push({
-					id: uuidv4(),
 					type: Image,
+					id: uuidv4(),
 					syntax: ["![", `](${rhs.object.children})`],
 					src: rhs.object.children,
 					alt: toInnerText(lhs.object.children),
@@ -972,8 +961,8 @@ function parseGFM(text) {
 			// --- or ***
 			if (nchars === 3 && each === char.repeat(3)) {
 				data.push({
-					id: uuidv4(),
 					type: Break,
+					id: uuidv4(),
 					syntax: [each],
 					children: null,
 				})
@@ -986,13 +975,12 @@ function parseGFM(text) {
 		}
 		// <Paragraph>
 		data.push({
-			id: uuidv4(),
 			type: Paragraph,
+			id: uuidv4(),
 			syntax: null,
 			children: parseInnerGFM(each),
 		})
 	}
-	console.log({ data })
 	return data
 }
 
@@ -1028,6 +1016,10 @@ function toInnerText(children, options = { markdown: false }) {
 		if (each === null || typeof each === "string") {
 			text += each || ""
 			continue
+		// List:
+		} else if (Array.isArray(each)) {
+			text += toInnerText(each, options)
+			continue
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
@@ -1042,6 +1034,11 @@ function toText(data, options = { markdown: false }) {
 	let text = ""
 	// Iterate elements:
 	for (const each of data) {
+		// List:
+ 		if (Array.isArray(each)) {
+			text += toText(each, options)
+			continue
+		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		text += (options.markdown && s1) || ""
 		if (each.type === Break) {
@@ -1068,6 +1065,10 @@ function toInnerHTML(children) {
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
 			html += escape(each) || "<br>"
+			continue
+		// List:
+		} else if (Array.isArray(each)) {
+			html += toInnerHTML(each)
 			continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
@@ -1154,6 +1155,8 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
+	cmap[List.type] = "List"
+	cmap[ListItem.type] = "ListItem"
 	cmap[Image.type] = "Image"
 	cmap[Break.type] = "Break"
 
@@ -1176,6 +1179,8 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
+	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
+	cmapHTML[ListItem.type] = ["\t<li>\n\t\t", "\n\t</li>\n"]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
 })()
@@ -1281,7 +1286,6 @@ const App = props => {
 			mounted.current = true
 			return
 		}
-		let fn = null
 		if (!debugCSS) {
 			debugCSSRef.current.classList.remove("debug-css")
 		} else {
@@ -1357,20 +1361,20 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 		}
 	}, [value])
 
-	// const [text, setText] = React.useState(() => toText(state.data))
-	// const [html, setHTML] = React.useState(() => toHTML(state.data))
-	// const [json, setJSON] = React.useState(() => toJSON(state.data))
+	const [text, setText] = React.useState(() => toText(state.data))
+	const [html, setHTML] = React.useState(() => toHTML(state.data))
+	const [json, setJSON] = React.useState(() => toJSON(state.data))
 
-	// React.useEffect(() => {
-	// 	const id = setTimeout(() => {
-	// 		setText(toText(state.data))
-	// 		setHTML(toHTML(state.data))
-	// 		setJSON(toJSON(state.data))
-	// 	}, 25)
-	// 	return () => {
-	// 		clearTimeout(id)
-	// 	}
-	// }, [state.data])
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			setText(toText(state.data))
+			setHTML(toHTML(state.data))
+			setJSON(toJSON(state.data))
+		}, 25)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state.data])
 
 	// Read-only shortcut:
 	React.useEffect(() => {
@@ -1477,14 +1481,14 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 				{/* RHS */}
 				<div ref={debugCSSRef}>
 					<DocumentTitle title={state.meta && state.meta.title}>
-						{/* {state.renderMode === "text" && ( */}
-						{/* 	<CodeBlockStandalone */}
-						{/* 		// Overwrite my-*: */}
-						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
-						{/* 		metadata="text" */}
-						{/* 		data={`${text}\n`} */}
-						{/* 	/> */}
-						{/* )} */}
+						{state.renderMode === "text" && (
+							<CodeBlockStandalone
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								metadata="text"
+								data={`${text}\n`}
+							/>
+						)}
 						{state.renderMode === "markdown" && (
 							<Editor
 								className="text-lg"
@@ -1493,22 +1497,22 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 								setState={setState}
 							/>
 						)}
-						{/* {state.renderMode === "html" && ( */}
-						{/* 	<CodeBlockStandalone */}
-						{/* 		// Overwrite my-*: */}
-						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
-						{/* 		metadata="html" */}
-						{/* 		data={`${html}\n`} */}
-						{/* 	/> */}
-						{/* )} */}
-						{/* {state.renderMode === "json" && ( */}
-						{/* 	<CodeBlockStandalone */}
-						{/* 		// Overwrite my-*: */}
-						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
-						{/* 		metadata="json" */}
-						{/* 		data={`${json}\n`} */}
-						{/* 	/> */}
-						{/* )} */}
+						{state.renderMode === "html" && (
+							<CodeBlockStandalone
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								metadata="html"
+								data={`${html}\n`}
+							/>
+						)}
+						{state.renderMode === "json" && (
+							<CodeBlockStandalone
+								// Overwrite my-*:
+								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								metadata="json"
+								data={`${json}\n`}
+							/>
+						)}
 					</DocumentTitle>
 				</div>
 
