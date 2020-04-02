@@ -266,7 +266,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={{ tabSize: 2 }} spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2, fontSize: "0.875em" }} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				<Markdown syntax={[syntax + metadata.raw]}>
 					{readOnly && (
@@ -297,7 +297,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	)
 })
 
-const CodeBlockStandalone = ({ metadata, data, ...props }) => {
+const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
@@ -313,7 +313,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ tabSize: 2 }} {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2, fontSize: "0.875em", ...style }} {...props}>
 			{html ? (
 				<span
 					className={!lang ? null : `language-${lang}`}
@@ -1461,7 +1461,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 					ref={ref}
 					// FIXME: Add min-height
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
-					style={{ tabSize: 2 }}
+					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
 					onKeyDown={e => {
 						if (e.keyCode !== KEY_CODE_TAB) {
@@ -1484,7 +1484,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								style={{ margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }}
 								metadata={parseMetadata("text")}
 								data={`${text}\n`}
 							/>
@@ -1492,21 +1492,21 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 						{state.renderMode === "markdown" && (
 							<Editor
 								className="text-lg"
-								style={{ tabSize: 4 }}
+								style={{ MozTabSize: 4, tabSize: 4 }}
 								state={state}
 								setState={setState}
 							/>
 						)}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								style={{ margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }}
 								metadata={parseMetadata("html")}
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
+								style={{ margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }}
 								metadata={parseMetadata("json")}
 								data={`${json}\n`}
 							/>
