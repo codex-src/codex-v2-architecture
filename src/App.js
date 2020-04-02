@@ -7,16 +7,6 @@ import uuidv4 from "uuid/v4"
 
 import "./App.css"
 
-// Extracts a language extension from a metadata string.
-function getLanguage(metadata) {
-	metadata = metadata.toLowerCase()
-	const index = metadata.lastIndexOf(".")
-	if (index === -1 || index + 1 === metadata.length) {
-		return metadata
-	}
-	return metadata.slice(index + 1)
-}
-
 // Parses syntax into a start (s1) and end (s2) string.
 function parseSyntax(syntax) {
 	let s1 = "" // Start syntax
@@ -264,7 +254,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const lang = getLanguage(metadata)
+		const lang = (metadata.extension || metadata.raw).toLowerCase()
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
@@ -278,7 +268,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 		// NOTE: Doesn’t use py-* because of <Markdown>
 		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={{ tabSize: 2 }} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				<Markdown syntax={[syntax + metadata]}>
+				<Markdown syntax={[syntax + metadata.raw]}>
 					{readOnly && (
 						<br />
 					)}
@@ -286,9 +276,12 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 			</NodeHOC>
 			<NodeHOC>
 				{html ? (
-					<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
-						__html: html,
-					}} />
+					<span
+						className={!lang ? null : `language-${lang}`}
+						dangerouslySetInnerHTML={{
+							__html: html,
+						}}
+					/>
 				) : (
 					data
 				)}
@@ -309,7 +302,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const lang = getLanguage(metadata)
+		const lang = (metadata.extension || metadata.raw).toLowerCase()
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
@@ -322,9 +315,12 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	return (
 		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ tabSize: 2 }} {...props}>
 			{html ? (
-				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
-					__html: html,
-				}} />
+				<span
+					className={!lang ? null : `language-${lang}`}
+					dangerouslySetInnerHTML={{
+						__html: html,
+					}}
+				/>
 			) : (
 				data
 			)}
@@ -349,6 +345,7 @@ const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 const List = React.memo(({ id, tag: Type, depth, data, ...props }) => (
 	<NodeHOC id={id} className={!depth ? "-my-2" : null}>
 		<Type className="ml-5">
+			{/* TODO: Remove? */}
 			{data.map(each => (
 				each.type === ListItem ? (
 					<ListItem
@@ -378,6 +375,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 			{readOnly && !data ? (
 				null
 			) : (
+				// TODO: Add transition duration-300?
 				<div className="absolute inset-0" style={{ opacity: readOnly && !hover ? "0%" : "100%" }}>
 					<div className="px-8 flex flex-row justify-center items-end h-full">
 						<div className="my-2 px-2 py-1 bg-white rounded shadow-hero truncate">
@@ -766,6 +764,23 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 	return children
 }
 
+// Parses a metadata object from a raw metadata string.
+function parseMetadata(raw) {
+	// TODO: Add support for URL-based metadata strings?
+	const metadata = {
+		raw,           // E.g. hello.world
+		filename: "",  // E.g. hello
+		extension: "", // E.g. world
+	}
+	const index = raw.lastIndexOf(".")
+	if (index === -1 || index + 1 === metadata.length) {
+		return metadata
+	}
+	metadata.filename = raw.slice(0, index)
+	metadata.extension = raw.slice(index + 1)
+	return metadata
+}
+
 // Parses a VDOM representation to GFM text.
 function parseGFM(text) {
 	const newHash = newHashEpoch()
@@ -868,20 +883,21 @@ function parseGFM(text) {
 					break
 				}
 				x2++ // Iterate once past end
-				const metadata = each.slice(3)
+				const raw = each.slice(3)
 				data.push({
 					type: CodeBlock,
 					id: uuidv4(),
 					syntax: "```",
-					metadata,
-					// Trim syntax and start paragraph:
-					children: body.slice(x1, x2).join("\n").slice(3 + metadata.length, -3).slice(1),
+					metadata: parseMetadata(raw),
+					children: body.slice(x1, x2)
+						.join("\n")
+						.slice(3 + raw.length, -3) // Trim syntax
+						.slice(1),                 // Trim start paragraph
 				})
 				index = x2 - 1
 				continue
 			}
 			break
-
 		// <List>
 		case char === "\t" || (
 			(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) && (
@@ -1102,7 +1118,7 @@ function toHTML(data, __depth = 0) {
 		html += /* "\t".repeat(__depth) + */ (typeof s1 !== "function" ? s1 : s1(each))
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) {
+		} else if (each.type === Blockquote || each.type === List) {
 			html += (
 				// eslint-disable-next-line prefer-template
 				"\n" +
@@ -1192,8 +1208,8 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type] = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = [data => `<pre${!getLanguage(data.metadata) ? "" : ` class="language-${getLanguage(data.metadata)}"`}><code>`, "</code></pre>"]
-	cmapHTML[ListItem.type] = ["\t<li>\n\t\t", "\n\t</li>\n"]
+	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension ? "" : ` class="language-${data.metadata.extension.toLowerCase()}"`}><code>`, "</code></pre>"]
+	cmapHTML[ListItem.type] = ["<li>\t", "\n</li>"]
 	cmapHTML[List.type] = ["<ul>\n", "</ul>"]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
