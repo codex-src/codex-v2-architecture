@@ -730,7 +730,7 @@ function parseList(range, { numbered, checked } = { numbered: false, checked: fa
 		let ref = data.children
 		let deep = 0
 		while (deep < tabs.length) {
-			if (!ref.length || ref[ref.length - 1].type !== List) { //  || !Array.isArray(ref[ref.length - 1])) {
+			if (!ref.length || ref[ref.length - 1].type !== List) {
 				ref.push({
 					type: List,
 					tag: !numbered ? "ul" : "ol",
@@ -908,13 +908,6 @@ function parseGFM(text) {
 				}
 				const range = body.slice(x1, x2)
 				data.push(parseList(range))
-				// data.push({
-				// 	type: List,
-				// 	tag: "ul",
-				// 	id: uuidv4(),
-				// 	depth: 0,
-				// 	children: parseList(body.slice(x1, x2)),
-				// })
 				index = x2 - 1
 				continue
 			// 1. List
@@ -932,13 +925,6 @@ function parseGFM(text) {
 				}
 				const range = body.slice(x1, x2)
 				data.push(parseList(range, { numbered: true }))
-				// data.push({
-				// 	type: List,
-				// 	tag: "ol",
-				// 	id: uuidv4(),
-				// 	depth: 0,
-				// 	children: parseList(body.slice(x1, x2), { numbered: true }),
-				// })
 				index = x2 - 1
 				continue
 			}
@@ -1216,7 +1202,6 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 	React.useLayoutEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
-			// TODO: Prevent useless rerenders to <Provider>?
 			<Provider value={state}>
 				{state.data.map(({ type: Type, children: data, ...each }) => (
 					<Type key={each.id} data={data} {...each} />
@@ -1539,17 +1524,5 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 		</div>
 	)
 }
-
-// DEBUG
-// console.log(toHTML([parseList(`
-// - a
-// 	- b
-// 		- c
-// 		- d
-// 				- e
-// - f
-// 	- g
-// - h
-// `.trim().split("\n"))]))
 
 export default App
