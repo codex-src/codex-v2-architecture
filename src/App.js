@@ -333,10 +333,10 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 }
 
 // FIXME: Remove depth -- move to data
-const ListItem = React.memo(({ syntax, data, ...props }) => (
+const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 	<NodeHOC>
 		<li className="-ml-5 my-2 flex flex-row">
-			<Syntax className="hidden">{"\t".repeat(props.depth)}</Syntax>
+			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 			<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={syntax}>
 				<div>
 					{toInnerReact(data)}
@@ -346,44 +346,24 @@ const ListItem = React.memo(({ syntax, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const List = React.memo(({ id, tag: Type, data, ...props }) => (
-	<NodeHOC id={id} className={!props.depth ? "-my-2" : null}>
+const List = React.memo(({ id, tag: Type, depth, data, ...props }) => (
+	<NodeHOC id={id} className={!depth ? "-my-2" : null}>
 		<Type className="ml-5">
-			{data.map((each, index) => (
-				!Array.isArray(each.children) ? (
-					<NodeHOC key={index}>
-						<li className="-ml-5 my-2 flex flex-row">
-							<Syntax className="hidden">{"\t".repeat(0)}</Syntax>
-							<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={each.syntax}>
-								<div>
-									{toInnerReact(each.children)}
-								</div>
-							</Markdown>
-						</li>
-					</NodeHOC>
-
-					// toInnerReact(each.children)
+			{data.map(each => (
+				each.type === ListItem ? (
+					<ListItem
+						key={each.id}
+						{...{ ...each, children: null }}
+						data={each.children}
+					/>
 				) : (
-					<List key={index} id={index} tag={Type} data={each.children} />
+					<List
+						key={each.id}
+						{...{ ...each, children: null }}
+						data={each.children}
+					/>
 				)
 			))}
-
-			{/* 	!Array.isArray(each) ? ( */}
-			{/* 		<ListItem */}
-			{/* 			key={index} */}
-			{/* 			syntax={each.syntax} */}
-			{/* 			data={each.children} */}
-			{/* 			depth={props.depth || 0} */}
-			{/* 		/> */}
-			{/* 	) : ( */}
-			{/* 		<List */}
-			{/* 			key={index} */}
-			{/* 			tag={Type} */}
-			{/* 			data={each} */}
-			{/* 			depth={(props.depth || 0) + 1} */}
-			{/* 		/> */}
-			{/* 	) */}
-			{/* ))} */}
 		</Type>
 	</NodeHOC>
 ))
@@ -746,71 +726,29 @@ function newHashEpoch() {
 	return newHash
 }
 
-// // List
-// // { regex: /^((?:\t*[*+\-•] .*\n?)*\t*[*+\-•] .*)/,
-// { regex: /^((?:\t*[*•] .*\n?)*\t*[*•] .*)/,
-// parse: (offset, key, matches) =>
-// 	<List key={key} children={parseList(offset, matches[1])} /> },
-//
-// // List isNumbered
-// { regex: /^((?:\t*\d+[.)] .*\n?)*\t*\d+[.)] .*)/,
-// parse: (offset, key, matches) =>
-// 	<List key={key} isNumbered children={parseList(offset, matches[1], true)} /> },
-//
-// // Checklist
-// { regex: /^((?:\t*[+-] .*\n?)*\t*[+-] .*)/,
-// parse: (offset, key, matches) =>
-// 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
-
 /* eslint-disable no-useless-escape */
 const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)$/
 const NumberedRe = /^(\t*)(\d+\. )(.*)$/
 const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 /* eslint-enable no-useless-escape */
 
-// // Parses a nested data structure.
-// //
-// // TODO: Add UUID
-// function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
-// 	const parsed = []
-// 	for (const each of data) {
-// 		// eslint-disable-next-line no-useless-escape
-// 		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
-// 		let scope = parsed // TODO: Rename to ref?
-// 		let depth = 0
-// 		while (depth < tabs.length) {
-// 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
-// 				scope.push([])
-// 			}
-// 			scope = scope[scope.length - 1]
-// 			depth++
-// 		}
-// 		const children = parseInnerGFM(substr)
-// 		scope.push({
-// 			type: ListItem,
-// 			tabs, // Takes precedence
-// 			syntax: [syntax],
-// 			children,
-// 		})
-// 	}
-// 	return parsed
-// }
-
 // Parses a nested data structure.
 //
 // TODO: Add UUID
 function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
-	const parsed = []
+	const children = []
 	for (const each of data) {
-		// eslint-disable-next-line no-useless-escape
-		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
-		let scope = parsed // TODO: Rename to ref?
+		const [, pre, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
+		let scope = children // TODO: Rename to ref?
 		let depth = 0
-		while (depth < tabs.length) {
+		while (depth < pre.length) {
 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
 				scope.push({
 					type: List,
+					tag: !numbered ? "ul" : "ol",
+					id: uuidv4(),
 					syntax: null,
+					depth: depth + 1,
 					children: [],
 				})
 			}
@@ -819,23 +757,14 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 		}
 		scope.push({
 			type: ListItem,
-			tabs, // Takes precedence
+			id: uuidv4(),
 			syntax: [syntax],
+			depth: depth + 1,
 			children: parseInnerGFM(substr),
 		})
 	}
-	return parsed
+	return children
 }
-
-// const data2 = `- a
-// - b
-// 	- c
-// 		- d
-// 		- e
-// 	- f
-// - g
-// 	- h`.split("\n")
-// console.log(parseList2(data2))
 
 // Parses a VDOM representation to GFM text.
 function parseGFM(text) {
@@ -952,18 +881,16 @@ function parseGFM(text) {
 				continue
 			}
 			break
+
 		// <List>
 		case char === "\t" || char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9"):
 			// - List
-			//
-			// eslint-disable-next-line no-useless-escape
 			if (nchars >= 2 && UnnumberedRe.test(each)) {
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
-					// eslint-disable-next-line no-useless-escape
 					if (body[x2].length < 2 || !UnnumberedRe.test(body[x2])) {
 						// No-op
 						break
@@ -972,9 +899,10 @@ function parseGFM(text) {
 				}
 				data.push({
 					type: List,
+					tag: "ul",
 					id: uuidv4(),
 					syntax: null,
-					tag: "ul",
+					depth: 0,
 					children: parseList(body.slice(x1, x2)),
 				})
 				index = x2 - 1
@@ -986,7 +914,6 @@ function parseGFM(text) {
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
-					// eslint-disable-next-line no-useless-escape
 					if (body[x2].length < 2 || !NumberedRe.test(body[x2])) {
 						// No-op
 						break
@@ -995,15 +922,17 @@ function parseGFM(text) {
 				}
 				data.push({
 					type: List,
+					tag: "ol",
 					id: uuidv4(),
 					syntax: null,
-					tag: "ol",
+					depth: 0,
 					children: parseList(body.slice(x1, x2), { numbered: true }),
 				})
 				index = x2 - 1
 				continue
 			}
 			break
+
 		// <Image>
 		//
 		// TODO: Move to parseInnerGFM to support
