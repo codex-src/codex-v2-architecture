@@ -241,12 +241,12 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	// TODO: Dynamically compute syntax width for padding-left
-	const readOnlyStyle = { paddingLeft: "1.4ch", boxShadow: "-2px 0 var(--gray-600)" }
+	const readOnlyStyle = { paddingLeft: 23.88, boxShadow: "-2px 0 var(--gray-600)" }
 	return (
 		<CompoundNodeHOC id={id}>
 			{data.map((each, index) => (
 				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={!readOnly ? null : readOnlyStyle}>
-					<Markdown syntax={each.syntax}>
+					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
 						)}
@@ -277,7 +277,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={{ tabSize: 2 }} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				<Markdown syntax={[syntax + metadata]}>
 					{readOnly && (
@@ -321,7 +321,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ tabSize: 2 }} {...props}>
 			{html ? (
 				<span className={!lang ? null : `language-${lang}`} dangerouslySetInnerHTML={{
 					__html: html,
@@ -332,6 +332,35 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 		</div>
 	)
 }
+
+const ULNested = React.memo(({ parsed, ...props }) => {
+	const { readOnly } = React.useContext(EditorContext)
+
+	return (
+		<ul className="ml-5" data-read-only={readOnly || null}>
+			{parsed.map((each, index) => (
+				!Array.isArray(each) ? (
+					<li key={index} className="-ml-5 my-1 flex flex-row">
+						<span className="hidden" children={each.indents} />
+						<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
+							<div>
+								{toInnerReact(each.children)}
+							</div>
+						</Markdown>
+					</li>
+				) : (
+					<ULNested key={index} parsed={each} />
+				)
+			))}
+		</ul>
+	)
+})
+
+const UL = React.memo(({ id, parsed, ...props }) => (
+	<NodeHOC id={id} className="-my-1">
+		<ULNested parsed={parsed} />
+	</NodeHOC>
+))
 
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
@@ -706,6 +735,42 @@ function newHashEpoch() {
 // parse: (offset, key, matches) =>
 // 	<Checklist key={key} children={parseList(offset, matches[1])} /> },
 
+// // `UnnumberedRe` supports:
+// //
+// // * Item
+// // + Item
+// // - Item
+// // • Item
+// //
+// // and `NumberedRe` supports:
+// //
+// // 1) Item
+// // 1. Item
+// //
+// const UnnumberedRe = /^(\t*)([*+\-•])( .*)/
+// const NumberedRe   = /^(\t*)(\d+[).])( .*)/
+
+// Parses a nested data structure.
+function parseList(data, syntax, { numbered, checked } = { numbered: false, checked: false }) {
+	const parsed = []
+	for (const each of data) {
+		const [, indents, syntax, substr] = each.match(/(\t*)(- )(.*)/)
+		let scope = parsed // TODO: Rename to ref?
+		let depth = 0
+		while (depth < indents.length) {
+			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
+				scope.push([])
+			}
+			scope = scope[scope.length - 1]
+			depth++
+		}
+		// TODO: Add UUID?
+		const children = parseInnerGFM(substr)
+		scope.push({ indents, syntax: [syntax], children })
+	}
+	return parsed
+}
+
 // Parses a VDOM representation to GFM text.
 function parseGFM(text) {
 	const newHash = newHashEpoch()
@@ -821,6 +886,60 @@ function parseGFM(text) {
 				continue
 			}
 			break
+
+		case char === "\t" || char === "-":
+			// - Unnumbered
+			if (nchars >= 2 && /^\t*- /.test(each)) {
+				const x1 = index
+				let x2 = x1
+				x2++
+				// Iterate to end syntax:
+				while (x2 < body.length) {
+					if (body[x2].length < 2 || !/^\t*- /.test(body[x2])) {
+						// No-op
+						break
+					}
+					x2++
+				}
+				const parsed = parseList(body.slice(x1, x2))
+				data.push({
+					id: uuidv4(),
+					type: UL,
+					syntax: ["- "],
+					parsed,
+					children: null, // ??
+					// children: body.slice(x1, x2).map(each => ({
+					// 	id: uuidv4(),
+					// 	type: Paragraph,
+					// 	syntax: [each.slice(0, 2)],
+					// 	children: parseInnerGFM(each.slice(2)),
+					// })),
+				})
+				index = x2 - 1
+				continue
+			}
+			break
+
+			// // > Blockquote
+			// if (
+			// 	(nchars >= 2 && each.slice(0, 2) === "> ") ||
+			// 	(nchars === 1 && each === ">")
+			// ) {
+			// 	const x1 = index
+			// 	let x2 = x1
+			// 	x2++
+			// 	// Iterate to end syntax:
+			// 	while (x2 < body.length) {
+			// 		if (
+			// 			(body[x2].length < 2 || body[x2].slice(0, 2) !== "> ") &&
+			// 			(body[x2].length !== 1 || body[x2] !== ">")
+			// 		) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		x2++
+			// 	}
+
 		// <Image>
 		//
 		// TODO: Move to parseInnerGFM to support
@@ -879,6 +998,7 @@ function parseGFM(text) {
 			children: parseInnerGFM(each),
 		})
 	}
+	console.log({ data })
 	return data
 }
 
@@ -1152,6 +1272,23 @@ const KEY_CODE_TAB = 9
 
 const App = props => {
 	const ref = React.useRef()
+	const debugCSSRef = React.useRef()
+
+	const [debugCSS, setDebugCSS] = React.useState(false)
+
+	const mounted = React.useRef()
+	React.useEffect(() => {
+		if (!mounted.current) {
+			mounted.current = true
+			return
+		}
+		let fn = null
+		if (!debugCSS) {
+			debugCSSRef.current.classList.remove("debug-css")
+		} else {
+			debugCSSRef.current.classList.add("debug-css")
+		}
+	}, [debugCSS])
 
 	// <textarea> (1 of 2):
 	const [value, setValue] = React.useState(() => {
@@ -1221,20 +1358,20 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 		}
 	}, [value])
 
-	const [text, setText] = React.useState(() => toText(state.data))
-	const [html, setHTML] = React.useState(() => toHTML(state.data))
-	const [json, setJSON] = React.useState(() => toJSON(state.data))
+	// const [text, setText] = React.useState(() => toText(state.data))
+	// const [html, setHTML] = React.useState(() => toHTML(state.data))
+	// const [json, setJSON] = React.useState(() => toJSON(state.data))
 
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			setText(toText(state.data))
-			setHTML(toHTML(state.data))
-			setJSON(toJSON(state.data))
-		}, 25)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [state.data])
+	// React.useEffect(() => {
+	// 	const id = setTimeout(() => {
+	// 		setText(toText(state.data))
+	// 		setHTML(toHTML(state.data))
+	// 		setJSON(toJSON(state.data))
+	// 	}, 25)
+	// 	return () => {
+	// 		clearTimeout(id)
+	// 	}
+	// }, [state.data])
 
 	// Read-only shortcut:
 	React.useEffect(() => {
@@ -1302,6 +1439,13 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 									>
 										Toggle read-only: {(`${state.readOnly}`)}
 									</button>
+									<button
+										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+										onPointerDown={e => e.preventDefault()}
+										onClick={e => setDebugCSS(!debugCSS)}
+									>
+										Toggle CSS debugger: {(`${debugCSS}`)}
+									</button>
 								</React.Fragment>
 							)}
 						</div>
@@ -1332,40 +1476,40 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 				/>
 
 				{/* RHS */}
-				<div>
+				<div ref={debugCSSRef}>
 					<DocumentTitle title={state.meta && state.meta.title}>
-						{state.renderMode === "text" && (
-							<CodeBlockStandalone
-								// Overwrite my-*:
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="text"
-								data={`${text}\n`}
-							/>
-						)}
+						{/* {state.renderMode === "text" && ( */}
+						{/* 	<CodeBlockStandalone */}
+						{/* 		// Overwrite my-*: */}
+						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
+						{/* 		metadata="text" */}
+						{/* 		data={`${text}\n`} */}
+						{/* 	/> */}
+						{/* )} */}
 						{state.renderMode === "markdown" && (
 							<Editor
 								className="text-lg"
-								style={{ tabSize: 2 }}
+								style={{ tabSize: 4 }}
 								state={state}
 								setState={setState}
 							/>
 						)}
-						{state.renderMode === "html" && (
-							<CodeBlockStandalone
-								// Overwrite my-*:
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="html"
-								data={`${html}\n`}
-							/>
-						)}
-						{state.renderMode === "json" && (
-							<CodeBlockStandalone
-								// Overwrite my-*:
-								style={{ margin: "-0.5em 0", tabSize: 2 }}
-								metadata="json"
-								data={`${json}\n`}
-							/>
-						)}
+						{/* {state.renderMode === "html" && ( */}
+						{/* 	<CodeBlockStandalone */}
+						{/* 		// Overwrite my-*: */}
+						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
+						{/* 		metadata="html" */}
+						{/* 		data={`${html}\n`} */}
+						{/* 	/> */}
+						{/* )} */}
+						{/* {state.renderMode === "json" && ( */}
+						{/* 	<CodeBlockStandalone */}
+						{/* 		// Overwrite my-*: */}
+						{/* 		style={{ margin: "-0.5em 0", tabSize: 2 }} */}
+						{/* 		metadata="json" */}
+						{/* 		data={`${json}\n`} */}
+						{/* 	/> */}
+						{/* )} */}
 					</DocumentTitle>
 				</div>
 

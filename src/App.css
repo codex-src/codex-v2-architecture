@@ -140,6 +140,14 @@
 	padding-bottom: 50%;
 }
 
+ul[data-read-only] li::before {
+	flex-shrink: 0;
+	display: inline-flex;
+	width: 1.15em;
+	content: "•";
+	color: var(--md-blue-a400);
+}
+
 .line-through > .font-mono {
 	vertical-align: 1px;
 }

@@ -3,6 +3,7 @@ import Prism from "./Prism"
 import React from "react"
 import ReactDOM from "react-dom"
 
+import "debug.css" // Takes precedence
 import "./prism-custom.css"
 
 ;(() => {

@@ -35,6 +35,7 @@
     ]
   },
   "devDependencies": {
+    "debug.css": "https://github.com/codex-src/debug.css",
     "serve": "^11.3.0"
   }
 }
