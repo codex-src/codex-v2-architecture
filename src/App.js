@@ -328,7 +328,7 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	)
 }
 
-const Item = React.memo(({ syntax, depth, data, ...props }) => (
+const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 	<NodeHOC>
 		<li className="-ml-5 my-2 flex flex-row">
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
@@ -719,7 +719,6 @@ const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 // Parses a nested data structure.
 function parseList(range, { numbered, checked } = { numbered: false, checked: false }) {
 	const data = {
-		DEBUG: "LIST",
 		type: List,
 		tag: !numbered ? "ul" : "ol",
 		id: uuidv4(),
@@ -727,17 +726,16 @@ function parseList(range, { numbered, checked } = { numbered: false, checked: fa
 		children: [],
 	}
 	for (const each of range) {
-		const [, depth, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
+		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
 		let ref = data.children
 		let deep = 0
-		while (deep < depth.length) {
+		while (deep < tabs.length) {
 			if (!ref.length || ref[ref.length - 1].type !== List) { //  || !Array.isArray(ref[ref.length - 1])) {
 				ref.push({
-					DEBUG: "LIST",
 					type: List,
 					tag: !numbered ? "ul" : "ol",
 					id: uuidv4(),
-					depth: deep + 1,
+					depth: deep + 1, // Eagerly increment
 					children: [],
 				})
 			}
@@ -745,11 +743,10 @@ function parseList(range, { numbered, checked } = { numbered: false, checked: fa
 			deep++
 		}
 		ref.push({
-			DEBUG: "LIST ITEM",
-			type: Item,
+			type: ListItem,
 			id: uuidv4(),
-			syntax: [depth + syntax],
-			depth,
+			syntax: [tabs + syntax],
+			depth: deep,
 			children: parseInnerGFM(substr),
 		})
 	}
@@ -1166,7 +1163,7 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
-	cmap[Item.type] = "Item"
+	cmap[ListItem.type] = "ListItem"
 	cmap[List.type] = "List"
 	cmap[Image.type] = "Image"
 	cmap[Break.type] = "Break"
@@ -1190,7 +1187,7 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
-	cmapHTML[Item.type] = ["<li>\n\t", "\n</li>"]
+	cmapHTML[ListItem.type] = ["<li>\n\t", "\n</li>"]
 	cmapHTML[List.type] = [data => `<${data.tag}>`, data => `</${data.tag}>`]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
