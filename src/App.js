@@ -36,32 +36,33 @@ function parseSyntax(syntax) {
 	return [s1, s2]
 }
 
-const Syntax = ({ className, ...props }) => (
-	<span className={className || "text-md-blue-a400"} {...props}>
-		{props.children}
-	</span>
-)
-
-const Markdown = ({ syntax, ...props }) => {
+const Syntax = ({ className, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
+	if (readOnly) {
+		return null
+	}
+	return (
+		<span className={className || "text-md-blue-a400"} {...props}>
+			{props.children}
+		</span>
+	)
+}
+
+const Markdown = ({ syntax, ...props }) => {
 	const [startSyntax, endSyntax] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
-			{!readOnly && (
-				startSyntax && (
-					<Syntax readOnly={readOnly} {...props}>
-						{startSyntax}
-					</Syntax>
-				)
+			{startSyntax && (
+				<Syntax {...props}>
+					{startSyntax}
+				</Syntax>
 			)}
 			{props.children}
-			{!readOnly && (
-				endSyntax && (
-					<Syntax readOnly={readOnly} {...props}>
-						{endSyntax}
-					</Syntax>
-				)
+			{endSyntax && (
+				<Syntax {...props}>
+					{endSyntax}
+				</Syntax>
 			)}
 		</React.Fragment>
 	)
@@ -333,15 +334,14 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 	)
 }
 
-const ULNested = React.memo(({ parsed, ...props }) => {
+const Recurse = React.memo(({ parsed, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
 		<ul className="ml-5" data-read-only={readOnly || null}>
 			{parsed.map((each, index) => (
 				!Array.isArray(each) ? (
-					<li key={index} className="-ml-5 my-1 flex flex-row">
-						<span className="hidden" children={each.indents} />
+					<li key={index} className="-ml-5 my-2 flex flex-row">
 						<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 							<div>
 								{toInnerReact(each.children)}
@@ -349,16 +349,16 @@ const ULNested = React.memo(({ parsed, ...props }) => {
 						</Markdown>
 					</li>
 				) : (
-					<ULNested key={index} parsed={each} />
+					<Recurse key={index} parsed={each} />
 				)
 			))}
 		</ul>
 	)
 })
 
-const UL = React.memo(({ id, parsed, ...props }) => (
-	<NodeHOC id={id} className="-my-1">
-		<ULNested parsed={parsed} />
+const List = React.memo(({ id, parsed, ...props }) => (
+	<NodeHOC id={id} className="-my-2">
+		<Recurse parsed={parsed} />
 	</NodeHOC>
 ))
 
@@ -754,19 +754,18 @@ function newHashEpoch() {
 function parseList(data, syntax, { numbered, checked } = { numbered: false, checked: false }) {
 	const parsed = []
 	for (const each of data) {
-		const [, indents, syntax, substr] = each.match(/(\t*)(- )(.*)/)
+		const [, tabs, syntax, substr] = each.match(/(\t*)(- )(.*)/)
 		let scope = parsed // TODO: Rename to ref?
 		let depth = 0
-		while (depth < indents.length) {
+		while (depth < tabs.length) {
 			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
 				scope.push([])
 			}
 			scope = scope[scope.length - 1]
 			depth++
 		}
-		// TODO: Add UUID?
 		const children = parseInnerGFM(substr)
-		scope.push({ indents, syntax: [syntax], children })
+		scope.push({ syntax: [<><span className="hidden">{tabs}</span>{syntax}</>], children })
 	}
 	return parsed
 }
@@ -904,7 +903,7 @@ function parseGFM(text) {
 				const parsed = parseList(body.slice(x1, x2))
 				data.push({
 					id: uuidv4(),
-					type: UL,
+					type: List,
 					syntax: ["- "],
 					parsed,
 					children: null, // ??
@@ -1254,8 +1253,9 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 				className,
 
 				style: {
-					outline: "none",
+					// wordWrap: "break-word",
 					caretColor: "black",
+					outline: "none",
 					...style,
 				},
 
