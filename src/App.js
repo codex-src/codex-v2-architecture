@@ -717,17 +717,23 @@ const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 /* eslint-enable no-useless-escape */
 
 // Parses a nested data structure.
-//
-// TODO: Add UUID
-function parseList(data, { numbered, checked } = { numbered: false, checked: false }) {
-	const children = []
-	for (const each of data) {
+function parseList(range, { numbered, checked } = { numbered: false, checked: false }) {
+	const data = {
+		DEBUG: "LIST",
+		type: List,
+		tag: !numbered ? "ul" : "ol",
+		id: uuidv4(),
+		depth: 0,
+		children: [],
+	}
+	for (const each of range) {
 		const [, depth, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
-		let scope = children // TODO: Rename to ref?
+		let ref = data.children
 		let deep = 0
 		while (deep < depth.length) {
-			if (!scope.length || !Array.isArray(scope[scope.length - 1])) {
-				scope.push({
+			if (!ref.length || ref[ref.length - 1].type !== List) { //  || !Array.isArray(ref[ref.length - 1])) {
+				ref.push({
+					DEBUG: "LIST",
 					type: List,
 					tag: !numbered ? "ul" : "ol",
 					id: uuidv4(),
@@ -735,18 +741,19 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 					children: [],
 				})
 			}
-			scope = scope[scope.length - 1].children
+			ref = ref[ref.length - 1].children
 			deep++
 		}
-		scope.push({
+		ref.push({
+			DEBUG: "LIST ITEM",
 			type: Item,
 			id: uuidv4(),
 			syntax: [depth + syntax],
-			depth: deep + 1,
+			depth,
 			children: parseInnerGFM(substr),
 		})
 	}
-	return children
+	return data
 }
 
 // Parses a metadata object from a raw metadata string.
@@ -902,13 +909,15 @@ function parseGFM(text) {
 					}
 					x2++
 				}
-				data.push({
-					type: List,
-					tag: "ul",
-					id: uuidv4(),
-					depth: 0,
-					children: parseList(body.slice(x1, x2)),
-				})
+				const range = body.slice(x1, x2)
+				data.push(parseList(range))
+				// data.push({
+				// 	type: List,
+				// 	tag: "ul",
+				// 	id: uuidv4(),
+				// 	depth: 0,
+				// 	children: parseList(body.slice(x1, x2)),
+				// })
 				index = x2 - 1
 				continue
 			// 1. List
@@ -924,13 +933,15 @@ function parseGFM(text) {
 					}
 					x2++
 				}
-				data.push({
-					type: List,
-					tag: "ol",
-					id: uuidv4(),
-					depth: 0,
-					children: parseList(body.slice(x1, x2), { numbered: true }),
-				})
+				const range = body.slice(x1, x2)
+				data.push(parseList(range, { numbered: true }))
+				// data.push({
+				// 	type: List,
+				// 	tag: "ol",
+				// 	id: uuidv4(),
+				// 	depth: 0,
+				// 	children: parseList(body.slice(x1, x2), { numbered: true }),
+				// })
 				index = x2 - 1
 				continue
 			}
@@ -1531,5 +1542,17 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 		</div>
 	)
 }
+
+// DEBUG
+// console.log(toHTML([parseList(`
+// - a
+// 	- b
+// 		- c
+// 		- d
+// 				- e
+// - f
+// 	- g
+// - h
+// `.trim().split("\n"))]))
 
 export default App
