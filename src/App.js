@@ -329,7 +329,7 @@ const CodeBlockStandalone = ({ metadata, data, ...props }) => {
 }
 
 // FIXME: Remove depth -- move to data
-const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
+const Item = React.memo(({ syntax, depth, data, ...props }) => (
 	<NodeHOC>
 		<li className="-ml-5 my-2 flex flex-row">
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
@@ -342,26 +342,14 @@ const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const List = React.memo(({ id, tag: Type, depth, data, ...props }) => (
+// NOTE: Compound component
+const List = React.memo(({ id, tag: Tag, depth, data, ...props }) => (
 	<NodeHOC id={id} className={!depth ? "-my-2" : null}>
-		<Type className="ml-5">
-			{/* TODO: Remove? */}
-			{data.map(each => (
-				each.type === ListItem ? (
-					<ListItem
-						key={each.id}
-						{...{ ...each, children: null }}
-						data={each.children}
-					/>
-				) : (
-					<List
-						key={each.id}
-						{...{ ...each, children: null }}
-						data={each.children}
-					/>
-				)
+		<Tag className="ml-5">
+			{data.map(({ type: Type, children: data, ...each }) => (
+				<Type key={each.id} data={data} {...each} />
 			))}
-		</Type>
+		</Tag>
 	</NodeHOC>
 ))
 
@@ -677,7 +665,6 @@ function parseInnerGFM(text) {
 			if (emoji) {
 				data.push({
 					type: Emoji,
-					syntax: null,
 					emoji,
 					children: emoji.emoji,
 				})
@@ -745,7 +732,6 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 					type: List,
 					tag: !numbered ? "ul" : "ol",
 					id: uuidv4(),
-					syntax: null,
 					depth: depth + 1,
 					children: [],
 				})
@@ -754,7 +740,7 @@ function parseList(data, { numbered, checked } = { numbered: false, checked: fal
 			depth++
 		}
 		scope.push({
-			type: ListItem,
+			type: Item,
 			id: uuidv4(),
 			syntax: [syntax],
 			depth: depth + 1,
@@ -781,7 +767,7 @@ function parseMetadata(raw) {
 	return metadata
 }
 
-// Parses a VDOM representation to GFM text.
+// Parses GFM text to a VDOM representation.
 function parseGFM(text) {
 	const newHash = newHashEpoch()
 
@@ -844,7 +830,6 @@ function parseGFM(text) {
 				data.push({
 					type: Blockquote,
 					id: uuidv4(),
-					syntax: null,
 					children: body.slice(x1, x2).map(each => ({
 						type: Paragraph,
 						id: uuidv4(), // TODO: Use index?
@@ -922,7 +907,6 @@ function parseGFM(text) {
 					type: List,
 					tag: "ul",
 					id: uuidv4(),
-					syntax: null,
 					depth: 0,
 					children: parseList(body.slice(x1, x2)),
 				})
@@ -945,7 +929,6 @@ function parseGFM(text) {
 					type: List,
 					tag: "ol",
 					id: uuidv4(),
-					syntax: null,
 					depth: 0,
 					children: parseList(body.slice(x1, x2), { numbered: true }),
 				})
@@ -1007,15 +990,13 @@ function parseGFM(text) {
 		data.push({
 			type: Paragraph,
 			id: uuidv4(),
-			syntax: null,
 			children: parseInnerGFM(each),
 		})
 	}
 	return data
 }
 
-// Converts a nested VDOM representation to renderable React
-// components.
+// Parses a nested VDOM representation to React components.
 function toInnerReact(children) {
 	if (children === null || typeof children === "string") {
 		return children
@@ -1023,7 +1004,7 @@ function toInnerReact(children) {
 	const components = []
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			components.push(each)
+			components.push(toInnerReact(each))
 			continue
 		}
 		const { type: Type, ...props } = each
@@ -1036,7 +1017,7 @@ function toInnerReact(children) {
 	return components
 }
 
-// Converts a nested VDOM representation to text.
+// Parses a nested VDOM representation to text.
 function toInnerText(children, options = { markdown: false }) {
 	let text = ""
 	if (children === null || typeof children === "string") {
@@ -1044,40 +1025,39 @@ function toInnerText(children, options = { markdown: false }) {
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			text += toInnerText(each, options)
+			text += toInnerText(each)
 			continue
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		if (options.markdown) {
-			text += s1 !== "function" ? s1 : s1(each)
+			text += typeof s1 !== "function" ? s1 : s1(each)
 		}
 		text += toInnerText(each.children, options)
 		if (options.markdown) {
-			text += s2 !== "function" ? s2 : s2(each)
+			text += typeof s2 !== "function" ? s2 : s2(each)
 		}
 	}
 	return text
 }
 
-// Converts a VDOM representation to text.
+// Parses a VDOM representation to text.
 function toText(data, options = { markdown: false }) {
 	let text = ""
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
 		if (options.markdown) {
-			text += s1 !== "function" ? s1 : s1(each)
+			text += typeof s1 !== "function" ? s1 : s1(each)
 		}
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote || each.type === List) {
+		} else if (each.type === Blockquote) {
 			text += toText(each.children, options)
 		} else {
 			text += toInnerText(each.children, options)
 		}
 		if (options.markdown) {
-			text += s2 !== "function" ? s2 : s2(each)
+			text += typeof s2 !== "function" ? s2 : s2(each)
 		}
-		// Add a paragraph:
 		if (each !== data[data.length - 1]) {
 			text += "\n"
 		}
@@ -1085,7 +1065,7 @@ function toText(data, options = { markdown: false }) {
 	return text
 }
 
-// Converts a nested VDOM representation to HTML.
+// Parses a nested VDOM representation to an HTML string.
 function toInnerHTML(children) {
 	let html = ""
 	if (children === null || typeof children === "string") {
@@ -1097,20 +1077,20 @@ function toInnerHTML(children) {
 			continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += s1 !== "function" ? s1 : s1(each)
+		html += typeof s1 !== "function" ? s1 : s1(each)
 		html += toInnerHTML(each.children)
-		html += s2 !== "function" ? s2 : s2(each)
+		html += typeof s2 !== "function" ? s2 : s2(each)
 	}
 	return html
 }
 
-// Converts a VDOM representation to an HTML string.
-function toHTML(data, __depth = 0) {
+// Parses a VDOM representation to an HTML string.
+function toHTML(data) {
 	let html = ""
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += s1 !== "function" ? s1 : s1(each)
-		if (each.type == Break) {
+		html += typeof s1 !== "function" ? s1 : s1(each)
+		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
 			html += (
@@ -1125,8 +1105,7 @@ function toHTML(data, __depth = 0) {
 		} else {
 			html += toInnerHTML(each.children)
 		}
-		// Add a paragraph:
-		html += s2 !== "function" ? s2 : s2(each)
+		html += typeof s2 !== "function" ? s2 : s2(each)
 		if (each !== data[data.length - 1]) {
 			html += "\n"
 		}
@@ -1134,10 +1113,7 @@ function toHTML(data, __depth = 0) {
 	return html
 }
 
-// Converts a VDOM representation to a JSON string.
-//
-// FIXME: Don’t store React types in VDOM -- then toJSON can
-// be deleted
+// Parses a VDOM representation to a JSON string.
 function toJSON(data) {
 	const json = JSON.stringify(
 		data,
@@ -1180,7 +1156,7 @@ const cmapHTML = new Map()
 	cmap[Paragraph.type] = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
 	cmap[CodeBlock.type] = "CodeBlock"
-	cmap[ListItem.type] = "ListItem"
+	cmap[Item.type] = "Item"
 	cmap[List.type] = "List"
 	cmap[Image.type] = "Image"
 	cmap[Break.type] = "Break"
@@ -1204,7 +1180,7 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
-	cmapHTML[ListItem.type] = ["<li>\n\t", "\n</li>"]
+	cmapHTML[Item.type] = ["<li>\n\t", "\n</li>"]
 	cmapHTML[List.type] = [data => `<${data.tag}>`, data => `</${data.tag}>`]
 	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
@@ -1235,8 +1211,8 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 		ReactDOM.render(
 			// TODO: Prevent useless rerenders to <Provider>?
 			<Provider value={state}>
-				{state.data.map(({ type: Type, children: data, ...props }) => (
-					<Type key={props.id} data={data} {...props} />
+				{state.data.map(({ type: Type, children: data, ...each }) => (
+					<Type key={each.id} data={data} {...each} />
 				))}
 			</Provider>,
 			ref.current,
