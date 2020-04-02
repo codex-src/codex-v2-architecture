@@ -711,29 +711,35 @@ function newHashEpoch() {
 }
 
 /* eslint-disable no-useless-escape */
-const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)$/
-const NumberedRe = /^(\t*)(\d+\. )(.*)$/
-const TaskRe = /^(\t*)(- [ |x] )(.*)$/
+const ListRe = /^(\t*(?:[\-\+\*] |\d+\. ))(.*)$/
+
+const NumberedRe = /^(\t*\d+\. )(.*)$/
+
+// const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)$/
+// const TaskRe = /^(\t*)(- [ |x] )(.*)$/
 /* eslint-enable no-useless-escape */
 
 // Parses a nested data structure.
-function parseList(range, { numbered, checked } = { numbered: false, checked: false }) {
+function parseList(range) {
 	const data = {
 		type: List,
-		tag: !numbered ? "ul" : "ol",
+		tag: !NumberedRe.test(range[0]) ? "ul" : "ol",
 		id: uuidv4(),
 		depth: 0,
 		children: [],
 	}
 	for (const each of range) {
-		const [, tabs, syntax, substr] = each.match(!numbered ? UnnumberedRe : NumberedRe)
+		// FIXME
+		const [, syntax, substr] = each.match(ListRe)
 		let ref = data.children
 		let deep = 0
-		while (deep < tabs.length) {
+		// Count up to a non-tab character:
+		const depth = syntax.search(/[^\t]/)
+		while (deep < depth) {
 			if (!ref.length || ref[ref.length - 1].type !== List) {
 				ref.push({
 					type: List,
-					tag: !numbered ? "ul" : "ol",
+					tag: !NumberedRe.test(each) ? "ul" : "ol",
 					id: uuidv4(),
 					depth: deep + 1, // Eagerly increment
 					children: [],
@@ -745,7 +751,7 @@ function parseList(range, { numbered, checked } = { numbered: false, checked: fa
 		ref.push({
 			type: ListItem,
 			id: uuidv4(),
-			syntax: [tabs + syntax],
+			syntax: [syntax],
 			depth: deep,
 			children: parseInnerGFM(substr),
 		})
@@ -757,9 +763,9 @@ function parseList(range, { numbered, checked } = { numbered: false, checked: fa
 function parseMetadata(raw) {
 	// TODO: Add support for URL-based metadata strings?
 	const metadata = {
-		raw,           // E.g. hello.world
-		filename: "",  // E.g. hello
-		extension: "", // E.g. world
+		raw,           // "hello.world"
+		filename: "",  // "hello"
+		extension: "", // "world"
 	}
 	const index = raw.lastIndexOf(".")
 	if (index === -1 || index + 1 === metadata.length) {
@@ -894,13 +900,14 @@ function parseGFM(text) {
 			)
 		):
 			// - List
-			if (nchars >= 2 && UnnumberedRe.test(each)) {
+			// 1. List
+			if (nchars >= 2 && ListRe.test(each)) { // 2 is the fewest characters
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
-					if (body[x2].length < 2 || !UnnumberedRe.test(body[x2])) {
+					if (body[x2].length < 2 || !ListRe.test(body[x2])) {
 						// No-op
 						break
 					}
@@ -908,23 +915,6 @@ function parseGFM(text) {
 				}
 				const range = body.slice(x1, x2)
 				data.push(parseList(range))
-				index = x2 - 1
-				continue
-			// 1. List
-			} else if (nchars >= 3 && NumberedRe.test(each)) {
-				const x1 = index
-				let x2 = x1
-				x2++
-				// Iterate to end syntax:
-				while (x2 < body.length) {
-					if (body[x2].length < 2 || !NumberedRe.test(body[x2])) {
-						// No-op
-						break
-					}
-					x2++
-				}
-				const range = body.slice(x1, x2)
-				data.push(parseList(range, { numbered: true }))
 				index = x2 - 1
 				continue
 			}
