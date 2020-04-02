@@ -156,12 +156,12 @@
 }
 
 .codex-editor.feature-read-only ol li::before {
-	margin-right: 0.5rem;
+	margin-right: 0.5rem; /* FIXME: Use em? */
 	flex-shrink: 0;
 	display: inline-flex;
 	counter-increment: number;
 	content: counter(number) ". ";
-	font-feature-settings: 'tnum';
+	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
 

@@ -757,8 +757,10 @@ function newHashEpoch() {
 // const UnnumberedRe = /^(\t*)([*+\-•])( .*)/
 // const NumberedRe   = /^(\t*)(\d+[).])( .*)/
 
+/* eslint-disable no-useless-escape */
 const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)/
 const NumberedRe = /^(\t*)(\d\. )(.*)/
+/* eslint-enable no-useless-escape */
 
 // Parses a nested data structure.
 //
@@ -904,7 +906,7 @@ function parseGFM(text) {
 			}
 			break
 		// <List>
-		case char === "\t" || char === "-" || char === "+" || char === "*" || char >= "0" && char <= "9":
+		case char === "\t" || char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9"):
 			// - List
 			//
 			// eslint-disable-next-line no-useless-escape
