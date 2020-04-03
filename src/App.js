@@ -347,7 +347,7 @@ const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 
 // NOTE: Compound component
 const List = React.memo(({ id, tag, depth, data, ...props }) => (
-	<NodeHOC tag={tag} className={!depth ? "ml-5 -my-2" : "ml-5"}>
+	<NodeHOC tag={tag} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
 		))}
