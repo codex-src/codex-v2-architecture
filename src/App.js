@@ -1204,7 +1204,7 @@ const cmapHTML = new Map()
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
 	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
-	cmapHTML[TaskItem.type]   = ["<li>\n\t", "\n</li>"] // TODO
+	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : ` checked`}>\n\t`, "\n</li>"]
 	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
 	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type]      = ["<hr>", ""] // Leaf node
