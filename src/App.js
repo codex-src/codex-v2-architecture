@@ -651,14 +651,16 @@ function parseInnerGFM(text) {
 			break
 		default:
 			// 😀
-			const emoji = emojiTrie.atStart(text.slice(index)) // eslint-disable-line no-case-declarations
-			if (emoji && emoji.status === "fully-qualified") {
+			//
+			// eslint-disable-next-line no-case-declarations
+			const em = emojiTrie.atStart(text.slice(index))
+			if (em && em.status === "fully-qualified") {
 				data.push({
 					type: Emoji,
-					description: emoji.description,
-					children: emoji.emoji,
+					description: em.description,
+					children: em.emoji,
 				})
-				index += emoji.emoji.length - 1
+				index += em.emoji.length - 1
 				continue
 			}
 			break
