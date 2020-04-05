@@ -490,7 +490,6 @@ function parseInnerGFM(text) {
 		// <Escape>
 		case char === "\\":
 	 		if (index + 1 < text.length && spec.isASCIIPunctuation(text[index + 1])) {
-				// No-op
 				data.push({
 					type: Escape,
 					syntax: [char],
@@ -500,7 +499,11 @@ function parseInnerGFM(text) {
 				continue
 			}
 			break
-		// <StrongEm> or <Strong> or <Em>
+		// <StrongEm>
+		// <Strong>
+		// <Em>
+		//
+		// TODO: Refactor?
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (nchars >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
@@ -584,37 +587,35 @@ function parseInnerGFM(text) {
 			break
 		// <A> (1 of 2)
 		case char === "h":
-			// https://etc
+			// https://
 			if (nchars >= spec.HTTPS.length && text.slice(index, index + spec.HTTPS.length) === spec.HTTPS) {
-				const matches = spec.safeURLRe.exec(text.slice(index + spec.HTTPS.length))
+				const matches = spec.safeURLRe.exec(text.slice(index))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
-				const children = text.slice(index + spec.HTTPS.length, index + spec.HTTPS.length + offset)
 				data.push({
 					type: A,
 					syntax: [spec.HTTPS],
-					href: spec.HTTPS + children,
-					children,
+					href: matches[0],
+					children: matches[0].slice(spec.HTTPS.length),
 				})
-				index += spec.HTTPS.length + offset - 1
+				index += offset - 1
 				continue
-			// http://etc
+			// http://
 			} else if (nchars >= spec.HTTP.length && text.slice(index, index + spec.HTTP.length) === spec.HTTP) {
-				const matches = spec.safeURLRe.exec(text.slice(index + spec.HTTP.length))
+				const matches = spec.safeURLRe.exec(text.slice(index))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
-				const children = text.slice(index + spec.HTTP.length, index + spec.HTTP.length + offset)
 				data.push({
 					type: A,
 					syntax: [spec.HTTP],
-					href: spec.HTTP + children,
-					children,
+					href: matches[0],
+					children: matches[0].slice(spec.HTTP.length),
 				})
-				index += spec.HTTP.length + offset - 1
+				index += offset - 1
 				continue
 			}
 			break
