@@ -377,6 +377,7 @@ const List = React.memo(({ id, depth, numbered, data, ...props }) => (
 	</NodeHOC>
 ))
 
+// TODO: Add my-1?
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
@@ -408,7 +409,7 @@ const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<NodeHOC id={id}>
+		<NodeHOC id={id} className="my-1">
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
@@ -459,6 +460,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 				? text.slice(index, index + offset)
 				: parseInnerGFM(text.slice(index, index + offset)),
 		}
+		// TODO: Rename members
 		index += syntax.length + offset - 1
 		return { object, x2: index }
 	}
