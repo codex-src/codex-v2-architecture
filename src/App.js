@@ -341,7 +341,7 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	)
 }
 
-const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
+const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
@@ -352,9 +352,19 @@ const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
 	</NodeHOC>
 ))
 
+const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
+	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" data-feature-task-item>
+		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
+		<input className="mr-2" style={{ marginTop: "0.375em" }} type="checkbox" checked={checked.value} onChange={e => {}} />
+		<div>
+			{toInnerReact(data)}
+		</div>
+	</NodeHOC>
+))
+
 // NOTE: Compound component
-const List = React.memo(({ id, tag, depth, data, ...props }) => (
-	<NodeHOC tag={tag} className="ml-5">
+const List = React.memo(({ id, depth, numbered, data, ...props }) => (
+	<NodeHOC id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
 		))}
@@ -720,28 +730,26 @@ function newHashEpoch() {
 	return newHash
 }
 
-/* eslint-disable no-useless-escape */
-const ListRe = /^(\t*(?:[\-\+\*] |\d+\. ))(.*)$/
-
-const NumberedRe = /^(\t*\d+\. )(.*)$/
-
-// const UnnumberedRe = /^(\t*)([\-\+\*] )(.*)$/
-// const TaskRe = /^(\t*)(- [ |x] )(.*)$/
-/* eslint-enable no-useless-escape */
+/* eslint-disable no-multi-spaces, no-useless-escape */
+const ListRe              = /^\t*(?:- \[( |x)\] |[\-\+\*] |\d+\. )/
+// const UnnumberedListRe = /^\t*[\-\+\*] /
+const NumberedListRe      = /^\t*\d+\. /
+// const TaskListRe       = /^\t*- \[( |x)\] /
+/* eslint-enable no-multi-spaces, no-useless-escape */
 
 // Parses an unnumbered or numbered VDOM representation from
 // a range of paragraphs.
 function parseList(range) {
 	const data = {
 		type: List,
-		tag: !NumberedRe.test(range[0]) ? "ul" : "ol",
 		id: uuidv4(),
 		depth: 0,
+		numbered: NumberedListRe.test(range[0]),
 		children: [],
 	}
 	for (const each of range) {
-		// FIXME
-		const [, syntax, substr] = each.match(ListRe)
+		const [syntax] = each.match(ListRe)
+		const substr = each.slice(syntax.length)
 		let ref = data.children
 		let deep = 0
 		// Count up to a non-tab character:
@@ -750,20 +758,26 @@ function parseList(range) {
 			if (!ref.length || ref[ref.length - 1].type !== List) {
 				ref.push({
 					type: List,
-					tag: !NumberedRe.test(each) ? "ul" : "ol",
 					id: uuidv4(),
 					depth: deep + 1, // Eagerly increment
+					numbered: NumberedListRe.test(each),
 					children: [],
 				})
 			}
 			ref = ref[ref.length - 1].children
 			deep++
 		}
+		let checked = null
+		if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) {
+			const value = syntax[syntax.length - 3] === "x"
+			checked = { value }
+		}
 		ref.push({
-			type: ListItem,
+			type: !checked ? ListItem : TaskItem,
 			id: uuidv4(),
+			depth: deep, // Takes precedence
 			syntax: [syntax],
-			depth: deep,
+			checked,
 			children: parseInnerGFM(substr),
 		})
 	}
@@ -1131,53 +1145,53 @@ const cmap = new Map()
 const cmapHTML = new Map()
 
 ;(() => {
-	// React:
-	cmap[Emoji] = "Emoji"
-	cmap[Escape] = "Escape"
-	cmap[Em] = "Em"
-	cmap[Strong] = "Strong"
-	cmap[StrongAndEm] = "StrongAndEm"
-	cmap[Code] = "Code"
-	cmap[Strike] = "Strike"
-	cmap[A] = "A"
-
-	cmap[Header.type] = "Header"
-	cmap[Subheader.type] = "Subheader"
-	cmap[H3.type] = "H3"
-	cmap[H4.type] = "H4"
-	cmap[H5.type] = "H5"
-	cmap[H6.type] = "H6"
-	cmap[Paragraph.type] = "Paragraph"
+	/* eslint-disable no-multi-spaces */
+	cmap[Emoji]           = "Emoji"
+	cmap[Escape]          = "Escape"
+	cmap[Em]              = "Em"
+	cmap[Strong]          = "Strong"
+	cmap[StrongAndEm]     = "StrongAndEm"
+	cmap[Code]            = "Code"
+	cmap[Strike]          = "Strike"
+	cmap[A]               = "A"
+	cmap[Header.type]     = "Header"
+	cmap[Subheader.type]  = "Subheader"
+	cmap[H3.type]         = "H3"
+	cmap[H4.type]         = "H4"
+	cmap[H5.type]         = "H5"
+	cmap[H6.type]         = "H6"
+	cmap[Paragraph.type]  = "Paragraph"
 	cmap[Blockquote.type] = "Blockquote"
-	cmap[CodeBlock.type] = "CodeBlock"
-	cmap[ListItem.type] = "ListItem"
-	cmap[List.type] = "List"
-	cmap[Image.type] = "Image"
-	cmap[Break.type] = "Break"
+	cmap[CodeBlock.type]  = "CodeBlock"
+	cmap[ListItem.type]   = "ListItem"
+	cmap[TaskItem.type]   = "TaskItem"
+	cmap[List.type]       = "List"
+	cmap[Image.type]      = "Image"
+	cmap[Break.type]      = "Break"
 
-	// HTML:
-	cmapHTML[Emoji] = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
-	cmapHTML[Escape] = ["", ""] // No-op
-	cmapHTML[Em] = ["<em>", "</em>"]
-	cmapHTML[Strong] = ["<strong>", "</strong>"]
-	cmapHTML[StrongAndEm] = ["<strong><em>", "</em></strong>"]
-	cmapHTML[Code] = ["<code>", "</code>"]
-	cmapHTML[Strike] = ["<strike>", "</strike>"]
-	cmapHTML[A] = [data => `<a href="${data.href}">`, "</a>"]
-
-	cmapHTML[Header.type] = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
-	cmapHTML[Subheader.type] = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
-	cmapHTML[H3.type] = [data => `<a href="#${data.hash}">\n\t<h3 id="${data.hash}">\n\t\t`, "\n\t</h3>\n</a>"]
-	cmapHTML[H4.type] = [data => `<a href="#${data.hash}">\n\t<h4 id="${data.hash}">\n\t\t`, "\n\t</h4>\n</a>"]
-	cmapHTML[H5.type] = [data => `<a href="#${data.hash}">\n\t<h5 id="${data.hash}">\n\t\t`, "\n\t</h5>\n</a>"]
-	cmapHTML[H6.type] = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
-	cmapHTML[Paragraph.type] = ["<p>\n\t", "\n</p>"]
+	cmapHTML[Emoji]           = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
+	cmapHTML[Escape]          = ["", ""] // No-op
+	cmapHTML[Em]              = ["<em>", "</em>"]
+	cmapHTML[Strong]          = ["<strong>", "</strong>"]
+	cmapHTML[StrongAndEm]     = ["<strong><em>", "</em></strong>"]
+	cmapHTML[Code]            = ["<code>", "</code>"]
+	cmapHTML[Strike]          = ["<strike>", "</strike>"]
+	cmapHTML[A]               = [data => `<a href="${data.href}">`, "</a>"]
+	cmapHTML[Header.type]     = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
+	cmapHTML[Subheader.type]  = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
+	cmapHTML[H3.type]         = [data => `<a href="#${data.hash}">\n\t<h3 id="${data.hash}">\n\t\t`, "\n\t</h3>\n</a>"]
+	cmapHTML[H4.type]         = [data => `<a href="#${data.hash}">\n\t<h4 id="${data.hash}">\n\t\t`, "\n\t</h4>\n</a>"]
+	cmapHTML[H5.type]         = [data => `<a href="#${data.hash}">\n\t<h5 id="${data.hash}">\n\t\t`, "\n\t</h5>\n</a>"]
+	cmapHTML[H6.type]         = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
+	cmapHTML[Paragraph.type]  = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type] = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
-	cmapHTML[ListItem.type] = ["<li>\n\t", "\n</li>"]
-	cmapHTML[List.type] = [data => `<${data.tag}>`, data => `</${data.tag}>`]
-	cmapHTML[Image.type] = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
-	cmapHTML[Break.type] = ["<hr>", ""] // Leaf node
+	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
+	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
+	cmapHTML[TaskItem.type]   = ["<li>\n\t", "\n</li>"] // TODO
+	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
+	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
+	cmapHTML[Break.type]      = ["<hr>", ""] // Leaf node
+	/* eslint-enable no-multi-spaces */
 })()
 
 // Sets the document title (uses useEffect).
@@ -1244,11 +1258,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			{
 				ref,
 
-				className: [
-					"codex-editor",
-					className,
-					state.readOnly && "feature-read-only",
-				].filter(Boolean).join(" "),
+				className: `codex-editor${!className ? "" : ` ${className}`}`,
 
 				style: {
 					// wordWrap: "break-word", // Not working
@@ -1259,6 +1269,8 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 
 				// contentEditable: !state.readOnly,
 				// suppressContentEditableWarning: !state.readOnly,
+
+				"data-feature-read-only": state.readOnly || null
 			},
 		)
 	)

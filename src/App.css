@@ -150,7 +150,7 @@
 	padding-bottom: 50%;
 }
 
-.codex-editor.feature-read-only ul > li::before {
+.codex-editor[data-feature-read-only] ul > li:not([data-feature-task-item])::before {
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
@@ -159,11 +159,11 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor.feature-read-only ol,
-.codex-editor.feature-read-only ul {
+.codex-editor[data-feature-read-only] ol,
+.codex-editor[data-feature-read-only] ul {
 	counter-reset: number;
 }
-.codex-editor.feature-read-only ol > li::before {
+.codex-editor[data-feature-read-only] ol > li::before {
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
