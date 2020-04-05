@@ -173,9 +173,9 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ul li[data-feature-task-item] .font-mono,
-.codex-editor ol li[data-feature-task-item] .font-mono,
-.codex-editor .line-through > .font-mono {
+.codex-editor ul > li[data-feature-task-item] .font-mono,
+.codex-editor ol > li[data-feature-task-item] .font-mono,
+.codex-editor span[data-type-strike] .font-mono {
 	vertical-align: 1px;
 }
 

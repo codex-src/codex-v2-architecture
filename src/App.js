@@ -33,11 +33,7 @@ const Syntax = ({ className, ...props }) => {
 	if (readOnly) {
 		return null
 	}
-	return (
-		<span className={className || "text-md-blue-a400"} {...props}>
-			{props.children}
-		</span>
-	)
+	return <span className={className || "text-md-blue-a400"} {...props}>{props.children}</span>
 }
 
 const Markdown = ({ syntax, ...props }) => {
@@ -99,7 +95,7 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<span className="p-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
+		<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -122,7 +118,7 @@ const strikeStyle = {
 }
 
 const Strike = ({ syntax, ...props }) => (
-	<span style={strikeStyle}>
+	<span style={strikeStyle} data-type-strike>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
