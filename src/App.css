@@ -192,6 +192,13 @@
 	font-size: 160%; /* 200 % */
 }
 
+.-tracking-px {
+	letter-spacing: -0.0125em;
+}
+.tracking-px {
+	letter-spacing: 0.0125em;
+}
+
 .leading-base {
 	line-height: 1.15;
 }

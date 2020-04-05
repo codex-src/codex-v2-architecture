@@ -151,8 +151,8 @@ const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
 	)
 }
 
-const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-3xl leading-tight">
+const Header = React.memo(({ id, syntax, hash, data, ...props }) => (
+	<NodeHOC id={id} className="font-medium text-3xl -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -163,8 +163,8 @@ const H1 = React.memo(({ id, syntax, hash, data, ...props }) => (
 	</NodeHOC>
 ))
 
-const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-2xl leading-tight">
+const Subheader = React.memo(({ id, syntax, hash, data, ...props }) => (
+	<NodeHOC id={id} className="font-medium text-2xl -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -176,7 +176,7 @@ const H2 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-xl leading-tight">
+	<NodeHOC id={id} className="font-semibold text-xl -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -188,7 +188,7 @@ const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-lg leading-tight">
+	<NodeHOC id={id} className="font-semibold text-lg -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -200,7 +200,7 @@ const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold leading-tight">
+	<NodeHOC id={id} className="font-semibold -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -212,7 +212,7 @@ const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
 ))
 
 const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold leading-tight">
+	<NodeHOC id={id} className="font-semibold -tracking-px leading-tight">
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toInnerReact(data) || (
@@ -799,7 +799,7 @@ function parseGFM(text) {
 		const char = each.charAt(0)
 		const nchars = each.length
 		switch (true) {
-		// <H1>
+		// <Header>
 		case char === "#":
 			// # Header
 			// ## Subheader
@@ -817,7 +817,7 @@ function parseGFM(text) {
 			) {
 				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
-					type: [H1, H2, H3, H4, H5, H6][syntax.length - 2],
+					type: [Header, Subheader, H3, H4, H5, H6][syntax.length - 2],
 					id: uuidv4(),
 					syntax: [syntax],
 					hash: newHash(toInnerText(parseInnerGFM(each.slice(syntax.length)))),
@@ -1141,8 +1141,8 @@ const cmapHTML = new Map()
 	cmap[Strike] = "Strike"
 	cmap[A] = "A"
 
-	cmap[H1.type] = "H1"
-	cmap[H2.type] = "H2"
+	cmap[Header.type] = "Header"
+	cmap[Subheader.type] = "Subheader"
 	cmap[H3.type] = "H3"
 	cmap[H4.type] = "H4"
 	cmap[H5.type] = "H5"
@@ -1165,8 +1165,8 @@ const cmapHTML = new Map()
 	cmapHTML[Strike] = ["<strike>", "</strike>"]
 	cmapHTML[A] = [data => `<a href="${data.href}">`, "</a>"]
 
-	cmapHTML[H1.type] = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
-	cmapHTML[H2.type] = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
+	cmapHTML[Header.type] = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
+	cmapHTML[Subheader.type] = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
 	cmapHTML[H3.type] = [data => `<a href="#${data.hash}">\n\t<h3 id="${data.hash}">\n\t\t`, "\n\t</h3>\n</a>"]
 	cmapHTML[H4.type] = [data => `<a href="#${data.hash}">\n\t<h4 id="${data.hash}">\n\t\t`, "\n\t</h4>\n</a>"]
 	cmapHTML[H5.type] = [data => `<a href="#${data.hash}">\n\t<h5 id="${data.hash}">\n\t\t`, "\n\t</h5>\n</a>"]
@@ -1219,8 +1219,8 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			...current,
 			// // TODO: Convert to a rich data structure with nesting
 			// tableOfContents: state.data.filter(each => (
-			// 	each.type === H1 ||
-			// 	each.type === H2 ||
+			// 	each.type === Header ||
+			// 	each.type === Subheader ||
 			// 	each.type === H3 ||
 			// 	each.type === H4 ||
 			// 	each.type === H5 ||
