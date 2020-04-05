@@ -229,21 +229,32 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 	</NodeHOC>
 ))
 
-const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
+// Generates an emoji string or returns null.
+//
+// -> null
+// -> "emojis-1"
+// -> "emojis-2"
+// -> "emojis-3"
+//
+function emojiString(data) {
 	const emojis = (
-		data &&
-		Array.isArray(data) &&
-		data.length <= 3 &&
-		data.every(each => each.emoji)
+		Array.isArray(data) &&         // []
+		data.length <= 3 &&            // [..., ..., ...]
+		data.every(each => each.emoji) // [{ emoji: ... }, { emoji: ... }, { emoji: ... }, ]
 	)
-	return (
-		<NodeHOC id={id} className={!emojis ? null : `emojis-${data.length}`}>
-			{toInnerReact(data) || (
-				<br />
-			)}
-		</NodeHOC>
-	)
-})
+	if (!emojis) {
+		return null
+	}
+	return `emojis-${data.length}`
+}
+
+const Paragraph = React.memo(({ id, data }) => (
+	<NodeHOC id={id} className={emojiString(data)}>
+		{toInnerReact(data) || (
+			<br />
+		)}
+	</NodeHOC>
+))
 
 // NOTE: Compound component
 const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
