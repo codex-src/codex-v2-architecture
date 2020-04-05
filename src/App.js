@@ -58,8 +58,8 @@ const Markdown = ({ syntax, ...props }) => {
 	)
 }
 
-const Emoji = ({ emoji, ...props }) => (
-	<span className="emoji" aria-label={emoji.description} role="img">
+const Emoji = ({ description, ...props }) => (
+	<span className="emoji" aria-label={description} role="img">
 		{props.children}
 	</span>
 )
@@ -242,9 +242,9 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 //
 function emojiString(data, max = 3) {
 	const emojis = (
-		Array.isArray(data) &&         // []
-		data.length <= max &&          // [..., ..., ...]
-		data.every(each => each.emoji) // [{ emoji: ... }, { emoji: ... }, { emoji: ... }, ]
+		Array.isArray(data) &&
+		data.length <= max &&
+		data.every(each => each.type === Emoji)
 	)
 	if (!emojis) {
 		return null
@@ -709,10 +709,10 @@ function parseInnerGFM(text) {
 		default:
 			// 😀
 			const emoji = emojiTrie.atStart(text.slice(index)) // eslint-disable-line no-case-declarations
-			if (emoji) {
+			if (emoji && emoji.status === "fully-qualified") {
 				data.push({
 					type: Emoji,
-					emoji,
+					description: emoji.description,
 					children: emoji.emoji,
 				})
 				index += emoji.emoji.length - 1
@@ -810,24 +810,6 @@ function parseList(range) {
 		})
 	}
 	return data
-}
-
-// Parses a metadata object from a raw metadata string.
-function parseMetadata(raw) {
-	// TODO: Add support for URL-based metadata strings?
-	const metadata = {
-		raw,           // "hello.world"
-		filename: "",  // "hello"
-		extension: "", // "world"
-		language: "",  //
-	}
-	const index = raw.lastIndexOf(".")
-	if (index === -1 || index + 1 === metadata.length) {
-		return metadata
-	}
-	metadata.filename = raw.slice(0, index)
-	metadata.extension = raw.slice(index + 1)
-	return metadata
 }
 
 // Parses GFM text to a VDOM representation.
@@ -1196,7 +1178,7 @@ const cmapHTML = new Map()
 	cmapJSON[Image.type]      = "Image"
 	cmapJSON[Break.type]      = "Break"
 
-	cmapHTML[Emoji]           = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
+	cmapHTML[Emoji]           = [data => `<span aria-label="${data.description}" role="img">`, "</span>"]
 	cmapHTML[Escape]          = ["", ""] // No-op
 	cmapHTML[Em]              = ["<em>", "</em>"]
 	cmapHTML[Strong]          = ["<strong>", "</strong>"]
