@@ -105,9 +105,7 @@ const strikeStyle = {
 	"--red-100": "var(--gray-100)",
 	"--red-600": "currentColor",
 	"--md-blue-a400": "currentColor",
-
 	"textDecoration": "line-through",
-	// fontStyle: "italic",
 	"color": "var(--gray-500)",
 }
 
@@ -134,22 +132,14 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
+// TODO: Add word-wrap: break-words?
 const NodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
-	return (
-		<Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props}>
-			{props.children}
-		</Tag>
-	)
+	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
 }
-
 const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
-	return (
-		<Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
-			{props.children}
-		</Tag>
-	)
+	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
 }
 
 const Header = React.memo(({ id, syntax, hash, data }) => (
