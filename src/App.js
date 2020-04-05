@@ -276,47 +276,37 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 })
 
 // NOTE: Compound component
-const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
+const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [lang, setLang] = React.useState("")
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const lang = (metadata.extension || metadata.raw).toLowerCase()
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
 			return
 		}
-		setLang(lang)
 		setHTML(window.Prism.highlight(data, parser, lang))
-	}, [metadata, data])
+	}, [lang, data])
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
 		<CompoundNodeHOC className="-mx-6 my-2 px-6 break-words font-mono text-sm leading-snug border" style={tabSize(2)} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				<Markdown syntax={[syntax + metadata.raw]}>
+				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
 			</NodeHOC>
 			<NodeHOC>
-				{html ? (
-					<span
-						className={!lang ? null : `language-${lang}`}
-						dangerouslySetInnerHTML={{
-							__html: html,
-						}}
-					/>
-				) : (
-					data
-				)}
+				<span className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+					__html: html || data,
+				}} />
 			</NodeHOC>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				<Markdown syntax={[syntax]}>
+				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
 					)}
@@ -825,6 +815,7 @@ function parseMetadata(raw) {
 		raw,           // "hello.world"
 		filename: "",  // "hello"
 		extension: "", // "world"
+		language: "",  //
 	}
 	const index = raw.lastIndexOf(".")
 	if (index === -1 || index + 1 === metadata.length) {
@@ -936,16 +927,14 @@ function parseGFM(text) {
 					break
 				}
 				x2++ // Iterate once past end
-				const raw = each.slice(3)
 				data.push({
 					type: CodeBlock,
 					id: uuidv4(),
-					syntax: "```",
-					metadata: parseMetadata(raw),
-					children: body.slice(x1, x2)
-						.join("\n")
-						.slice(3 + raw.length, -3) // Trim syntax
-						.slice(1),                 // Trim start paragraph
+					syntax: [body[x1], body[x2 - 1]],
+					lang: each.slice(3).split(".").slice(-1)[0].toLowerCase(), // TODO: Remove toLowerCase?
+					children: body.slice(x1, x2).join("\n")
+						.slice(each.length, -3) // Trim syntax
+						.slice(1),              // Trim start paragraph
 				})
 				index = x2 - 1
 				continue
@@ -1219,7 +1208,7 @@ const cmapHTML = new Map()
 	cmapHTML[H6.type]         = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
 	cmapHTML[Paragraph.type]  = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
+	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>`, "</code></pre>"]
 	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
 	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t`, "\n</li>"]
 	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
