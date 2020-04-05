@@ -219,7 +219,7 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 ))
 
 // Returns whether a VDOM representation uses 1-3 emojis.
-function areEmojis(data) {
+function emojis(data) {
 	const ok = (
 		Array.isArray(data) &&
 		data.length <= 3 &&
@@ -229,7 +229,7 @@ function areEmojis(data) {
 }
 
 const Paragraph = React.memo(({ id, data }) => (
-	<NodeHOC id={id} className={areEmojis(data) && "emojis"}>
+	<NodeHOC id={id} className={emojis(data) && "emojis"}>
 		{toInnerReact(data) || (
 			<br />
 		)}
@@ -329,7 +329,7 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 }
 
 // TODO
-const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
+const ListItem = React.memo(({ syntax, depth, checked, data, ...props }) => (
 	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
@@ -341,7 +341,7 @@ const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 ))
 
 // TODO
-const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
+const TaskItem = React.memo(({ syntax, depth, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
@@ -676,13 +676,12 @@ function newHashEpoch() {
 		// ALPHA / DIGIT / "-" / "." / "_" / "~"
 		//
 		// https://tools.ietf.org/html/rfc3986
-		const hash = str
-			.toLowerCase()
-			// Convert spaces and dashes to one dash
+		const hash = str.toLowerCase()
+			// Convert spaces and dashes to one dash:
 			.replace(/(\s+|-+)/g, "-")
-			// Drop URL unsafe characters
+			// Drop URL unsafe characters:
 			.replace(/[^\w\-\.\~]/g, "") // eslint-disable-line no-useless-escape
-			// Trim dashes
+			// Trim dashes:
 			.replace(/(^-+|-+$)/g, "")
 		const seen = hashes[hash]
 		if (!seen) {
@@ -695,14 +694,12 @@ function newHashEpoch() {
 }
 
 /* eslint-disable no-multi-spaces, no-useless-escape */
-const ListRe              = /^\t*(?:- \[( |x)\] |[\-\+\*] |\d+\. )/
-// const UnnumberedListRe = /^\t*[\-\+\*] /
-const NumberedListRe      = /^\t*\d+\. /
-// const TaskListRe       = /^\t*- \[( |x)\] /
+const AnyListRe      = /^\t*(?:- \[( |x)\] |[\-\+\*] |\d+\. )/
+const NumberedListRe = /^\t*\d+\. /
 /* eslint-enable no-multi-spaces, no-useless-escape */
 
-// Parses an unnumbered or numbered VDOM representation from
-// a range of paragraphs.
+// Parses a list-based VDOM representation from a range of
+// paragraphs.
 function parseList(range) {
 	const data = {
 		type: List,
@@ -712,17 +709,17 @@ function parseList(range) {
 		children: [],
 	}
 	for (const each of range) {
-		const [syntax] = each.match(ListRe)
+		const [syntax] = each.match(AnyListRe)
 		const substr = each.slice(syntax.length)
 		let ref = data.children
 		let deep = 0
-		// Count up to a non-tab character:
 		const depth = syntax.search(/[^\t]/)
 		while (deep < depth) {
 			if (!ref.length || ref[ref.length - 1].type !== List) {
 				ref.push({
 					type: List,
 					id: uuidv4(),
+					syntax: null,
 					depth: deep + 1, // Eagerly increment
 					numbered: NumberedListRe.test(each),
 					children: [],
@@ -739,8 +736,8 @@ function parseList(range) {
 		ref.push({
 			type: !checked ? ListItem : TaskItem,
 			id: uuidv4(),
-			depth: deep, // Takes precedence
 			syntax: [syntax],
+			depth: deep,
 			checked,
 			children: parseInnerGFM(substr),
 		})
@@ -871,13 +868,13 @@ function parseGFM(text) {
 		):
 			// - List
 			// 1. List
-			if (nchars >= 2 && ListRe.test(each)) { // 2 is the fewest characters
+			if (nchars >= 2 && AnyListRe.test(each)) { // 2 is the fewest characters
 				const x1 = index
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < body.length) {
-					if (body[x2].length < 2 || !ListRe.test(body[x2])) {
+					if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
 						// No-op
 						break
 					}
