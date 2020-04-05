@@ -111,9 +111,9 @@ const strikeStyle = {
 	"--red-600": "currentColor",
 	"--md-blue-a400": "currentColor",
 
-	textDecoration: "line-through",
+	"textDecoration": "line-through",
 	// fontStyle: "italic",
-	color: "var(--gray-500)",
+	"color": "var(--gray-500)",
 }
 
 const Strike = ({ syntax, ...props }) => (
@@ -236,10 +236,10 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 // -> "emojis-2"
 // -> "emojis-3"
 //
-function emojiString(data) {
+function emojiString(data, max = 3) {
 	const emojis = (
 		Array.isArray(data) &&         // []
-		data.length <= 3 &&            // [..., ..., ...]
+		data.length <= max &&          // [..., ..., ...]
 		data.every(each => each.emoji) // [{ emoji: ... }, { emoji: ... }, { emoji: ... }, ]
 	)
 	if (!emojis) {
@@ -257,14 +257,13 @@ const Paragraph = React.memo(({ id, data }) => (
 ))
 
 // NOTE: Compound component
-const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
+const Blockquote = React.memo(({ id, syntax, data }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	// FIXME: Dynamically compute syntax size
 	return (
-		<CompoundNodeHOC id={id} className="my-2" style={{ boxShadow: !readOnly ? null : "inset 0.125em 0 var(--gray-600)" }}>
+		<CompoundNodeHOC id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				<NodeHOC key={each.id} id={each.id} className="my-1 text-gray-600" style={{ paddingLeft: !readOnly ? null : "calc(24.88/18 * 1em)" }}>
+				<NodeHOC key={each.id} id={each.id} className="my-1 text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -1222,7 +1221,7 @@ const cmapHTML = new Map()
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.metadata.extension || data.metadata.raw ? "" : ` class="language-${(data.metadata.extension || data.metadata.raw).toLowerCase()}"`}><code>`, "</code></pre>"]
 	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
-	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : ` checked`}>\n\t`, "\n</li>"]
+	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t`, "\n</li>"]
 	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
 	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
 	cmapHTML[Break.type]      = ["<hr>", ""] // Leaf node
@@ -1293,9 +1292,9 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			{
 				ref,
 
-				className: `codex-editor${!className ? "" : ` ${className}`}`,
+				"className": `codex-editor${!className ? "" : ` ${className}`}`,
 
-				style: {
+				"style": {
 					// wordWrap: "break-word", // Not working
 					caretColor: "black",
 					outline: "none",
@@ -1305,7 +1304,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 				// contentEditable: !state.readOnly,
 				// suppressContentEditableWarning: !state.readOnly,
 
-				"data-feature-read-only": state.readOnly || null
+				"data-feature-read-only": state.readOnly || null,
 			},
 		)
 	)
