@@ -112,6 +112,7 @@ const strikeStyle = {
 }
 
 const Strike = ({ syntax, ...props }) => (
+	// NOTE: data-type-strike is needed for CSS
 	<span style={strikeStyle} data-type-strike>
 		<Markdown syntax={syntax}>
 			{props.children}
@@ -119,8 +120,15 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
+// Using target="_blank" without rel="noopener noreferrer"
+// is a security risk: see https://mathiasbynens.github.io/rel-noopener react/jsx-no-target-blank
+const safeAnchorAttrs = {
+	target: "_blank",
+	ref: "noopener noreferrer",
+}
+
 const A = ({ syntax, href, ...props }) => (
-	<a className="underline text-md-blue-a400" href={href}>
+	<a className="underline text-md-blue-a400" href={href} {...safeAnchorAttrs}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
