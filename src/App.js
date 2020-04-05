@@ -7,23 +7,27 @@ import uuidv4 from "uuid/v4"
 
 import "./App.css"
 
-// Parses syntax into a start (s1) and end (s2) string.
+// Parses syntax into a start and end string.
 function parseSyntax(syntax) {
-	let s1 = "" // Start syntax
-	let s2 = "" // End syntax
 	if (syntax === null) {
 		return ["", ""]
-	} else if (typeof syntax === "string") {
-		s1 = syntax
-		s2 = syntax
+	}
+	let start = ""
+	let end = ""
+	// "syntax"
+	// -> ["syntax", "syntax"]
+	if (typeof syntax === "string") {
+		start = syntax
+		end = syntax
+	// ["syntax"] OR ["syntax", "syntax"]
+	// -> ["syntax", "syntax"]
 	} else if (Array.isArray(syntax)) {
-		s1 = syntax[0]
-		// Guard end syntax:
+		start = syntax[0]
 		if (syntax.length === 2) {
-			s2 = syntax[1]
+			end = syntax[1]
 		}
 	}
-	return [s1, s2]
+	return [start, end]
 }
 
 const Syntax = ({ className, ...props }) => {
