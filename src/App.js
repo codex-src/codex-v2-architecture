@@ -113,7 +113,7 @@ const strikeStyle = {
 	"--md-blue-a400": "currentColor",
 
 	textDecoration: "line-through",
-	fontStyle: "italic",
+	// fontStyle: "italic",
 	color: "var(--gray-500)",
 }
 
@@ -356,7 +356,7 @@ const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
-		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={value && strikeStyle} data-feature-task-item>
+		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={value && strikeStyle} data-type-task-item>
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 			<input
 				// NOTE: Use md-blue-a200 because md-blue-a400 is

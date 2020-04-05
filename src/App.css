@@ -150,7 +150,7 @@
 	padding-bottom: 50%;
 }
 
-.codex-editor[data-feature-read-only] ul > li:not([data-feature-task-item])::before {
+.codex-editor[data-feature-read-only] ul > li:not([data-type-task-item])::before {
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
@@ -173,8 +173,8 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ul > li[data-feature-task-item] .font-mono,
-.codex-editor ol > li[data-feature-task-item] .font-mono,
+.codex-editor ul > li[data-type-task-item] .font-mono,
+.codex-editor ol > li[data-type-task-item] .font-mono,
 .codex-editor span[data-type-strike] .font-mono {
 	vertical-align: 1px;
 }
