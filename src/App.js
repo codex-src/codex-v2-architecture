@@ -246,7 +246,7 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	return (
 		<CompoundNodeHOC id={id} className="my-2" style={{ boxShadow: !readOnly ? null : "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={{ paddingLeft: !readOnly ? null : "calc(24.88/18 * 1em)" }}>
+				<NodeHOC key={each.id} id={each.id} className="my-1 text-gray-600" style={{ paddingLeft: !readOnly ? null : "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -1333,13 +1333,15 @@ const App = props => {
 			}
 		}
 		return `
-# Hello, world!
+# Hello, Codex!
 
-_What in the hell am I looking at?_
+_What am I looking at?_
 
-This is a technical prototype for the new editor for https://opencodex.dev. **The left-hand side is a \`<textarea>\` you can type into and the right-hand side renders gorgeous React! 👀** This prototype specifically parses GitHub Flavored Markdown into _multiple_ data types, including \`text\`, \`html\`, and \`json\`.
+This is a technical prototype for the new editor architecture for https://opencodex.dev. **The left-hand side is a \`<textarea>\` you can type into and the right-hand side renders React! 👀** This prototype specifically parses GitHub Flavored Markdown into _multiple_ data types, including \`text\`, \`html\`, and \`json\`. 🤓
 
-Syntax highlighting is also supported using PrismJS. Simply open a code block and type!
+Try pressing the \`Plain text\`, \`Markdown\`, \`HTML\` and \`JSON\` buttons at the top; these convert the parsed markdown data structure to various formats. This may help you better understand what’s going on behind the hood.
+
+**Syntax highlighting** is supported thanks to PrismJS. Simply open a code block and type!
 
 \`\`\`go
 package main
@@ -1351,17 +1353,52 @@ func main() {
 }
 \`\`\`
 
-Why stop there?! Why not images! ⚡️
+All of the following language extensions are supported right now:
 
-![**Star Wars**](https://camo.githubusercontent.com/aa4f8ab810278debb3b3bc2a2dc46819650aa11e/68747470733a2f2f6d2e6d656469612d616d617a6f6e2e636f6d2f696d616765732f4d2f4d5635424e7a49344e6d466b4e6a45744e6d51774d4330305a5442684c546b774f4759744e6a6731595455794f57593359325534586b4579586b46716347646551585a335a584e735a586b402e5f56315f55583437375f4352302c302c3437372c3236385f414c5f2e6a7067)
+\`\`\`
+bash c cpp css d diff docker dockerfile git go graphql html http js jsx json kotlin php py rb ruby rust sass sh sql svg swift ts tsx wasm xml yaml yml
+\`\`\`
 
-Or emojis?!
+Furthermore, this demo supports the following block-level elements:
 
-😂
+> _To be, or not to be, that is the question:_
+> _Whether 'tis nobler in the mind to suffer_
+> _The slings and arrows of outrageous fortune,_
+> _Or to take arms against a sea of troubles_
+> _And by opposing end them._
+>
+> — William Shakespeare
 
-Even [links](https://google.com) are supported now. Crazy, huh?
+OK so blockquotes, obviously. 😉
 
-**Try pressing the \`Text\`, \`Markdown\`, \`HTML\` and \`JSON\` buttons at the top; these convert the parsed markdown data structure to various formats.** This may help you better understand what’s going on behind the hood.
+- Lists
+	- Nested lists
+		- Recursively nested lists
+			- You get the idea…
+
+1. Numbered lists are also supported
+1. You don’t need to bother typing the _actual_ list item number, in read-only mode all of this is handled _for you_
+1. Nested lists also reset the number counter ask you would imagine
+	1. So this would be render \`1.\`
+		1. And this would _also_ render \`1.\`
+	1. But this would render \`2.\`
+
+And finally…
+
+🥁
+
+No…not emojis, _though those are supported._
+
+- [x] **Checklists**!
+- [x] Or as GFM would have you refer to them…task lists
+- [ ] Checklists can be ‘checked’ or ‘unchecked’ simply by using GFM-flavored syntax: use \`- [ ]\` for unchecked and \`- [x]\` for checked
+	- [ ] Task lists are normal lists, so you can easily nest them
+		- [ ] Recursively!
+			- [ ] OK…I think you get the idea 😉
+
+Last and not least…images _(and GIFs)_ are supported!
+
+![You call that code?! Khhheee!! 😾](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)
 `.trim()
 	})
 
@@ -1397,20 +1434,24 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			setText(toText(state.data)) // Test no-markdown output
 			// setHTML(`<article class="codex-output">\n${
 			// 	toHTML(state.data)
 			// 		.split("\n")
 			// 		.map(each => `\t${each}`)
 			// 		.join("\n")
 			// }\n</article>`)
-			setHTML(toHTML(state.data))
-			setJSON(toJSON(state.data))
+			if (state.renderMode === "text") {
+				setText(toText(state.data))
+			} else if (state.renderMode === "html") {
+				setHTML(toHTML(state.data))
+			} else if (state.renderMode === "json") {
+				setJSON(toJSON(state.data))
+			}
 		}, 25)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [state.data])
+	}, [state.renderMode, state.data])
 
 	// Read-only shortcut:
 	React.useEffect(() => {
@@ -1444,7 +1485,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 								onPointerDown={e => e.preventDefault()}
 								onClick={e => setState({ ...state, renderMode: "text" })}
 							>
-								Text
+								Plain text
 							</button>
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
