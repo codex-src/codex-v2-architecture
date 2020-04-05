@@ -361,8 +361,8 @@ const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 			{/* <input className="mr-2" style={{ marginTop: "0.375em" }} type="checkbox" checked={checked.value} onChange={e => {}} /> */}
 			<input
-				className="form-checkbox mr-2 w-4 h-4 text-md-blue-a200"
-				style={{ marginLeft: "calc((4.297 + 0.5) / 16 * -1em)", marginTop: "0.375em" }}
+				className="form-checkbox mr-2 text-md-blue-a200"
+				style={{ marginLeft: "calc((2.047 + 0.75) / 16 * -1em)", marginTop: "0.375em", width: "0.875em", height: "0.875em" }}
 				type="checkbox"
 				checked={value}
 				onChange={e => setValue(!value)}
