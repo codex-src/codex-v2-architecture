@@ -150,74 +150,81 @@ const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
 	)
 }
 
-const Header = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-3xl -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const Header = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-medium text-3xl -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
-
-const Subheader = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-medium text-2xl -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const Subheader = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-medium text-2xl -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
-
-const H3 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-xl -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const H3 = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-semibold text-xl -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
-
-const H4 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold text-lg -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const H4 = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-semibold text-lg -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
-
-const H5 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const H5 = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-semibold -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
-
-const H6 = React.memo(({ id, syntax, hash, data, ...props }) => (
-	<NodeHOC id={id} className="font-semibold -tracking-px leading-tight">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toInnerReact(data) || (
-					<br />
-				)}
-			</Markdown>
+const H6 = React.memo(({ id, syntax, hash, data }) => (
+	<NodeHOC id={id} className="my-1">
+		<a id={hash} href={`#${hash}`}>
+			<span className="font-semibold -tracking-px leading-tight">
+				<Markdown syntax={syntax}>
+					{toInnerReact(data) || (
+						<br />
+					)}
+				</Markdown>
+			</span>
 		</a>
 	</NodeHOC>
 ))
@@ -380,6 +387,7 @@ const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 
 // NOTE: Compound component
 const List = React.memo(({ id, depth, numbered, data, ...props }) => (
+	// FIXME: Y-axis margin is wrong
 	<NodeHOC id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
