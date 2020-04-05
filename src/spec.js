@@ -15,6 +15,7 @@ export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;
 // Covers: <start> !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ <end>
 //
 // https://github.github.com/gfm/#ascii-punctuation-character
+// https://github.github.com/gfm/#example-308
 export function isASCIIPunctuation(char) {
 	const ok = (
 		(char >= "\u0021" && char <= "\u002f") ||

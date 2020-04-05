@@ -489,7 +489,7 @@ function parseInnerGFM(text) {
 		switch (true) {
 		// <Escape>
 		case char === "\\":
-	 		if (index + 1 < text.length && text[index + 1].match(/[\W_]/)) {
+	 		if (index + 1 < text.length && spec.isASCIIPunctuation(text[index + 1])) {
 				// No-op
 				data.push({
 					type: Escape,
