@@ -111,15 +111,18 @@ const Code = ({ syntax, ...props }) => {
 	)
 }
 
+const strikeStyle = {
+	"--red-100": "var(--gray-100)",
+	"--red-600": "currentColor",
+	"--md-blue-a400": "currentColor",
+
+	textDecoration: "line-through",
+	fontStyle: "italic",
+	color: "var(--gray-500)",
+}
+
 const Strike = ({ syntax, ...props }) => (
-	<span
-		className="line-through text-gray-600"
-		style={{
-			"--red-100": "var(--gray-100)",
-			"--red-600": "currentColor",
-			"--md-blue-a400": "currentColor",
-		}}
-	>
+	<span style={strikeStyle}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -353,24 +356,11 @@ const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 	</NodeHOC>
 ))
 
-// <span
-// 	className="line-through text-gray-600"
-// 	style={{
-// 		"--red-100": "var(--gray-100)",
-// 		"--red-600": "currentColor",
-// 		"--md-blue-a400": "currentColor",
-// 	}}
-// >
-// 	<Markdown syntax={syntax}>
-// 		{props.children}
-// 	</Markdown>
-// </span>
-
 const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
-		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={{ textDecoration: !value ? null : "line-through" }} data-feature-task-item>
+		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={value && strikeStyle} data-feature-task-item>
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 			<input
 				// NOTE: Use md-blue-a200 because md-blue-a400 is
