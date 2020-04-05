@@ -255,6 +255,7 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 	return (
 		<CompoundNodeHOC id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
+				// NOTE: Put my-1 on <NodeHOC> not <CompoundNodeHOC>
 				<NodeHOC key={each.id} id={each.id} className="my-1 text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
@@ -339,6 +340,7 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 	)
 }
 
+// TODO
 const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
@@ -350,6 +352,7 @@ const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 	</NodeHOC>
 ))
 
+// TODO
 const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
@@ -414,7 +417,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	)
 })
 
-const Break = React.memo(({ id, syntax, ...props }) => {
+const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
