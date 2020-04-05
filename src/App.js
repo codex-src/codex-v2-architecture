@@ -1148,7 +1148,7 @@ function toJSON(data) {
 				return value
 			}
 			// React component (guard React.memo):
-			return `<${cmap[value.type || value]}>`
+			return cmapJSON[value.type || value]
 		},
 		"\t",
 	)
@@ -1158,33 +1158,33 @@ function toJSON(data) {
 const EditorContext = React.createContext()
 
 // Maps type references to names or HTML.
-const cmap = new Map()
+const cmapJSON = new Map()
 const cmapHTML = new Map()
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	cmap[Emoji]           = "Emoji"
-	cmap[Escape]          = "Escape"
-	cmap[Em]              = "Em"
-	cmap[Strong]          = "Strong"
-	cmap[StrongAndEm]     = "StrongAndEm"
-	cmap[Code]            = "Code"
-	cmap[Strike]          = "Strike"
-	cmap[A]               = "A"
-	cmap[Header.type]     = "Header"
-	cmap[Subheader.type]  = "Subheader"
-	cmap[H3.type]         = "H3"
-	cmap[H4.type]         = "H4"
-	cmap[H5.type]         = "H5"
-	cmap[H6.type]         = "H6"
-	cmap[Paragraph.type]  = "Paragraph"
-	cmap[Blockquote.type] = "Blockquote"
-	cmap[CodeBlock.type]  = "CodeBlock"
-	cmap[ListItem.type]   = "ListItem"
-	cmap[TaskItem.type]   = "TaskItem"
-	cmap[List.type]       = "List"
-	cmap[Image.type]      = "Image"
-	cmap[Break.type]      = "Break"
+	cmapJSON[Emoji]           = "Emoji"
+	cmapJSON[Escape]          = "Escape"
+	cmapJSON[Em]              = "Em"
+	cmapJSON[Strong]          = "Strong"
+	cmapJSON[StrongAndEm]     = "StrongAndEm"
+	cmapJSON[Code]            = "Code"
+	cmapJSON[Strike]          = "Strike"
+	cmapJSON[A]               = "A"
+	cmapJSON[Header.type]     = "Header"
+	cmapJSON[Subheader.type]  = "Subheader"
+	cmapJSON[H3.type]         = "H3"
+	cmapJSON[H4.type]         = "H4"
+	cmapJSON[H5.type]         = "H5"
+	cmapJSON[H6.type]         = "H6"
+	cmapJSON[Paragraph.type]  = "Paragraph"
+	cmapJSON[Blockquote.type] = "Blockquote"
+	cmapJSON[CodeBlock.type]  = "CodeBlock"
+	cmapJSON[ListItem.type]   = "ListItem"
+	cmapJSON[TaskItem.type]   = "TaskItem"
+	cmapJSON[List.type]       = "List"
+	cmapJSON[Image.type]      = "Image"
+	cmapJSON[Break.type]      = "Break"
 
 	cmapHTML[Emoji]           = [data => `<span aria-label="${data.emoji.description}" role="img">`, "</span>"]
 	cmapHTML[Escape]          = ["", ""] // No-op
