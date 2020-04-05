@@ -1,3 +1,14 @@
+export const HTTPS = "https://"
+export const HTTP = "http://"
+
+// Matches a URL terminated by an alphanumeric (word) or
+// forward-slash character.
+//
+// https://tools.ietf.org/html/rfc3986
+//
+// eslint-disable-next-line no-useless-escape
+export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/
+
 // Returns whether a character is an ASCII punctuation
 // character as defined by the GFM spec.
 //

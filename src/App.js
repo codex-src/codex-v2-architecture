@@ -452,7 +452,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		if (syntax[0] === "_" && index - 1 >= 0 && (!spec.isASCIIWhitespace(text[index - 1]) && !spec.isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
-		// Guard: (Some) syntax cannot surround spaces:
+		// Guard: Some syntax cannot surround spaces:
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
 			offset < minChars ||
@@ -474,17 +474,6 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 	}
 	return parse
 }
-
-const HTTPS = "https://"
-const HTTP = "http://"
-
-// Matches a URL terminated by an alphanumeric (word) or
-// forward-slash character.
-//
-// https://tools.ietf.org/html/rfc3986
-//
-// eslint-disable-next-line no-useless-escape
-const urlSafeRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/
 
 // Parses a nested VDOM representation to GFM text.
 //
@@ -596,36 +585,36 @@ function parseInnerGFM(text) {
 		// <A> (1 of 2)
 		case char === "h":
 			// https://etc
-			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
-				const matches = urlSafeRe.exec(text.slice(index + HTTPS.length))
+			if (nchars >= spec.HTTPS.length && text.slice(index, index + spec.HTTPS.length) === spec.HTTPS) {
+				const matches = spec.safeURLRe.exec(text.slice(index + spec.HTTPS.length))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
-				const children = text.slice(index + HTTPS.length, index + HTTPS.length + offset)
+				const children = text.slice(index + spec.HTTPS.length, index + spec.HTTPS.length + offset)
 				data.push({
 					type: A,
-					syntax: [HTTPS],
-					href: HTTPS + children,
+					syntax: [spec.HTTPS],
+					href: spec.HTTPS + children,
 					children,
 				})
-				index += HTTPS.length + offset - 1
+				index += spec.HTTPS.length + offset - 1
 				continue
 			// http://etc
-			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
-				const matches = urlSafeRe.exec(text.slice(index + HTTP.length))
+			} else if (nchars >= spec.HTTP.length && text.slice(index, index + spec.HTTP.length) === spec.HTTP) {
+				const matches = spec.safeURLRe.exec(text.slice(index + spec.HTTP.length))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
-				const children = text.slice(index + HTTP.length, index + HTTP.length + offset)
+				const children = text.slice(index + spec.HTTP.length, index + spec.HTTP.length + offset)
 				data.push({
 					type: A,
-					syntax: [HTTP],
-					href: HTTP + children,
+					syntax: [spec.HTTP],
+					href: spec.HTTP + children,
 					children,
 				})
-				index += HTTP.length + offset - 1
+				index += spec.HTTP.length + offset - 1
 				continue
 			}
 			break
