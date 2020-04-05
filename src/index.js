@@ -6,7 +6,8 @@ import ReactDOM from "react-dom"
 import "debug.css"
 
 import "./prism-custom.css"
-import "./codex-tailwind-overrides.css"
+import "./tailwind-form-checkbox.css"
+import "./tailwind-codex-overrides.css"
 
 ;(() => {
 	// Render React DOM:

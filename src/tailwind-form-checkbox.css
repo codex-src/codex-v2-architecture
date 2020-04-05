@@ -1,0 +1,42 @@
+/* https://tailwindcss-custom-forms.netlify.com */
+/* https://tailwindui.com/components/application-ui/forms/sign-in-forms */
+
+.form-checkbox {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	-webkit-print-color-adjust: exact;
+	color-adjust: exact;
+	display: inline-block;
+	vertical-align: middle;
+	background-origin: border-box;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	flex-shrink: 0;
+	height: 1em;
+	width: 1em;
+	/* color: #4299e1; */
+	background-color: #fff;
+	border-color: #e2e8f0;
+	border-width: 1px;
+	/* border-radius: 0.25rem; */
+	border-radius: 0.375em;
+}
+.form-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
+  border-color: #a4cafe;
+}
+.form-checkbox:checked:focus {
+  border-color: transparent;
+}
+.form-checkbox:checked {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z'/%3E%3C/svg%3E");
+  border-color: transparent;
+  background-color: currentColor;
+  background-size: 100% 100%;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
