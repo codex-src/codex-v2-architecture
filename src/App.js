@@ -353,16 +353,35 @@ const ListItem = React.memo(({ depth, syntax, checked, data, ...props }) => (
 	</NodeHOC>
 ))
 
+// <span
+// 	className="line-through text-gray-600"
+// 	style={{
+// 		"--red-100": "var(--gray-100)",
+// 		"--red-600": "currentColor",
+// 		"--md-blue-a400": "currentColor",
+// 	}}
+// >
+// 	<Markdown syntax={syntax}>
+// 		{props.children}
+// 	</Markdown>
+// </span>
+
 const TaskItem = React.memo(({ depth, syntax, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
-		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" data-feature-task-item>
+		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={{ textDecoration: !value ? null : "line-through" }} data-feature-task-item>
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
-			{/* <input className="mr-2" style={{ marginTop: "0.375em" }} type="checkbox" checked={checked.value} onChange={e => {}} /> */}
 			<input
+				// NOTE: Use md-blue-a200 because md-blue-a400 is
+				// too dark
 				className="form-checkbox mr-2 text-md-blue-a200"
-				style={{ marginLeft: "calc((2.047 + 0.75) / 16 * -1em)", marginTop: "0.375em", width: "0.875em", height: "0.875em" }}
+				style={{
+					marginLeft: "calc((2.047 + 0.75) / 16 * -1em)",
+					marginTop: "0.375em",
+					width: "0.875em",
+					height: "0.875em",
+				}}
 				type="checkbox"
 				checked={value}
 				onChange={e => setValue(!value)}

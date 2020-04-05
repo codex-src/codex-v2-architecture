@@ -173,22 +173,24 @@
 	color: var(--md-blue-a400);
 }
 
-.line-through > .font-mono {
+.codex-editor ul li[data-feature-task-item] .font-mono,
+.codex-editor ol li[data-feature-task-item] .font-mono,
+.codex-editor .line-through > .font-mono {
 	vertical-align: 1px;
 }
 
-.emoji {
+.codex-editor .emoji {
 	vertical-align: -10%;
 	font-size: 120%;
 	line-height: 1;
 }
-.emojis-1 {
+.codex-editor .emojis-1 {
 	font-size: 240%; /* 300% */
 }
-.emojis-2 {
+.codex-editor .emojis-2 {
 	font-size: 200%; /* 250% */
 }
-.emojis-3 {
+.codex-editor .emojis-3 {
 	font-size: 160%; /* 200 % */
 }
 
