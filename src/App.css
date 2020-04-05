@@ -155,7 +155,7 @@
 	flex-shrink: 0;
 	display: inline-flex;
 	content: "•";
-	width: 0.65em;
+	width: calc(12.7 / 18 * 1em);
 	color: var(--md-blue-a400);
 }
 

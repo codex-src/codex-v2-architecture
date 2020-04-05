@@ -247,7 +247,7 @@ const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	return (
 		<CompoundNodeHOC id={id} className="my-2" style={{ boxShadow: !readOnly ? null : "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={{ paddingLeft: !readOnly ? null : 23.88 }}>
+				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={{ paddingLeft: !readOnly ? null : "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
