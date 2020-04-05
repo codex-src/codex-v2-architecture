@@ -1,4 +1,5 @@
 import * as emojiTrie from "emoji-trie"
+import * as spec from "./spec"
 import escape from "lodash/escape"
 import Prism from "./Prism"
 import React from "react"
@@ -89,17 +90,13 @@ const StrongAndEm = ({ syntax, ...props }) => (
 	</span>
 )
 
-const Code = ({ syntax, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
-
-	return (
-		<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
-			<Markdown className="text-red-600" syntax={syntax}>
-				{props.children}
-			</Markdown>
-		</span>
-	)
-}
+const Code = ({ syntax, ...props }) => (
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
+		<Markdown className="text-red-600" syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
+)
 
 const strikeStyle = {
 	"--red-100": "var(--gray-100)",
@@ -431,42 +428,7 @@ const Break = React.memo(({ id, syntax }) => {
 	)
 })
 
-// Returns whether a character is an ASCII whitespace
-// character as defined by the GFM spec.
-//
-// https://github.github.com/gfm/#whitespace-character
-function isASCIIWhitespace(char) {
-	const ok = (
-		char === "\u0020" ||
-		char === "\u0009" ||
-		char === "\u000a" ||
-		char === "\u000b" ||
-		char === "\u000c" ||
-		char === "\u000d"
-	)
-	return ok
-}
-
-// Returns whether a character is an ASCII punctuation
-// character as defined by the GFM spec.
-//
-// Covers: <start> !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ <end>
-//
-// https://github.github.com/gfm/#ascii-punctuation-character
-function isASCIIPunctuation(char) {
-	const ok = (
-		(char >= "\u0021" && char <= "\u002f") ||
-		(char >= "\u003a" && char <= "\u0040") ||
-		(char >= "\u005b" && char <= "\u0060") ||
-		(char >= "\u007b" && char <= "\u007e")
-	)
-	return ok
-}
-
 // Registers a type for parseInnerGFM.
-//
-// TODO: Update [^a-zA-Z0-9] to ‘ASCII punctuation
-// character’ -- https://github.github.com/gfm/#ascii-punctuation-character
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
@@ -487,7 +449,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		// Guard: _Em_ and __strong and em__ cannot be nested:
 		//
 		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(text[index - 1]) && !isASCIIPunctuation(text[index - 1]))) {
+		if (syntax[0] === "_" && index - 1 >= 0 && (!spec.isASCIIWhitespace(text[index - 1]) && !spec.isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
 		// Guard: (Some) syntax cannot surround spaces:
