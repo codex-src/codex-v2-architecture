@@ -120,11 +120,10 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
-// Using target="_blank" without rel="noopener noreferrer"
-// is a security risk: see https://mathiasbynens.github.io/rel-noopener react/jsx-no-target-blank
+// react/jsx-no-target-blank
 const safeAnchorAttrs = {
 	target: "_blank",
-	ref: "noopener noreferrer",
+	rel: "noopener noreferrer",
 }
 
 const A = ({ syntax, href, ...props }) => (
