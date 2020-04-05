@@ -1,4 +1,3 @@
-// import * as Hero from "react-heroicons"
 import * as emojiTrie from "emoji-trie"
 import escape from "lodash/escape"
 import Prism from "./Prism"
@@ -1075,7 +1074,7 @@ function toText(data, options = { markdown: false }) {
 		}
 		if (each.type === Break) {
 			// No-op
-		} else if (each.type === Blockquote) {
+		} else if (each.type === Blockquote || each.type === List) {
 			text += toText(each.children, options)
 		} else {
 			text += toInnerText(each.children, options)
@@ -1297,10 +1296,10 @@ const LOCALSTORAGE_KEY = "codex-app-v2.1"
 
 const KEY_CODE_TAB = 9
 
-function tabSize(n) {
+function tabSize(size) {
 	const style = {
-		MozTabSize: n,
-		tabSize: n,
+		MozTabSize: size,
+		tabSize: size,
 	}
 	return style
 }
