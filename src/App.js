@@ -292,57 +292,57 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="-mx-6 my-2 px-6 break-words font-mono text-sm leading-snug border" style={tabSize(2)} spellCheck={false}>
-			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				<Markdown syntax={[syntax[0]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</NodeHOC>
-			<NodeHOC>
-				<span className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-					__html: html || data,
-				}} />
-			</NodeHOC>
-			<NodeHOC className="py-px leading-none text-md-blue-a200">
-				<Markdown syntax={[syntax[1]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</NodeHOC>
+		<CompoundNodeHOC className="-mx-6 my-1 px-6 border" style={tabSize(2)} spellCheck={false}>
+			<div className="break-words font-mono text-sm leading-snug">
+				<NodeHOC className="py-px leading-none text-md-blue-a200">
+					<Markdown syntax={[syntax[0]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</NodeHOC>
+				<NodeHOC>
+					<span
+						className={lang && `language-${lang}`}
+						dangerouslySetInnerHTML={{
+							__html: html || data,
+						}}
+					/>
+				</NodeHOC>
+				<NodeHOC className="py-px leading-none text-md-blue-a200">
+					<Markdown syntax={[syntax[1]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</NodeHOC>
+			</div>
 		</CompoundNodeHOC>
 	)
 })
 
-const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
-	const [lang, setLang] = React.useState("")
+const CodeBlockStandalone = ({ lang, data, ...props }) => {
 	const [html, setHTML] = React.useState("")
 
 	React.useEffect(() => {
-		const lang = (metadata.extension || metadata.raw).toLowerCase()
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
 			return
 		}
-		setLang(lang)
 		setHTML(window.Prism.highlight(data, parser, lang))
-	}, [metadata, data])
+	}, [lang, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg" style={{ ...tabSize(2), ...style }} {...props}>
-			{html ? (
+		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg" {...props}>
+			<div className="whitespace-pre-wrap break-words font-mono text-sm leading-snug">
 				<span
-					className={!lang ? null : `language-${lang}`}
+					className={lang && `language-${lang}`}
 					dangerouslySetInnerHTML={{
-						__html: html,
+						__html: html || data,
 					}}
 				/>
-			) : (
-				data
-			)}
+			</div>
 		</div>
 	)
 }
@@ -1568,7 +1568,7 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								metadata={parseMetadata("text")}
+								lang={parseMetadata("text")}
 								data={`${text}\n`}
 							/>
 						)}
@@ -1583,14 +1583,14 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								metadata={parseMetadata("html")}
+								lang={parseMetadata("html")}
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								metadata={parseMetadata("json")}
+								lang={parseMetadata("json")}
 								data={`${json}\n`}
 							/>
 						)}
