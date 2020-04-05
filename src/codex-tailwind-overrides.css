@@ -1,3 +1,191 @@
+.codex-editor .-ml-0,
+.codex-editor.-ml-0 {
+	margin-left: -0;
+}
+.codex-editor.-ml-1,
+.codex-editor .-ml-1 {
+	margin-left: -.25em;
+}
+.codex-editor.-ml-2,
+.codex-editor .-ml-2 {
+	margin-left: -.5em;
+}
+.codex-editor.-ml-3,
+.codex-editor .-ml-3 {
+	margin-left: -.75em;
+}
+.codex-editor.-ml-4,
+.codex-editor .-ml-4 {
+	margin-left: -1em;
+}
+.codex-editor.-ml-5,
+.codex-editor .-ml-5 {
+	margin-left: -1.25em;
+}
+.codex-editor.-ml-6,
+.codex-editor .-ml-6 {
+	margin-left: -1.5em;
+}
+
+.codex-editor.-mr-0,
+.codex-editor .-mr-0 {
+	margin-right: -0;
+}
+.codex-editor.-mr-1,
+.codex-editor .-mr-1 {
+	margin-right: -.25em;
+}
+.codex-editor.-mr-2,
+.codex-editor .-mr-2 {
+	margin-right: -.5em;
+}
+.codex-editor.-mr-3,
+.codex-editor .-mr-3 {
+	margin-right: -.75em;
+}
+.codex-editor.-mr-4,
+.codex-editor .-mr-4 {
+	margin-right: -1em;
+}
+.codex-editor.-mr-5,
+.codex-editor .-mr-5 {
+	margin-right: -1.25em;
+}
+.codex-editor.-mr-6,
+.codex-editor .-mr-6 {
+	margin-right: -1.5em;
+}
+
+.codex-editor.-mt-0,
+.codex-editor .-mt-0 {
+	margin-top: -0;
+}
+.codex-editor.-mt-1,
+.codex-editor .-mt-1 {
+	margin-top: -.25em;
+}
+.codex-editor.-mt-2,
+.codex-editor .-mt-2 {
+	margin-top: -.5em;
+}
+.codex-editor.-mt-3,
+.codex-editor .-mt-3 {
+	margin-top: -.75em;
+}
+.codex-editor.-mt-4,
+.codex-editor .-mt-4 {
+	margin-top: -1em;
+}
+.codex-editor.-mt-5,
+.codex-editor .-mt-5 {
+	margin-top: -1.25em;
+}
+.codex-editor.-mt-6,
+.codex-editor .-mt-6 {
+	margin-top: -1.5em;
+}
+
+.codex-editor.-mb-0,
+.codex-editor .-mb-0 {
+	margin-bottom: -0;
+}
+.codex-editor.-mb-1,
+.codex-editor .-mb-1 {
+	margin-bottom: -.25em;
+}
+.codex-editor.-mb-2,
+.codex-editor .-mb-2 {
+	margin-bottom: -.5em;
+}
+.codex-editor.-mb-3,
+.codex-editor .-mb-3 {
+	margin-bottom: -.75em;
+}
+.codex-editor.-mb-4,
+.codex-editor .-mb-4 {
+	margin-bottom: -1em;
+}
+.codex-editor.-mb-5,
+.codex-editor .-mb-5 {
+	margin-bottom: -1.25em;
+}
+.codex-editor.-mb-6,
+.codex-editor .-mb-6 {
+	margin-bottom: -1.5em;
+}
+
+.codex-editor.-mx-0,
+.codex-editor .-mx-0 {
+	margin-left: -0;
+	margin-right: -0;
+}
+.codex-editor.-mx-1,
+.codex-editor .-mx-1 {
+	margin-left: -.25em;
+	margin-right: -.25em;
+}
+.codex-editor.-mx-2,
+.codex-editor .-mx-2 {
+	margin-left: -.5em;
+	margin-right: -.5em;
+}
+.codex-editor.-mx-3,
+.codex-editor .-mx-3 {
+	margin-left: -.75em;
+	margin-right: -.75em;
+}
+.codex-editor.-mx-4,
+.codex-editor .-mx-4 {
+	margin-left: -1em;
+	margin-right: -1em;
+}
+.codex-editor.-mx-5,
+.codex-editor .-mx-5 {
+	margin-left: -1.25em;
+	margin-right: -1.25em;
+}
+.codex-editor.-mx-6,
+.codex-editor .-mx-6 {
+	margin-left: -1.5em;
+	margin-right: -1.5em;
+}
+
+.codex-editor.-my-0,
+.codex-editor .-my-0 {
+	margin-top: -0;
+	margin-bottom: -0;
+}
+.codex-editor.-my-1,
+.codex-editor .-my-1 {
+	margin-top: -.25em;
+	margin-bottom: -.25em;
+}
+.codex-editor.-my-2,
+.codex-editor .-my-2 {
+	margin-top: -.5em;
+	margin-bottom: -.5em;
+}
+.codex-editor.-my-3,
+.codex-editor .-my-3 {
+	margin-top: -.75em;
+	margin-bottom: -.75em;
+}
+.codex-editor.-my-4,
+.codex-editor .-my-4 {
+	margin-top: -1em;
+	margin-bottom: -1em;
+}
+.codex-editor.-my-5,
+.codex-editor .-my-5 {
+	margin-top: -1.25em;
+	margin-bottom: -1.25em;
+}
+.codex-editor.-my-6,
+.codex-editor .-my-6 {
+	margin-top: -1.5em;
+	margin-bottom: -1.5em;
+}
+
 .codex-editor .ml-0,
 .codex-editor.ml-0 {
 	margin-left: 0;
