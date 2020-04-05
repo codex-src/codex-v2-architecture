@@ -218,27 +218,18 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 	</NodeHOC>
 ))
 
-// Generates an emoji string or returns null.
-//
-// -> null
-// -> "emojis-1"
-// -> "emojis-2"
-// -> "emojis-3"
-//
-function emojiString(data, max = 3) {
-	const emojis = (
+// Returns whether a VDOM representation uses 1-3 emojis.
+function areEmojis(data) {
+	const ok = (
 		Array.isArray(data) &&
-		data.length <= max &&
+		data.length <= 3 &&
 		data.every(each => each.type === Emoji)
 	)
-	if (!emojis) {
-		return null
-	}
-	return `emojis-${data.length}`
+	return ok
 }
 
 const Paragraph = React.memo(({ id, data }) => (
-	<NodeHOC id={id} className={emojiString(data)}>
+	<NodeHOC id={id} className={areEmojis(data) && "emojis"}>
 		{toInnerReact(data) || (
 			<br />
 		)}

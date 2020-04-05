@@ -184,14 +184,8 @@
 	font-size: 120%;
 	line-height: 1;
 }
-.codex-editor .emojis-1 {
-	font-size: 240%; /* 300% */
-}
-.codex-editor .emojis-2 {
-	font-size: 200%; /* 250% */
-}
-.codex-editor .emojis-3 {
-	font-size: 160%; /* 200 % */
+.codex-editor .emojis {
+	font-size: 200%; /* 200% * 120% = 240% */
 }
 
 .-tracking-px {
