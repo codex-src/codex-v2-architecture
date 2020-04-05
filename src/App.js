@@ -1292,7 +1292,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 	)
 }
 
-const LOCALSTORAGE_KEY = "codex-app-v2.1"
+const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
 const KEY_CODE_TAB = 9
 
@@ -1389,7 +1389,7 @@ And finally…
 
 No…not emojis, _though those are supported._
 
-- [x] **Checklists**!
+- [x] **Checklists!**
 - [x] Or as GFM would have you refer to them…task lists
 - [ ] Checklists can be ‘checked’ or ‘unchecked’ simply by using GFM-flavored syntax: use \`- [ ]\` for unchecked and \`- [x]\` for checked
 	- [ ] Task lists are normal lists, so you can easily nest them
