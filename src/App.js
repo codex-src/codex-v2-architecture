@@ -1572,7 +1572,7 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								lang={parseMetadata("text")}
+								lang="text"
 								data={`${text}\n`}
 							/>
 						)}
@@ -1587,14 +1587,14 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								lang={parseMetadata("html")}
+								lang="html"
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
 								style={{ margin: "-0.5em 0", ...tabSize(2) }}
-								lang={parseMetadata("json")}
+								lang="json"
 								data={`${json}\n`}
 							/>
 						)}
