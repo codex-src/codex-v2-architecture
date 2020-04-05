@@ -129,7 +129,6 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
-// TODO: Add word-wrap: break-words?
 const NodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
 	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
@@ -751,7 +750,6 @@ function parseGFM(text) {
 
 	const data = []
 	const body = text.split("\n")
-	// NOTE: Use an index for multiline elements
 	for (let index = 0; index < body.length; index++) {
 		const each = body[index]
 		const char = each.charAt(0)
@@ -810,7 +808,7 @@ function parseGFM(text) {
 					id: uuidv4(),
 					children: body.slice(x1, x2).map(each => ({
 						type: Paragraph,
-						id: uuidv4(), // TODO: Use index?
+						id: uuidv4(),
 						syntax: [each.slice(0, 2)],
 						children: parseInnerGFM(each.slice(2)),
 					})),
@@ -861,14 +859,12 @@ function parseGFM(text) {
 			break
 		// <List>
 		case char === "\t" || (
-			(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) && (
-				each !== "---" && // Negate break
-				each !== "***"    // Negate break
-			)
+			(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
+			(each !== "---" && each !== "***") // Negate break
 		):
 			// - List
 			// 1. List
-			if (nchars >= 2 && AnyListRe.test(each)) { // 2 is the fewest characters
+			if (nchars >= "- ".length && AnyListRe.test(each)) {
 				const x1 = index
 				let x2 = x1
 				x2++
@@ -911,6 +907,7 @@ function parseGFM(text) {
 				data.push({
 					type: Image,
 					id: uuidv4(),
+					// syntax: ["![", "](…)"],
 					syntax: ["![", `](${rhs.object.children})`],
 					src: rhs.object.children,
 					alt: toInnerText(lhs.object.children),
@@ -921,7 +918,8 @@ function parseGFM(text) {
 			break
 		// <Break>
 		case char === "-" || char === "*":
-			// --- or ***
+			// ---
+			// ***
 			if (nchars === 3 && each === char.repeat(3)) {
 				data.push({
 					type: Break,
@@ -1203,9 +1201,10 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 				"className": `codex-editor${!className ? "" : ` ${className}`}`,
 
 				"style": {
-					// wordWrap: "break-word", // Not working
-					caretColor: "black",
+					whiteSpace: "pre-wrap",
+					// caretColor: "black",
 					outline: "none",
+					overflowWrap: "break-word",
 					...style,
 				},
 
