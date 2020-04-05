@@ -16,7 +16,7 @@ import "./codex-tailwind-overrides.css"
 		</React.StrictMode>,
 		document.getElementById("root"),
 	)
-	// Load PrismJS languages:
+	// Load PrismJS languages (asynchronous):
 	document.addEventListener("DOMContentLoaded", e => {
 		if (!window.Prism || !window.Prism.languages) {
 			// No-op

@@ -98,7 +98,7 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<span className="p-px font-mono text-sm text-red-600 bg-red-100 rounded-sm subpixel-antialiased" style={tabSize(2)} spellCheck={false}>
+		<span className="p-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -111,7 +111,14 @@ const Code = ({ syntax, ...props }) => {
 }
 
 const Strike = ({ syntax, ...props }) => (
-	<span className="line-through text-gray-500" style={{ "--md-blue-a400": "currentColor" }}>
+	<span
+		className="line-through text-gray-600"
+		style={{
+			"--red-100": "var(--gray-100)",
+			"--red-600": "currentColor",
+			"--md-blue-a400": "currentColor",
+		}}
+	>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
