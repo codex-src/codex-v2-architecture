@@ -9,25 +9,20 @@ import "./App.css"
 
 // Parses syntax into a start and end string.
 function parseSyntax(syntax) {
+	let startSyntax = ""
+	let endSyntax = ""
 	if (syntax === null) {
-		return ["", ""]
-	}
-	let start = ""
-	let end = ""
-	// "syntax"
-	// -> ["syntax", "syntax"]
-	if (typeof syntax === "string") {
-		start = syntax
-		end = syntax
-	// ["syntax"] OR ["syntax", "syntax"]
-	// -> ["syntax", "syntax"]
+		// No-op
+	} else if (typeof syntax === "string") {
+		startSyntax = syntax
+		endSyntax = syntax
 	} else if (Array.isArray(syntax)) {
-		start = syntax[0]
+		startSyntax = syntax[0]
 		if (syntax.length === 2) {
-			end = syntax[1]
+			endSyntax = syntax[1]
 		}
 	}
-	return [start, end]
+	return [startSyntax, endSyntax]
 }
 
 const Syntax = props => {
@@ -100,11 +95,7 @@ const Code = ({ syntax, ...props }) => {
 	return (
 		<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
 			<Markdown className="text-red-600" syntax={syntax}>
-				{!readOnly ? (
-					props.children
-				) : (
-					props.children.trim()
-				)}
+				{props.children}
 			</Markdown>
 		</span>
 	)
