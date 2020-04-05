@@ -98,8 +98,7 @@ const Code = ({ syntax, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		// NOTE: Don’t use text-sm; uses rem instead of em
-		<span className="p-px font-mono text-red-600 bg-red-100 rounded subpixel-antialiased" style={{ fontSize: "0.875em" }}>
+		<span className="p-px font-mono text-sm text-red-600 bg-red-100 rounded-sm subpixel-antialiased" style={tabSize(2)} spellCheck={false}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					props.children
@@ -139,9 +138,9 @@ const NodeHOC = ({ id, tag, style, ...props }) => {
 const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
 	return (
-		<div id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
+		<Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props}>
 			{props.children}
-		</div>
+		</Tag>
 	)
 }
 
@@ -237,8 +236,9 @@ const Paragraph = React.memo(({ id, syntax, data, ...props }) => {
 const Blockquote = React.memo(({ id, syntax, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
+	// FIXME: Dynamically compute syntax size
 	return (
-		<CompoundNodeHOC id={id} style={{ boxShadow: !readOnly ? null : "inset 2px 0 var(--gray-600)" }}>
+		<CompoundNodeHOC id={id} style={{ boxShadow: !readOnly ? null : "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
 				<NodeHOC key={each.id} id={each.id} className="text-gray-600" style={{ paddingLeft: !readOnly ? null : 23.88 }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
@@ -272,7 +272,7 @@ const CodeBlock = React.memo(({ id, syntax, metadata, data, ...props }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-md subpixel-antialiased" style={tabSize(2)} spellCheck={false}>
+		<CompoundNodeHOC className="my-2 px-6 break-words font-mono text-sm leading-snug border" style={tabSize(2)} spellCheck={false}>
 			<NodeHOC className="py-px leading-none text-md-blue-a200">
 				<Markdown syntax={[syntax + metadata.raw]}>
 					{readOnly && (
@@ -319,7 +319,7 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 	}, [metadata, data])
 
 	return (
-		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg subpixel-antialiased" style={{ ...tabSize(2), ...style }} {...props}>
+		<div className="my-2 px-6 py-4 whitespace-pre-wrap break-words font-mono text-sm leading-snug bg-white rounded-lg shadow-hero-lg" style={{ ...tabSize(2), ...style }} {...props}>
 			{html ? (
 				<span
 					className={!lang ? null : `language-${lang}`}
@@ -335,7 +335,7 @@ const CodeBlockStandalone = ({ metadata, data, style, ...props }) => {
 }
 
 const ListItem = React.memo(({ syntax, depth, data, ...props }) => (
-	<NodeHOC tag="li" className="-ml-5 my-2 flex flex-row">
+	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
 			<div>
@@ -375,6 +375,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 					</div>
 				</div>
 			)}
+			{/* FIXME: Change to ems */}
 			<img className="mx-auto" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
 		</NodeHOC>
 	)
@@ -1490,7 +1491,7 @@ Even [links](https://google.com) are supported now. Crazy, huh?
 						)}
 						{state.renderMode === "markdown" && (
 							<Editor
-								className="text-lg"
+								className="text-xs"
 								style={tabSize(4)}
 								state={state}
 								setState={setState}

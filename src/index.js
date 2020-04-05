@@ -3,8 +3,10 @@ import Prism from "./Prism"
 import React from "react"
 import ReactDOM from "react-dom"
 
-import "debug.css" // Takes precedence
+import "debug.css"
+
 import "./prism-custom.css"
+import "./codex-tailwind-overrides.css"
 
 ;(() => {
 	// Render React DOM:

@@ -1,0 +1,333 @@
+.codex-editor .ml-0,
+.codex-editor.ml-0 {
+	margin-left: 0;
+}
+.codex-editor.ml-1,
+.codex-editor .ml-1 {
+	margin-left: .25em;
+}
+.codex-editor.ml-2,
+.codex-editor .ml-2 {
+	margin-left: .5em;
+}
+.codex-editor.ml-3,
+.codex-editor .ml-3 {
+	margin-left: .75em;
+}
+.codex-editor.ml-4,
+.codex-editor .ml-4 {
+	margin-left: 1em;
+}
+
+.codex-editor.mr-0,
+.codex-editor .mr-0 {
+	margin-right: 0;
+}
+.codex-editor.mr-1,
+.codex-editor .mr-1 {
+	margin-right: .25em;
+}
+.codex-editor.mr-2,
+.codex-editor .mr-2 {
+	margin-right: .5em;
+}
+.codex-editor.mr-3,
+.codex-editor .mr-3 {
+	margin-right: .75em;
+}
+.codex-editor.mr-4,
+.codex-editor .mr-4 {
+	margin-right: 1em;
+}
+
+.codex-editor.mt-0,
+.codex-editor .mt-0 {
+	margin-top: 0;
+}
+.codex-editor.mt-1,
+.codex-editor .mt-1 {
+	margin-top: .25em;
+}
+.codex-editor.mt-2,
+.codex-editor .mt-2 {
+	margin-top: .5em;
+}
+.codex-editor.mt-3,
+.codex-editor .mt-3 {
+	margin-top: .75em;
+}
+.codex-editor.mt-4,
+.codex-editor .mt-4 {
+	margin-top: 1em;
+}
+
+.codex-editor.mb-0,
+.codex-editor .mb-0 {
+	margin-bottom: 0;
+}
+.codex-editor.mb-1,
+.codex-editor .mb-1 {
+	margin-bottom: .25em;
+}
+.codex-editor.mb-2,
+.codex-editor .mb-2 {
+	margin-bottom: .5em;
+}
+.codex-editor.mb-3,
+.codex-editor .mb-3 {
+	margin-bottom: .75em;
+}
+.codex-editor.mb-4,
+.codex-editor .mb-4 {
+	margin-bottom: 1em;
+}
+
+.codex-editor.mx-0,
+.codex-editor .mx-0 {
+	margin-left: 0;
+	margin-right: 0;
+}
+.codex-editor.mx-1,
+.codex-editor .mx-1 {
+	margin-left: .25em;
+	margin-right: .25em;
+}
+.codex-editor.mx-2,
+.codex-editor .mx-2 {
+	margin-left: .5em;
+	margin-right: .5em;
+}
+.codex-editor.mx-3,
+.codex-editor .mx-3 {
+	margin-left: .75em;
+	margin-right: .75em;
+}
+.codex-editor.mx-4,
+.codex-editor .mx-4 {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+.codex-editor.my-0,
+.codex-editor .my-0 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.codex-editor.my-1,
+.codex-editor .my-1 {
+	margin-top: .25em;
+	margin-bottom: .25em;
+}
+.codex-editor.my-2,
+.codex-editor .my-2 {
+	margin-top: .5em;
+	margin-bottom: .5em;
+}
+.codex-editor.my-3,
+.codex-editor .my-3 {
+	margin-top: .75em;
+	margin-bottom: .75em;
+}
+.codex-editor.my-4,
+.codex-editor .my-4 {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+.codex-editor.pl-0,
+.codex-editor .pl-0 {
+	padding-left: 0;
+}
+.codex-editor.pl-1,
+.codex-editor .pl-1 {
+	padding-left: .25em;
+}
+.codex-editor.pl-2,
+.codex-editor .pl-2 {
+	padding-left: .5em;
+}
+.codex-editor.pl-3,
+.codex-editor .pl-3 {
+	padding-left: .75em;
+}
+.codex-editor.pl-4,
+.codex-editor .pl-4 {
+	padding-left: 1em;
+}
+
+.codex-editor.pr-0,
+.codex-editor .pr-0 {
+	padding-right: 0;
+}
+.codex-editor.pr-1,
+.codex-editor .pr-1 {
+	padding-right: .25em;
+}
+.codex-editor.pr-2,
+.codex-editor .pr-2 {
+	padding-right: .5em;
+}
+.codex-editor.pr-3,
+.codex-editor .pr-3 {
+	padding-right: .75em;
+}
+.codex-editor.pr-4,
+.codex-editor .pr-4 {
+	padding-right: 1em;
+}
+
+.codex-editor.pt-0,
+.codex-editor .pt-0 {
+	padding-top: 0;
+}
+.codex-editor.pt-1,
+.codex-editor .pt-1 {
+	padding-top: .25em;
+}
+.codex-editor.pt-2,
+.codex-editor .pt-2 {
+	padding-top: .5em;
+}
+.codex-editor.pt-3,
+.codex-editor .pt-3 {
+	padding-top: .75em;
+}
+.codex-editor.pt-4,
+.codex-editor .pt-4 {
+	padding-top: 1em;
+}
+
+.codex-editor.pb-0,
+.codex-editor .pb-0 {
+	padding-bottom: 0;
+}
+.codex-editor.pb-1,
+.codex-editor .pb-1 {
+	padding-bottom: .25em;
+}
+.codex-editor.pb-2,
+.codex-editor .pb-2 {
+	padding-bottom: .5em;
+}
+.codex-editor.pb-3,
+.codex-editor .pb-3 {
+	padding-bottom: .75em;
+}
+.codex-editor.pb-4,
+.codex-editor .pb-4 {
+	padding-bottom: 1em;
+}
+
+.codex-editor.px-0,
+.codex-editor .px-0 {
+	padding-left: 0;
+	padding-right: 0;
+}
+.codex-editor.px-1,
+.codex-editor .px-1 {
+	padding-left: .25em;
+	padding-right: .25em;
+}
+.codex-editor.px-2,
+.codex-editor .px-2 {
+	padding-left: .5em;
+	padding-right: .5em;
+}
+.codex-editor.px-3,
+.codex-editor .px-3 {
+	padding-left: .75em;
+	padding-right: .75em;
+}
+.codex-editor.px-4,
+.codex-editor .px-4 {
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.codex-editor.py-0,
+.codex-editor .py-0 {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.codex-editor.py-1,
+.codex-editor .py-1 {
+	padding-top: .25em;
+	padding-bottom: .25em;
+}
+.codex-editor.py-2,
+.codex-editor .py-2 {
+	padding-top: .5em;
+	padding-bottom: .5em;
+}
+.codex-editor.py-3,
+.codex-editor .py-3 {
+	padding-top: .75em;
+	padding-bottom: .75em;
+}
+.codex-editor.py-4,
+.codex-editor .py-4 {
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+.codex-editor.text-xs,
+.codex-editor .text-xs {
+	font-size: .75em;
+}
+.codex-editor.text-sm,
+.codex-editor .text-sm {
+	font-size: .875em;
+}
+.codex-editor.text-base,
+.codex-editor .text-base {
+	font-size: 1em;
+}
+.codex-editor.text-lg,
+.codex-editor .text-lg {
+	font-size: 1.125em;
+}
+.codex-editor.text-xl,
+.codex-editor .text-xl {
+	font-size: 1.25em;
+}
+.codex-editor.text-2xl,
+.codex-editor .text-2xl {
+	font-size: 1.5em;
+}
+.codex-editor.text-3xl,
+.codex-editor .text-3xl {
+	font-size: 1.875em;
+}
+.codex-editor.text-4xl,
+.codex-editor .text-4xl {
+	font-size: 2.25em;
+}
+.codex-editor.text-5xl,
+.codex-editor .text-5xl {
+	font-size: 3em;
+}
+.codex-editor.text-6xl,
+.codex-editor .text-6xl {
+	font-size: 4em;
+}
+
+.codex-editor.rounded-none,
+.codex-editor .rounded-none {
+	border-radius: 0;
+}
+.codex-editor.rounded-sm,
+.codex-editor .rounded-sm {
+	border-radius: .125em;
+}
+.codex-editor.rounded,
+.codex-editor .rounded {
+	border-radius: .25em;
+}
+.codex-editor.rounded-md,
+.codex-editor .rounded-md {
+	border-radius: .375em;
+}
+.codex-editor.rounded-lg,
+.codex-editor .rounded-lg {
+	border-radius: .5em;
+}
