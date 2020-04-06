@@ -351,19 +351,39 @@ const Caption = ({ syntax, data }) => (
 	</div>
 )
 
+// Prepares a hover state and functions e.g. {...hoverFns}.
+function useHover(initialValue) {
+	const [hover, setHover] = React.useState(initialValue)
+	const hoverFns = {
+		onMouseEnter: e => {
+			setHover(true)
+		},
+		onMouseLeave: e => {
+			setHover(false)
+		},
+	}
+	return [hover, hoverFns]
+}
+
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
 
-	const [hover, setHover] = React.useState(state.readOnly)
+	const [hover, hoverFns] = useHover(state.readOnly)
 
+	const imgStyle = {
+		maxWidth:  state.rect.width,
+		maxHeight: state.rect.width * 10 / 16,
+	}
 	return (
-		<Node id={id} className="relative flex flex-row justify-center" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
-			<div className="absolute inset-0 pointer-events-none" style={{ opacity: state.readOnly && !hover ? "0%" : "100%" }}>
+		<Node id={id} className="relative flex flex-row justify-center">
+			<div className="absolute inset-0 pointer-events-none" style={{ opacity: state.readOnly && (!data || !hover) ? "0%" : "100%" }}>
 				<div className="px-8 py-2 flex flex-row justify-center items-end h-full">
 					<Caption syntax={syntax} data={data} />
 				</div>
 			</div>
-			<img className="rounded shadow-hero" style={{ maxWidth: state.rect.width, maxHeight: state.rect.width / 2 }} src={src} alt={alt} />
+			<div className="rounded shadow-hero overflow-hidden" {...hoverFns}>
+				<img style={imgStyle} src={src} alt={alt} />
+			</div>
 		</Node>
 	)
 })
