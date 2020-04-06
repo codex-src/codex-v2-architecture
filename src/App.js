@@ -170,7 +170,7 @@ const headerClassNames = {
 }
 
 const Header = React.memo(({ id, tag, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
+	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
 			<div className={headerClassNames[tag]}>
 				<Markdown syntax={syntax}>
@@ -198,8 +198,7 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 	return (
 		<CompoundNode id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				// NOTE: Put my-1 on <Node> not <CompoundNode>
-				<Node key={each.id} id={each.id} className="my-1 text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
+				<Node key={each.id} id={each.id} className="text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -236,7 +235,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNode className="-mx-6 my-1 px-6 border" {...attrs.code}>
+		<CompoundNode className="-mx-6 px-6 border" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
@@ -344,7 +343,6 @@ const List = React.memo(({ id, depth, numbered, data, ...props }) => (
 	</Node>
 ))
 
-// TODO: Add my-1?
 const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
