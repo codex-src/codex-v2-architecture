@@ -133,13 +133,14 @@ const NodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
 	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
 }
+
 const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
 	const Tag = tag || "div"
 	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
 }
 
 const Header = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h1>
 		<a id={hash} href={`#${hash}`}>
 			<span className="font-medium text-3xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
@@ -151,8 +152,9 @@ const Header = React.memo(({ id, syntax, hash, data }) => (
 		</a>
 	</NodeHOC>
 ))
+
 const Subheader = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h2>
 		<a id={hash} href={`#${hash}`}>
 			<span className="font-medium text-2xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
@@ -164,10 +166,11 @@ const Subheader = React.memo(({ id, syntax, hash, data }) => (
 		</a>
 	</NodeHOC>
 ))
+
 const H3 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h3>
 		<a id={hash} href={`#${hash}`}>
-			<span className="font-semibold text-xl -tracking-px leading-tight">
+			<span className="font-semibold text-xl">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -177,10 +180,11 @@ const H3 = React.memo(({ id, syntax, hash, data }) => (
 		</a>
 	</NodeHOC>
 ))
+
 const H4 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h4>
 		<a id={hash} href={`#${hash}`}>
-			<span className="font-semibold text-lg -tracking-px leading-tight">
+			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -190,10 +194,11 @@ const H4 = React.memo(({ id, syntax, hash, data }) => (
 		</a>
 	</NodeHOC>
 ))
+
 const H5 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h5>
 		<a id={hash} href={`#${hash}`}>
-			<span className="font-semibold -tracking-px leading-tight">
+			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -203,10 +208,11 @@ const H5 = React.memo(({ id, syntax, hash, data }) => (
 		</a>
 	</NodeHOC>
 ))
+
 const H6 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1">
+	<NodeHOC id={id} className="my-1" data-type-header data-type-h6>
 		<a id={hash} href={`#${hash}`}>
-			<span className="font-semibold -tracking-px leading-tight">
+			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -1494,8 +1500,8 @@ Last and not least…images _(and GIFs)_ are supported!
 						)}
 						{state.renderMode === "markdown" && (
 							<Editor
-								className="text-lg"
-								style={tabSize(4)}
+								// className="text-lg"
+								style={{ ...tabSize(4), fontSize: 17 }}
 								state={state}
 								setState={setState}
 							/>

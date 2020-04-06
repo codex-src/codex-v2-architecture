@@ -173,11 +173,11 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ul > li[data-type-task-item] .font-mono,
-.codex-editor ol > li[data-type-task-item] .font-mono,
-.codex-editor span[data-type-strike] .font-mono {
-	vertical-align: 1px;
-}
+/* .codex-editor ul > li[data-type-task-item] .font-mono, */
+/* .codex-editor ol > li[data-type-task-item] .font-mono, */
+/* .codex-editor span[data-type-strike] .font-mono { */
+/* 	vertical-align: 1px; */
+/* } */
 
 .codex-editor .emoji {
 	vertical-align: -10%;
