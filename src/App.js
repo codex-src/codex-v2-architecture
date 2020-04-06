@@ -1272,7 +1272,7 @@ const App = props => {
 	// Read-only shortcut:
 	React.useEffect(() => {
 		const handler = e => {
-			if (!e.metaKey || e.keyCode !== 80) {
+			if (!e.metaKey || e.keyCode !== 80) { // P
 				// No-op
 				return
 			}
@@ -1377,7 +1377,7 @@ const App = props => {
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="txt"
-							data={`${text}\n`}
+							data={text}
 						/>
 					)}
 					{state.renderMode === RenderModes.MD && (
@@ -1393,14 +1393,14 @@ const App = props => {
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="html"
-							data={`${html}\n`}
+							data={html}
 						/>
 					)}
 					{state.renderMode === RenderModes.JSON && (
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="json"
-							data={`${json}\n`}
+							data={json}
 						/>
 					)}
 				</DocumentTitle>
