@@ -10,8 +10,14 @@ import RenderModes from "./RenderModes"
 import Settings from "./Settings"
 import uuidv4 from "uuid/v4"
 
+import {
+	CompoundNode,
+	Node,
+} from "./HOC"
+
 import "./App.css"
 
+// Extraneous attributes.
 const attrs = {
 	code: {
 		style: {
@@ -26,8 +32,8 @@ const attrs = {
 	},
 }
 
-// Parses syntax into a start and end string.
-function parseSyntax(syntax) {
+// Gets syntax from a string or an array of strings.
+function getSyntax(syntax) {
 	let startSyntax = ""
 	let endSyntax = ""
 	if (syntax === null) {
@@ -54,16 +60,21 @@ const Syntax = props => {
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const [startSyntax, endSyntax] = parseSyntax(syntax)
+	const [startSyntax, endSyntax] = getSyntax(syntax)
 	return (
 		<React.Fragment>
+
+			{/* LHS */}
 			<Syntax {...props}>
 				{startSyntax}
 			</Syntax>
+
+			{/* RHS */}
 			{props.children}
 			<Syntax {...props}>
 				{endSyntax}
 			</Syntax>
+
 		</React.Fragment>
 	)
 }
@@ -140,17 +151,6 @@ const A = ({ syntax, href, ...props }) => (
 		</Markdown>
 	</a>
 )
-
-// NOTE: Shadows browser’s Node API
-const Node = ({ id, tag, style, ...props }) => {
-	const Type = tag || "div"
-	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
-}
-
-const CompoundNode = ({ id, tag, style, ...props }) => {
-	const Type = tag || "div"
-	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
-}
 
 // Trims extraneous spaces from a string.
 function trimAny(str) {
@@ -990,7 +990,7 @@ function toInnerText(children, options = { markdown: false }) {
 			text += toInnerText(each, options)
 			continue
 		}
-		const [s1, s2] = parseSyntax(each.syntax)
+		const [s1, s2] = getSyntax(each.syntax)
 		if (options.markdown) {
 			text += readSyntax(s1, each)
 		}
@@ -1006,7 +1006,7 @@ function toInnerText(children, options = { markdown: false }) {
 function toText(data, options = { markdown: false }) {
 	let text = ""
 	for (const each of data) {
-		const [s1, s2] = parseSyntax(each.syntax)
+		const [s1, s2] = getSyntax(each.syntax)
 		text += !options.markdown ? "" : readSyntax(s1, each)
 		if (each.type === Break) {
 			// No-op
