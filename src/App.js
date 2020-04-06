@@ -1183,8 +1183,8 @@ const LOCALSTORAGE_KEY = "codex-app-v2.2"
 const KEY_CODE_TAB = 9
 
 const App = props => {
-	const ref = React.useRef()
-	const debugCSSRef = React.useRef()
+	const textareaRef = React.useRef()
+	const editorRef = React.useRef()
 
 	const [debugCSS, setDebugCSS] = React.useState(false)
 
@@ -1195,13 +1195,13 @@ const App = props => {
 			return
 		}
 		if (!debugCSS) {
-			debugCSSRef.current.classList.remove("debug-css")
+			editorRef.current.classList.remove("debug-css")
 		} else {
-			debugCSSRef.current.classList.add("debug-css")
+			editorRef.current.classList.add("debug-css")
 		}
 	}, [debugCSS])
 
-	// <textarea> (1 of 2):
+	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => {
 		const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 		if (cache) {
@@ -1213,7 +1213,7 @@ const App = props => {
 		return raw("./Demo.md")
 	})
 
-	// <textarea> (2 of 2):
+	// <textarea (2 of 2):
 	React.useEffect(() => {
 		localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data: value }))
 	}, [value])
@@ -1346,8 +1346,7 @@ const App = props => {
 
 				{/* LHS */}
 				<textarea
-					ref={ref}
-					// FIXME: Add min-height
+					ref={textareaRef}
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
 					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
@@ -1357,51 +1356,49 @@ const App = props => {
 							return
 						}
 						e.preventDefault()
-						const { value, selectionStart: pos1, selectionEnd: pos2 } = ref.current
+						const { value, selectionStart: pos1, selectionEnd: pos2 } = textareaRef.current
 						const newValue = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
-						ref.current.value = newValue
-						ref.current.selectionStart = pos1 + 1
-						ref.current.selectionEnd = pos1 + 1
+						textareaRef.current.value = newValue
+						textareaRef.current.selectionStart = pos1 + 1
+						textareaRef.current.selectionEnd = pos1 + 1
 						setValue(newValue)
 					}}
 					onChange={e => setValue(e.target.value)}
 				/>
 
 				{/* RHS */}
-				<div>
-					<DocumentTitle title={state.meta && state.meta.title}>
-						{state.renderMode === "text" && (
-							<CodeBlockStandalone
-								style={cardStyle}
-								lang="text"
-								data={`${text}\n`}
-							/>
-						)}
-						{state.renderMode === "markdown" && (
-							<Editor
-								ref={debugCSSRef}
-								// className="text-lg"
-								style={{ fontSize: 17 }}
-								state={state}
-								setState={setState}
-							/>
-						)}
-						{state.renderMode === "html" && (
-							<CodeBlockStandalone
-								style={cardStyle}
-								lang="html"
-								data={`${html}\n`}
-							/>
-						)}
-						{state.renderMode === "json" && (
-							<CodeBlockStandalone
-								style={cardStyle}
-								lang="json"
-								data={`${json}\n`}
-							/>
-						)}
-					</DocumentTitle>
-				</div>
+				<DocumentTitle title={state.meta && state.meta.title}>
+					{state.renderMode === "text" && (
+						<CodeBlockStandalone
+							style={cardStyle}
+							lang="text"
+							data={`${text}\n`}
+						/>
+					)}
+					{state.renderMode === "markdown" && (
+						<Editor
+							ref={editorRef}
+							// className="text-lg"
+							style={{ fontSize: 17 }}
+							state={state}
+							setState={setState}
+						/>
+					)}
+					{state.renderMode === "html" && (
+						<CodeBlockStandalone
+							style={cardStyle}
+							lang="html"
+							data={`${html}\n`}
+						/>
+					)}
+					{state.renderMode === "json" && (
+						<CodeBlockStandalone
+							style={cardStyle}
+							lang="json"
+							data={`${json}\n`}
+						/>
+					)}
+				</DocumentTitle>
 
 			</div>
 		</div>
