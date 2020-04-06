@@ -340,7 +340,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
-				<Checkbox className="mr-2 text-md-blue-a200 shadow" style={checkboxStyle} {...$attrs} />
+				<Checkbox className="mr-2 text-md-blue-a200 shadow transition duration-150" style={checkboxStyle} {...$attrs} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
