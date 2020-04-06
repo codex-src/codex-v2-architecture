@@ -116,6 +116,7 @@ const Code = ({ syntax, ...props }) => (
 	</span>
 )
 
+// TODO
 const strikeStyle = {
 	"--red-100": "var(--gray-100)",
 	"--red-600": "currentColor",
@@ -393,7 +394,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 	return (
-		<NodeHOC id={id} className="my-1">
+		<Node id={id} className="my-1">
 			{!readOnly ? (
 				// Read-write mode:
 				<Markdown syntax={syntax} />
@@ -401,7 +402,7 @@ const Break = React.memo(({ id, syntax }) => {
 				// Read-only mode:
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
-		</NodeHOC>
+		</Node>
 	)
 })
 
@@ -1350,13 +1351,13 @@ const App = props => {
 							data={state.types.html}
 						/>
 					)}
-					{state.renderMode === RenderModes.JSON && (
-						<CodeBlockStandalone
-							style={cardStyle}
-							lang="json"
-							data={state.types.json}
-						/>
-					)}
+					{/* {state.renderMode === RenderModes.JSON && (} */}
+					{/* 	<CodeBlockStandalone} */}
+					{/* 		style={cardStyle}} */}
+					{/* 		lang="json"} */}
+					{/* 		data={state.types.json}} */}
+					{/* 	/>} */}
+					{/* )}} */}
 				</DocumentTitle>
 
 			</div>
