@@ -139,19 +139,21 @@ const CompoundNode = ({ id, tag, style, ...props }) => {
 	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
 }
 
-// Compresses a string (drops extraneous spaces).
-function compress(str) {
-	return str.split(/ +/).join(" ")
+// Trims extraneous spaces from a string.
+function trimSpaces(str) {
+	const trimmed = str
+		.replace(/ +/, " ") // Trims extra spaces
+		.trim() // Trims start and end spaces
+	return trimmed
 }
 
-// FIXME
 const headerClassNames = {
-	h1: compress("font-medium   text-3xl -tracking-px leading-tight"),
-	h2: compress("font-medium   text-2xl -tracking-px leading-tight"),
-	h3: compress("font-semibold text-xl  -tracking-px leading-tight"),
-	h4: compress("font-semibold text-xl  -tracking-px leading-tight"),
-	h5: compress("font-semibold text-xl  -tracking-px leading-tight"),
-	h6: compress("font-semibold text-xl  -tracking-px leading-tight"),
+	h1: trimSpaces("font-medium   text-3xl -tracking-px leading-tight"),
+	h2: trimSpaces("font-medium   text-2xl -tracking-px leading-tight"),
+	h3: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
+	h4: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
+	h5: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
+	h6: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
 }
 
 const Header = React.memo(({ id, tag, syntax, hash, data }) => (
