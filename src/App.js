@@ -1,5 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as spec from "./spec"
+import Button from "./Button"
 import Enum from "./Enum"
 import escape from "lodash/escape"
 import Prism from "./Prism"
@@ -1293,56 +1294,32 @@ const App = props => {
 		<div className="flex flex-row justify-center">
 			<div className="px-6 py-32 grid grid-cols-2 gap-12 w-full">
 
-				{/* Read-only button: */}
+				{/* Buttons (top-right): */}
 				<div className="-my-1 p-3 fixed right-0 top-0 z-30">
 					<div className="flex flex-col items-end">
 						<div className="-mx-1 my-1 flex flex-row">
-							<button
-								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: RenderModes.TXT })}
-							>
+							<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.TXT })}>
 								Plain text
-							</button>
-							<button
-								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: RenderModes.MD })}
-							>
+							</Button>
+							<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.MD })}>
 								Markdown
-							</button>
-							<button
-								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: RenderModes.HTML })}
-							>
+							</Button>
+							<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.HTML })}>
 								HTML
-							</button>
-							<button
-								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: RenderModes.JSON })}
-							>
+							</Button>
+							<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.JSON })}>
 								JSON
-							</button>
+							</Button>
 						</div>
 						<div className="-mx-1 my-1 flex flex-row">
 							{state.renderMode === RenderModes.MD && (
 								<React.Fragment>
-									<button
-										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-										onPointerDown={e => e.preventDefault()}
-										onClick={e => setState({ ...state, readOnly: !state.readOnly })}
-									>
+									<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, readOnly: !state.readOnly })}>
 										Toggle read-only: {String(state.readOnly)}
-									</button>
-									<button
-										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-										onPointerDown={e => e.preventDefault()}
-										onClick={e => setDebugCSS(!debugCSS)}
-									>
+									</Button>
+									<Button className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setDebugCSS(!debugCSS)}>
 										Toggle CSS debugger: {String(debugCSS)}
-									</button>
+									</Button>
 								</React.Fragment>
 							)}
 						</div>
