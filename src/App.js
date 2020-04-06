@@ -225,11 +225,9 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 			// No-op
 			return
 		}
-		setHTML(
-			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(data, parser, lang)
-			}} />
-		)
+		setHTML(<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+			__html: window.Prism.highlight(data, parser, lang),
+		}} />)
 	}, [lang, data])
 
 	return (
@@ -273,11 +271,9 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 			// No-op
 			return
 		}
-		setHTML(
-			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(data, parser, lang)
-			}} />
-		)
+		setHTML(<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+			__html: window.Prism.highlight(data, parser, lang),
+		}} />)
 	}, [lang, data])
 
 	return (
@@ -1278,6 +1274,9 @@ const App = props => {
 		debugCSS: false,
 		readOnly: false,
 		data: parseGFM(value),
+		text: "",
+		html: "",
+		json: "",
 	}))
 
 	// Update state:
@@ -1293,28 +1292,29 @@ const App = props => {
 		}
 	}, [value])
 
-	const [text, setText] = React.useState(() => toText(state.data))
-	const [html, setHTML] = React.useState(() => toHTML(state.data))
-	const [json, setJSON] = React.useState(() => toJSON(state.data))
-
+	// Update data structures:
 	React.useEffect(() => {
-		const id = setTimeout(() => {
-			switch (state.renderMode) {
-			case RenderModes.Text:
-				setText(toText(state.data))
-				break
-			case RenderModes.HTML:
-				setHTML(toHTML(state.data))
-				break
-			case RenderModes.JSON:
-				setJSON(toJSON(state.data))
-				break
-			default:
-				// No-op
-			}
-		}, 16.6667)
-		return () => {
-			clearTimeout(id)
+		switch (state.renderMode) {
+		case RenderModes.Text:
+			setState(current => ({
+				...current,
+				text: toText(state.data),
+			}))
+			break
+		case RenderModes.HTML:
+			setState(current => ({
+				...current,
+				html: toHTML(state.data),
+			}))
+			break
+		case RenderModes.JSON:
+			setState(current => ({
+				...current,
+				json: toJSON(state.data),
+			}))
+			break
+		default:
+			// No-op
 		}
 	}, [state.renderMode, state.data])
 
@@ -1347,19 +1347,20 @@ const App = props => {
 	}, [state.readOnly])
 
 	// Bind tab:
-	const onKeyDown = e => {
-		if (e.keyCode !== 9) { // Tab
+	const tabHandler = e => {
+		if (e.keyCode !== 9) {
 			// No-op
 			return
 		}
 		e.preventDefault()
 		const textarea = textareaRef.current
 		const { value, selectionStart: pos1, selectionEnd: pos2 } = textarea
-		const newValue = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
+		// eslint-disable-next-line prefer-template
+		const newValue = value.slice(0, pos1) + "\t" + value.slice(pos2)
 		Object.assign(textarea, {
 			value: newValue,
-			selectionStart: pos1 + 1,
-			selectionEnd: pos2 + 1,
+			selectionStart: pos1 + "\t".length,
+			selectionEnd: pos2 + "\t".length,
 		})
 		setValue(newValue)
 	}
@@ -1383,7 +1384,7 @@ const App = props => {
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
 					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
-					onKeyDown={onKeyDown}
+					onKeyDown={tabHandler}
 					onChange={e => setValue(e.target.value)}
 				/>
 
@@ -1392,7 +1393,7 @@ const App = props => {
 					{state.renderMode === RenderModes.Text && (
 						<CodeBlockStandalone
 							style={cardStyle}
-							data={text}
+							data={state.text}
 						/>
 					)}
 					{state.renderMode === RenderModes.CGFM && (
@@ -1407,14 +1408,14 @@ const App = props => {
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="html"
-							data={html}
+							data={state.html}
 						/>
 					)}
 					{state.renderMode === RenderModes.JSON && (
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="json"
-							data={json}
+							data={state.json}
 						/>
 					)}
 				</DocumentTitle>
