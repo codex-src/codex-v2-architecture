@@ -128,6 +128,7 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
+// NOTE: Shadows browser’s Node API
 const Node = ({ id, tag, style, ...props }) => {
 	const Type = tag || "div"
 	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
@@ -138,80 +139,25 @@ const CompoundNode = ({ id, tag, style, ...props }) => {
 	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
 }
 
-const Header = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
-		<a id={hash} href={`#${hash}`}>
-			<div className="font-medium text-3xl -tracking-px leading-tight">
-				<Markdown syntax={syntax}>
-					{toInnerReact(data) || (
-						<br />
-					)}
-				</Markdown>
-			</div>
-		</a>
-	</Node>
-))
+// Compresses a string (drops extraneous spaces).
+function compress(str) {
+	return str.split(/ +/).join(" ")
+}
 
-const Subheader = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
-		<a id={hash} href={`#${hash}`}>
-			<div className="font-medium text-2xl -tracking-px leading-tight">
-				<Markdown syntax={syntax}>
-					{toInnerReact(data) || (
-						<br />
-					)}
-				</Markdown>
-			</div>
-		</a>
-	</Node>
-))
+// FIXME
+const headerClassNames = {
+	h1: compress("font-medium   text-3xl -tracking-px leading-tight"),
+	h2: compress("font-medium   text-2xl -tracking-px leading-tight"),
+	h3: compress("font-semibold text-xl  -tracking-px leading-tight"),
+	h4: compress("font-semibold text-xl  -tracking-px leading-tight"),
+	h5: compress("font-semibold text-xl  -tracking-px leading-tight"),
+	h6: compress("font-semibold text-xl  -tracking-px leading-tight"),
+}
 
-const H3 = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
+const Header = React.memo(({ id, tag, syntax, hash, data }) => (
+	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-xl -tracking-px leading-tight">
-				<Markdown syntax={syntax}>
-					{toInnerReact(data) || (
-						<br />
-					)}
-				</Markdown>
-			</div>
-		</a>
-	</Node>
-))
-
-const H4 = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
-		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-xl -tracking-px leading-tight">
-				<Markdown syntax={syntax}>
-					{toInnerReact(data) || (
-						<br />
-					)}
-				</Markdown>
-			</div>
-		</a>
-	</Node>
-))
-
-const H5 = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
-		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-xl -tracking-px leading-tight">
-				<Markdown syntax={syntax}>
-					{toInnerReact(data) || (
-						<br />
-					)}
-				</Markdown>
-			</div>
-		</a>
-	</Node>
-))
-
-const H6 = React.memo(({ id, syntax, hash, data }) => (
-	<Node id={id} className="my-1">
-		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-xl -tracking-px leading-tight">
+			<div className={headerClassNames[tag]}>
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -781,7 +727,9 @@ function parseGFM(text) {
 			) {
 				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
-					type: [Header, Subheader, H3, H4, H5, H6][syntax.length - 2],
+					// type: [Header, Subheader, H3, H4, H5, H6][syntax.length - 2],
+					type: Header,
+					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: uuidv4(),
 					syntax: [syntax],
 					hash: newHash(toInnerText(parseInnerGFM(each.slice(syntax.length)))),
@@ -1103,11 +1051,6 @@ const cmapHTML = new Map()
 	cmapJSON[Strike]          = "Strike"
 	cmapJSON[A]               = "A"
 	cmapJSON[Header.type]     = "Header"
-	cmapJSON[Subheader.type]  = "Subheader"
-	cmapJSON[H3.type]         = "H3"
-	cmapJSON[H4.type]         = "H4"
-	cmapJSON[H5.type]         = "H5"
-	cmapJSON[H6.type]         = "H6"
 	cmapJSON[Paragraph.type]  = "Paragraph"
 	cmapJSON[Blockquote.type] = "Blockquote"
 	cmapJSON[CodeBlock.type]  = "CodeBlock"
@@ -1126,11 +1069,6 @@ const cmapHTML = new Map()
 	cmapHTML[Strike]          = ["<strike>", "</strike>"]
 	cmapHTML[A]               = [data => `<a href="${data.href}">`, "</a>"]
 	cmapHTML[Header.type]     = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
-	cmapHTML[Subheader.type]  = [data => `<a href="#${data.hash}">\n\t<h2 id="${data.hash}">\n\t\t`, "\n\t</h2>\n</a>"]
-	cmapHTML[H3.type]         = [data => `<a href="#${data.hash}">\n\t<h3 id="${data.hash}">\n\t\t`, "\n\t</h3>\n</a>"]
-	cmapHTML[H4.type]         = [data => `<a href="#${data.hash}">\n\t<h4 id="${data.hash}">\n\t\t`, "\n\t</h4>\n</a>"]
-	cmapHTML[H5.type]         = [data => `<a href="#${data.hash}">\n\t<h5 id="${data.hash}">\n\t\t`, "\n\t</h5>\n</a>"]
-	cmapHTML[H6.type]         = [data => `<a href="#${data.hash}">\n\t<h6 id="${data.hash}">\n\t\t`, "\n\t</h6>\n</a>"]
 	cmapHTML[Paragraph.type]  = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
 	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>`, "</code></pre>"]
