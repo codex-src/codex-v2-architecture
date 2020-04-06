@@ -397,8 +397,9 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	// 	})
 	// }
 	const imgStyle = {
-		minHeight: "3em",
+		// minHeight: "3em",
 		maxWidth:  state.rect && state.rect.width,
+		minHeight: state.rect && state.rect.width * 10 / 16,
 		maxHeight: state.rect && state.rect.width * 10 / 16,
 	}
 	return (
@@ -409,7 +410,7 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 				</div>
 			</div>
 			{/* <div style={{opacity: !loaded ? "0%" : "100%" }} {...$attrs}> */}
-			<div className={!loaded ? "opacity-0" : "opacity-100"} {...$attrs}>
+			<div className={!loaded ? "w-full text-transparent bg-gray-100" : ""} {...$attrs}>
 				<img style={imgStyle} src={src} alt={alt} onLoad={e => setLoaded(true)} />
 			</div>
 		</Node>
