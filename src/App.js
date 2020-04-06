@@ -8,6 +8,17 @@ import uuidv4 from "uuid/v4"
 
 import "./App.css"
 
+const codeAttrs = {
+	style: { MozTabSize: 2, tabSize: 2 },
+	spellCheck: false,
+}
+
+const anchorAttrs= {
+	// react/jsx-no-target-blank
+	target: "_blank",
+	rel: "noopener noreferrer",
+}
+
 // Parses syntax into a start and end string.
 function parseSyntax(syntax) {
 	let startSyntax = ""
@@ -91,7 +102,7 @@ const StrongAndEm = ({ syntax, ...props }) => (
 )
 
 const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabStyle(2)} spellCheck={false}>
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...codeAttrs}>
 		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -114,18 +125,8 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
-function hrefAttrs(href) {
-	const attrs = {
-		href,
-		// react/jsx-no-target-blank
-		target: "_blank",
-		rel: "noopener noreferrer",
-	}
-	return attrs
-}
-
 const A = ({ syntax, href, ...props }) => (
-	<a className="underline text-md-blue-a400" {...hrefAttrs(href)}>
+	<a className="underline text-md-blue-a400" href={href} {...anchorAttrs}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
@@ -219,7 +220,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNode className="-mx-6 my-1 px-6 border" style={tabStyle(2)} spellCheck={false}>
+		<CompoundNode className="-mx-6 my-1 px-6 border" {...codeAttrs}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
@@ -1146,13 +1147,23 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			{
 				ref,
 
-				"className": `codex-editor${!className ? "" : ` ${className}`}`,
+				"className": !className
+					? "codex-editor"
+					: `codex-editor ${className}`,
 
 				"style": {
+					// tab-size:
+					MozTabSize: 4,
+					tabSize: 4,
+
+					// contenteditable:
+					caretColor: "black",
+
+					// Imperative styles for contenteditable:
 					whiteSpace: "pre-wrap",
-					// caretColor: "black",
 					outline: "none",
 					overflowWrap: "break-word",
+
 					...style,
 				},
 
@@ -1168,14 +1179,6 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
 const KEY_CODE_TAB = 9
-
-function tabStyle(size) {
-	const style = {
-		MozTabSize: size,
-		tabSize: size,
-	}
-	return style
-}
 
 const App = props => {
 	const ref = React.useRef()
@@ -1345,6 +1348,7 @@ Last and not least…images _(and GIFs)_ are supported!
 		}
 	}, [state.readOnly])
 
+	const cardStyle = { margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="px-6 py-32 grid grid-cols-2 gap-12 w-full">
@@ -1410,7 +1414,7 @@ Last and not least…images _(and GIFs)_ are supported!
 					ref={ref}
 					// FIXME: Add min-height
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
-					style={tabStyle(2)}
+					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
 					onKeyDown={e => {
 						if (e.keyCode !== KEY_CODE_TAB) {
@@ -1433,7 +1437,7 @@ Last and not least…images _(and GIFs)_ are supported!
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
+								style={cardStyle}
 								lang="text"
 								data={`${text}\n`}
 							/>
@@ -1441,21 +1445,21 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "markdown" && (
 							<Editor
 								// className="text-lg"
-								style={{ ...tabStyle(4), fontSize: 17 }}
+								style={{ fontSize: 17 }}
 								state={state}
 								setState={setState}
 							/>
 						)}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
+								style={cardStyle}
 								lang="html"
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
+								style={cardStyle}
 								lang="json"
 								data={`${json}\n`}
 							/>
