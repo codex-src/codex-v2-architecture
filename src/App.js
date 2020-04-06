@@ -1,6 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as spec from "./spec"
-import Button from "./Button"
+import DocumentTitle from "./DocumentTitle"
 import escape from "lodash/escape"
 import Prism from "./Prism"
 import raw from "raw.macro"
@@ -367,13 +367,19 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	)
 })
 
+// NOTE:
+//
+// <Syntax ...> || (
+//   <hr ...>
+// )
+//
+// Doesn’t work -- because of React.memo?
+//
 const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 	return (
 		<Node id={id} className="my-1">
-			{!readOnly ? (
-				<Markdown syntax={syntax} />
-			) : (
+			{(!readOnly && <Syntax>{syntax[0]}</Syntax>) || (
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
 		</Node>
@@ -1098,18 +1104,6 @@ const cmapHTML = new Map()
 	cmapHTML[Break.type]      = ["<hr>", ""] // Leaf node
 	/* eslint-enable no-multi-spaces */
 })()
-
-// Sets the document title (uses useEffect).
-const DocumentTitle = ({ title, ...props }) => {
-	React.useEffect(() => {
-		if (!title) {
-			// No-op
-			return
-		}
-		document.title = title
-	}, [title])
-	return props.children || null
-}
 
 const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
