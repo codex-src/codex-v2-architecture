@@ -109,7 +109,7 @@ const StrongAndEm = ({ syntax, ...props }) => (
 )
 
 const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
 		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -1105,9 +1105,6 @@ const cmapHTML = new Map()
 	/* eslint-enable no-multi-spaces */
 })()
 
-const AVG_RUNES_PER_WORD = 6
-const AVG_WORDS_PER_MINUTE = 250
-
 // TODO: Add value to state (needed for backspace)
 const Editor = React.forwardRef(({ className, style, state, setState, ...props }, ref) => {
 
@@ -1123,32 +1120,6 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 			ref.current,
 		)
 	}, [state, ref])
-
-	React.useEffect(() => {
-		const text = toText(state.data)
-		const runes = [...text].length // Precompute for seconds
-		setState(current => ({
-			...current,
-			// // TODO: Convert to a rich data structure with nesting
-			// tableOfContents: state.data.filter(each => (
-			// 	each.type === Header ||
-			// 	each.type === Subheader ||
-			// 	each.type === H3 ||
-			// 	each.type === H4 ||
-			// 	each.type === H5 ||
-			// 	each.type === H6
-			// )),
-			meta: {
-				title: [...text.split("\n", 1)[0]].slice(0, 100).join("") || "Untitled",
-				runes: [...text].length,
-				words: text.split(/\s+/).filter(Boolean).length,
-				seconds: Math.ceil(runes / AVG_RUNES_PER_WORD / AVG_WORDS_PER_MINUTE * 60),
-			},
-		}))
-	}, [
-		state.data,
-		setState,
-	])
 
 	return (
 		React.createElement(
@@ -1185,7 +1156,32 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 	)
 })
 
-const LOCALSTORAGE_KEY = "codex-app-v2.2"
+const KEY = "codex-app-v2.2"
+
+const RUNES_PER_WORD = 6
+const WORDS_PER_MINUTE = 250
+
+// Parses a VDOM representation to other data types.
+function parseTypes(data) {
+	const types = {
+		text: toText(data),
+		html: toHTML(data),
+		json: toJSON(data),
+	}
+	return types
+}
+
+// Parses a text representation to metadata.
+function parseMetadata(text) {
+	const runes = [...text].length
+	const meta = {
+		title: text.split("\n", 1),
+		runes,
+		words: text.split(/\s+/).filter(Boolean).length,
+		seconds: Math.ceil(runes / RUNES_PER_WORD / WORDS_PER_MINUTE * 60),
+	}
+	return meta
+}
 
 const App = props => {
 	const textareaRef = React.useRef()
@@ -1193,7 +1189,7 @@ const App = props => {
 
 	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => {
-		const cache = localStorage.getItem(LOCALSTORAGE_KEY)
+		const cache = localStorage.getItem(KEY)
 		if (cache) {
 			const json = JSON.parse(cache)
 			if (json.data) {
@@ -1205,18 +1201,25 @@ const App = props => {
 
 	// <textarea (2 of 2):
 	React.useEffect(() => {
-		localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data: value }))
+		const id = setTimeout(() => {
+			localStorage.setItem(KEY, JSON.stringify({ data: value }))
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
 	}, [value])
+
+	// epoch: "",      // TODO
+	// sinceEpoch: "", // TODO
 
 	// Create state:
 	const [state, setState] = React.useState(() => ({
-		renderMode: RenderModes.CGFM,
+		renderMode: RenderModes.GFM,
 		debugCSS: false,
 		readOnly: false,
 		data: parseGFM(value),
-		text: "",
-		html: "",
-		json: "",
+		types: { text: "", html: "", json: "" },
+		metadata: { title: "", runes: 0, words: 0, seconds: 0 },
 	}))
 
 	// Update state:
@@ -1226,7 +1229,7 @@ const App = props => {
 				...current,
 				data: parseGFM(value),
 			}))
-		}, 16.6667)
+		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
@@ -1234,28 +1237,13 @@ const App = props => {
 
 	// Update data structures:
 	React.useEffect(() => {
-		switch (state.renderMode) {
-		case RenderModes.Text:
-			setState(current => ({
-				...current,
-				text: toText(state.data),
-			}))
-			break
-		case RenderModes.HTML:
-			setState(current => ({
-				...current,
-				html: toHTML(state.data),
-			}))
-			break
-		case RenderModes.JSON:
-			setState(current => ({
-				...current,
-				json: toJSON(state.data),
-			}))
-			break
-		default:
-			// No-op
-		}
+		// Precompute types for metadata:
+		const types = parseTypes(state.data)
+		setState(current => ({
+			...current,
+			types,
+			metadata: parseMetadata(types.text),
+		}))
 	}, [state.renderMode, state.data])
 
 	const mounted = React.useRef()
@@ -1329,14 +1317,15 @@ const App = props => {
 				/>
 
 				{/* RHS */}
-				<DocumentTitle title={state.meta && state.meta.title}>
+				<DocumentTitle title={(state.metadata && state.metadata.title) || "Untitled"}>
 					{state.renderMode === RenderModes.Text && (
 						<CodeBlockStandalone
 							style={cardStyle}
-							data={state.text}
+							lang={null} // No-op
+							data={state.types.text}
 						/>
 					)}
-					{state.renderMode === RenderModes.CGFM && (
+					{state.renderMode === RenderModes.GFM && (
 						<Editor
 							ref={editorRef}
 							style={{ fontSize: 17 }}
@@ -1348,14 +1337,14 @@ const App = props => {
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="html"
-							data={state.html}
+							data={state.types.html}
 						/>
 					)}
 					{state.renderMode === RenderModes.JSON && (
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="json"
-							data={state.json}
+							data={state.types.json}
 						/>
 					)}
 				</DocumentTitle>
