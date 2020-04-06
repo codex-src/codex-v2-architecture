@@ -192,13 +192,15 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 ))
 
 // NOTE: Compound component
-const Blockquote = React.memo(({ id, syntax, data }) => {
+const Blockquote = React.memo(({ id, data }) => {
 	const [state] = React.useContext(EditorContext)
 
+	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
+	const nodeStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
 	return (
-		<CompoundNode id={id} style={state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
+		<CompoundNode id={id} style={compoundNodeStyle}>
 			{data.map((each, index) => (
-				<Node key={each.id} id={each.id} className="text-gray-600" style={state.readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
+				<Node key={each.id} id={each.id} className="my-1 text-gray-600" style={nodeStyle}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -234,7 +236,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 	}, [lang, data])
 
 	return (
-		// NOTE: Doesn’t use py-* because of <Markdown>
+		// NOTE: Doesn’t use py-4 because of <Markdown>
 		<CompoundNode className="-mx-6 px-6 border" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
@@ -343,14 +345,6 @@ const List = React.memo(({ id, depth, numbered, data }) => (
 	</Node>
 ))
 
-const Caption = ({ syntax, data }) => (
-	<div className="mx-auto px-2 py-1 bg-white rounded shadow-hero truncate pointer-events-auto">
-		<Markdown syntax={syntax}>
-			{toInnerReact(data)}
-		</Markdown>
-	</div>
-)
-
 // Prepares a hover state and functions e.g. {...hoverFns}.
 function useHover(initialValue) {
 	const [hover, setHover] = React.useState(initialValue)
@@ -364,6 +358,14 @@ function useHover(initialValue) {
 	}
 	return [hover, hoverFns]
 }
+
+const Caption = ({ syntax, data }) => (
+	<div className="px-2 py-1 bg-white rounded shadow-hero truncate pointer-events-auto">
+		<Markdown syntax={syntax}>
+			{toInnerReact(data)}
+		</Markdown>
+	</div>
+)
 
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
@@ -1159,7 +1161,7 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 			</Provider>,
 			ref.current,
 		)
-	}, [state, ref])
+	}, [state, setState, ref])
 
 	return (
 		React.createElement(
