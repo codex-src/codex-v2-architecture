@@ -381,14 +381,25 @@ function useHovered(initialValue) {
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
 
+	const [loaded, setLoaded] = React.useState(false)
 	const [hovered, $attrs] = useHovered(state.readOnly)
 
 	const divStyle = {
 		opacity: state.readOnly && (!data || !hovered) ? "0%" : "100%",
 	}
+	// TODO: Guard state.rect?
+	//
+	// let imgStyle = null
+	// if (state.rect) {
+	// 	Object.assign(imgStyle,
+	// 		maxWidth:  state.rect && state.rect.width,
+	// 		maxHeight: state.rect && state.rect.width * 10 / 16,
+	// 	})
+	// }
 	const imgStyle = {
-		maxWidth:  state.rect.width,
-		maxHeight: state.rect.width * 10 / 16,
+		minHeight: "3em",
+		maxWidth:  state.rect && state.rect.width,
+		maxHeight: state.rect && state.rect.width * 10 / 16,
 	}
 	return (
 		<Node id={id} className="relative flex flex-row justify-center">
@@ -397,8 +408,9 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 					<Caption syntax={syntax} data={data} />
 				</div>
 			</div>
-			<div className="rounded shadow-hero overflow-hidden" {...$attrs}>
-				<img style={imgStyle} src={src} alt={alt} />
+			{/* <div style={{opacity: !loaded ? "0%" : "100%" }} {...$attrs}> */}
+			<div className={!loaded ? "opacity-0" : "opacity-100"} {...$attrs}>
+				<img style={imgStyle} src={src} alt={alt} onLoad={e => setLoaded(true)} />
 			</div>
 		</Node>
 	)
@@ -418,6 +430,8 @@ const Break = React.memo(({ id, syntax }) => {
 })
 
 // Registers a type for parseInnerGFM.
+//
+// TODO: Refactor to parseInner({ type, syntax, text, index, recurse, minOffset })?
 function registerType(type, syntax, { recurse } = { recurse: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
@@ -492,8 +506,6 @@ function parseInnerGFM(text) {
 		// <StrongEm>
 		// <Strong>
 		// <Em>
-		//
-		// TODO: Refactor?
 		case char === "*" || char === "_":
 			// ***Strong and em***
 			if (nchars >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
