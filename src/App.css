@@ -193,13 +193,18 @@
 	line-height: 1.15;
 }
 
+.text-md-blue-a100 {
+	color: var(--md-blue-a100);
+}
 .text-md-blue-a200 {
 	color: var(--md-blue-a200);
 }
 .text-md-blue-a400 {
 	color: var(--md-blue-a400);
 }
-
+.text-md-blue-a700 {
+	color: var(--md-blue-a700);
+}
 .text-red-100 {
 	color: var(--red-100);
 }

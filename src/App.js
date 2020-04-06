@@ -195,12 +195,12 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 const Blockquote = React.memo(({ id, data }) => {
 	const [state] = React.useContext(EditorContext)
 
-	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
-	const nodeStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
+	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
+	const eachStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
 	return (
 		<CompoundNode id={id} style={compoundNodeStyle}>
 			{data.map((each, index) => (
-				<Node key={each.id} id={each.id} className="my-1 text-gray-600" style={nodeStyle}>
+				<Node key={each.id} id={each.id} className="my-1 text-md-blue-a400" style={eachStyle}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
