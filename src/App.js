@@ -1239,6 +1239,8 @@ const App = props => {
 
 	// Update state:
 	React.useEffect(() => {
+		textareaRef.current.style.height = `${textareaRef.current.style.scrollHeight}px`
+
 		const id = setTimeout(() => {
 			const data = parseGFM(value)
 			const types = parseTypes(data)
