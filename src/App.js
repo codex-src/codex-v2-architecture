@@ -170,18 +170,8 @@ const Header = React.memo(({ id, tag, syntax, hash, data }) => (
 	</Node>
 ))
 
-// Returns whether a VDOM representation uses 1-3 emojis.
-function emojis(data) {
-	const ok = (
-		Array.isArray(data) &&
-		data.length <= 3 &&
-		data.every(each => each.type === Emoji)
-	)
-	return ok
-}
-
-const Paragraph = React.memo(({ id, data }) => (
-	<Node id={id} className={!emojis(data) ? null : "emojis"}>
+const Paragraph = React.memo(({ id, emojis, data }) => (
+	<Node id={id} className={!emojis ? null : `emojis emojis-${data.length}`}>
 		{toInnerReact(data) || (
 			<br />
 		)}
@@ -893,10 +883,16 @@ function parseGFM(text) {
 			break
 		}
 		// <Paragraph>
+		const children = parseInnerGFM(each)
 		data.push({
 			type: Paragraph,
 			id: uuidv4(),
-			children: parseInnerGFM(each),
+			emojis: (
+				children &&
+				children.every &&
+				children.every(each => each.type === Emoji)
+			),
+			children,
 		})
 	}
 	return data
