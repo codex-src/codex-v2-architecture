@@ -169,7 +169,8 @@ const headerClassNames = {
 	h6: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
 }
 
-const Header = React.memo(({ id, tag, syntax, hash, data }) => (
+const Header = React.memo(({ tag, id, syntax, hash, data }) => (
+	// NOTE: Don’t use <Node tag={tag} ...>
 	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
 			<div className={headerClassNames[tag]}>
@@ -335,10 +336,8 @@ const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
 })
 
 // NOTE: Compound component
-const List = React.memo(({ id, depth, numbered, data }) => (
-	// TODO: Add numbered class
-	// FIXME: Y-axis margin is wrong
-	<Node id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
+const List = React.memo(({ tag, id, depth, data }) => (
+	<Node tag={tag} id={id} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
 		))}
@@ -372,13 +371,18 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 
 	const [hover, hoverFns] = useHover(state.readOnly)
 
+	// <div ...>
+	const captionContainerStyle = {
+		opacity: state.readOnly && (!data || !hover) ? "0%" : "100%",
+	}
+	// <img ...>
 	const imgStyle = {
 		maxWidth:  state.rect.width,
 		maxHeight: state.rect.width * 10 / 16,
 	}
 	return (
 		<Node id={id} className="relative flex flex-row justify-center">
-			<div className="absolute inset-0 pointer-events-none" style={{ opacity: state.readOnly && (!data || !hover) ? "0%" : "100%" }}>
+			<div className="absolute inset-0 pointer-events-none" style={captionContainerStyle}>
 				<div className="px-8 py-2 flex flex-row justify-center items-end h-full">
 					<Caption syntax={syntax} data={data} />
 				</div>
@@ -694,9 +698,9 @@ const NumberedListRe = /^\t*\d+\. /
 function parseList(range) {
 	const data = {
 		type: List,
+		tag: !NumberedListRe.test(range[0]) ? "ul" : "ol",
 		id: uuidv4(),
 		depth: 0,
-		numbered: NumberedListRe.test(range[0]),
 		children: [],
 	}
 	for (const each of range) {
@@ -709,10 +713,9 @@ function parseList(range) {
 			if (!ref.length || ref[ref.length - 1].type !== List) {
 				ref.push({
 					type: List,
+					tag: !NumberedListRe.test(each) ? "ul" : "ol",
 					id: uuidv4(),
-					syntax: null,
 					depth: deep + 1, // Eagerly increment
-					numbered: NumberedListRe.test(each),
 					children: [],
 				})
 			}
@@ -765,7 +768,6 @@ function parseGFM(text) {
 			) {
 				const syntax = each.slice(0, each.indexOf(" ") + 1)
 				data.push({
-					// type: [Header, Subheader, H3, H4, H5, H6][syntax.length - 2],
 					type: Header,
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: uuidv4(),
@@ -1135,7 +1137,7 @@ const cmapHTML = new Map()
 	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>`, "</code></pre>"]
 	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
 	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t`, "\n</li>"]
-	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
+	cmapHTML[List.type]       = [data => `<${data.tag}>`, data => `</${data.tag}>`]
 	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""]
 	cmapHTML[Break.type]      = ["<hr>", ""]
 	/* eslint-enable no-multi-spaces */
