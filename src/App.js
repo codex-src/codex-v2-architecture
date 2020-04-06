@@ -343,24 +343,26 @@ const List = React.memo(({ id, depth, numbered, data }) => (
 	</Node>
 ))
 
+const Caption = ({ syntax, data }) => (
+	<div className="mx-auto px-2 py-1 bg-white rounded shadow-hero truncate pointer-events-auto">
+		<Markdown syntax={syntax}>
+			{toInnerReact(data)}
+		</Markdown>
+	</div>
+)
+
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
 
-	const [hover, setHover] = React.useState(() => state.readOnly)
+	const [hover, setHover] = React.useState(state.readOnly)
 
 	return (
 		<Node id={id} className="relative flex flex-row justify-center" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
-			{!state.readOnly && (
-				<div className="absolute inset-0" style={{ opacity: state.readOnly && !hover ? "0%" : "100%" }}>
-					<div className="px-8 flex flex-row justify-center items-end h-full">
-						<div className="my-2 px-2 py-1 bg-white rounded shadow-hero truncate">
-							<Markdown syntax={syntax}>
-								{toInnerReact(data)}
-							</Markdown>
-						</div>
-					</div>
+			<div className="absolute inset-0 pointer-events-none" style={{ opacity: state.readOnly && !hover ? "0%" : "100%" }}>
+				<div className="px-8 py-2 flex flex-row justify-center items-end h-full">
+					<Caption syntax={syntax} data={data} />
 				</div>
-			)}
+			</div>
 			<img className="rounded shadow-hero" style={{ maxWidth: state.rect.width, maxHeight: state.rect.width / 2 }} src={src} alt={alt} />
 		</Node>
 	)
