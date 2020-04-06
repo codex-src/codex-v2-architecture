@@ -1186,21 +1186,24 @@ function parseMetadata(text) {
 
 const KEY = "codex-app-v2.2"
 
+const initialValue = (() => {
+	const cache = localStorage.getItem(KEY)
+	if (!cache) {
+		return raw("./Demo.md")
+	}
+	const json = JSON.parse(cache)
+	if (!json.data) {
+		return raw("./Demo.md")
+	}
+	return json.data
+})()
+
 const App = props => {
 	const textareaRef = React.useRef()
 	const editorRef = React.useRef()
 
 	// <textarea (1 of 2):
-	const [value, setValue] = React.useState(() => {
-		const cache = localStorage.getItem(KEY)
-		if (cache) {
-			const json = JSON.parse(cache)
-			if (json.data) {
-				return json.data
-			}
-		}
-		return raw("./Demo.md")
-	})
+	const [value, setValue] = React.useState(() => initialValue)
 
 	// <textarea (2 of 2):
 	React.useEffect(() => {
