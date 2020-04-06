@@ -372,34 +372,20 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	)
 })
 
-// // NOTE:
-// //
-// // <Syntax ...> || (
-// //   <hr ...>
-// // )
-// //
-// // Doesn’t work -- because of React.memo?
-// //
-// const Break = React.memo(({ id, syntax }) => {
-// 	const { readOnly } = React.useContext(EditorContext)
-// 	return (
-// 		<Node id={id} className="my-1">
-// 			{(!readOnly && <Syntax>{syntax[0]}</Syntax>) || (
-// 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
-// 			)}
-// 		</Node>
-// 	)
-// })
-
+// NOTE:
+//
+// <Syntax ...> || (
+//   <hr ...>
+// )
+//
+// Doesn’t work -- because of React.memo?
 const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 	return (
-		<Node id={id} className="my-1">
+		<Node id={id}>
 			{!readOnly ? (
-				// Read-write mode:
 				<Markdown syntax={syntax} />
 			) : (
-				// Read-only mode:
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
 		</Node>
@@ -427,15 +413,17 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		// Guard: _Em_ and __strong and em__ cannot be nested:
 		//
 		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && index - 1 >= 0 && (!spec.isASCIIWhitespace(text[index - 1]) && !spec.isASCIIPunctuation(text[index - 1]))) {
+		if (syntax[0] === "_" && text < text.length && !spec.isASCIIPunctuation(text[index - 1])) {
 			return null
 		}
-		// Guard: Some syntax cannot surround spaces:
+		// Guard: Most syntax cannot surround spaces:
+		//
+		// TODO: Refactor
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
 			offset < minChars ||
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length] === " ") ||           // Exempt <Code> and <A>
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && text[index + syntax.length + offset - 1] === " ") // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length])) ||           // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
 		) {
 			return null
 		}
@@ -565,10 +553,10 @@ function parseInnerGFM(text) {
 			}
 			break
 		// <A> (1 of 2)
-		//
-		// TODO: Eat "www."
 		case char === "h":
 			// https://
+			//
+			// TODO: Eat "www."
 			if (nchars >= spec.HTTPS.length && text.slice(index, index + spec.HTTPS.length) === spec.HTTPS) {
 				const matches = spec.safeURLRe.exec(text.slice(index))
 				let offset = 0
@@ -584,6 +572,8 @@ function parseInnerGFM(text) {
 				index += offset - 1
 				continue
 			// http://
+			//
+			// TODO: Eat "www."
 			} else if (nchars >= spec.HTTP.length && text.slice(index, index + spec.HTTP.length) === spec.HTTP) {
 				const matches = spec.safeURLRe.exec(text.slice(index))
 				let offset = 0
@@ -601,8 +591,6 @@ function parseInnerGFM(text) {
 			}
 			break
 		// <A> (2 of 2)
-		//
-		// TODO: Eat "www."
 		case char === "[":
 			// [Anchor](href)
 			if (nchars >= "[x](x)".length) {

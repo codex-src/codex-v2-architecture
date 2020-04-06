@@ -46,7 +46,7 @@ OK so blockquotes, obviously. 😉
 1. Nested lists also reset the number counter ask you would imagine
 	1. So this would be render `1.`
 		1. And this would _also_ render `1.`
-	1. But this would render `2.`
+	1. But this would render `2.` (in read-only mode)
 
 And finally…
 
