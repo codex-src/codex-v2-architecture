@@ -140,84 +140,84 @@ const CompoundNode = ({ id, tag, style, ...props }) => {
 
 const Header = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-medium text-3xl -tracking-px leading-tight">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-medium text-3xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
 
 const Subheader = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-medium text-2xl -tracking-px leading-tight">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-medium text-2xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
 
 const H3 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-semibold text-xl">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-semibold text-xl">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
 
 const H4 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-semibold text-lg">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
 
 const H5 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-semibold text-lg">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
 
 const H6 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
-		<a id={hash} className="block" href={`#${hash}`}>
-			<span className="font-semibold text-lg">
+		<a id={hash} href={`#${hash}`}>
+			<div className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
 					)}
 				</Markdown>
-			</span>
+			</div>
 		</a>
 	</Node>
 ))
