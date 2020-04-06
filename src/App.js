@@ -1172,7 +1172,7 @@ const KEY_CODE_TAB = 9
 function tabStyle(size) {
 	const style = {
 		MozTabSize: size,
-		tabStyle: size,
+		tabSize: size,
 	}
 	return style
 }
