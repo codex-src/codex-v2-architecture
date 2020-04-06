@@ -8,15 +8,18 @@ import uuidv4 from "uuid/v4"
 
 import "./App.css"
 
-const codeAttrs = {
-	style: { MozTabSize: 2, tabSize: 2 },
-	spellCheck: false,
-}
-
-const anchorAttrs= {
-	// react/jsx-no-target-blank
-	target: "_blank",
-	rel: "noopener noreferrer",
+const attrs = {
+	code: {
+		style: {
+			MozTabSize: 2,
+			tabSize: 2,
+		},
+		spellCheck: false,
+	},
+	a: {
+		target: "_blank",
+		rel: "noopener noreferrer",
+	},
 }
 
 // Parses syntax into a start and end string.
@@ -102,7 +105,7 @@ const StrongAndEm = ({ syntax, ...props }) => (
 )
 
 const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...codeAttrs}>
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
 		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -126,7 +129,7 @@ const Strike = ({ syntax, ...props }) => (
 )
 
 const A = ({ syntax, href, ...props }) => (
-	<a className="underline text-md-blue-a400" href={href} {...anchorAttrs}>
+	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
@@ -220,7 +223,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNode className="-mx-6 my-1 px-6 border" {...codeAttrs}>
+		<CompoundNode className="-mx-6 my-1 px-6 border" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
