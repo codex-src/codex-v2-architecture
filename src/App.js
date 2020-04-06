@@ -296,16 +296,22 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 }
 
 // TODO
-const ListItem = React.memo(({ syntax, depth, checked, data }) => (
-	<Node tag="li" className="-ml-5 my-1 flex flex-row">
-		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
-		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
-			<div>
-				{toInnerReact(data)}
-			</div>
-		</Markdown>
-	</Node>
-))
+const ListItem = React.memo(({ syntax, depth, checked, data }) => {
+	const syntaxStyle = {
+		MozTabSize: 0,
+		tabSize: 0,
+		fontFeatureSettings: "'tnum'",
+	}
+	return (
+		<Node tag="li" className="-ml-5 my-1 flex flex-row">
+			<Markdown className="mr-2 text-md-blue-a400" style={syntaxStyle} syntax={syntax}>
+				<div>
+					{toInnerReact(data)}
+				</div>
+			</Markdown>
+		</Node>
+	)
+})
 
 // TODO
 const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
@@ -336,7 +342,7 @@ const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
 })
 
 // NOTE: Compound component
-const List = React.memo(({ tag, id, depth, data }) => (
+const List = React.memo(({ tag, id, data }) => (
 	<Node tag={tag} id={id} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
@@ -700,7 +706,7 @@ function parseList(range) {
 		type: List,
 		tag: !NumberedListRe.test(range[0]) ? "ul" : "ol",
 		id: uuidv4(),
-		depth: 0,
+		// depth: 0,
 		children: [],
 	}
 	for (const each of range) {
@@ -715,7 +721,7 @@ function parseList(range) {
 					type: List,
 					tag: !NumberedListRe.test(each) ? "ul" : "ol",
 					id: uuidv4(),
-					depth: deep + 1, // Eagerly increment
+					// depth: deep + 1, // Eagerly increment
 					children: [],
 				})
 			}
