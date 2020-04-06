@@ -1,12 +1,13 @@
 import * as emojiTrie from "emoji-trie"
 import * as spec from "./spec"
 import Button from "./Button"
-import Enum from "./Enum"
 import escape from "lodash/escape"
 import Prism from "./Prism"
 import raw from "raw.macro"
 import React from "react"
 import ReactDOM from "react-dom"
+import RenderModes from "./RenderModes"
+import Settings from "./Settings"
 import uuidv4 from "uuid/v4"
 
 import "./App.css"
@@ -538,6 +539,8 @@ function parseInnerGFM(text) {
 			}
 			break
 		// <A> (1 of 2)
+		//
+		// TODO: Eat "www."
 		case char === "h":
 			// https://
 			if (nchars >= spec.HTTPS.length && text.slice(index, index + spec.HTTPS.length) === spec.HTTPS) {
@@ -572,6 +575,8 @@ function parseInnerGFM(text) {
 			}
 			break
 		// <A> (2 of 2)
+		//
+		// TODO: Eat "www."
 		case char === "[":
 			// [Anchor](href)
 			if (nchars >= "[x](x)".length) {
@@ -1186,106 +1191,11 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 	)
 })
 
-const Settings = ({ state, setState, ...props }) => (
-	<div className="flex flex-col items-end">
-
-		{/* Top */}
-		<div className="-m-1 flex flex-row">
-			<Button
-				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-				onClick={e => setState({
-					...state,
-					renderMode: RenderModes.Text,
-				})}
-			>
-				Plain text
-			</Button>
-			<Button
-				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-				onClick={e => setState({
-					...state,
-					renderMode: RenderModes.CGFM,
-				})}
-			>
-				Markdown
-			</Button>
-			<Button
-				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-				onClick={e => setState({
-					...state,
-					renderMode: RenderModes.HTML,
-				})}
-			>
-				HTML
-			</Button>
-			<Button
-				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-				onClick={e => setState({
-					...state,
-					renderMode: RenderModes.JSON,
-				})}
-			>
-				JSON
-			</Button>
-		</div>
-
-		{/* Bottom */}
-		<div className="h-2" />
-		<div className="-m-1 flex flex-row">
-			{state.renderMode === RenderModes.CGFM && (
-				<React.Fragment>
-					<Button
-						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-						onClick={e => setState({
-							...state,
-							readOnly: !state.readOnly,
-						})}
-					>
-						Toggle read-only: {String(state.readOnly)}
-					</Button>
-					<Button
-						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-						onClick={e => setState({
-							...state,
-							debugCSS: !state.debugCSS,
-						})}
-					>
-						Toggle CSS debugger: {String(state.debugCSS)}
-					</Button>
-				</React.Fragment>
-			)}
-		</div>
-
-	</div>
-)
-
 const LOCALSTORAGE_KEY = "codex-app-v2.2"
-
-const RenderModes = new Enum(
-	"Text",
-	"CGFM",
-	"HTML",
-	"JSON",
-)
 
 const App = props => {
 	const textareaRef = React.useRef()
 	const editorRef = React.useRef()
-
-	// const [debugCSS, setDebugCSS] = React.useState(false)
-
-	// const mounted = React.useRef()
-	// React.useEffect(() => {
-	// 	if (!mounted.current) {
-	// 		mounted.current = true
-	// 		return
-	// 	}
-	// 	if (!debugCSS) {
-	// 		editorRef.current.classList.remove("debug-css")
-	// 	} else {
-	// 		editorRef.current.classList.add("debug-css")
-	// 	}
-	// }, [debugCSS])
 
 	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => {
