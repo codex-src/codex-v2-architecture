@@ -331,7 +331,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 
 	const checkboxStyle = {
 		marginLeft: "calc(((12 + 2) - 11.438) / 16 * -1em)",
-		marginTop: "0.375em",
+		marginTop: "0.25em",
 		width: "0.875em",
 		height: "0.875em",
 	}
