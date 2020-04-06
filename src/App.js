@@ -390,22 +390,15 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	)
 })
 
-// NOTE:
-//
-// <Syntax ...> || (
-//   <hr ...>
-// )
-//
-// Doesn’t work -- because of React.memo?
 const Break = React.memo(({ id, syntax }) => {
 	const [state] = React.useContext(EditorContext)
 	return (
 		<Node id={id}>
-			{!state.readOnly ? (
-				<Markdown syntax={syntax} />
-			) : (
-				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
-			)}
+			<Markdown syntax={syntax}>
+				{state.readOnly && (
+					<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
+				)}
+			</Markdown>
 		</Node>
 	)
 })
