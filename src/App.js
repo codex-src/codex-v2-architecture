@@ -20,15 +20,15 @@ import "./App.css"
 // Extraneous attributes.
 const attrs = {
 	code: {
-		style: {
-			MozTabSize: 2,
-			tabSize: 2,
-		},
+		style: { MozTabSize: 2, tabSize: 2 },
 		spellCheck: false,
 	},
 	a: {
 		target: "_blank",
 		rel: "noopener noreferrer",
+	},
+	li: {
+		style: { MozTabSize: 0, tabSize: 0, fontFeatureSettings: "'tnum'" },
 	},
 }
 
@@ -295,23 +295,15 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 	)
 }
 
-// TODO
-const ListItem = React.memo(({ syntax, depth, checked, data }) => {
-	const syntaxStyle = {
-		MozTabSize: 0,
-		tabSize: 0,
-		fontFeatureSettings: "'tnum'",
-	}
-	return (
-		<Node tag="li" className="-ml-5 my-1 flex flex-row">
-			<Markdown className="mr-2 text-md-blue-a400" style={syntaxStyle} syntax={syntax}>
-				<div>
-					{toInnerReact(data)}
-				</div>
-			</Markdown>
-		</Node>
-	)
-})
+const ListItem = React.memo(({ syntax, depth, checked, data }) => (
+	<Node tag="li" className="-ml-5 my-1 flex flex-row">
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+			<div>
+				{toInnerReact(data)}
+			</div>
+		</Markdown>
+	</Node>
+))
 
 // TODO
 const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
