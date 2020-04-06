@@ -51,8 +51,8 @@ function getSyntax(syntax) {
 }
 
 const Syntax = props => {
-	const { readOnly } = React.useContext(EditorContext)
-	if (!props.children || readOnly) {
+	const [state] = React.useContext(EditorContext)
+	if (!props.children || state.readOnly) {
 		return null
 	}
 	// NOTE: props.className doesn’t concatenate
@@ -193,12 +193,12 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 
 // NOTE: Compound component
 const Blockquote = React.memo(({ id, syntax, data }) => {
-	const { readOnly } = React.useContext(EditorContext)
+	const [state] = React.useContext(EditorContext)
 
 	return (
-		<CompoundNode id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
+		<CompoundNode id={id} style={state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				<Node key={each.id} id={each.id} className="text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
+				<Node key={each.id} id={each.id} className="text-gray-600" style={state.readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -212,7 +212,7 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 
 // NOTE: Compound component
 const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
-	const { readOnly } = React.useContext(EditorContext)
+	const [state] = React.useContext(EditorContext)
 
 	const [html, setHTML] = React.useState(null)
 
@@ -239,7 +239,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
-						{readOnly && (
+						{state.readOnly && (
 							<br />
 						)}
 					</Markdown>
@@ -251,7 +251,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 				</Node>
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[1]]}>
-						{readOnly && (
+						{state.readOnly && (
 							<br />
 						)}
 					</Markdown>
@@ -293,7 +293,7 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 }
 
 // TODO
-const ListItem = React.memo(({ syntax, depth, checked, data, ...props }) => (
+const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
@@ -305,7 +305,7 @@ const ListItem = React.memo(({ syntax, depth, checked, data, ...props }) => (
 ))
 
 // TODO
-const TaskItem = React.memo(({ syntax, depth, checked, data, ...props }) => {
+const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
@@ -333,7 +333,7 @@ const TaskItem = React.memo(({ syntax, depth, checked, data, ...props }) => {
 })
 
 // NOTE: Compound component
-const List = React.memo(({ id, depth, numbered, data, ...props }) => (
+const List = React.memo(({ id, depth, numbered, data }) => (
 	// TODO: Add numbered class
 	// FIXME: Y-axis margin is wrong
 	<Node id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
@@ -343,18 +343,15 @@ const List = React.memo(({ id, depth, numbered, data, ...props }) => (
 	</Node>
 ))
 
-const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
-	const { readOnly } = React.useContext(EditorContext)
+const Image = React.memo(({ id, syntax, src, alt, data }) => {
+	const [state] = React.useContext(EditorContext)
 
-	const [hover, setHover] = React.useState(() => readOnly)
+	const [hover, setHover] = React.useState(() => state.readOnly)
 
 	return (
-		<Node id={id} className="relative" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
-			{readOnly && !data ? (
-				null
-			) : (
-				// TODO: Add transition duration-300?
-				<div className="absolute inset-0" style={{ opacity: readOnly && !hover ? "0%" : "100%" }}>
+		<Node id={id} className="relative flex flex-row justify-center" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
+			{!state.readOnly && (
+				<div className="absolute inset-0" style={{ opacity: state.readOnly && !hover ? "0%" : "100%" }}>
 					<div className="px-8 flex flex-row justify-center items-end h-full">
 						<div className="my-2 px-2 py-1 bg-white rounded shadow-hero truncate">
 							<Markdown syntax={syntax}>
@@ -364,8 +361,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 					</div>
 				</div>
 			)}
-			{/* FIXME: Change to ems */}
-			<img className="mx-auto rounded shadow-hero" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
+			<img className="rounded shadow-hero" style={{ maxWidth: state.rect.width, maxHeight: state.rect.width / 2 }} src={src} alt={alt} />
 		</Node>
 	)
 })
@@ -378,10 +374,10 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 //
 // Doesn’t work -- because of React.memo?
 const Break = React.memo(({ id, syntax }) => {
-	const { readOnly } = React.useContext(EditorContext)
+	const [state] = React.useContext(EditorContext)
 	return (
 		<Node id={id}>
-			{!readOnly ? (
+			{!state.readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
@@ -1134,7 +1130,7 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 	React.useLayoutEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
-			<Provider value={state}>
+			<Provider value={[state, setState]}>
 				{state.data.map(({ type: Type, children: data, ...each }) => (
 					<Type key={each.id} data={data} {...each} />
 				))}
@@ -1226,6 +1222,7 @@ const App = props => {
 
 	// Create state:
 	const [state, setState] = React.useState(() => ({
+		rect: { x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 },
 		renderMode: RenderModes.GFM,
 		debugCSS: false,
 		readOnly: false,
@@ -1239,11 +1236,16 @@ const App = props => {
 	React.useEffect(() => {
 		textareaRef.current.style.height = `${textareaRef.current.style.scrollHeight}px`
 
+		let rect = null
+		if (editorRef.current) {
+			rect = editorRef.current.getBoundingClientRect()
+		}
 		const id = setTimeout(() => {
 			const data = parseGFM(value)
 			const types = parseTypes(data)
 			setState(current => ({
 				...current,
+				rect,
 				raw: value,
 				data,
 				types,
