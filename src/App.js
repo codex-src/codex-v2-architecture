@@ -213,15 +213,23 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
-	const [html, setHTML] = React.useState("")
+	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
+		// if (!lang) {
+		// 	// No-op
+		// 	return
+		// }
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
 			return
 		}
-		setHTML(window.Prism.highlight(data, parser, lang))
+		setHTML(
+			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, lang)
+			}} />
+		)
 	}, [lang, data])
 
 	return (
@@ -236,12 +244,9 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 					</Markdown>
 				</Node>
 				<Node>
-					<span
-						className={lang && `language-${lang}`}
-						dangerouslySetInnerHTML={{
-							__html: html || data,
-						}}
-					/>
+					{html || (
+						data
+					)}
 				</Node>
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[1]]}>
@@ -256,26 +261,31 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 })
 
 const CodeBlockStandalone = ({ lang, data, ...props }) => {
-	const [html, setHTML] = React.useState("")
+	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
+		// if (!lang) {
+		// 	// No-op
+		// 	return
+		// }
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
 			return
 		}
-		setHTML(window.Prism.highlight(data, parser, lang))
+		setHTML(
+			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, lang)
+			}} />
+		)
 	}, [lang, data])
 
 	return (
 		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg" {...props}>
 			<div className="whitespace-pre-wrap break-words font-mono text-sm leading-snug">
-				<span
-					className={lang && `language-${lang}`}
-					dangerouslySetInnerHTML={{
-						__html: html || data,
-					}}
-				/>
+				{html || (
+					data
+				)}
 			</div>
 		</div>
 	)
@@ -1185,10 +1195,10 @@ const Settings = ({ state, setState, ...props }) => (
 
 		{/* Top */}
 		<div className="-m-1 flex flex-row">
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.TXT })}>
+			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.Text })}>
 				Plain text
 			</Button>
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.MD })}>
+			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.CGFM })}>
 				Markdown
 			</Button>
 			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.HTML })}>
@@ -1202,7 +1212,7 @@ const Settings = ({ state, setState, ...props }) => (
 		{/* Bottom */}
 		<div className="h-2" />
 		<div className="-m-1 flex flex-row">
-			{state.renderMode === RenderModes.MD && (
+			{state.renderMode === RenderModes.CGFM && (
 				<React.Fragment>
 					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, readOnly: !state.readOnly })}>
 						Toggle read-only: {String(state.readOnly)}
@@ -1220,8 +1230,8 @@ const Settings = ({ state, setState, ...props }) => (
 const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
 const RenderModes = new Enum(
-	"TXT",
-	"MD",
+	"Text",
+	"CGFM",
 	"HTML",
 	"JSON",
 )
@@ -1264,7 +1274,7 @@ const App = props => {
 
 	// Create state:
 	const [state, setState] = React.useState(() => ({
-		renderMode: RenderModes.MD,
+		renderMode: RenderModes.CGFM,
 		debugCSS: false,
 		readOnly: false,
 		data: parseGFM(value),
@@ -1289,12 +1299,18 @@ const App = props => {
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			if (state.renderMode === RenderModes.TXT) {
+			switch (state.renderMode) {
+			case RenderModes.Text:
 				setText(toText(state.data))
-			} else if (state.renderMode === RenderModes.HTML) {
+				break
+			case RenderModes.HTML:
 				setHTML(toHTML(state.data))
-			} else if (state.renderMode === RenderModes.JSON) {
+				break
+			case RenderModes.JSON:
 				setJSON(toJSON(state.data))
+				break
+			default:
+				// No-op
 			}
 		}, 16.6667)
 		return () => {
@@ -1358,8 +1374,6 @@ const App = props => {
 					<Settings
 						state={state}
 						setState={setState}
-						// debugCSS={debugCSS}
-						// setDebugCSS={setDebugCSS}
 					/>
 				</div>
 
@@ -1375,10 +1389,13 @@ const App = props => {
 
 				{/* RHS */}
 				<DocumentTitle title={state.meta && state.meta.title}>
-					{state.renderMode === RenderModes.TXT && (
-						<CodeBlockStandalone style={cardStyle} data={text} />
+					{state.renderMode === RenderModes.Text && (
+						<CodeBlockStandalone
+							style={cardStyle}
+							data={text}
+						/>
 					)}
-					{state.renderMode === RenderModes.MD && (
+					{state.renderMode === RenderModes.CGFM && (
 						<Editor
 							ref={editorRef}
 							style={{ fontSize: 17 }}
@@ -1387,10 +1404,18 @@ const App = props => {
 						/>
 					)}
 					{state.renderMode === RenderModes.HTML && (
-						<CodeBlockStandalone style={cardStyle} lang="html" data={html} />
+						<CodeBlockStandalone
+							style={cardStyle}
+							lang="html"
+							data={html}
+						/>
 					)}
 					{state.renderMode === RenderModes.JSON && (
-						<CodeBlockStandalone style={cardStyle} lang="json" data={json} />
+						<CodeBlockStandalone
+							style={cardStyle}
+							lang="json"
+							data={json}
+						/>
 					)}
 				</DocumentTitle>
 
