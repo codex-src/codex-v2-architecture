@@ -148,7 +148,7 @@ const CompoundNode = ({ id, tag, style, ...props }) => {
 }
 
 // Trims extraneous spaces from a string.
-function trimSpaces(str) {
+function trimAny(str) {
 	const trimmed = str
 		.replace(/ +/, " ") // Trims extra spaces
 		.trim() // Trims start and end spaces
@@ -156,16 +156,16 @@ function trimSpaces(str) {
 }
 
 const headerClassNames = {
-	h1: trimSpaces("font-medium   text-3xl -tracking-px leading-tight"),
-	h2: trimSpaces("font-medium   text-2xl -tracking-px leading-tight"),
-	h3: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
-	h4: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
-	h5: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
-	h6: trimSpaces("font-semibold text-xl  -tracking-px leading-tight"),
+	h1: trimAny("font-medium   text-3xl -tracking-px leading-tight"),
+	h2: trimAny("font-medium   text-2xl -tracking-px leading-tight"),
+	h3: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
+	h4: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
+	h5: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
+	h6: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
 }
 
 const Header = React.memo(({ id, tag, syntax, hash, data }) => (
-	<Node id={id}>
+	<Node id={id} className="my-1">
 		<a id={hash} href={`#${hash}`}>
 			<div className={headerClassNames[tag]}>
 				<Markdown syntax={syntax}>
@@ -359,7 +359,6 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 
 const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
-
 	return (
 		<Node id={id} className="my-1">
 			{!readOnly ? (
@@ -370,6 +369,16 @@ const Break = React.memo(({ id, syntax }) => {
 		</Node>
 	)
 })
+
+// const Break = React.memo(({ id, syntax }) => {
+// 	const { readOnly } = React.useContext(EditorContext)
+//
+// 	let Component = props => <Markdown syntax={syntax} {...props} />
+// 	if (readOnly) {
+// 		Component = props => <hr className="inline-block w-full" style={{ verticalAlign: "15%" }} {...props} />
+// 	}
+// 	return <Node id={id} className="my-1"><Component /></Node>
+// })
 
 // Registers a type for parseInnerGFM.
 function registerType(type, syntax, { recurse } = { recurse: true }) {
