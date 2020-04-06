@@ -169,7 +169,7 @@ const Subheader = React.memo(({ id, syntax, hash, data }) => (
 const H3 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
 		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-xl">
+			<div className="font-semibold text-xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -183,7 +183,7 @@ const H3 = React.memo(({ id, syntax, hash, data }) => (
 const H4 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
 		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-lg">
+			<div className="font-semibold text-xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -197,7 +197,7 @@ const H4 = React.memo(({ id, syntax, hash, data }) => (
 const H5 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
 		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-lg">
+			<div className="font-semibold text-xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
@@ -211,7 +211,7 @@ const H5 = React.memo(({ id, syntax, hash, data }) => (
 const H6 = React.memo(({ id, syntax, hash, data }) => (
 	<Node id={id} className="my-1">
 		<a id={hash} href={`#${hash}`}>
-			<div className="font-semibold text-lg">
+			<div className="font-semibold text-xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
