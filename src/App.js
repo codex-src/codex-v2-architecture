@@ -1042,22 +1042,22 @@ function toHTML(data) {
 	return html
 }
 
-// Parses a VDOM representation to a JSON string.
-function toJSON(data) {
-	const json = JSON.stringify(
-		data,
-		(key, value) => {
-			// Non-React component:
-			if (key !== "type") {
-				return value
-			}
-			// React component (guard React.memo):
-			return cmapJSON[value.type || value]
-		},
-		"\t",
-	)
-	return json
-}
+// // Parses a VDOM representation to a JSON string.
+// function toJSON(data) {
+// 	const json = JSON.stringify(
+// 		data,
+// 		(key, value) => {
+// 			// Non-React component:
+// 			if (key !== "type") {
+// 				return value
+// 			}
+// 			// React component (guard React.memo):
+// 			return cmapJSON[value.type || value]
+// 		},
+// 		"\t",
+// 	)
+// 	return json
+// }
 
 const EditorContext = React.createContext()
 
@@ -1166,7 +1166,7 @@ function parseTypes(data) {
 	const types = {
 		text: toText(data),
 		html: toHTML(data),
-		json: toJSON(data),
+		// json: toJSON(data),
 	}
 	return types
 }
@@ -1209,43 +1209,34 @@ const App = props => {
 		}
 	}, [value])
 
-	// epoch: "",      // TODO
-	// sinceEpoch: "", // TODO
-
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		renderMode: RenderModes.GFM,
 		debugCSS: false,
 		readOnly: false,
 		data: parseGFM(value),
-		types: { text: "", html: "", json: "" },
+		types: { text: "", html: "" /* , json: "" */ },
 		metadata: { title: "", runes: 0, words: 0, seconds: 0 },
 	}))
 
 	// Update state:
 	React.useEffect(() => {
 		const id = setTimeout(() => {
+			const data = parseGFM(value)
+			const types = parseTypes(data)
 			setState(current => ({
 				...current,
-				data: parseGFM(value),
+				data,
+				types,
+				metadata: parseMetadata(types.text),
 			}))
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [value])
+	}, [value, state.renderMode])
 
-	// Update data structures:
-	React.useEffect(() => {
-		// Precompute types for metadata:
-		const types = parseTypes(state.data)
-		setState(current => ({
-			...current,
-			types,
-			metadata: parseMetadata(types.text),
-		}))
-	}, [state.renderMode, state.data])
-
+	// Debug CSS:
 	const mounted = React.useRef()
 	React.useEffect(() => {
 		if (!mounted.current) {
