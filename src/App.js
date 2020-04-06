@@ -1102,8 +1102,7 @@ const AVG_RUNES_PER_WORD = 6
 const AVG_WORDS_PER_MINUTE = 250
 
 // TODO: Add value to state (needed for backspace)
-const Editor = ({ className, style, state, setState, ...props }) => {
-	const ref = React.useRef()
+const Editor = React.forwardRef(({ className, style, state, setState, ...props }, ref) => {
 
 	// Rerender the DOM when state.data changes:
 	React.useLayoutEffect(() => {
@@ -1116,7 +1115,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			</Provider>,
 			ref.current,
 		)
-	}, [state])
+	}, [state, ref])
 
 	React.useEffect(() => {
 		const text = toText(state.data)
@@ -1177,7 +1176,7 @@ const Editor = ({ className, style, state, setState, ...props }) => {
 			},
 		)
 	)
-}
+})
 
 const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
@@ -1369,7 +1368,7 @@ const App = props => {
 				/>
 
 				{/* RHS */}
-				<div ref={debugCSSRef}>
+				<div>
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
@@ -1380,6 +1379,7 @@ const App = props => {
 						)}
 						{state.renderMode === "markdown" && (
 							<Editor
+								ref={debugCSSRef}
 								// className="text-lg"
 								style={{ fontSize: 17 }}
 								state={state}
