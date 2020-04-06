@@ -979,14 +979,25 @@ function toInnerText(children, options = { markdown: false }) {
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		if (options.markdown) {
-			text += typeof s1 !== "function" ? s1 : s1(each)
+			text += read(s1, each)
 		}
 		text += toInnerText(each.children, options)
 		if (options.markdown) {
-			text += typeof s2 !== "function" ? s2 : s2(each)
+			text += read(s2, each)
 		}
 	}
 	return text
+}
+
+// Returns a string or the return of a function.
+function read(strOrFn, args) {
+	// if (typeof strOrFn !== "string" && typeof strOrFn !== "function") {
+	// 	throw new Error(`read: expected a string or function, got ${typeof strOrFn}`)
+	// }
+	if (typeof strOrFn === "string") {
+		return strOrFn
+	}
+	return strOrFn(args)
 }
 
 // Parses a VDOM representation to text.
@@ -994,7 +1005,7 @@ function toText(data, options = { markdown: false }) {
 	let text = ""
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
-		text += !options.markdown ? "" : (typeof s1 !== "function" ? s1 : s1(each))
+		text += !options.markdown ? "" : read(s1, each)
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
@@ -1002,7 +1013,7 @@ function toText(data, options = { markdown: false }) {
 		} else {
 			text += toInnerText(each.children, options)
 		}
-		text += !options.markdown ? "" : (typeof s2 !== "function" ? s2 : s2(each))
+		text += !options.markdown ? "" : read(s2, each)
 		if (each !== data[data.length - 1]) {
 			text += "\n"
 		}
@@ -1022,9 +1033,9 @@ function toInnerHTML(children) {
 			continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += typeof s1 !== "function" ? s1 : s1(each)
+		html += read(s1, each)
 		html += toInnerHTML(each.children)
-		html += typeof s2 !== "function" ? s2 : s2(each)
+		html += read(s2, each)
 	}
 	return html
 }
@@ -1034,7 +1045,7 @@ function toHTML(data) {
 	let html = ""
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += typeof s1 !== "function" ? s1 : s1(each)
+		html += read(s1, each)
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
@@ -1050,7 +1061,7 @@ function toHTML(data) {
 		} else {
 			html += toInnerHTML(each.children)
 		}
-		html += typeof s2 !== "function" ? s2 : s2(each)
+		html += read(s2, each)
 		if (each !== data[data.length - 1]) {
 			html += "\n"
 		}

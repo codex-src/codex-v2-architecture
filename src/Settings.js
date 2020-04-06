@@ -57,7 +57,7 @@ const Settings = ({ state, setState, ...props }) => (
 							readOnly: !state.readOnly,
 						})}
 					>
-						Toggle read-only: {String(state.readOnly)}
+						Toggle readOnly: {String(state.readOnly)}
 					</Button>
 					<Button
 						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -66,7 +66,7 @@ const Settings = ({ state, setState, ...props }) => (
 							debugCSS: !state.debugCSS,
 						})}
 					>
-						Toggle debug-css: {String(state.debugCSS)}
+						Toggle debugCSS: {String(state.debugCSS)}
 					</Button>
 				</React.Fragment>
 			)}
