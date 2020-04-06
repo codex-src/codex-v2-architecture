@@ -945,6 +945,19 @@ function parseGFM(text) {
 	return data
 }
 
+// Reads syntax from a string or function-return.
+function readSyntax(strOrFn, args) {
+	// if (typeof strOrFn !== "string" && typeof strOrFn !== "function") {
+	// 	throw new Error(`readSyntax: expected a string or function, got ${typeof strOrFn}`)
+	// }
+	if (typeof strOrFn === "string") {
+		const str = strOrFn
+		return str
+	}
+	const fn = strOrFn
+	return fn(args)
+}
+
 // Parses a nested VDOM representation to React components.
 function toInnerReact(children) {
 	if (children === null || typeof children === "string") {
@@ -979,25 +992,14 @@ function toInnerText(children, options = { markdown: false }) {
 		}
 		const [s1, s2] = parseSyntax(each.syntax)
 		if (options.markdown) {
-			text += read(s1, each)
+			text += readSyntax(s1, each)
 		}
 		text += toInnerText(each.children, options)
 		if (options.markdown) {
-			text += read(s2, each)
+			text += readSyntax(s2, each)
 		}
 	}
 	return text
-}
-
-// Returns a string or the return of a function.
-function read(strOrFn, args) {
-	// if (typeof strOrFn !== "string" && typeof strOrFn !== "function") {
-	// 	throw new Error(`read: expected a string or function, got ${typeof strOrFn}`)
-	// }
-	if (typeof strOrFn === "string") {
-		return strOrFn
-	}
-	return strOrFn(args)
 }
 
 // Parses a VDOM representation to text.
@@ -1005,7 +1007,7 @@ function toText(data, options = { markdown: false }) {
 	let text = ""
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
-		text += !options.markdown ? "" : read(s1, each)
+		text += !options.markdown ? "" : readSyntax(s1, each)
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
@@ -1013,7 +1015,7 @@ function toText(data, options = { markdown: false }) {
 		} else {
 			text += toInnerText(each.children, options)
 		}
-		text += !options.markdown ? "" : read(s2, each)
+		text += !options.markdown ? "" : readSyntax(s2, each)
 		if (each !== data[data.length - 1]) {
 			text += "\n"
 		}
@@ -1033,9 +1035,9 @@ function toInnerHTML(children) {
 			continue
 		}
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += read(s1, each)
+		html += readSyntax(s1, each)
 		html += toInnerHTML(each.children)
-		html += read(s2, each)
+		html += readSyntax(s2, each)
 	}
 	return html
 }
@@ -1045,7 +1047,7 @@ function toHTML(data) {
 	let html = ""
 	for (const each of data) {
 		const [s1, s2] = cmapHTML[each.type.type || each.type]
-		html += read(s1, each)
+		html += readSyntax(s1, each)
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
@@ -1061,7 +1063,7 @@ function toHTML(data) {
 		} else {
 			html += toInnerHTML(each.children)
 		}
-		html += read(s2, each)
+		html += readSyntax(s2, each)
 		if (each !== data[data.length - 1]) {
 			html += "\n"
 		}
