@@ -114,14 +114,18 @@ const Strike = ({ syntax, ...props }) => (
 	</span>
 )
 
-// react/jsx-no-target-blank
-const safeAnchorAttrs = {
-	target: "_blank",
-	rel: "noopener noreferrer",
+function hrefAttrs(href) {
+	const attrs = {
+		href,
+		// react/jsx-no-target-blank
+		target: "_blank",
+		rel: "noopener noreferrer",
+	}
+	return attrs
 }
 
 const A = ({ syntax, href, ...props }) => (
-	<a className="underline text-md-blue-a400" href={href} {...safeAnchorAttrs}>
+	<a className="underline text-md-blue-a400" {...hrefAttrs(href)}>
 		<Markdown syntax={!props.children || syntax}>
 			{props.children || syntax}
 		</Markdown>
