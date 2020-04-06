@@ -1186,7 +1186,7 @@ const RenderModes = new Enum(
 	"TXT",
 	"MD",
 	"HTML",
-	"JSON"
+	"JSON",
 )
 
 const App = props => {
@@ -1270,10 +1270,10 @@ const App = props => {
 		}
 	}, [state.renderMode, state.data])
 
-	// Read-only shortcut:
+	// Bind command-p for read-only:
 	React.useEffect(() => {
 		const handler = e => {
-			if (!e.metaKey || e.keyCode !== 80) { // P
+			if (!e.metaKey || e.keyCode !== 80) {
 				// No-op
 				return
 			}
@@ -1288,6 +1288,24 @@ const App = props => {
 			window.removeEventListener("keydown", handler)
 		}
 	}, [state.readOnly])
+
+	// Bind tab:
+	const onKeyDown = e => {
+		if (e.keyCode !== 9) { // Tab
+			// No-op
+			return
+		}
+		e.preventDefault()
+		const textarea = textareaRef.current
+		const { value, selectionStart: pos1, selectionEnd: pos2 } = textarea
+		const newValue = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
+		Object.assign(textarea, {
+			value: newValue,
+			selectionStart: pos1 + 1,
+			selectionEnd: pos2 + 1,
+		})
+		setValue(newValue)
+	}
 
 	const cardStyle = { margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }
 	return (
@@ -1332,53 +1350,28 @@ const App = props => {
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
 					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
-					onKeyDown={e => {
-						if (e.keyCode !== 9) { // Tab
-							// No-op
-							return
-						}
-						e.preventDefault()
-						const { value, selectionStart: pos1, selectionEnd: pos2 } = textareaRef.current
-						const newValue = `${value.slice(0, pos1)}\t${value.slice(pos2)}`
-						textareaRef.current.value = newValue
-						textareaRef.current.selectionStart = pos1 + 1
-						textareaRef.current.selectionEnd = pos1 + 1
-						setValue(newValue)
-					}}
+					onKeyDown={onKeyDown}
 					onChange={e => setValue(e.target.value)}
 				/>
 
 				{/* RHS */}
 				<DocumentTitle title={state.meta && state.meta.title}>
 					{state.renderMode === RenderModes.TXT && (
-						<CodeBlockStandalone
-							style={cardStyle}
-							lang="txt"
-							data={text}
-						/>
+						<CodeBlockStandalone style={cardStyle} data={text} />
 					)}
 					{state.renderMode === RenderModes.MD && (
 						<Editor
 							ref={editorRef}
-							// className="text-lg"
 							style={{ fontSize: 17 }}
 							state={state}
 							setState={setState}
 						/>
 					)}
 					{state.renderMode === RenderModes.HTML && (
-						<CodeBlockStandalone
-							style={cardStyle}
-							lang="html"
-							data={html}
-						/>
+						<CodeBlockStandalone style={cardStyle} lang="html" data={html} />
 					)}
 					{state.renderMode === RenderModes.JSON && (
-						<CodeBlockStandalone
-							style={cardStyle}
-							lang="json"
-							data={json}
-						/>
+						<CodeBlockStandalone style={cardStyle} lang="json" data={json} />
 					)}
 				</DocumentTitle>
 
