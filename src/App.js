@@ -974,9 +974,7 @@ function toText(data, options = { markdown: false }) {
 	let text = ""
 	for (const each of data) {
 		const [s1, s2] = parseSyntax(each.syntax)
-		if (options.markdown) {
-			text += typeof s1 !== "function" ? s1 : s1(each)
-		}
+		text += !options.markdown ? "" : (typeof s1 !== "function" ? s1 : s1(each))
 		if (each.type === Break) {
 			// No-op
 		} else if (each.type === Blockquote || each.type === List) {
@@ -984,9 +982,7 @@ function toText(data, options = { markdown: false }) {
 		} else {
 			text += toInnerText(each.children, options)
 		}
-		if (options.markdown) {
-			text += typeof s2 !== "function" ? s2 : s2(each)
-		}
+		text += !options.markdown ? "" : (typeof s2 !== "function" ? s2 : s2(each))
 		if (each !== data[data.length - 1]) {
 			text += "\n"
 		}
@@ -1065,6 +1061,14 @@ const EditorContext = React.createContext()
 const cmapJSON = new Map()
 const cmapHTML = new Map()
 
+// TODO: Add support for major frameworks, e.g.
+//
+// Alpine.js
+// Vue.js
+// React.js
+// Angular.js
+// etc.
+//
 ;(() => {
 	/* eslint-disable no-multi-spaces */
 	cmapJSON[Emoji]           = "Emoji"
@@ -1085,7 +1089,7 @@ const cmapHTML = new Map()
 	cmapJSON[Image.type]      = "Image"
 	cmapJSON[Break.type]      = "Break"
 
-	cmapHTML[Escape]          = ["", ""] // No-op
+	cmapHTML[Escape]          = ["", ""]
 	cmapHTML[Emoji]           = [data => `<span aria-label="${data.description}" role="img">`, "</span>"]
 	cmapHTML[Em]              = ["<em>", "</em>"]
 	cmapHTML[Strong]          = ["<strong>", "</strong>"]
@@ -1100,15 +1104,14 @@ const cmapHTML = new Map()
 	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
 	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t`, "\n</li>"]
 	cmapHTML[List.type]       = [data => `<${!data.numbered ? "ul" : "ol"}>`, data => `</${!data.numbered ? "ul" : "ol"}>`]
-	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""] // Leaf node
-	cmapHTML[Break.type]      = ["<hr>", ""] // Leaf node
+	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""]
+	cmapHTML[Break.type]      = ["<hr>", ""]
 	/* eslint-enable no-multi-spaces */
 })()
 
-// TODO: Add value to state (needed for backspace)
 const Editor = React.forwardRef(({ className, style, state, setState, ...props }, ref) => {
 
-	// Rerender the DOM when state.data changes:
+	// Rerender the React-managed DOM when state.data changes:
 	React.useLayoutEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
@@ -1156,11 +1159,6 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 	)
 })
 
-const KEY = "codex-app-v2.2"
-
-const RUNES_PER_WORD = 6
-const WORDS_PER_MINUTE = 250
-
 // Parses a VDOM representation to other data types.
 function parseTypes(data) {
 	const types = {
@@ -1173,15 +1171,20 @@ function parseTypes(data) {
 
 // Parses a text representation to metadata.
 function parseMetadata(text) {
+	const runesPerWord = 6
+	const wordsPerMinute = 250
+
 	const runes = [...text].length
 	const meta = {
 		title: text.split("\n", 1),
 		runes,
 		words: text.split(/\s+/).filter(Boolean).length,
-		seconds: Math.ceil(runes / RUNES_PER_WORD / WORDS_PER_MINUTE * 60),
+		seconds: Math.ceil(runes / runesPerWord / wordsPerMinute * 60),
 	}
 	return meta
 }
+
+const KEY = "codex-app-v2.2"
 
 const App = props => {
 	const textareaRef = React.useRef()
@@ -1214,6 +1217,7 @@ const App = props => {
 		renderMode: RenderModes.GFM,
 		debugCSS: false,
 		readOnly: false,
+		raw: value,
 		data: parseGFM(value),
 		types: { text: "", html: "" /* , json: "" */ },
 		metadata: { title: "", runes: 0, words: 0, seconds: 0 },
@@ -1226,6 +1230,7 @@ const App = props => {
 			const types = parseTypes(data)
 			setState(current => ({
 				...current,
+				raw: value,
 				data,
 				types,
 				metadata: parseMetadata(types.text),
