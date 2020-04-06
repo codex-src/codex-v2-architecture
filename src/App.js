@@ -107,8 +107,7 @@ const strikeStyle = {
 }
 
 const Strike = ({ syntax, ...props }) => (
-	// NOTE: data-type-strike is needed for CSS
-	<span style={strikeStyle} data-type-strike>
+	<span style={strikeStyle}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -129,19 +128,19 @@ const A = ({ syntax, href, ...props }) => (
 	</a>
 )
 
-const NodeHOC = ({ id, tag, style, ...props }) => {
-	const Tag = tag || "div"
-	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
+const Node = ({ id, tag, style, ...props }) => {
+	const Type = tag || "div"
+	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-node {...props} />
 }
 
-const CompoundNodeHOC = ({ id, tag, style, ...props }) => {
-	const Tag = tag || "div"
-	return <Tag id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
+const CompoundNode = ({ id, tag, style, ...props }) => {
+	const Type = tag || "div"
+	return <Type id={id} style={{ whiteSpace: "pre-wrap", ...style }} data-compound-node {...props} />
 }
 
 const Header = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h1>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-medium text-3xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -150,12 +149,12 @@ const Header = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 const Subheader = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h2>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-medium text-2xl -tracking-px leading-tight">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -164,12 +163,12 @@ const Subheader = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 const H3 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h3>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-semibold text-xl">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -178,12 +177,12 @@ const H3 = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 const H4 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h4>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -192,12 +191,12 @@ const H4 = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 const H5 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h5>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -206,12 +205,12 @@ const H5 = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 const H6 = React.memo(({ id, syntax, hash, data }) => (
-	<NodeHOC id={id} className="my-1" data-type-header data-type-h6>
-		<a id={hash} href={`#${hash}`}>
+	<Node id={id} className="my-1">
+		<a id={hash} className="block" href={`#${hash}`}>
 			<span className="font-semibold text-lg">
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
@@ -220,7 +219,7 @@ const H6 = React.memo(({ id, syntax, hash, data }) => (
 				</Markdown>
 			</span>
 		</a>
-	</NodeHOC>
+	</Node>
 ))
 
 // Returns whether a VDOM representation uses 1-3 emojis.
@@ -234,11 +233,11 @@ function emojis(data) {
 }
 
 const Paragraph = React.memo(({ id, data }) => (
-	<NodeHOC id={id} className={emojis(data) && "emojis"}>
+	<Node id={id} className={!emojis(data) ? null : "emojis"}>
 		{toInnerReact(data) || (
 			<br />
 		)}
-	</NodeHOC>
+	</Node>
 ))
 
 // NOTE: Compound component
@@ -246,18 +245,18 @@ const Blockquote = React.memo(({ id, syntax, data }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<CompoundNodeHOC id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
+		<CompoundNode id={id} style={readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }}>
 			{data.map((each, index) => (
-				// NOTE: Put my-1 on <NodeHOC> not <CompoundNodeHOC>
-				<NodeHOC key={each.id} id={each.id} className="my-1 text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
+				// NOTE: Put my-1 on <Node> not <CompoundNode>
+				<Node key={each.id} id={each.id} className="my-1 text-gray-600" style={readOnly && { paddingLeft: "calc(24.88/18 * 1em)" }}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
 						)}
 					</Markdown>
-				</NodeHOC>
+				</Node>
 			))}
-		</CompoundNodeHOC>
+		</CompoundNode>
 	)
 })
 
@@ -278,32 +277,32 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNodeHOC className="-mx-6 my-1 px-6 border" style={tabSize(2)} spellCheck={false}>
+		<CompoundNode className="-mx-6 my-1 px-6 border" style={tabSize(2)} spellCheck={false}>
 			<div className="break-words font-mono text-sm leading-snug">
-				<NodeHOC className="py-px leading-none text-md-blue-a200">
+				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</NodeHOC>
-				<NodeHOC>
+				</Node>
+				<Node>
 					<span
 						className={lang && `language-${lang}`}
 						dangerouslySetInnerHTML={{
 							__html: html || data,
 						}}
 					/>
-				</NodeHOC>
-				<NodeHOC className="py-px leading-none text-md-blue-a200">
+				</Node>
+				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</NodeHOC>
+				</Node>
 			</div>
-		</CompoundNodeHOC>
+		</CompoundNode>
 	)
 })
 
@@ -335,14 +334,14 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 
 // TODO
 const ListItem = React.memo(({ syntax, depth, checked, data, ...props }) => (
-	<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row">
+	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 		<Markdown className="mr-2 text-md-blue-a400" style={{ fontFeatureSettings: "'tnum'" }} syntax={[syntax[0].trimStart()]}>
 			<div>
 				{toInnerReact(data)}
 			</div>
 		</Markdown>
-	</NodeHOC>
+	</Node>
 ))
 
 // TODO
@@ -350,7 +349,7 @@ const TaskItem = React.memo(({ syntax, depth, checked, data, ...props }) => {
 	const [value, setValue] = React.useState(checked.value)
 
 	return (
-		<NodeHOC tag="li" className="-ml-5 my-1 flex flex-row" style={value && strikeStyle} data-type-task-item>
+		<Node tag="li" className="-ml-5 my-1 flex flex-row checked" style={value && strikeStyle}>
 			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
 			<input
 				// NOTE: Use md-blue-a200 because md-blue-a400 is
@@ -369,18 +368,19 @@ const TaskItem = React.memo(({ syntax, depth, checked, data, ...props }) => {
 			<div>
 				{toInnerReact(data)}
 			</div>
-		</NodeHOC>
+		</Node>
 	)
 })
 
 // NOTE: Compound component
 const List = React.memo(({ id, depth, numbered, data, ...props }) => (
+	// TODO: Add numbered class
 	// FIXME: Y-axis margin is wrong
-	<NodeHOC id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
+	<Node id={id} tag={!numbered ? "ul" : "ol"} className="ml-5">
 		{data.map(({ type: Type, children: data, ...each }) => (
 			<Type key={each.id} data={data} {...each} />
 		))}
-	</NodeHOC>
+	</Node>
 ))
 
 // TODO: Add my-1?
@@ -390,7 +390,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	const [hover, setHover] = React.useState(() => readOnly)
 
 	return (
-		<NodeHOC id={id} className="relative" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
+		<Node id={id} className="relative" onMouseEnter={e => setHover(true)} onMouseLeave={e => setHover(false)}>
 			{readOnly && !data ? (
 				null
 			) : (
@@ -407,7 +407,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 			)}
 			{/* FIXME: Change to ems */}
 			<img className="mx-auto" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
-		</NodeHOC>
+		</Node>
 	)
 })
 
@@ -415,13 +415,13 @@ const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 
 	return (
-		<NodeHOC id={id} className="my-1">
+		<Node id={id} className="my-1">
 			{!readOnly ? (
 				<Markdown syntax={syntax} />
 			) : (
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
-		</NodeHOC>
+		</Node>
 	)
 })
 
@@ -1117,8 +1117,8 @@ const cmapHTML = new Map()
 	cmapJSON[Image.type]      = "Image"
 	cmapJSON[Break.type]      = "Break"
 
-	cmapHTML[Emoji]           = [data => `<span aria-label="${data.description}" role="img">`, "</span>"]
 	cmapHTML[Escape]          = ["", ""] // No-op
+	cmapHTML[Emoji]           = [data => `<span aria-label="${data.description}" role="img">`, "</span>"]
 	cmapHTML[Em]              = ["<em>", "</em>"]
 	cmapHTML[Strong]          = ["<strong>", "</strong>"]
 	cmapHTML[StrongAndEm]     = ["<strong><em>", "</em></strong>"]
