@@ -56,14 +56,18 @@ const Markdown = ({ syntax, ...props }) => {
 
 const Emoji = ({ description, ...props }) => (
 	<span className="emoji" aria-label={description} role="img">
-		{props.children}
+		<Markdown>
+			{props.children}
+		</Markdown>
 	</span>
 )
 
 const Escape = ({ syntax, ...props }) => (
-	<Markdown syntax={syntax}>
-		{props.children}
-	</Markdown>
+	<span>
+		<Markdown syntax={syntax}>
+			{props.children}
+		</Markdown>
+	</span>
 )
 
 const Em = ({ syntax, ...props }) => (
@@ -91,7 +95,7 @@ const StrongAndEm = ({ syntax, ...props }) => (
 )
 
 const Code = ({ syntax, ...props }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabSize(2)} spellCheck={false}>
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" style={tabStyle(2)} spellCheck={false}>
 		<Markdown className="text-red-600" syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -219,7 +223,7 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 
 	return (
 		// NOTE: Doesn’t use py-* because of <Markdown>
-		<CompoundNode className="-mx-6 my-1 px-6 border" style={tabSize(2)} spellCheck={false}>
+		<CompoundNode className="-mx-6 my-1 px-6 border" style={tabStyle(2)} spellCheck={false}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
@@ -1169,10 +1173,10 @@ const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
 const KEY_CODE_TAB = 9
 
-function tabSize(size) {
+function tabStyle(size) {
 	const style = {
 		MozTabSize: size,
-		tabSize: size,
+		tabStyle: size,
 	}
 	return style
 }
@@ -1410,7 +1414,7 @@ Last and not least…images _(and GIFs)_ are supported!
 					ref={ref}
 					// FIXME: Add min-height
 					className="w-full h-full min-h-screen resize-none outline-none overflow-y-hidden"
-					style={tabSize(2)}
+					style={tabStyle(2)}
 					value={value}
 					onKeyDown={e => {
 						if (e.keyCode !== KEY_CODE_TAB) {
@@ -1433,7 +1437,7 @@ Last and not least…images _(and GIFs)_ are supported!
 					<DocumentTitle title={state.meta && state.meta.title}>
 						{state.renderMode === "text" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabSize(2) }}
+								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
 								lang="text"
 								data={`${text}\n`}
 							/>
@@ -1441,21 +1445,21 @@ Last and not least…images _(and GIFs)_ are supported!
 						{state.renderMode === "markdown" && (
 							<Editor
 								// className="text-lg"
-								style={{ ...tabSize(4), fontSize: 17 }}
+								style={{ ...tabStyle(4), fontSize: 17 }}
 								state={state}
 								setState={setState}
 							/>
 						)}
 						{state.renderMode === "html" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabSize(2) }}
+								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
 								lang="html"
 								data={`${html}\n`}
 							/>
 						)}
 						{state.renderMode === "json" && (
 							<CodeBlockStandalone
-								style={{ margin: "-0.5em 0", ...tabSize(2) }}
+								style={{ margin: "-0.5em 0", ...tabStyle(2) }}
 								lang="json"
 								data={`${json}\n`}
 							/>
