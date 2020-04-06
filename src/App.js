@@ -32,7 +32,7 @@ const attrs = {
 			"--red-600": "currentColor",
 			"--md-blue-a400": "currentColor",
 			"textDecoration": "line-through",
-			"color": "var(--gray-500)", // TODO
+			"color": "var(--gray-500)",
 		},
 	},
 	a: {
@@ -305,7 +305,6 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-			{/* NOTE: Add a <span> because of flex flex-row */}
 			<span>{toInnerReact(data)}</span>
 		</Markdown>
 	</Node>
@@ -340,9 +339,8 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={$checked && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
-				too dark and overwritten by strikeStyle */}
-				<Checkbox className="mr-2 text-md-blue-a200" style={checkboxStyle} {...$attrs} />
-				{/* NOTE: Add a <span> because of flex flex-row */}
+				too dark and overwritten by attrs.strike.style */}
+				<Checkbox className="mr-2 text-md-blue-a200 shadow" style={checkboxStyle} {...$attrs} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
@@ -436,35 +434,33 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		pattern = `[^\\\\]${pattern}`
 		patternOffset++
 	}
-	const parse = (text, index, { minChars } = { minChars: 1 }) => {
-		// Guard: _Em_ and __strong and em__ cannot be nested:
+	const parse = (text, index, { minOffset } = { minOffset: 1 }) => {
+		// Guard: Character before start underscore syntax must
+		// be whitespace or punctutation:
 		//
 		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && text < text.length && !spec.isASCIIPunctuation(text[index - 1])) {
+		if (syntax[0] === "_" && index - 1 >= 0 && (!spec.isASCIIWhitespace(text[index - 1]) && !spec.isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
 		// Guard: Most syntax cannot surround spaces:
-		//
-		// TODO: Refactor
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
-			offset < minChars ||
+			offset < minOffset ||
 			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length])) ||           // Exempt <Code> and <A>
 			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
 		) {
 			return null
 		}
 		index += syntax.length
-		const object = {
+		const data = {
 			type,
 			syntax,
 			children: !recurse
 				? text.slice(index, index + offset)
 				: parseInnerGFM(text.slice(index, index + offset)),
 		}
-		// TODO: Rename members
-		index += syntax.length + offset - 1
-		return { object, x2: index }
+		index += syntax.length + offset
+		return { data, x2: index }
 	}
 	return parse
 }
@@ -506,8 +502,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			// **Strong** or __strong__
 			} else if (nchars >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
@@ -516,8 +512,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			// _Emphasis_ or *emphasis*
 			} else if (nchars >= "*x*".length) {
@@ -526,8 +522,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			}
 			break
@@ -540,8 +536,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			// ~Strike~
 			} else if (nchars >= "~x~".length) {
@@ -550,8 +546,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			}
 			break
@@ -564,8 +560,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			// `Code`
 			} else if (nchars >= "`x`".length) {
@@ -574,8 +570,8 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				data.push(parsed.object)
-				index = parsed.x2
+				data.push(parsed.data)
+				index = parsed.x2 - 1
 				continue
 			}
 			break
@@ -627,11 +623,11 @@ function parseInnerGFM(text) {
 					break
 				}
 				// Check ( syntax:
-				if (lhs.x2 + "]".length < text.length && text[lhs.x2 + "]".length] !== "(") {
+				if (lhs.x2 < text.length && text[lhs.x2] !== "(") {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2 + "]".length)
+				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -639,11 +635,11 @@ function parseInnerGFM(text) {
 				data.push({
 					type: A,
 					// syntax: ["[", "](…)"],
-					syntax: ["[", `](${rhs.object.children})`],
-					href: rhs.object.children.trim(),
-					children: lhs.object.children,
+					syntax: ["[", `](${rhs.data.children})`],
+					href: rhs.data.children.trim(),
+					children: lhs.data.children,
 				})
-				index = rhs.x2
+				index = rhs.x2 - 1
 				continue
 			}
 			break
@@ -853,7 +849,7 @@ function parseGFM(text) {
 					type: CodeBlock,
 					id: uuidv4(),
 					syntax: [body[x1], body[x2 - 1]],
-					lang: each.slice(3).split(".").slice(-1)[0].toLowerCase(), // TODO: Remove toLowerCase?
+					lang: each.slice(3).split(".").slice(-1)[0].toLowerCase(),
 					children: body.slice(x1, x2).join("\n")
 						.slice(each.length, -3) // Trim syntax
 						.slice(1),              // Trim start paragraph
@@ -890,21 +886,21 @@ function parseGFM(text) {
 		// <Image>
 		//
 		// TODO: Move to parseInnerGFM to support
-		// [![Image](a:href)](b:href) syntax?
+		// [![Image](href)](href) syntax?
 		case char === "!":
 			// ![Image](href)
 			if (nchars >= "![](x)".length) {
-				const lhs = registerType(null, "]")(each, "!".length, { minChars: 0 })
+				const lhs = registerType(null, "]")(each, "!".length, { minOffset: 0 })
 				if (!lhs) {
 					// No-op
 					break
 				}
 				// Check ( syntax:
-				if (lhs.x2 + "]".length < nchars && each[lhs.x2 + 1] !== "(") {
+				if (lhs.x2 < nchars && each[lhs.x2] !== "(") {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2 + "]".length)
+				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -913,10 +909,10 @@ function parseGFM(text) {
 					type: Image,
 					id: uuidv4(),
 					// syntax: ["![", "](…)"],
-					syntax: ["![", `](${rhs.object.children})`],
-					src: rhs.object.children,
-					alt: toInnerText(lhs.object.children),
-					children: lhs.object.children,
+					syntax: ["![", `](${rhs.data.children})`],
+					src: rhs.data.children,
+					alt: toInnerText(lhs.data.children),
+					children: lhs.data.children,
 				})
 				continue
 			}
