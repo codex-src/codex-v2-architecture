@@ -1180,7 +1180,7 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 	)
 })
 
-const Buttons = ({ state, setState, debugCSS, setDebugCSS, ...props }) => (
+const Settings = ({ state, setState, ...props }) => (
 	<div className="flex flex-col items-end">
 
 		{/* Top */}
@@ -1207,8 +1207,8 @@ const Buttons = ({ state, setState, debugCSS, setDebugCSS, ...props }) => (
 					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, readOnly: !state.readOnly })}>
 						Toggle read-only: {String(state.readOnly)}
 					</Button>
-					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setDebugCSS(!debugCSS)}>
-						Toggle CSS debugger: {String(debugCSS)}
+					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, debugCSS: !state.debugCSS })}>
+						Toggle CSS debugger: {String(state.debugCSS)}
 					</Button>
 				</React.Fragment>
 			)}
@@ -1230,20 +1230,20 @@ const App = props => {
 	const textareaRef = React.useRef()
 	const editorRef = React.useRef()
 
-	const [debugCSS, setDebugCSS] = React.useState(false)
+	// const [debugCSS, setDebugCSS] = React.useState(false)
 
-	const mounted = React.useRef()
-	React.useEffect(() => {
-		if (!mounted.current) {
-			mounted.current = true
-			return
-		}
-		if (!debugCSS) {
-			editorRef.current.classList.remove("debug-css")
-		} else {
-			editorRef.current.classList.add("debug-css")
-		}
-	}, [debugCSS])
+	// const mounted = React.useRef()
+	// React.useEffect(() => {
+	// 	if (!mounted.current) {
+	// 		mounted.current = true
+	// 		return
+	// 	}
+	// 	if (!debugCSS) {
+	// 		editorRef.current.classList.remove("debug-css")
+	// 	} else {
+	// 		editorRef.current.classList.add("debug-css")
+	// 	}
+	// }, [debugCSS])
 
 	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => {
@@ -1265,6 +1265,7 @@ const App = props => {
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		renderMode: RenderModes.MD,
+		debugCSS: false,
 		readOnly: false,
 		data: parseGFM(value),
 	}))
@@ -1291,13 +1292,7 @@ const App = props => {
 			if (state.renderMode === RenderModes.TXT) {
 				setText(toText(state.data))
 			} else if (state.renderMode === RenderModes.HTML) {
-				// setHTML(toHTML(state.data))
-				setHTML(`<article class="codex-output">\n${
-					toHTML(state.data)
-						.split("\n")
-						.map(each => `\t${each}`)
-						.join("\n")
-				}\n</article>`)
+				setHTML(toHTML(state.data))
 			} else if (state.renderMode === RenderModes.JSON) {
 				setJSON(toJSON(state.data))
 			}
@@ -1306,6 +1301,15 @@ const App = props => {
 			clearTimeout(id)
 		}
 	}, [state.renderMode, state.data])
+
+	const mounted = React.useRef()
+	React.useEffect(() => {
+		if (!mounted.current) {
+			mounted.current = true
+			return
+		}
+		editorRef.current.classList.toggle("debug-css")
+	}, [state.debugCSS])
 
 	// Bind command-p for read-only:
 	React.useEffect(() => {
@@ -1349,13 +1353,13 @@ const App = props => {
 		<div className="flex flex-row justify-center">
 			<div className="px-6 py-32 grid grid-cols-2 gap-12 w-full">
 
-				{/* Buttons */}
+				{/* Settings */}
 				<div className="p-3 fixed right-0 top-0 z-30">
-					<Buttons
+					<Settings
 						state={state}
 						setState={setState}
-						debugCSS={debugCSS}
-						setDebugCSS={setDebugCSS}
+						// debugCSS={debugCSS}
+						// setDebugCSS={setDebugCSS}
 					/>
 				</div>
 
