@@ -365,7 +365,7 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 				</div>
 			)}
 			{/* FIXME: Change to ems */}
-			<img className="mx-auto" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
+			<img className="mx-auto rounded shadow-hero" style={{ minHeight: 8 + 4 + 27 + 4 + 8, maxWidth: 672, maxHeight: 672 / 2 }} src={src} alt={alt} />
 		</Node>
 	)
 })
