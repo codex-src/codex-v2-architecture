@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "debug.css": "https://github.com/codex-src/debug.css",
+    "raw.macro": "^0.3.0",
     "serve": "^11.3.0"
   }
 }
