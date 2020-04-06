@@ -227,10 +227,10 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
-		// if (!lang) {
-		// 	// No-op
-		// 	return
-		// }
+		if (!lang) {
+			// No-op
+			return
+		}
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
@@ -275,10 +275,10 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
-		// if (!lang) {
-		// 	// No-op
-		// 	return
-		// }
+		if (!lang) {
+			// No-op
+			return
+		}
 		const parser = Prism[lang]
 		if (!parser) {
 			// No-op
@@ -305,6 +305,7 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+			{/* NOTE: Add a <span> because of flex flex-row */}
 			<span>{toInnerReact(data)}</span>
 		</Markdown>
 	</Node>
@@ -326,8 +327,8 @@ function useChecked(initialValue) {
 	return [checked, attrs]
 }
 
-const TaskItem = React.memo(({ syntax, checked: $checked, data }) => {
-	const [checked, checkedAttrs] = useChecked($checked.value)
+const TaskItem = React.memo(({ syntax, checked, data }) => {
+	const [$checked, $attrs] = useChecked(checked.value)
 
 	const checkboxStyle = {
 		marginLeft: "calc(((12 + 2) - 11.438) / 16 * -1em)",
@@ -336,11 +337,12 @@ const TaskItem = React.memo(({ syntax, checked: $checked, data }) => {
 		height: "0.875em",
 	}
 	return (
-		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={checked && attrs.strike.style}>
+		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={$checked && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by strikeStyle */}
-				<Checkbox className="mr-2 text-md-blue-a200" style={checkboxStyle} {...checkedAttrs} />
+				<Checkbox className="mr-2 text-md-blue-a200" style={checkboxStyle} {...$attrs} />
+				{/* NOTE: Add a <span> because of flex flex-row */}
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
@@ -356,6 +358,14 @@ const List = React.memo(({ tag, id, data }) => (
 	</Node>
 ))
 
+const Caption = ({ syntax, data }) => (
+	<div className="px-2 py-1 bg-white rounded shadow-hero truncate pointer-events-auto">
+		<Markdown syntax={syntax}>
+			{toInnerReact(data)}
+		</Markdown>
+	</div>
+)
+
 // Prepares a hovered state and functions e.g. {...attrs}.
 function useHovered(initialValue) {
 	const [hovered, setHovered] = React.useState(initialValue)
@@ -370,24 +380,14 @@ function useHovered(initialValue) {
 	return [hovered, attrs]
 }
 
-const Caption = ({ syntax, data }) => (
-	<div className="px-2 py-1 bg-white rounded shadow-hero truncate pointer-events-auto">
-		<Markdown syntax={syntax}>
-			{toInnerReact(data)}
-		</Markdown>
-	</div>
-)
-
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
 
-	const [hovered, hoveredAttrs] = useHovered(state.readOnly)
+	const [hovered, $attrs] = useHovered(state.readOnly)
 
-	// <div ...>
 	const divStyle = {
 		opacity: state.readOnly && (!data || !hovered) ? "0%" : "100%",
 	}
-	// <img ...>
 	const imgStyle = {
 		maxWidth:  state.rect.width,
 		maxHeight: state.rect.width * 10 / 16,
@@ -399,7 +399,7 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 					<Caption syntax={syntax} data={data} />
 				</div>
 			</div>
-			<div className="rounded shadow-hero overflow-hidden" {...hoveredAttrs}>
+			<div className="rounded shadow-hero overflow-hidden" {...$attrs}>
 				<img style={imgStyle} src={src} alt={alt} />
 			</div>
 		</Node>
@@ -712,7 +712,6 @@ function parseList(range) {
 		type: List,
 		tag: !NumberedListRe.test(range[0]) ? "ul" : "ol",
 		id: uuidv4(),
-		// depth: 0,
 		children: [],
 	}
 	for (const each of range) {
@@ -727,7 +726,6 @@ function parseList(range) {
 					type: List,
 					tag: !NumberedListRe.test(each) ? "ul" : "ol",
 					id: uuidv4(),
-					// depth: deep + 1, // Eagerly increment
 					children: [],
 				})
 			}
@@ -743,7 +741,6 @@ function parseList(range) {
 			type: !checked ? ListItem : TaskItem,
 			id: uuidv4(),
 			syntax: [syntax],
-			// depth: deep,
 			checked,
 			children: parseInnerGFM(substr),
 		})
