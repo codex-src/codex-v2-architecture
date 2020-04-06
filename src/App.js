@@ -1191,16 +1191,40 @@ const Settings = ({ state, setState, ...props }) => (
 
 		{/* Top */}
 		<div className="-m-1 flex flex-row">
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.Text })}>
+			<Button
+				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+				onClick={e => setState({
+					...state,
+					renderMode: RenderModes.Text,
+				})}
+			>
 				Plain text
 			</Button>
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.CGFM })}>
+			<Button
+				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+				onClick={e => setState({
+					...state,
+					renderMode: RenderModes.CGFM,
+				})}
+			>
 				Markdown
 			</Button>
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.HTML })}>
+			<Button
+				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+				onClick={e => setState({
+					...state,
+					renderMode: RenderModes.HTML,
+				})}
+			>
 				HTML
 			</Button>
-			<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, renderMode: RenderModes.JSON })}>
+			<Button
+				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+				onClick={e => setState({
+					...state,
+					renderMode: RenderModes.JSON,
+				})}
+			>
 				JSON
 			</Button>
 		</div>
@@ -1210,10 +1234,22 @@ const Settings = ({ state, setState, ...props }) => (
 		<div className="-m-1 flex flex-row">
 			{state.renderMode === RenderModes.CGFM && (
 				<React.Fragment>
-					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, readOnly: !state.readOnly })}>
+					<Button
+						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+						onClick={e => setState({
+							...state,
+							readOnly: !state.readOnly,
+						})}
+					>
 						Toggle read-only: {String(state.readOnly)}
 					</Button>
-					<Button className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" onClick={e => setState({ ...state, debugCSS: !state.debugCSS })}>
+					<Button
+						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+						onClick={e => setState({
+							...state,
+							debugCSS: !state.debugCSS,
+						})}
+					>
 						Toggle CSS debugger: {String(state.debugCSS)}
 					</Button>
 				</React.Fragment>
