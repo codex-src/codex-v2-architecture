@@ -321,7 +321,7 @@ function useChecked(initialValue) {
 		checked,
 		onChange: e => {
 			setChecked(!checked)
-		}
+		},
 	}
 	return [checked, attrs]
 }
@@ -399,8 +399,8 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const imgStyle = {
 		// minHeight: "3em",
 		maxWidth:  state.rect && state.rect.width,
-		minHeight: state.rect && state.rect.width * 10 / 16,
-		maxHeight: state.rect && state.rect.width * 10 / 16,
+		minHeight: !loaded ? state.rect && state.rect.width * 9 / 16 : 0,
+		maxHeight: state.rect && state.rect.width * 9 / 16,
 	}
 	return (
 		<Node id={id} className="relative flex flex-row justify-center">
@@ -411,7 +411,7 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 			</div>
 			{/* <div style={{opacity: !loaded ? "0%" : "100%" }} {...$attrs}> */}
 			<div className={!loaded ? "w-full text-transparent bg-gray-100" : ""} {...$attrs}>
-				<img style={imgStyle} src={src} alt={alt} onLoad={e => setLoaded(true)} />
+				<img className="mx-auto" style={imgStyle} src={src} alt={alt} onLoad={e => setLoaded(true)} />
 			</div>
 		</Node>
 	)
