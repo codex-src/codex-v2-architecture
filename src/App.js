@@ -1169,17 +1169,17 @@ function parseTypes(data) {
 	return types
 }
 
+const RunesPerWord = 6
+const WordsPerMinute = 250
+
 // Parses a text representation to metadata.
 function parseMetadata(text) {
-	const runesPerWord = 6
-	const wordsPerMinute = 250
-
 	const runes = [...text].length
 	const meta = {
 		title: text.split("\n", 1),
 		runes,
 		words: text.split(/\s+/).filter(Boolean).length,
-		seconds: Math.ceil(runes / runesPerWord / wordsPerMinute * 60),
+		seconds: Math.ceil(runes / RunesPerWord / WordsPerMinute * 60),
 	}
 	return meta
 }
@@ -1205,16 +1205,6 @@ const App = props => {
 	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => initialValue)
 
-	// <textarea (2 of 2):
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			localStorage.setItem(KEY, JSON.stringify({ data: value }))
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [value])
-
 	// Create state:
 	const [state, setState] = React.useState(() => ({
 		renderMode: RenderModes.GFM,
@@ -1238,6 +1228,8 @@ const App = props => {
 				types,
 				metadata: parseMetadata(types.text),
 			}))
+			// Save to localStorage:
+			localStorage.setItem(KEY, JSON.stringify({ data: value }))
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
