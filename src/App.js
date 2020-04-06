@@ -20,15 +20,31 @@ import "./App.css"
 // Extraneous attributes.
 const attrs = {
 	code: {
-		style: { MozTabSize: 2, tabSize: 2 },
+		style: {
+			MozTabSize: 2,
+			tabSize: 2,
+		},
 		spellCheck: false,
+	},
+	strike: {
+		style: {
+			"--red-100": "var(--gray-100)",
+			"--red-600": "currentColor",
+			"--md-blue-a400": "currentColor",
+			"textDecoration": "line-through",
+			"color": "var(--gray-500)", // TODO
+		},
 	},
 	a: {
 		target: "_blank",
 		rel: "noopener noreferrer",
 	},
 	li: {
-		style: { MozTabSize: 0, tabSize: 0, fontFeatureSettings: "'tnum'" },
+		style: {
+			MozTabSize: 0,
+			tabSize: 0,
+			fontFeatureSettings: "'tnum'",
+		},
 	},
 }
 
@@ -127,17 +143,8 @@ const Code = ({ syntax, ...props }) => (
 	</span>
 )
 
-// TODO
-const strikeStyle = {
-	"--red-100": "var(--gray-100)",
-	"--red-600": "currentColor",
-	"--md-blue-a400": "currentColor",
-	"textDecoration": "line-through",
-	"color": "var(--gray-500)",
-}
-
 const Strike = ({ syntax, ...props }) => (
-	<span style={strikeStyle}>
+	<span {...attrs.strike}>
 		<Markdown syntax={syntax}>
 			{props.children}
 		</Markdown>
@@ -298,37 +305,44 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-			<div>
-				{toInnerReact(data)}
-			</div>
+			<span>{toInnerReact(data)}</span>
 		</Markdown>
 	</Node>
 ))
 
-// TODO
-const TaskItem = React.memo(({ syntax, depth, checked, data }) => {
-	const [value, setValue] = React.useState(checked.value)
+const Checkbox = ({ className, ...props }) => (
+	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
+)
 
+// Prepares a checked state and functions e.g. {...attrs}.
+function useChecked(initialValue) {
+	const [checked, setChecked] = React.useState(initialValue)
+	const attrs = {
+		checked,
+		onChange: e => {
+			setChecked(!checked)
+		}
+	}
+	return [checked, attrs]
+}
+
+const TaskItem = React.memo(({ syntax, checked: $checked, data }) => {
+	const [checked, checkedAttrs] = useChecked($checked.value)
+
+	const checkboxStyle = {
+		marginLeft: "calc(((12 + 2) - 11.438) / 16 * -1em)",
+		marginTop: "0.375em",
+		width: "0.875em",
+		height: "0.875em",
+	}
 	return (
-		<Node tag="li" className="-ml-5 my-1 flex flex-row checked" style={value && strikeStyle}>
-			<Syntax className="hidden">{"\t".repeat(depth)}</Syntax>
-			<input
-				// NOTE: Use md-blue-a200 because md-blue-a400 is
-				// too dark
-				className="form-checkbox mr-2 text-md-blue-a200"
-				style={{
-					marginLeft: "calc((2.047 + 0.75) / 16 * -1em)",
-					marginTop: "0.375em",
-					width: "0.875em",
-					height: "0.875em",
-				}}
-				type="checkbox"
-				checked={value}
-				onChange={e => setValue(!value)}
-			/>
-			<div>
-				{toInnerReact(data)}
-			</div>
+		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={checked && attrs.strike.style}>
+			<Markdown className="hidden" syntax={syntax}>
+				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
+				too dark and overwritten by strikeStyle */}
+				<Checkbox className="mr-2 text-md-blue-a200" style={checkboxStyle} {...checkedAttrs} />
+				<span>{toInnerReact(data)}</span>
+			</Markdown>
 		</Node>
 	)
 })
@@ -342,18 +356,18 @@ const List = React.memo(({ tag, id, data }) => (
 	</Node>
 ))
 
-// Prepares a hover state and functions e.g. {...hoverFns}.
-function useHover(initialValue) {
-	const [hover, setHover] = React.useState(initialValue)
-	const hoverFns = {
+// Prepares a hovered state and functions e.g. {...attrs}.
+function useHovered(initialValue) {
+	const [hovered, setHovered] = React.useState(initialValue)
+	const attrs = {
 		onMouseEnter: e => {
-			setHover(true)
+			setHovered(true)
 		},
 		onMouseLeave: e => {
-			setHover(false)
+			setHovered(false)
 		},
 	}
-	return [hover, hoverFns]
+	return [hovered, attrs]
 }
 
 const Caption = ({ syntax, data }) => (
@@ -367,11 +381,11 @@ const Caption = ({ syntax, data }) => (
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = React.useContext(EditorContext)
 
-	const [hover, hoverFns] = useHover(state.readOnly)
+	const [hovered, hoveredAttrs] = useHovered(state.readOnly)
 
 	// <div ...>
-	const captionContainerStyle = {
-		opacity: state.readOnly && (!data || !hover) ? "0%" : "100%",
+	const divStyle = {
+		opacity: state.readOnly && (!data || !hovered) ? "0%" : "100%",
 	}
 	// <img ...>
 	const imgStyle = {
@@ -380,12 +394,12 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	}
 	return (
 		<Node id={id} className="relative flex flex-row justify-center">
-			<div className="absolute inset-0 pointer-events-none" style={captionContainerStyle}>
+			<div className="absolute inset-0 pointer-events-none" style={divStyle}>
 				<div className="px-8 py-2 flex flex-row justify-center items-end h-full">
 					<Caption syntax={syntax} data={data} />
 				</div>
 			</div>
-			<div className="rounded shadow-hero overflow-hidden" {...hoverFns}>
+			<div className="rounded shadow-hero overflow-hidden" {...hoveredAttrs}>
 				<img style={imgStyle} src={src} alt={alt} />
 			</div>
 		</Node>
@@ -729,7 +743,7 @@ function parseList(range) {
 			type: !checked ? ListItem : TaskItem,
 			id: uuidv4(),
 			syntax: [syntax],
-			depth: deep,
+			// depth: deep,
 			checked,
 			children: parseInnerGFM(substr),
 		})
