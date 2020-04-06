@@ -1,5 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as spec from "./spec"
+import Enum from "./Enum"
 import escape from "lodash/escape"
 import Prism from "./Prism"
 import raw from "raw.macro"
@@ -1180,7 +1181,12 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 
 const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
-const KEY_CODE_TAB = 9
+const RenderModes = new Enum(
+	"TXT",
+	"MD",
+	"HTML",
+	"JSON"
+)
 
 const App = props => {
 	const textareaRef = React.useRef()
@@ -1220,20 +1226,19 @@ const App = props => {
 
 	// Create state:
 	const [state, setState] = React.useState(() => ({
-		// TODO: Use new Enum pattern
-		renderMode: "markdown", // E.g. "text" || "markdown" || "html" || "json"
+		renderMode: RenderModes.MD,
 		readOnly: false,
 		data: parseGFM(value),
 	}))
 
-	// Update state (debounce 25ms):
+	// Update state:
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			setState(current => ({
 				...current,
 				data: parseGFM(value),
 			}))
-		}, 25)
+		}, 16.6667)
 		return () => {
 			clearTimeout(id)
 		}
@@ -1245,9 +1250,9 @@ const App = props => {
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			if (state.renderMode === "text") {
+			if (state.renderMode === RenderModes.TXT) {
 				setText(toText(state.data))
-			} else if (state.renderMode === "html") {
+			} else if (state.renderMode === RenderModes.HTML) {
 				// setHTML(toHTML(state.data))
 				setHTML(`<article class="codex-output">\n${
 					toHTML(state.data)
@@ -1255,10 +1260,10 @@ const App = props => {
 						.map(each => `\t${each}`)
 						.join("\n")
 				}\n</article>`)
-			} else if (state.renderMode === "json") {
+			} else if (state.renderMode === RenderModes.JSON) {
 				setJSON(toJSON(state.data))
 			}
-		}, 25)
+		}, 16.6667)
 		return () => {
 			clearTimeout(id)
 		}
@@ -1295,48 +1300,48 @@ const App = props => {
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "text" })}
+								onClick={e => setState({ ...state, renderMode: RenderModes.TXT })}
 							>
 								Plain text
 							</button>
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "markdown" })}
+								onClick={e => setState({ ...state, renderMode: RenderModes.MD })}
 							>
 								Markdown
 							</button>
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "html" })}
+								onClick={e => setState({ ...state, renderMode: RenderModes.HTML })}
 							>
 								HTML
 							</button>
 							<button
 								className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 								onPointerDown={e => e.preventDefault()}
-								onClick={e => setState({ ...state, renderMode: "json" })}
+								onClick={e => setState({ ...state, renderMode: RenderModes.JSON })}
 							>
 								JSON
 							</button>
 						</div>
 						<div className="-mx-1 my-1 flex flex-row">
-							{state.renderMode === "markdown" && (
+							{state.renderMode === RenderModes.MD && (
 								<React.Fragment>
 									<button
 										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 										onPointerDown={e => e.preventDefault()}
 										onClick={e => setState({ ...state, readOnly: !state.readOnly })}
 									>
-										Toggle read-only: {(`${state.readOnly}`)}
+										Toggle read-only: {String(state.readOnly)}
 									</button>
 									<button
 										className="mx-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 										onPointerDown={e => e.preventDefault()}
 										onClick={e => setDebugCSS(!debugCSS)}
 									>
-										Toggle CSS debugger: {(`${debugCSS}`)}
+										Toggle CSS debugger: {String(debugCSS)}
 									</button>
 								</React.Fragment>
 							)}
@@ -1351,7 +1356,7 @@ const App = props => {
 					style={{ MozTabSize: 2, tabSize: 2 }}
 					value={value}
 					onKeyDown={e => {
-						if (e.keyCode !== KEY_CODE_TAB) {
+						if (e.keyCode !== 9) { // Tab
 							// No-op
 							return
 						}
@@ -1368,14 +1373,14 @@ const App = props => {
 
 				{/* RHS */}
 				<DocumentTitle title={state.meta && state.meta.title}>
-					{state.renderMode === "text" && (
+					{state.renderMode === RenderModes.TXT && (
 						<CodeBlockStandalone
 							style={cardStyle}
-							lang="text"
+							lang="txt"
 							data={`${text}\n`}
 						/>
 					)}
-					{state.renderMode === "markdown" && (
+					{state.renderMode === RenderModes.MD && (
 						<Editor
 							ref={editorRef}
 							// className="text-lg"
@@ -1384,14 +1389,14 @@ const App = props => {
 							setState={setState}
 						/>
 					)}
-					{state.renderMode === "html" && (
+					{state.renderMode === RenderModes.HTML && (
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="html"
 							data={`${html}\n`}
 						/>
 					)}
-					{state.renderMode === "json" && (
+					{state.renderMode === RenderModes.JSON && (
 						<CodeBlockStandalone
 							style={cardStyle}
 							lang="json"
