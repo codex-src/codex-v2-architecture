@@ -226,9 +226,11 @@ const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
 			// No-op
 			return
 		}
-		setHTML(<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-			__html: window.Prism.highlight(data, parser, lang),
-		}} />)
+		setHTML((
+			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, lang),
+			}} />
+		))
 	}, [lang, data])
 
 	return (
@@ -272,9 +274,11 @@ const CodeBlockStandalone = ({ lang, data, ...props }) => {
 			// No-op
 			return
 		}
-		setHTML(<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-			__html: window.Prism.highlight(data, parser, lang),
-		}} />)
+		setHTML((
+			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, lang),
+			}} />
+		))
 	}, [lang, data])
 
 	return (
@@ -367,22 +371,37 @@ const Image = React.memo(({ id, syntax, src, alt, data, ...props }) => {
 	)
 })
 
-// NOTE:
-//
-// <Syntax ...> || (
-//   <hr ...>
-// )
-//
-// Doesn’t work -- because of React.memo?
-//
+// // NOTE:
+// //
+// // <Syntax ...> || (
+// //   <hr ...>
+// // )
+// //
+// // Doesn’t work -- because of React.memo?
+// //
+// const Break = React.memo(({ id, syntax }) => {
+// 	const { readOnly } = React.useContext(EditorContext)
+// 	return (
+// 		<Node id={id} className="my-1">
+// 			{(!readOnly && <Syntax>{syntax[0]}</Syntax>) || (
+// 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
+// 			)}
+// 		</Node>
+// 	)
+// })
+
 const Break = React.memo(({ id, syntax }) => {
 	const { readOnly } = React.useContext(EditorContext)
 	return (
-		<Node id={id} className="my-1">
-			{(!readOnly && <Syntax>{syntax[0]}</Syntax>) || (
+		<NodeHOC id={id} className="my-1">
+			{!readOnly ? (
+				// Read-write mode:
+				<Markdown syntax={syntax} />
+			) : (
+				// Read-only mode:
 				<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
 			)}
-		</Node>
+		</NodeHOC>
 	)
 })
 
@@ -1061,13 +1080,13 @@ const EditorContext = React.createContext()
 const cmapJSON = new Map()
 const cmapHTML = new Map()
 
-// TODO: Add support for major frameworks, e.g.
+// TODO: Add support for frameworks, e.g.
 //
-// Alpine.js
-// Vue.js
-// React.js
-// Angular.js
-// etc.
+// - Alpine.js
+// - Vue.js
+// - React.js
+// - Angular.js
+// - etc.
 //
 ;(() => {
 	/* eslint-disable no-multi-spaces */
