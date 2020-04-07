@@ -1,13 +1,13 @@
 import App from "./App"
-import Prism from "./Prism"
+import Prism from "./Editor/Prism"
 import React from "react"
 import ReactDOM from "react-dom"
 
 import "debug.css"
 
-import "./prism-custom.css"
-import "./tailwind-form-checkbox.css"
-import "./tailwind-codex-overrides.css"
+import "./stylesheets/prism-custom.css"
+import "./stylesheets/tailwind-form-checkbox.css"
+import "./stylesheets/tailwind-codex-overrides.css"
 
 ;(() => {
 	// Render React DOM:

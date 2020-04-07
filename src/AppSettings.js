@@ -1,6 +1,6 @@
 import Button from "./Button"
 import React from "react"
-import RenderModes from "./RenderModes"
+import RenderModes from "./Editor/RenderModes"
 
 const Settings = ({ state, setState, ...props }) => (
 	<div className="flex flex-col items-end">

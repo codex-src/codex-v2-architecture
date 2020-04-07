@@ -218,23 +218,6 @@
 	background: var(--red-600);
 }
 
-/* .bg-gray-50 { */
-/* 	background: #fbfdfe; */
-/* } */
-/* .bg-md-gray-50 { */
-/* 	background: #fafafa; */
-/* } */
-
-/* .rounded-lg-xl { */
-/* 	border-radius: 0.75rem; */
-/* } */
-/* .rounded-xl { */
-/* 	border-radius: 1rem; */
-/* } */
-/* .rounded-2xl { */
-/* 	border-radius: 2rem; */
-/* } */
-
 .shadow-hero-sm {
 	box-shadow:
 		0 0 0 1px rgba(0, 0, 0, 0.05),
