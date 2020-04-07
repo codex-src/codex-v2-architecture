@@ -1,15 +1,9 @@
-import * as emojiTrie from "emoji-trie"
-import * as spec from "./Editor/spec"
 import AppSettings from "./AppSettings"
 import CodeExport from "./CodeExport"
 import DocumentTitle from "./DocumentTitle"
-import escape from "lodash/escape"
-import Prism from "./Editor/Prism"
 import raw from "raw.macro"
 import React from "react"
-import ReactDOM from "react-dom"
 import RenderModes from "./Editor/RenderModes"
-import uuidv4 from "uuid/v4"
 
 import "./App.css"
 
@@ -153,7 +147,6 @@ const App = props => {
 		setValue(newValue)
 	}
 
-	const cardStyle = { margin: "-0.5em 0", MozTabSize: 2, tabSize: 2 }
 	return (
 		<div className="flex flex-row justify-center">
 			<div className="px-6 py-32 grid grid-cols-2 gap-12 w-full">
@@ -180,9 +173,13 @@ const App = props => {
 				<DocumentTitle title={(state.metadata && state.metadata.title) || "Untitled"}>
 					{state.renderMode === RenderModes.Text && (
 						<CodeExport
-							style={cardStyle}
-							lang={null} // No-op
-							data={state.types.text}
+							style={{
+								margin: "-0.5em 0",
+								MozTabSize: 2,
+								tabSize: 2,
+							}}
+							lang="text"
+							children={state.types.text}
 						/>
 					)}
 					{state.renderMode === RenderModes.GFM && (
@@ -195,18 +192,15 @@ const App = props => {
 					)}
 					{state.renderMode === RenderModes.HTML && (
 						<CodeExport
-							style={cardStyle}
+							style={{
+								margin: "-0.5em 0",
+								MozTabSize: 2,
+								tabSize: 2,
+							}}
 							lang="html"
-							data={state.types.html}
+							children={state.types.html}
 						/>
 					)}
-					{/* {state.renderMode === RenderModes.JSON && (} */}
-					{/* 	<CodeExport} */}
-					{/* 		style={cardStyle}} */}
-					{/* 		lang="json"} */}
-					{/* 		data={state.types.json}} */}
-					{/* 	/>} */}
-					{/* )}} */}
 				</DocumentTitle>
 
 			</div>

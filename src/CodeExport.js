@@ -1,7 +1,7 @@
-import Prism from "./Editor/Prism"
+import Prism from "./Prism"
 import React from "react"
 
-const CodeExport = ({ lang, data, ...props }) => {
+const CodeExport = ({ lang, style, children }) => {
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
@@ -16,16 +16,16 @@ const CodeExport = ({ lang, data, ...props }) => {
 		}
 		setHTML((
 			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(data, parser, lang),
+				__html: window.Prism.highlight(children, parser, lang),
 			}} />
 		))
-	}, [lang, data])
+	}, [lang, children])
 
 	return (
-		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg" {...props}>
+		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg" style={style}>
 			<div className="whitespace-pre-wrap break-words font-mono text-sm leading-snug">
 				{html || (
-					data
+					children
 				)}
 			</div>
 		</div>

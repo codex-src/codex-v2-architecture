@@ -1,6 +1,6 @@
 import React from "react"
 
-const DocumentTitle = ({ title, ...props }) => {
+const DocumentTitle = ({ title, children }) => {
 	React.useEffect(() => {
 		if (!title) {
 			// No-op
@@ -8,9 +8,9 @@ const DocumentTitle = ({ title, ...props }) => {
 		}
 		document.title = title
 	}, [title])
-	// NOTE: Use props.children || null so <DocumentTitle> can
-	// be used as an effect
-	return props.children || null
+	// NOTE: Use children || null so <DocumentTitle> can be
+	// used as an effect
+	return children || null
 }
 
 export default DocumentTitle

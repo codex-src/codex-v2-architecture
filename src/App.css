@@ -1,5 +1,4 @@
 :root {
-	/* https://tailwindcss.com/docs/customizing-colors/#default-color-palette */
 	--black:        #000000;
 	--blue-100:     #ebf8ff;
 	--blue-200:     #bee3f8;
@@ -187,10 +186,6 @@
 }
 .tracking-px {
 	letter-spacing: 0.0125em;
-}
-
-.leading-base {
-	line-height: 1.15;
 }
 
 .text-md-blue-a100 {
