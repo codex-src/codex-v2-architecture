@@ -1,5 +1,5 @@
+import AppCode from "./AppCode"
 import AppSettings from "./AppSettings"
-import CodeExport from "./CodeExport"
 import DocumentTitle from "./DocumentTitle"
 import raw from "raw.macro"
 import React from "react"
@@ -172,7 +172,7 @@ const App = props => {
 				{/* RHS */}
 				<DocumentTitle title={(state.metadata && state.metadata.title) || "Untitled"}>
 					{state.renderMode === RenderModes.Text && (
-						<CodeExport
+						<AppCode
 							style={{
 								margin: "-0.5em 0",
 								MozTabSize: 2,
@@ -191,7 +191,7 @@ const App = props => {
 						/>
 					)}
 					{state.renderMode === RenderModes.HTML && (
-						<CodeExport
+						<AppCode
 							style={{
 								margin: "-0.5em 0",
 								MozTabSize: 2,

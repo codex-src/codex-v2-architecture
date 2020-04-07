@@ -1,21 +1,27 @@
-import * as emojiTrie from "emoji-trie"
-import * as spec from "./spec"
 import EditorContext from "./EditorContext"
 import escape from "lodash/escape"
 import Prism from "../Prism"
-import raw from "raw.macro"
 import React from "react"
 import ReactDOM from "react-dom"
-import RenderModes from "./RenderModes"
 import uuidv4 from "uuid/v4"
+import { atStart as emojiAtStart } from "emoji-trie"
 
 import {
 	CompoundNode,
 	Node,
 } from "./HOC"
 
+import {
+	HTTP,
+	HTTPS,
+	isASCIIPunctuation,
+	isASCIIWhitespace,
+	safeURLRe,
+} from "./spec"
+
 // Extraneous attributes.
 const attrs = {
+	// TODO: HOC can go here
 	code: {
 		style: {
 			MozTabSize: 2,
@@ -418,15 +424,15 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		// be whitespace or punctutation:
 		//
 		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && index - 1 >= 0 && (!spec.isASCIIWhitespace(text[index - 1]) && !spec.isASCIIPunctuation(text[index - 1]))) {
+		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(text[index - 1]) && !isASCIIPunctuation(text[index - 1]))) {
 			return null
 		}
 		// Guard: Most syntax cannot surround spaces:
 		const offset = text.slice(index + syntax.length).search(pattern) + patternOffset
 		if (
 			offset < minOffset ||
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length])) ||           // Exempt <Code> and <A>
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && spec.isASCIIWhitespace(text[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(text[index + syntax.length])) ||           // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(text[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
 		) {
 			return null
 		}
@@ -458,7 +464,7 @@ function parseInnerGFM(text) {
 		switch (true) {
 		// <Escape>
 		case char === "\\":
-	 		if (index + 1 < text.length && spec.isASCIIPunctuation(text[index + 1])) {
+	 		if (index + 1 < text.length && isASCIIPunctuation(text[index + 1])) {
 				data.push({
 					type: Escape,
 					syntax: [char],
@@ -557,34 +563,34 @@ function parseInnerGFM(text) {
 			// https://
 			//
 			// TODO: Eat "www."
-			if (nchars >= spec.HTTPS.length && text.slice(index, index + spec.HTTPS.length) === spec.HTTPS) {
-				const matches = spec.safeURLRe.exec(text.slice(index))
+			if (nchars >= HTTPS.length && text.slice(index, index + HTTPS.length) === HTTPS) {
+				const matches = safeURLRe.exec(text.slice(index))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
 				data.push({
 					type: A,
-					syntax: [spec.HTTPS],
+					syntax: [HTTPS],
 					href: matches[0],
-					children: matches[0].slice(spec.HTTPS.length),
+					children: matches[0].slice(HTTPS.length),
 				})
 				index += offset - 1
 				continue
 			// http://
 			//
 			// TODO: Eat "www."
-			} else if (nchars >= spec.HTTP.length && text.slice(index, index + spec.HTTP.length) === spec.HTTP) {
-				const matches = spec.safeURLRe.exec(text.slice(index))
+			} else if (nchars >= HTTP.length && text.slice(index, index + HTTP.length) === HTTP) {
+				const matches = safeURLRe.exec(text.slice(index))
 				let offset = 0
 				if (matches) {
 					offset = matches[0].length
 				}
 				data.push({
 					type: A,
-					syntax: [spec.HTTP],
+					syntax: [HTTP],
 					href: matches[0],
-					children: matches[0].slice(spec.HTTP.length),
+					children: matches[0].slice(HTTP.length),
 				})
 				index += offset - 1
 				continue
@@ -624,14 +630,14 @@ function parseInnerGFM(text) {
 			// 😀
 			//
 			// eslint-disable-next-line no-case-declarations
-			const em = emojiTrie.atStart(text.slice(index))
-			if (em && em.status === "fully-qualified") {
+			const e = emojiAtStart(text.slice(index))
+			if (e && e.status === "fully-qualified") {
 				data.push({
 					type: Emoji,
-					description: em.description,
-					children: em.emoji,
+					description: e.description,
+					children: e.emoji,
 				})
-				index += em.emoji.length - 1
+				index += e.emoji.length - 1
 				continue
 			}
 			break

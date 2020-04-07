@@ -1,7 +1,7 @@
 import Prism from "./Prism"
 import React from "react"
 
-const CodeExport = ({ lang, style, children }) => {
+const AppCode = ({ lang, style, children }) => {
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
@@ -32,4 +32,4 @@ const CodeExport = ({ lang, style, children }) => {
 	)
 }
 
-export default CodeExport
+export default AppCode
