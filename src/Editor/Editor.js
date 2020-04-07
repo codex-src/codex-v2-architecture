@@ -1082,15 +1082,15 @@ const cmapHTML = new Map()
 	cmapHTML[Strike]      = data => `<strike>%</strike>`
 	cmapHTML[A]           = data => `<a href="${data.href}">%</a>`
 
-	cmapHTML[Header.type]     = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
-	cmapHTML[Paragraph.type]  = ["<p>\n\t", "\n</p>"]
-	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
-	cmapHTML[CodeBlock.type]  = [data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>`, "</code></pre>"]
-	cmapHTML[ListItem.type]   = ["<li>\n\t", "\n</li>"]
-	cmapHTML[TaskItem.type]   = [data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t`, "\n</li>"]
-	cmapHTML[List.type]       = [data => `<${data.tag}>`, data => `</${data.tag}>`]
-	cmapHTML[Image.type]      = [data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`, ""]
-	cmapHTML[Break.type]      = ["<hr>", ""]
+	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t%\n\t</h1>\n</a>`
+	cmapHTML[Paragraph.type]  = data => `<p>\n\t%\n</p>`
+	cmapHTML[Blockquote.type] = data => `<blockquote>%</blockquote>`
+	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>%</code></pre>`
+	cmapHTML[ListItem.type]   = data => `<li>\n\t%\n</li>`
+	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t%\n</li>`
+	cmapHTML[List.type]       = data => `<${data.tag}>%</${data.tag}>`
+	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>%`
+	cmapHTML[Break.type]      = data => "<hr>%"
 	/* eslint-enable no-multi-spaces */
 })()
 
