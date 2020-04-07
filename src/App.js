@@ -12,8 +12,8 @@ import {
 	parseGFM,
 	toHTML,
 	toHTML__BEM,
+	toReact_js,
 	toText,
-	// toString,
 } from "./Editor/Editor"
 
 // Parses a VDOM representation to other data types.
@@ -27,7 +27,7 @@ function parseTypes(data) {
 		[RenderModes.HTML__BEM]:  toHTML__BEM(data),
 		// [RenderModes.Alpine_js]:  toText(data), // TODO
 		// [RenderModes.Angular_js]: toText(data), // TODO
-		// [RenderModes.React_js]:   toText(data), // TODO
+		[RenderModes.React_js]:   toReact_js(data), // TODO
 		// [RenderModes.Svelte_js]:  toText(data), // TODO
 		// [RenderModes.Vue_js]:     toText(data), // TODO
 	}
@@ -220,6 +220,17 @@ const App = props => {
 							}}
 							lang="html"
 							children={state.types[RenderModes.HTML__BEM]}
+						/>
+					)}
+					{state.renderMode === RenderModes.React_js && (
+						<AppCode
+							style={{
+								margin: "-0.5em 0",
+								MozTabSize: 2,
+								tabSize: 2,
+							}}
+							lang="html"
+							children={state.types[RenderModes.React_js]}
 						/>
 					)}
 				</DocumentTitle>

@@ -685,9 +685,10 @@ const NumberedListRe = /^\t*\d+\. /
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
 function parseList(range) {
+	let tag = !NumberedListRe.test(range[0]) ? "ul" : "ol"
 	const data = {
 		type: List,
-		tag: !NumberedListRe.test(range[0]) ? "ul" : "ol",
+		tag,
 		id: uuidv4(),
 		children: [],
 	}
@@ -699,9 +700,10 @@ function parseList(range) {
 		const depth = syntax.search(/[^\t]/)
 		while (deep < depth) {
 			if (!ref.length || ref[ref.length - 1].type !== List) {
+				tag = !NumberedListRe.test(each) ? "ul" : "ol"
 				ref.push({
 					type: List,
-					tag: !NumberedListRe.test(each) ? "ul" : "ol",
+					tag,
 					id: uuidv4(),
 					children: [],
 				})
@@ -716,6 +718,7 @@ function parseList(range) {
 		}
 		ref.push({
 			type: !checked ? ListItem : TaskItem,
+			tag,
 			id: uuidv4(),
 			syntax: [syntax],
 			checked,
@@ -959,6 +962,7 @@ function toInnerReact(children) {
 const cmapText      = new Map()
 const cmapHTML      = new Map()
 const cmapHTML__BEM = new Map()
+const cmapReact_js     = new Map()
 /* eslint-enable no-multi-spaces */
 
 // Parses a nested VDOM representation to a string.
@@ -979,7 +983,7 @@ function toInnerString(children, cmap = cmapText) {
 }
 
 // Parses a VDOM representation to a string.
-export function toString(data, cmap = cmapText) {
+function toString(data, cmap = cmapText) {
 	let str = ""
 	for (const each of data) {
 		const fn = cmap[each.type.type || each.type]
@@ -999,6 +1003,9 @@ export function toHTML(data) {
 }
 export function toHTML__BEM(data) {
 	return toString(data, cmapHTML__BEM)
+}
+export function toReact_js(data) {
+	return toString(data, cmapReact_js)
 }
 
 ;(() => {
@@ -1040,6 +1047,11 @@ export function toHTML__BEM(data) {
 	cmapHTML[Image.type]           = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
 	cmapHTML[Break.type]           = data => "<hr>"
 
+	// - ul-list
+	// - ul-list__item
+	// - ul-list__item-input
+	// - ul-list__item-input--unchecked
+
 	// TODO: Change <img ...> to <figure ...>
 	cmapHTML__BEM[Escape]          = data => data.children
 	cmapHTML__BEM[Emoji]           = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML__BEM)}</span>`
@@ -1047,17 +1059,35 @@ export function toHTML__BEM(data) {
 	cmapHTML__BEM[Strong]          = data => `<strong class="strong">${toInnerString(data.children, cmapHTML__BEM)}</strong>`
 	cmapHTML__BEM[StrongAndEm]     = data => `<strong class="strong"><em class="emphasis">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
 	cmapHTML__BEM[Code]            = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
-	cmapHTML__BEM[Strike]          = data => `<strike class="strikethrough">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
+	cmapHTML__BEM[Strike]          = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
 	cmapHTML__BEM[A]               = data => `<a class="anchor" href="${data.href}">${toInnerString(data.children, cmapHTML__BEM)}</a>`
-	cmapHTML__BEM[Header.type]     = data => `<a class="anchor" href="#${data.hash}">\n\t<h1 id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</h1>\n</a>`
+	cmapHTML__BEM[Header.type]     = data => `<a class="header--anchor" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]  = data => `<p class="paragraph">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="code-block" ${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code></pre>`
-	cmapHTML__BEM[ListItem.type]   = data => `<li class="list-item">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	cmapHTML__BEM[TaskItem.type]   = data => `<li class="list-item list-item__task-item">\n\t<input class="task-input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	cmapHTML__BEM[List.type]       = data => `<${data.tag} class="list list__${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="preformatted-code" ${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code class="preformatted-code__code">${toInnerString(data.children, cmapHTML__BEM)}</code></pre>`
+	cmapHTML__BEM[ListItem.type]   = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	cmapHTML__BEM[TaskItem.type]   = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item">\n\t<input class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item-input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	cmapHTML__BEM[List.type]       = data => `<${data.tag} class="${data.tag}-list">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	cmapHTML__BEM[Image.type]      = data => `<img class="image" src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
 	cmapHTML__BEM[Break.type]      = data => "<hr class=\"horizontal-rule\">"
+
+	cmapReact_js[Escape]           = data => data.children
+	cmapReact_js[Emoji]            = data => `<Emoji description="${data.description}">${toInnerString(data.children, cmapReact_js)}</Emoji>`
+	cmapReact_js[Em]               = data => `<Em>${toInnerString(data.children, cmapReact_js)}</Em>`
+	cmapReact_js[Strong]           = data => `<Strong>${toInnerString(data.children, cmapReact_js)}</Strong>`
+	cmapReact_js[StrongAndEm]      = data => `<StrongEm>${toInnerString(data.children, cmapReact_js)}</StrongEm>`
+	cmapReact_js[Code]             = data => `<Code>${toInnerString(data.children, cmapReact_js)}</code>`
+	cmapReact_js[Strike]           = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</strike>`
+	cmapReact_js[A]                = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</a>`
+	cmapReact_js[Header.type]      = data => `<Header tag="${data.tag}">\n\t${toInnerString(data.children, cmapReact_js)}\n</Header>`
+	cmapReact_js[Paragraph.type]   = data => `<Paragraph>\n\t${toInnerString(data.children, cmapReact_js)}\n</Paragraph>`
+	cmapReact_js[Blockquote.type]  = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
+	cmapReact_js[CodeBlock.type]   = data => `<CodeBlock extension="${data.lang.toLowercase()}">${toInnerString(data.children, cmapReact_js)}</CodeBlock>`
+	cmapReact_js[ListItem.type]    = data => `<ListItem>\n\t${toInnerString(data.children, cmapReact_js)}\n</ListItem>`
+	cmapReact_js[TaskItem.type]    = data => `<ListItem>\n\t<TaskItem${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</ListItem>`
+	cmapReact_js[List.type]        = data => `<List tag="${data.tag}">${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
+	cmapReact_js[Image.type]       = data => `<Image src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />`
+	cmapReact_js[Break.type]       = data => "<HR />"
 	/* eslint-enable no-multi-spaces */
 })()
 
