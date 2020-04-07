@@ -401,9 +401,7 @@ const Break = React.memo(({ id, syntax }) => {
 })
 
 // Registers a type for parseInnerGFM.
-//
-// TODO: Refactor to parseInner({ type, syntax, text, index, toNestedString, minOffset })?
-function registerType(type, syntax, { toNestedString } = { toNestedString: true }) {
+function registerType(type, syntax, opts = { recurse: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
@@ -440,7 +438,7 @@ function registerType(type, syntax, { toNestedString } = { toNestedString: true 
 		const data = {
 			type,
 			syntax,
-			children: !toNestedString // TODO: Rename to recurse
+			children: !opts.recurse
 				? text.slice(index, index + offset)
 				: parseInnerGFM(text.slice(index, index + offset)),
 		}
@@ -538,7 +536,7 @@ function parseInnerGFM(text) {
 		case char === "`":
 			// ```Code```
 			if (nchars >= "```x```".length && text.slice(index, index + 3) === "```") {
-				const parsed = registerType(Code, "```", { toNestedString: false })(text, index)
+				const parsed = registerType(Code, "```", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -548,7 +546,7 @@ function parseInnerGFM(text) {
 				continue
 			// `Code`
 			} else if (nchars >= "`x`".length) {
-				const parsed = registerType(Code, "`", { toNestedString: false })(text, index)
+				const parsed = registerType(Code, "`", { recurse: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -610,7 +608,7 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { toNestedString: false })(text, lhs.x2)
+				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -760,7 +758,7 @@ export function parseGFM(text) {
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: uuidv4(),
 					syntax: [syntax],
-					hash: newHash(toNestedString(parseInnerGFM(each.slice(syntax.length)))),
+					hash: newHash(toInnerString(parseInnerGFM(each.slice(syntax.length)))),
 					children: parseInnerGFM(each.slice(syntax.length)),
 				})
 				continue
@@ -883,7 +881,7 @@ export function parseGFM(text) {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { toNestedString: false })(each, lhs.x2)
+				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -894,7 +892,7 @@ export function parseGFM(text) {
 					// syntax: ["![", "](…)"],
 					syntax: ["![", `](${rhs.data.children})`],
 					src: rhs.data.children,
-					alt: toNestedString(lhs.data.children),
+					alt: toInnerString(lhs.data.children),
 					children: lhs.data.children,
 				})
 				continue
@@ -969,14 +967,14 @@ function toInnerReact(children) {
 }
 
 // Parses a nested VDOM representation to a string.
-function toNestedString(children, opts = { html: false }) {
+function toInnerString(children, opts = { html: false }) {
 	let str = ""
 	if (children === null || typeof children === "string") {
 		return !opts.html ? children || "" : escape(children) || "<br>"
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			str += toNestedString(each, opts)
+			str += toInnerString(each, opts)
 			continue
 		}
 		const fn = (!opts.html ? cmapText : cmapHTML)[each.type.type || each.type]
@@ -998,48 +996,44 @@ export function toString(data, opts = { html: false }) {
 	return str
 }
 
-// Component map.
-//
-/* eslint-disable no-multi-spaces */
+// Component maps.
 const cmapText = new Map()
-const cmapGFM  = new Map()
 const cmapHTML = new Map()
-/* eslint-enable no-multi-spaces */
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
 	cmapText[Escape]          = data => data.children
-	cmapText[Emoji]           = data => toNestedString(data.children)
-	cmapText[Em]              = data => toNestedString(data.children)
-	cmapText[Strong]          = data => toNestedString(data.children)
-	cmapText[StrongAndEm]     = data => toNestedString(data.children)
+	cmapText[Emoji]           = data => toInnerString(data.children)
+	cmapText[Em]              = data => toInnerString(data.children)
+	cmapText[Strong]          = data => toInnerString(data.children)
+	cmapText[StrongAndEm]     = data => toInnerString(data.children)
 	cmapText[Code]            = data => data.children
-	cmapText[Strike]          = data => toNestedString(data.children)
-	cmapText[A]               = data => toNestedString(data.children)
-	cmapText[Header.type]     = data => toNestedString(data.children)
-	cmapText[Paragraph.type]  = data => toNestedString(data.children)
+	cmapText[Strike]          = data => toInnerString(data.children)
+	cmapText[A]               = data => toInnerString(data.children)
+	cmapText[Header.type]     = data => toInnerString(data.children)
+	cmapText[Paragraph.type]  = data => toInnerString(data.children)
 	cmapText[Blockquote.type] = data => toString(data.children)
 	cmapText[CodeBlock.type]  = data => data.children
-	cmapText[ListItem.type]   = data => toNestedString(data.children)
-	cmapText[TaskItem.type]   = data => toNestedString(data.children)
+	cmapText[ListItem.type]   = data => toInnerString(data.children)
+	cmapText[TaskItem.type]   = data => toInnerString(data.children)
 	cmapText[List.type]       = data => toString(data.children)
-	cmapText[Image.type]      = data => toNestedString(data.children)
+	cmapText[Image.type]      = data => toInnerString(data.children)
 	cmapText[Break.type]      = data => ""
 
 	cmapHTML[Escape]          = data => data.children
-	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toNestedString(data.children, { html: true })}</span>`
-	cmapHTML[Em]              = data => `<em>${toNestedString(data.children, { html: true })}</em>`
-	cmapHTML[Strong]          = data => `<strong>${toNestedString(data.children, { html: true })}</strong>`
-	cmapHTML[StrongAndEm]     = data => `<strong><em>${toNestedString(data.children, { html: true })}</em></strong>`
-	cmapHTML[Code]            = data => `<code>${toNestedString(data.children, { html: true })}</code>`
-	cmapHTML[Strike]          = data => `<strike>${toNestedString(data.children, { html: true })}</strike>`
-	cmapHTML[A]               = data => `<a href="${data.href}">${toNestedString(data.children, { html: true })}</a>`
-	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toNestedString(data.children, { html: true })}\n\t</h1>\n</a>`
-	cmapHTML[Paragraph.type]  = data => `<p>\n\t${toNestedString(data.children, { html: true })}\n</p>`
+	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerString(data.children, { html: true })}</span>`
+	cmapHTML[Em]              = data => `<em>${toInnerString(data.children, { html: true })}</em>`
+	cmapHTML[Strong]          = data => `<strong>${toInnerString(data.children, { html: true })}</strong>`
+	cmapHTML[StrongAndEm]     = data => `<strong><em>${toInnerString(data.children, { html: true })}</em></strong>`
+	cmapHTML[Code]            = data => `<code>${toInnerString(data.children, { html: true })}</code>`
+	cmapHTML[Strike]          = data => `<strike>${toInnerString(data.children, { html: true })}</strike>`
+	cmapHTML[A]               = data => `<a href="${data.href}">${toInnerString(data.children, { html: true })}</a>`
+	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerString(data.children, { html: true })}\n\t</h1>\n</a>`
+	cmapHTML[Paragraph.type]  = data => `<p>\n\t${toInnerString(data.children, { html: true })}\n</p>`
 	cmapHTML[Blockquote.type] = data => `<blockquote>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toNestedString(data.children, { html: true })}</code></pre>`
-	cmapHTML[ListItem.type]   = data => `<li>\n\t${toNestedString(data.children, { html: true })}\n</li>`
-	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toNestedString(data.children, { html: true })}\n</li>`
+	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerString(data.children, { html: true })}</code></pre>`
+	cmapHTML[ListItem.type]   = data => `<li>\n\t${toInnerString(data.children, { html: true })}\n</li>`
+	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, { html: true })}\n</li>`
 	cmapHTML[List.type]       = data => `<${data.tag}>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
 	cmapHTML[Break.type]      = data => "<hr>"
