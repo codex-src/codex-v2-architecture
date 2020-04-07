@@ -331,6 +331,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 
 	const checkboxStyle = {
 		margin: "0.1875em 0.5em 0 calc(((14 + 2) - 11.438) / 16 * -1em)",
+		borderRadius: "0.3125em",
 	}
 	return (
 		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={$checked && attrs.strike.style}>
