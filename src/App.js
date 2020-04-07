@@ -330,17 +330,14 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 	const [$checked, $attrs] = useChecked(checked.value)
 
 	const checkboxStyle = {
-		marginLeft: "calc(((14 + 2) - 11.438) / 16 * -1em)",
-		marginTop: "0.1875em",
-		// width: "0.875em",
-		// height: "0.875em",
+		margin: "0.1875em 0.5em 0 calc(((14 + 2) - 11.438) / 16 * -1em)",
 	}
 	return (
 		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={$checked && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
-				<Checkbox className="mr-2 flex-shrink-0 w-4 h-4 text-md-blue-a200 shadow transition duration-150" style={checkboxStyle} {...$attrs} />
+				<Checkbox className="flex-shrink-0 w-4 h-4 text-md-blue-a200 shadow transition duration-150" style={checkboxStyle} {...$attrs} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
