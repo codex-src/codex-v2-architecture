@@ -224,27 +224,27 @@ const Blockquote = React.memo(({ id, data }) => {
 })
 
 // NOTE: Compound component
-const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
+const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 	const [state] = useEditorState()
 
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
-		if (!lang) {
+		if (!extension) {
 			// No-op
 			return
 		}
-		const parser = Prism[lang]
+		const parser = Prism[extension]
 		if (!parser) {
 			// No-op
 			return
 		}
 		setHTML((
-			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(data, parser, lang),
+			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, extension),
 			}} />
 		))
-	}, [lang, data])
+	}, [extension, data])
 
 	return (
 		// NOTE: Doesn’t use py-4 because of <Markdown>
@@ -829,11 +829,13 @@ export function parseGFM(text) {
 					break
 				}
 				x2++ // Iterate once past end
+				const info = each.slice(3)
 				data.push({
 					type: CodeBlock,
 					id: uuidv4(),
 					syntax: [body[x1], body[x2 - 1]],
-					lang: each.slice(3).split(".").slice(-1)[0].toLowerCase(),
+					info,
+					extension: info.split(".").slice(-1)[0].toLowerCase(),
 					children: body.slice(x1, x2).join("\n")
 						.slice(each.length, -3) // Trim syntax
 						.slice(1),              // Trim start paragraph
@@ -1040,7 +1042,7 @@ export function toReact_js(data) {
 	cmapHTML[Header.type]          = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</h1>\n</a>`
 	cmapHTML[Paragraph.type]       = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[Blockquote.type]      = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML[CodeBlock.type]       = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML)}<!--\n--></code></pre>`
+	cmapHTML[CodeBlock.type]       = data => `<pre${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML)}<!--\n--></code></pre>`
 	cmapHTML[ListItem.type]        = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[TaskItem.type]        = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[List.type]            = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
@@ -1060,7 +1062,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[Header.type]     = data => `<a class="header--anchor" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]  = data => `<p class="paragraph">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="preformatted"${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM)}<!--\n--></code></pre>`
+	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="preformatted"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM)}<!--\n--></code></pre>`
 	cmapHTML__BEM[ListItem.type]   = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[TaskItem.type]   = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item">\n\t<input class="${data.tag === "ul" ? "unordered" : "ordered"}-list__item-input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[List.type]       = data => `<${data.tag} class="${data.tag}-list">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
@@ -1075,15 +1077,15 @@ export function toReact_js(data) {
 	cmapReact_js[Code]             = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
 	cmapReact_js[Strike]           = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
 	cmapReact_js[A]                = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
-	cmapReact_js[Header.type]      = data => `<Header tag="${data.tag}">\n\t${toInnerString(data.children, cmapReact_js)}\n</Header>`
-	cmapReact_js[Paragraph.type]   = data => `<Paragraph>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
+	cmapReact_js[Header.type]      = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
+	cmapReact_js[Paragraph.type]   = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[Blockquote.type]  = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
-	cmapReact_js[CodeBlock.type]   = data => `<Preformatted${!data.lang ? "" : ` info="${(data.lang).toLowerCase()}"`}>\n{\`${toInnerString(data.children).replace(/`/g, "\\`")}\`}\n</Preformatted>`
+	cmapReact_js[CodeBlock.type]   = data => `<Pre${!data.extension ? "" : ` info="${(data.extension).toLowerCase()}"`}>\n{\`${toInnerString(data.children).replace(/`/g, "\\`")}\`}\n</Pre>`
 	cmapReact_js[ListItem.type]    = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[TaskItem.type]    = data => `<Item>\n\t<TaskItem${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	cmapReact_js[List.type]        = data => `<List tag="${data.tag}">${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
-	cmapReact_js[Image.type]       = data => `<Image src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />`
-	cmapReact_js[Break.type]       = data => "<HorizontalRule />"
+	cmapReact_js[List.type]        = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
+	cmapReact_js[Image.type]       = data => `<Img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />`
+	cmapReact_js[Break.type]       = data => "<HR />"
 	/* eslint-enable no-multi-spaces */
 })()
 
