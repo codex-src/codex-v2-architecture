@@ -1056,14 +1056,14 @@ export function toReact_js(data) {
 	// TODO: BEM for <blockquote>
 	cmapHTML__BEM[Escape]          = data => data.children
 	cmapHTML__BEM[Emoji]           = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML__BEM)}</span>`
-	cmapHTML__BEM[Em]              = data => `<em class="emphasis">${toInnerString(data.children, cmapHTML__BEM)}</em>`
+	cmapHTML__BEM[Em]              = data => `<em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em>`
 	cmapHTML__BEM[Strong]          = data => `<strong class="strong">${toInnerString(data.children, cmapHTML__BEM)}</strong>`
-	cmapHTML__BEM[StrongAndEm]     = data => `<strong class="strong"><em class="emphasis">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
+	cmapHTML__BEM[StrongAndEm]     = data => `<strong class="strong"><em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
 	cmapHTML__BEM[Code]            = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
 	cmapHTML__BEM[Strike]          = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
 	cmapHTML__BEM[A]               = data => `<a class="anchor" href="${data.href}">${toInnerString(data.children, cmapHTML__BEM)}</a>`
 	cmapHTML__BEM[Header.type]     = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
-	cmapHTML__BEM[Paragraph.type]  = data => `<p class="p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
+	cmapHTML__BEM[Paragraph.type]  = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM)}<!--\n--></code></pre>`
 	cmapHTML__BEM[ListItem.type]   = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
