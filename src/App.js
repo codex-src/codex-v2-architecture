@@ -10,15 +10,18 @@ import "./App.css"
 import {
 	Editor,
 	parseGFM,
-	toString,
+	toHTML,
+	toHTML__BEM,
+	toText,
+	// toString,
 } from "./Editor/Editor"
 
 // Parses a VDOM representation to other data types.
 function parseTypes(data) {
 	const types = {
-		text: toString(data),
-		html: toString(data, { html: true }),
-		html__bem: toString(data, { html: true }), // { html__bem: true }),
+		text: toText(data),
+		html: toHTML(data),
+		html__bem: toHTML__BEM(data),
 	}
 	return types
 }
