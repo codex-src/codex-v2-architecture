@@ -1,9 +1,9 @@
 import Enum from "../Enum"
 
 const RenderModes = new Enum(
-	"Text", // Plain text
-	"GFM",  // GitHub Flavored Markdown
-	"HTML", // HTML (string)
+	"Text",
+	"GFM",
+	"HTML",
 )
 
 export default RenderModes

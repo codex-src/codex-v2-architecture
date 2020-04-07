@@ -1,18 +1,16 @@
+/* eslint-disable no-multi-spaces */
 export const HTTPS = "https://"
-export const HTTP = "http://"
+export const HTTP  = "http://"
+/* eslint-enable no-multi-spaces */
 
 // Matches a URL terminated by an alphanumeric (word) or
 // forward-slash character.
 //
 // https://tools.ietf.org/html/rfc3986
-//
-// eslint-disable-next-line no-useless-escape
-export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/
+export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/ // eslint-disable-line no-useless-escape
 
 // Returns whether a character is an ASCII punctuation
 // character as defined by the GFM spec.
-//
-// Covers: <start> !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ <end>
 //
 // https://github.github.com/gfm/#ascii-punctuation-character
 // https://github.github.com/gfm/#example-308

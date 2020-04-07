@@ -3,6 +3,7 @@ import escape from "lodash/escape"
 import Prism from "../Prism"
 import React from "react"
 import ReactDOM from "react-dom"
+import useEditorState from "./useEditorState"
 import uuidv4 from "uuid/v4"
 import { atStart as emojiAtStart } from "emoji-trie"
 
@@ -21,7 +22,6 @@ import {
 
 // Extraneous attributes.
 const attrs = {
-	// TODO: HOC can go here
 	code: {
 		style: {
 			MozTabSize: 2,
@@ -70,7 +70,7 @@ function getSyntax(syntax) {
 }
 
 const Syntax = props => {
-	const [state] = React.useContext(EditorContext)
+	const [state] = useEditorState()
 	if (!props.children || state.readOnly) {
 		return null
 	}
@@ -204,7 +204,7 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 
 // NOTE: Compound component
 const Blockquote = React.memo(({ id, data }) => {
-	const [state] = React.useContext(EditorContext)
+	const [state] = useEditorState()
 
 	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
 	const eachStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
@@ -225,7 +225,7 @@ const Blockquote = React.memo(({ id, data }) => {
 
 // NOTE: Compound component
 const CodeBlock = React.memo(({ id, syntax, lang, data }) => {
-	const [state] = React.useContext(EditorContext)
+	const [state] = useEditorState()
 
 	const [html, setHTML] = React.useState(null)
 
@@ -349,7 +349,7 @@ function useHovered(initialValue) {
 }
 
 const Image = React.memo(({ id, syntax, src, alt, data }) => {
-	const [state] = React.useContext(EditorContext)
+	const [state] = useEditorState()
 
 	const [loaded, setLoaded] = React.useState(false)
 	const [hovered, $attrs] = useHovered(state.readOnly)
@@ -388,7 +388,7 @@ const Image = React.memo(({ id, syntax, src, alt, data }) => {
 })
 
 const Break = React.memo(({ id, syntax }) => {
-	const [state] = React.useContext(EditorContext)
+	const [state] = useEditorState()
 	return (
 		<Node id={id}>
 			<Markdown syntax={syntax}>
