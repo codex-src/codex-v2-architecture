@@ -23,7 +23,7 @@ const AppCode = ({ lang, style, children }) => {
 
 	return (
 		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg" style={style}>
-			<div className="whitespace-pre-wrap break-words font-mono text-sm leading-snug">
+			<div className="whitespace-pre font-mono text-sm leading-snug overflow-x-scroll scrolling-touch">
 				{html || (
 					children
 				)}
