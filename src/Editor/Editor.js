@@ -20,7 +20,7 @@ import {
 	safeURLRe,
 } from "./spec"
 
-// Extraneous attributes.
+// Shared attributes.
 const attrs = {
 	code: {
 		style: {
@@ -1060,55 +1060,11 @@ export function toHTML(data) {
 	return html
 }
 
-// // Parses a VDOM representation to a JSON string.
-// function toJSON(data) {
-// 	const json = JSON.stringify(
-// 		data,
-// 		(key, value) => {
-// 			// Non-React component:
-// 			if (key !== "type") {
-// 				return value
-// 			}
-// 			// React component (guard React.memo):
-// 			return cmapJSON[value.type || value]
-// 		},
-// 		"\t",
-// 	)
-// 	return json
-// }
-
-// Maps type references to names or HTML.
-const cmapJSON = new Map()
+// Maps type references to HTML.
 const cmapHTML = new Map()
 
-// TODO: Add support for frameworks, e.g.
-//
-// - Alpine.js
-// - Vue.js
-// - React.js
-// - Angular.js
-// - etc.
-//
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	cmapJSON[Emoji]           = "Emoji"
-	cmapJSON[Escape]          = "Escape"
-	cmapJSON[Em]              = "Em"
-	cmapJSON[Strong]          = "Strong"
-	cmapJSON[StrongAndEm]     = "StrongAndEm"
-	cmapJSON[Code]            = "Code"
-	cmapJSON[Strike]          = "Strike"
-	cmapJSON[A]               = "A"
-	cmapJSON[Header.type]     = "Header"
-	cmapJSON[Paragraph.type]  = "Paragraph"
-	cmapJSON[Blockquote.type] = "Blockquote"
-	cmapJSON[CodeBlock.type]  = "CodeBlock"
-	cmapJSON[ListItem.type]   = "ListItem"
-	cmapJSON[TaskItem.type]   = "TaskItem"
-	cmapJSON[List.type]       = "List"
-	cmapJSON[Image.type]      = "Image"
-	cmapJSON[Break.type]      = "Break"
-
 	cmapHTML[Escape]          = ["", ""]
 	cmapHTML[Emoji]           = [data => `<span aria-label="${data.description}" role="img">`, "</span>"]
 	cmapHTML[Em]              = ["<em>", "</em>"]
@@ -1117,6 +1073,7 @@ const cmapHTML = new Map()
 	cmapHTML[Code]            = ["<code>", "</code>"]
 	cmapHTML[Strike]          = ["<strike>", "</strike>"]
 	cmapHTML[A]               = [data => `<a href="${data.href}">`, "</a>"]
+
 	cmapHTML[Header.type]     = [data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t`, "\n\t</h1>\n</a>"]
 	cmapHTML[Paragraph.type]  = ["<p>\n\t", "\n</p>"]
 	cmapHTML[Blockquote.type] = ["<blockquote>", "</blockquote>"]
@@ -1155,17 +1112,16 @@ export const Editor = React.forwardRef(({ className, style, state, setState, ...
 					: `codex-editor ${className}`,
 
 				"style": {
-					// tab-size:
 					MozTabSize: 4,
 					tabSize: 4,
 
-					// contenteditable:
-					caretColor: "black",
-
-					// Imperative styles for contenteditable:
-					whiteSpace: "pre-wrap",
-					outline: "none",
-					overflowWrap: "break-word",
+					// // contenteditable:
+					// caretColor: "black",
+					//
+					// // Imperative styles for contenteditable:
+					// whiteSpace: "pre-wrap",
+					// outline: "none",
+					// overflowWrap: "break-word",
 
 					...style,
 				},
