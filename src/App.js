@@ -17,11 +17,19 @@ import {
 } from "./Editor/Editor"
 
 // Parses a VDOM representation to other data types.
+//
+// TODO: Lazily parse
 function parseTypes(data) {
 	const types = {
-		text: toText(data),
-		html: toHTML(data),
-		html__bem: toHTML__BEM(data),
+		[RenderModes.Text]:       toText(data),
+		// [RenderModes.GFM]:     toText(data),
+		[RenderModes.HTML]:       toHTML(data),
+		[RenderModes.HTML__BEM]:  toHTML__BEM(data),
+		// [RenderModes.Alpine_js]:  toText(data), // TODO
+		// [RenderModes.Angular_js]: toText(data), // TODO
+		// [RenderModes.React_js]:   toText(data), // TODO
+		// [RenderModes.Svelte_js]:  toText(data), // TODO
+		// [RenderModes.Vue_js]:     toText(data), // TODO
 	}
 	return types
 }
@@ -91,7 +99,7 @@ const App = props => {
 				raw: value,
 				data,
 				types,
-				metadata: parseMetadata(types.text),
+				metadata: parseMetadata(types[RenderModes.Text]),
 			}))
 			// Save to localStorage:
 			localStorage.setItem(KEY, JSON.stringify({ data: value }))
@@ -181,7 +189,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="text"
-							children={state.types.text}
+							children={state.types[RenderModes.Text]}
 						/>
 					)}
 					{state.renderMode === RenderModes.GFM && (
@@ -200,7 +208,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="html"
-							children={state.types.html}
+							children={state.types[RenderModes.HTML]}
 						/>
 					)}
 					{state.renderMode === RenderModes.HTML__BEM && (
@@ -211,7 +219,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="html"
-							children={state.types.html__bem}
+							children={state.types[RenderModes.HTML__BEM]}
 						/>
 					)}
 				</DocumentTitle>
