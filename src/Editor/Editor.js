@@ -1023,7 +1023,7 @@ function toInnerHTML(children) {
 			html += toInnerHTML(each)
 			continue
 		}
-		const [s1, s2] = $$syntax(cmapHTML[each.type.type || each.type], each)
+		const [s1, s2] = $$syntax(each)
 		html += readSyntax(s1, each)
 		html += toInnerHTML(each.children)
 		html += readSyntax(s2, each)
@@ -1035,7 +1035,7 @@ function toInnerHTML(children) {
 export function toHTML(data) {
 	let html = ""
 	for (const each of data) {
-		const [s1, s2] = $$syntax(cmapHTML[each.type.type || each.type], each)
+		const [s1, s2] = $$syntax(each)
 		html += readSyntax(s1, each)
 		if (each.type === Break) {
 			// No-op
@@ -1060,12 +1060,9 @@ export function toHTML(data) {
 	return html
 }
 
-function $$syntax(x, each) {
-	if (typeof x !== "function")  {
-		return getSyntax(x)
-	}
-	return x(each).split("%")
-	// return str.split("%")
+function $$syntax(each) {
+	const fn = cmapHTML[each.type.type || each.type]
+	return fn(each).split("%")
 }
 
 // Maps type references to HTML.
@@ -1073,20 +1070,19 @@ const cmapHTML = new Map()
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	cmapHTML[Escape]      = data => "%"
-	cmapHTML[Emoji]       = data => `<span aria-label="${data.description}" role="img">%</span>`
-	cmapHTML[Em]          = data => `<em>%</em>`
-	cmapHTML[Strong]      = data => `<strong>%</strong>`
-	cmapHTML[StrongAndEm] = data => `<strong><em>%</em></strong>`
-	cmapHTML[Code]        = data => `<code>%</code>`
-	cmapHTML[Strike]      = data => `<strike>%</strike>`
-	cmapHTML[A]           = data => `<a href="${data.href}">%</a>`
-
+	cmapHTML[Escape]          = data => "%"
+	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">%</span>`
+	cmapHTML[Em]              = data => "<em>%</em>"
+	cmapHTML[Strong]          = data => "<strong>%</strong>"
+	cmapHTML[StrongAndEm]     = data => "<strong><em>%</em></strong>"
+	cmapHTML[Code]            = data => "<code>%</code>"
+	cmapHTML[Strike]          = data => "<strike>%</strike>"
+	cmapHTML[A]               = data => `<a href="${data.href}">%</a>`
 	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t%\n\t</h1>\n</a>`
-	cmapHTML[Paragraph.type]  = data => `<p>\n\t%\n</p>`
-	cmapHTML[Blockquote.type] = data => `<blockquote>%</blockquote>`
+	cmapHTML[Paragraph.type]  = data => "<p>\n\t%\n</p>"
+	cmapHTML[Blockquote.type] = data => "<blockquote>%</blockquote>"
 	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>%</code></pre>`
-	cmapHTML[ListItem.type]   = data => `<li>\n\t%\n</li>`
+	cmapHTML[ListItem.type]   = data => "<li>\n\t%\n</li>"
 	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t%\n</li>`
 	cmapHTML[List.type]       = data => `<${data.tag}>%</${data.tag}>`
 	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>%`
