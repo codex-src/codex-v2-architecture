@@ -969,14 +969,14 @@ function toInnerReact(children) {
 }
 
 // Parses a nested VDOM representation to text.
-function toInnerText(children, opts = { gfm: false }) {
+function toInnerText(children) {
 	let str = ""
 	if (children === null || typeof children === "string") {
 		return children || ""
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			str += toInnerText(each, opts)
+			str += toInnerText(each)
 			continue
 		}
 		const fn = cmapText[each.type.type || each.type]
@@ -986,7 +986,7 @@ function toInnerText(children, opts = { gfm: false }) {
 }
 
 // Parses a VDOM representation to text.
-export function toText(data, opts = { gfm: false }) {
+export function toText(data) {
 	let str = ""
 	for (const each of data) {
 		const fn = cmapText[each.type.type || each.type]
@@ -1054,25 +1054,7 @@ const cmapHTML = new Map()
 	cmapText[TaskItem.type]   = data => toInnerText(data.children)
 	cmapText[List.type]       = data => toText(data.children)
 	cmapText[Image.type]      = data => toInnerText(data.children)
-	cmapText[Break.type]      = data => data.syntax
-
-	cmapGFM[Escape]           = data => data.syntax + data.children
-	cmapGFM[Emoji]            = data => toInnerText(data.children, { gfm: true }) // TODO: Rename to gfm
-	cmapGFM[Em]               = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[Strong]           = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[StrongAndEm]      = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[Code]             = data => data.syntax[0] + data.children + data.syntax[1]
-	cmapGFM[Strike]           = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[A]                = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[Header.type]      = data => data.syntax[0] + toInnerText(data.children, { gfm: true })
-	cmapGFM[Paragraph.type]   = data => toInnerText(data.children, { gfm: true })
-	cmapGFM[Blockquote.type]  = data => toText(data.children, { gfm: true })
-	cmapGFM[CodeBlock.type]   = data => data.syntax[0] + data.children + data.syntax[1]
-	cmapGFM[ListItem.type]    = data => toInnerText(data.children, { gfm: true })
-	cmapGFM[TaskItem.type]    = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[List.type]        = data => data.syntax[0] + toText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[Image.type]       = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
-	cmapGFM[Break.type]       = data => data.syntax
+	cmapText[Break.type]      = data => ""
 
 	cmapHTML[Escape]          = data => data.children
 	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerHTML(data.children)}</span>`
