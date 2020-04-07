@@ -932,19 +932,6 @@ export function parseGFM(text) {
 	return data
 }
 
-// Reads syntax from a string or function-return.
-function readSyntax(strOrFn, args) {
-	// if (typeof strOrFn !== "string" && typeof strOrFn !== "function") {
-	// 	throw new Error(`readSyntax: expected a string or function, got ${typeof strOrFn}`)
-	// }
-	if (typeof strOrFn === "string") {
-		const str = strOrFn
-		return str
-	}
-	const fn = strOrFn
-	return fn(args)
-}
-
 // Parses a nested VDOM representation to React components.
 function toInnerReact(children) {
 	if (children === null || typeof children === "string") {
@@ -977,7 +964,7 @@ function toInnerString(children, opts = { html: false }) {
 			str += toInnerString(each, opts)
 			continue
 		}
-		const fn = (!opts.html ? cmapText : cmapHTML)[each.type.type || each.type]
+		const fn = (!opts.html ? cmapText : cmapHTMLVerbose)[each.type.type || each.type]
 		str += fn(each)
 	}
 	return str
@@ -987,7 +974,7 @@ function toInnerString(children, opts = { html: false }) {
 export function toString(data, opts = { html: false }) {
 	let str = ""
 	for (const each of data) {
-		const fn = (!opts.html ? cmapText : cmapHTML)[each.type.type || each.type]
+		const fn = (!opts.html ? cmapText : cmapHTMLVerbose)[each.type.type || each.type]
 		str += fn(each)
 		if (each !== data[data.length - 1]) {
 			str += "\n"
@@ -997,8 +984,12 @@ export function toString(data, opts = { html: false }) {
 }
 
 // Component maps.
-const cmapText = new Map()
-const cmapHTML = new Map()
+//
+/* eslint-disable no-multi-spaces */
+const cmapText        = new Map()
+const cmapHTML        = new Map()
+const cmapHTMLVerbose = new Map()
+/* eslint-enable no-multi-spaces */
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
@@ -1020,23 +1011,45 @@ const cmapHTML = new Map()
 	cmapText[Image.type]      = data => toInnerString(data.children)
 	cmapText[Break.type]      = data => ""
 
-	cmapHTML[Escape]          = data => data.children
-	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerString(data.children, { html: true })}</span>`
-	cmapHTML[Em]              = data => `<em>${toInnerString(data.children, { html: true })}</em>`
-	cmapHTML[Strong]          = data => `<strong>${toInnerString(data.children, { html: true })}</strong>`
-	cmapHTML[StrongAndEm]     = data => `<strong><em>${toInnerString(data.children, { html: true })}</em></strong>`
-	cmapHTML[Code]            = data => `<code>${toInnerString(data.children, { html: true })}</code>`
-	cmapHTML[Strike]          = data => `<strike>${toInnerString(data.children, { html: true })}</strike>`
-	cmapHTML[A]               = data => `<a href="${data.href}">${toInnerString(data.children, { html: true })}</a>`
-	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerString(data.children, { html: true })}\n\t</h1>\n</a>`
-	cmapHTML[Paragraph.type]  = data => `<p>\n\t${toInnerString(data.children, { html: true })}\n</p>`
-	cmapHTML[Blockquote.type] = data => `<blockquote>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerString(data.children, { html: true })}</code></pre>`
-	cmapHTML[ListItem.type]   = data => `<li>\n\t${toInnerString(data.children, { html: true })}\n</li>`
-	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, { html: true })}\n</li>`
-	cmapHTML[List.type]       = data => `<${data.tag}>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
-	cmapHTML[Break.type]      = data => "<hr>"
+	cmapHTML[Escape]                 = data => data.children
+	cmapHTML[Emoji]                  = data => `<span aria-label="${data.description}" role="img">${toInnerString(data.children, { html: true })}</span>`
+	cmapHTML[Em]                     = data => `<em>${toInnerString(data.children, { html: true })}</em>`
+	cmapHTML[Strong]                 = data => `<strong>${toInnerString(data.children, { html: true })}</strong>`
+	cmapHTML[StrongAndEm]            = data => `<strong><em>${toInnerString(data.children, { html: true })}</em></strong>`
+	cmapHTML[Code]                   = data => `<code>${toInnerString(data.children, { html: true })}</code>`
+	cmapHTML[Strike]                 = data => `<strike>${toInnerString(data.children, { html: true })}</strike>`
+	cmapHTML[A]                      = data => `<a href="${data.href}">${toInnerString(data.children, { html: true })}</a>`
+	cmapHTML[Header.type]            = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerString(data.children, { html: true })}\n\t</h1>\n</a>`
+	cmapHTML[Paragraph.type]         = data => `<p>\n\t${toInnerString(data.children, { html: true })}\n</p>`
+	cmapHTML[Blockquote.type]        = data => `<blockquote>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
+	cmapHTML[CodeBlock.type]         = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerString(data.children, { html: true })}</code></pre>`
+	cmapHTML[ListItem.type]          = data => `<li>\n\t${toInnerString(data.children, { html: true })}\n</li>`
+	// TODO: Remove data.checked guard
+	cmapHTML[TaskItem.type]          = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, { html: true })}\n</li>`
+	cmapHTML[List.type]              = data => `<${data.tag}>${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	// FIXME
+	cmapHTML[Image.type]             = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
+	cmapHTML[Break.type]             = data => "<hr>"
+
+	cmapHTMLVerbose[Escape]          = data => data.children
+	cmapHTMLVerbose[Emoji]           = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, { html: true })}</span>`
+	cmapHTMLVerbose[Em]              = data => `<em class="emphasis">${toInnerString(data.children, { html: true })}</em>`
+	cmapHTMLVerbose[Strong]          = data => `<strong class="strong">${toInnerString(data.children, { html: true })}</strong>`
+	cmapHTMLVerbose[StrongAndEm]     = data => `<strong class="strong"><em class="emphasis">${toInnerString(data.children, { html: true })}</em></strong>`
+	cmapHTMLVerbose[Code]            = data => `<code class="code">${toInnerString(data.children, { html: true })}</code>`
+	cmapHTMLVerbose[Strike]          = data => `<strike class="strikethrough">${toInnerString(data.children, { html: true })}</strike>`
+	cmapHTMLVerbose[A]               = data => `<a class="anchor" href="${data.href}">${toInnerString(data.children, { html: true })}</a>`
+	cmapHTMLVerbose[Header.type]     = data => `<a class="anchor" href="#${data.hash}">\n\t<h1 id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, { html: true })}\n\t</h1>\n</a>`
+	cmapHTMLVerbose[Paragraph.type]  = data => `<p class="paragraph">\n\t${toInnerString(data.children, { html: true })}\n</p>`
+	cmapHTMLVerbose[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
+	cmapHTMLVerbose[CodeBlock.type]  = data => `<pre class="code-block" ${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code class="code">${toInnerString(data.children, { html: true })}</code></pre>`
+	cmapHTMLVerbose[ListItem.type]   = data => `<li class="list-item">\n\t${toInnerString(data.children, { html: true })}\n</li>`
+	// TODO: Remove data.checked guard
+	cmapHTMLVerbose[TaskItem.type]   = data => `<li class="list-item list-item__task-item">\n\t<input class="task-input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, { html: true })}\n</li>`
+	cmapHTMLVerbose[List.type]       = data => `<${data.tag} class="list list__${data.tag}">${`\n${toString(data.children, { html: true }).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	// FIXME
+	cmapHTMLVerbose[Image.type]      = data => `<img class="image" src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
+	cmapHTMLVerbose[Break.type]      = data => "<hr class=\"horizontal-rule\">"
 	/* eslint-enable no-multi-spaces */
 })()
 

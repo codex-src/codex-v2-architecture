@@ -18,7 +18,7 @@ function parseTypes(data) {
 	const types = {
 		text: toString(data),
 		html: toString(data, { html: true }),
-		// json: toJSON(data),
+		html__bem: toString(data, { html: true }), // { html__bem: true }),
 	}
 	return types
 }
@@ -67,7 +67,7 @@ const App = props => {
 		readOnly: false,
 		raw: value,
 		data: parseGFM(value),
-		types: { text: "", html: "" /* , json: "" */ },
+		types: { text: "", html: "", html__bem: "" },
 		metadata: { title: "", runes: 0, words: 0, seconds: 0 },
 	}))
 
@@ -198,6 +198,17 @@ const App = props => {
 							}}
 							lang="html"
 							children={state.types.html}
+						/>
+					)}
+					{state.renderMode === RenderModes.HTML__BEM && (
+						<AppCode
+							style={{
+								margin: "-0.5em 0",
+								MozTabSize: 2,
+								tabSize: 2,
+							}}
+							lang="html"
+							children={state.types.html__bem}
 						/>
 					)}
 				</DocumentTitle>
