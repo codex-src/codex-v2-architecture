@@ -402,8 +402,8 @@ const Break = React.memo(({ id, syntax }) => {
 
 // Registers a type for parseInnerGFM.
 //
-// TODO: Refactor to parseInner({ type, syntax, text, index, recurse, minOffset })?
-function registerType(type, syntax, { recurse } = { recurse: true }) {
+// TODO: Refactor to parseInner({ type, syntax, text, index, toInnerHTML, minOffset })?
+function registerType(type, syntax, { toInnerHTML } = { toInnerHTML: true }) {
 	// Escape syntax for regex:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
@@ -440,7 +440,7 @@ function registerType(type, syntax, { recurse } = { recurse: true }) {
 		const data = {
 			type,
 			syntax,
-			children: !recurse
+			children: !toInnerHTML
 				? text.slice(index, index + offset)
 				: parseInnerGFM(text.slice(index, index + offset)),
 		}
@@ -538,7 +538,7 @@ function parseInnerGFM(text) {
 		case char === "`":
 			// ```Code```
 			if (nchars >= "```x```".length && text.slice(index, index + 3) === "```") {
-				const parsed = registerType(Code, "```", { recurse: false })(text, index)
+				const parsed = registerType(Code, "```", { toInnerHTML: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -548,7 +548,7 @@ function parseInnerGFM(text) {
 				continue
 			// `Code`
 			} else if (nchars >= "`x`".length) {
-				const parsed = registerType(Code, "`", { recurse: false })(text, index)
+				const parsed = registerType(Code, "`", { toInnerHTML: false })(text, index)
 				if (!parsed) {
 					// No-op
 					break
@@ -610,7 +610,7 @@ function parseInnerGFM(text) {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { recurse: false })(text, lhs.x2)
+				const rhs = registerType(null, ")", { toInnerHTML: false })(text, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -883,7 +883,7 @@ export function parseGFM(text) {
 					// No-op
 					break
 				}
-				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
+				const rhs = registerType(null, ")", { toInnerHTML: false })(each, lhs.x2)
 				if (!rhs) {
 					// No-op
 					break
@@ -1023,10 +1023,11 @@ function toInnerHTML(children) {
 			html += toInnerHTML(each)
 			continue
 		}
-		const [s1, s2] = $$syntax(each)
-		html += readSyntax(s1, each)
-		html += toInnerHTML(each.children)
-		html += readSyntax(s2, each)
+		// const [s1, s2] = $$syntax(each)
+		// html += readSyntax(s1, each)
+		// html += toInnerHTML(each.children)
+		// html += readSyntax(s2, each)
+		html += $$syntax(each)
 	}
 	return html
 }
@@ -1035,34 +1036,38 @@ function toInnerHTML(children) {
 export function toHTML(data) {
 	let html = ""
 	for (const each of data) {
-		const [s1, s2] = $$syntax(each)
-		html += readSyntax(s1, each)
-		if (each.type === Break) {
-			// No-op
-		} else if (each.type === Blockquote || each.type === List) {
-			html += (
-				// eslint-disable-next-line prefer-template
-				"\n" +
-				toHTML(each.children)
-					.split("\n")
-					.map(each => `\t${each}`)
-					.join("\n") +
-				"\n"
-			)
-		} else {
-			html += toInnerHTML(each.children)
-		}
-		html += readSyntax(s2, each)
+		html += $$syntax(each)
 		if (each !== data[data.length - 1]) {
 			html += "\n"
 		}
+		// const [s1, s2] = $$syntax(each)
+		// html += readSyntax(s1, each)
+		// if (each.type === Break) {
+		// 	// No-op
+		// } else if (each.type === Blockquote || each.type === List) {
+		// 	html += (
+		// 		// eslint-disable-next-line prefer-template
+		// 		"\n" +
+		// 		toHTML(each.children)
+		// 			.split("\n")
+		// 			.map(each => `\t${each}`)
+		// 			.join("\n") +
+		// 		"\n"
+		// 	)
+		// } else {
+		// 	html += toInnerHTML(each.children)
+		// }
+		// html += readSyntax(s2, each)
+		// if (each !== data[data.length - 1]) {
+		// 	html += "\n"
+		// }
 	}
 	return html
 }
 
 function $$syntax(each) {
 	const fn = cmapHTML[each.type.type || each.type]
-	return fn(each).split("%")
+	return fn(each)
 }
 
 // Maps type references to HTML.
@@ -1070,23 +1075,23 @@ const cmapHTML = new Map()
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	cmapHTML[Escape]          = data => "%"
-	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">%</span>`
-	cmapHTML[Em]              = data => "<em>%</em>"
-	cmapHTML[Strong]          = data => "<strong>%</strong>"
-	cmapHTML[StrongAndEm]     = data => "<strong><em>%</em></strong>"
-	cmapHTML[Code]            = data => "<code>%</code>"
-	cmapHTML[Strike]          = data => "<strike>%</strike>"
-	cmapHTML[A]               = data => `<a href="${data.href}">%</a>`
-	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t%\n\t</h1>\n</a>`
-	cmapHTML[Paragraph.type]  = data => "<p>\n\t%\n</p>"
-	cmapHTML[Blockquote.type] = data => "<blockquote>%</blockquote>"
-	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>%</code></pre>`
-	cmapHTML[ListItem.type]   = data => "<li>\n\t%\n</li>"
-	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t%\n</li>`
-	cmapHTML[List.type]       = data => `<${data.tag}>%</${data.tag}>`
-	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>%`
-	cmapHTML[Break.type]      = data => "<hr>%"
+	cmapHTML[Escape]          = data => toInnerHTML(data.children)
+	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerHTML(data.children)}</span>`
+	cmapHTML[Em]              = data => `<em>${toInnerHTML(data.children)}</em>`
+	cmapHTML[Strong]          = data => `<strong>${toInnerHTML(data.children)}</strong>`
+	cmapHTML[StrongAndEm]     = data => `<strong><em>${toInnerHTML(data.children)}</em></strong>`
+	cmapHTML[Code]            = data => `<code>${toInnerHTML(data.children)}</code>`
+	cmapHTML[Strike]          = data => `<strike>${toInnerHTML(data.children)}</strike>`
+	cmapHTML[A]               = data => `<a href="${data.href}">${toInnerHTML(data.children)}</a>`
+	cmapHTML[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerHTML(data.children)}\n\t</h1>\n</a>`
+	cmapHTML[Paragraph.type]  = data => `<p>\n\t${toInnerHTML(data.children)}\n</p>`
+	cmapHTML[Blockquote.type] = data => "<blockquote>TODO</blockquote>"
+	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerHTML(data.children)}</code></pre>`
+	cmapHTML[ListItem.type]   = data => "<li>\n\tTODO\n</li>"
+	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\tTODO\n</li>`
+	cmapHTML[List.type]       = data => `<${data.tag}>TODO</${data.tag}>`
+	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>` // TODO
+	cmapHTML[Break.type]      = data => `<hr>`
 	/* eslint-enable no-multi-spaces */
 })()
 
