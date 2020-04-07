@@ -41,7 +41,7 @@ const Settings = ({ state, setState, ...props }) => (
 					renderMode: RenderModes.HTML__BEM,
 				})}
 			>
-				HTML (BEM)
+				HTML and BEM classes
 			</Button>
 			<Button
 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"

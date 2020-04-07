@@ -21,13 +21,13 @@ import {
 // TODO: Lazily parse
 function parseTypes(data) {
 	const types = {
-		[RenderModes.Text]:       toText(data),
-		// [RenderModes.GFM]:     toText(data),
-		[RenderModes.HTML]:       toHTML(data),
-		[RenderModes.HTML__BEM]:  toHTML__BEM(data),
+		[RenderModes.Text]:          toText(data),
+		// [RenderModes.GFM]:        toText(data),
+		[RenderModes.HTML]:          toHTML(data),
+		[RenderModes.HTML__BEM]:     toHTML__BEM(data),
 		// [RenderModes.Alpine_js]:  toText(data), // TODO
 		// [RenderModes.Angular_js]: toText(data), // TODO
-		[RenderModes.React_js]:   toReact_js(data), // TODO
+		[RenderModes.React_js]:      toReact_js(data), // TODO
 		// [RenderModes.Svelte_js]:  toText(data), // TODO
 		// [RenderModes.Vue_js]:     toText(data), // TODO
 	}
