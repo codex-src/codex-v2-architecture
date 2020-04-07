@@ -1028,7 +1028,7 @@ export function toReact_js(data) {
 	cmapText[Header.type]          = data => toInnerString(data.children)
 	cmapText[Paragraph.type]       = data => toInnerString(data.children)
 	cmapText[Blockquote.type]      = data => toString(data.children)
-	cmapText[CodeBlock.type]       = data => data.children
+	cmapText[CodeBlock.type]       = data => data.children.slice(0, -1)
 	cmapText[ListItem.type]        = data => toInnerString(data.children)
 	cmapText[TaskItem.type]        = data => toInnerString(data.children)
 	cmapText[List.type]            = data => toString(data.children)
