@@ -98,66 +98,66 @@ const Markdown = ({ syntax, ...props }) => {
 	)
 }
 
-const Emoji = ({ description, ...props }) => (
+const Emoji = ({ description, children }) => (
 	<span className="emoji" aria-label={description} role="img">
 		<Markdown>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const Escape = ({ syntax, ...props }) => (
+const Escape = ({ syntax, children }) => (
 	<span>
 		<Markdown syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const Em = ({ syntax, ...props }) => (
+const Em = ({ syntax, children }) => (
 	<span className="italic">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const Strong = ({ syntax, ...props }) => (
+const Strong = ({ syntax, children }) => (
 	<span className="font-semibold">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const StrongAndEm = ({ syntax, ...props }) => (
+const StrongAndEm = ({ syntax, children }) => (
 	<span className="font-semibold italic">
 		<Markdown syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const Code = ({ syntax, ...props }) => (
+const Code = ({ syntax, children }) => (
 	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
 		<Markdown className="text-red-600" syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const Strike = ({ syntax, ...props }) => (
+const Strike = ({ syntax, children }) => (
 	<span {...attrs.strike}>
 		<Markdown syntax={syntax}>
-			{props.children}
+			{children}
 		</Markdown>
 	</span>
 )
 
-const A = ({ syntax, href, ...props }) => (
+const A = ({ syntax, href, children }) => (
 	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
-		<Markdown syntax={!props.children || syntax}>
-			{props.children || syntax}
+		<Markdown syntax={!children || syntax}>
+			{children || syntax}
 		</Markdown>
 	</a>
 )
@@ -969,120 +969,110 @@ function toInnerReact(children) {
 }
 
 // Parses a nested VDOM representation to text.
-function toInnerText(children, options = { markdown: false }) {
-	let text = ""
+function toInnerText(children, opts = { gfm: false }) {
+	let str = ""
 	if (children === null || typeof children === "string") {
 		return children || ""
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			text += toInnerText(each, options)
+			str += toInnerText(each, opts)
 			continue
 		}
-		const [s1, s2] = getSyntax(each.syntax)
-		if (options.markdown) {
-			text += readSyntax(s1, each)
-		}
-		text += toInnerText(each.children, options)
-		if (options.markdown) {
-			text += readSyntax(s2, each)
-		}
+		const fn = cmapText[each.type.type || each.type]
+		str += fn(each)
 	}
-	return text
+	return str
 }
 
 // Parses a VDOM representation to text.
-export function toText(data, options = { markdown: false }) {
-	let text = ""
+export function toText(data, opts = { gfm: false }) {
+	let str = ""
 	for (const each of data) {
-		const [s1, s2] = getSyntax(each.syntax)
-		text += !options.markdown ? "" : readSyntax(s1, each)
-		if (each.type === Break) {
-			// No-op
-		} else if (each.type === Blockquote || each.type === List) {
-			text += toText(each.children, options)
-		} else {
-			text += toInnerText(each.children, options)
-		}
-		text += !options.markdown ? "" : readSyntax(s2, each)
+		const fn = cmapText[each.type.type || each.type]
+		str += fn(each)
 		if (each !== data[data.length - 1]) {
-			text += "\n"
+			str += "\n"
 		}
 	}
-	return text
+	return str
 }
 
 // Parses a nested VDOM representation to an HTML string.
 function toInnerHTML(children) {
-	let html = ""
+	let str = ""
 	if (children === null || typeof children === "string") {
 		return escape(children) || "<br>"
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			html += toInnerHTML(each)
+			str += toInnerHTML(each)
 			continue
 		}
 		const fn = cmapHTML[each.type.type || each.type]
-		html += fn(each)
+		str += fn(each)
 	}
-	return html
+	return str
 }
 
 // Parses a VDOM representation to an HTML string.
 export function toHTML(data) {
-	let html = ""
+	let str = ""
 	for (const each of data) {
 		const fn = cmapHTML[each.type.type || each.type]
-		html += fn(each)
+		str += fn(each)
 		if (each !== data[data.length - 1]) {
-			html += "\n"
+			str += "\n"
 		}
 	}
-	return html
+	return str
 }
 
 // Component map.
+//
+/* eslint-disable no-multi-spaces */
 const cmapText = new Map()
+const cmapGFM  = new Map()
 const cmapHTML = new Map()
+/* eslint-enable no-multi-spaces */
 
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	// cmapText[Escape]          = data => toInnerHTML(data.children)
-	// cmapText[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerHTML(data.children)}</span>`
-	// cmapText[Em]              = data => `<em>${toInnerHTML(data.children)}</em>`
-	// cmapText[Strong]          = data => `<strong>${toInnerHTML(data.children)}</strong>`
-	// cmapText[StrongAndEm]     = data => `<strong><em>${toInnerHTML(data.children)}</em></strong>`
-	// cmapText[Code]            = data => `<code>${toInnerHTML(data.children)}</code>`
-	// cmapText[Strike]          = data => `<strike>${toInnerHTML(data.children)}</strike>`
-	// cmapText[A]               = data => `<a href="${data.href}">${toInnerHTML(data.children)}</a>`
-	// cmapText[Header.type]     = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerHTML(data.children)}\n\t</h1>\n</a>`
-	// cmapText[Paragraph.type]  = data => `<p>\n\t${toInnerHTML(data.children)}\n</p>`
-	// cmapText[Blockquote.type] = data => `<blockquote>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	// cmapText[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerHTML(data.children)}</code></pre>`
-	// cmapText[ListItem.type]   = data => "<li>\n\tTODO\n</li>"
-	// cmapText[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\tTODO\n</li>`
-	// cmapText[List.type]       = data => `<${data.tag}>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	// cmapText[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>` // TODO
-	// cmapText[Break.type]      = data => "<hr>"
+	cmapText[Escape]          = data => data.children
+	cmapText[Emoji]           = data => toInnerText(data.children)
+	cmapText[Em]              = data => toInnerText(data.children)
+	cmapText[Strong]          = data => toInnerText(data.children)
+	cmapText[StrongAndEm]     = data => toInnerText(data.children)
+	cmapText[Code]            = data => data.children
+	cmapText[Strike]          = data => toInnerText(data.children)
+	cmapText[A]               = data => toInnerText(data.children)
+	cmapText[Header.type]     = data => toInnerText(data.children)
+	cmapText[Paragraph.type]  = data => toInnerText(data.children)
+	cmapText[Blockquote.type] = data => toText(data.children)
+	cmapText[CodeBlock.type]  = data => data.children
+	cmapText[ListItem.type]   = data => toInnerText(data.children)
+	cmapText[TaskItem.type]   = data => toInnerText(data.children)
+	cmapText[List.type]       = data => toText(data.children)
+	cmapText[Image.type]      = data => toInnerText(data.children)
+	cmapText[Break.type]      = data => data.syntax
 
-	// cmapGFM[Escape]           = data => data.children
-	// cmapGFM[Emoji]            = data => toInnerText(data.children)
-	// cmapGFM[Em]               = data => `<em>${toInnerText(data.children)}</em>`
-	// cmapGFM[Strong]           = data => `<strong>${toInnerText(data.children)}</strong>`
-	// cmapGFM[StrongAndEm]      = data => `<strong><em>${toInnerText(data.children)}</em></strong>`
-	// cmapGFM[Code]             = data => `<code>${toInnerText(data.children)}</code>`
-	// cmapGFM[Strike]           = data => `<strike>${toInnerText(data.children)}</strike>`
-	// cmapGFM[A]                = data => `<a href="${data.href}">${toInnerText(data.children)}</a>`
-	// cmapGFM[Header.type]      = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerText(data.children)}\n\t</h1>\n</a>`
-	// cmapGFM[Paragraph.type]   = data => `<p>\n\t${toInnerText(data.children)}\n</p>`
-	// cmapGFM[Blockquote.type ] = data => `<blockquote>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	// cmapGFM[CodeBlock.type]   = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerText(data.children)}</code></pre>`
-	// cmapGFM[ListItem.type]    = data => "<li>\n\tTODO\n</li>"
-	// cmapGFM[TaskItem.type]    = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\tTODO\n</li>`
-	// cmapGFM[List.type]        = data => `<${data.tag}>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	// cmapGFM[Image.type]       = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>` // TODO
-	// cmapGFM[Break.type]       = data => "<hr>"
+	cmapGFM[Escape]           = data => data.syntax + data.children
+	cmapGFM[Emoji]            = data => toInnerText(data.children, { gfm: true }) // TODO: Rename to gfm
+	cmapGFM[Em]               = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[Strong]           = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[StrongAndEm]      = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[Code]             = data => data.syntax[0] + data.children + data.syntax[1]
+	cmapGFM[Strike]           = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[A]                = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[Header.type]      = data => data.syntax[0] + toInnerText(data.children, { gfm: true })
+	cmapGFM[Paragraph.type]   = data => toInnerText(data.children, { gfm: true })
+	cmapGFM[Blockquote.type]  = data => toText(data.children, { gfm: true })
+	cmapGFM[CodeBlock.type]   = data => data.syntax[0] + data.children + data.syntax[1]
+	cmapGFM[ListItem.type]    = data => toInnerText(data.children, { gfm: true })
+	cmapGFM[TaskItem.type]    = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[List.type]        = data => data.syntax[0] + toText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[Image.type]       = data => data.syntax[0] + toInnerText(data.children, { gfm: true }) + data.syntax[1]
+	cmapGFM[Break.type]       = data => data.syntax
 
 	cmapHTML[Escape]          = data => data.children
 	cmapHTML[Emoji]           = data => `<span aria-label="${data.description}" role="img">${toInnerHTML(data.children)}</span>`
@@ -1096,10 +1086,10 @@ const cmapHTML = new Map()
 	cmapHTML[Paragraph.type]  = data => `<p>\n\t${toInnerHTML(data.children)}\n</p>`
 	cmapHTML[Blockquote.type] = data => `<blockquote>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML[CodeBlock.type]  = data => `<pre${!data.lang ? "" : ` class="language-${(data.lang).toLowerCase()}"`}><code>${toInnerHTML(data.children)}</code></pre>`
-	cmapHTML[ListItem.type]   = data => "<li>\n\tTODO\n</li>"
-	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\tTODO\n</li>`
+	cmapHTML[ListItem.type]   = data => `<li>\n\t${toInnerHTML(data.children)}\n</li>`
+	cmapHTML[TaskItem.type]   = data => `<li>\n\t<input type="checkbox"${!data.checked || !data.checked.value ? "" : " checked"}>\n\t${toInnerHTML(data.children)}\n</li>`
 	cmapHTML[List.type]       = data => `<${data.tag}>${`\n${toHTML(data.children).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>` // TODO
+	cmapHTML[Image.type]      = data => `<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>`
 	cmapHTML[Break.type]      = data => "<hr>"
 	/* eslint-enable no-multi-spaces */
 })()
