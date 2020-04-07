@@ -836,9 +836,11 @@ export function parseGFM(text) {
 					syntax: [body[x1], body[x2 - 1]],
 					info,
 					extension: info.split(".").slice(-1)[0].toLowerCase(),
-					children: body.slice(x1, x2).join("\n")
-						.slice(each.length, -3) // Trim syntax
-						.slice(1),              // Trim start paragraph
+					children: x1 + 1 === x2 - 1
+						? ""
+						: body.slice(x1 + 1, x2 - 1).join("\n") + "\n"
+						// .slice(each.length, -3) // Trim syntax
+						// .slice(1),              // Trim start paragraph
 				})
 				index = x2 - 1
 				continue
@@ -1045,7 +1047,7 @@ export function toReact_js(data) {
 	cmapHTML[Header.type]          = data => `<a href="#${data.hash}">\n\t<h1 id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</h1>\n</a>`
 	cmapHTML[Paragraph.type]       = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[Blockquote.type]      = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML[CodeBlock.type]       = data => `<pre${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML)}<!--\n--></code></pre>`
+	cmapHTML[CodeBlock.type]       = data => `<pre${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML).slice(0, -1)}<!--\n--></code></pre>`
 	cmapHTML[ListItem.type]        = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[TaskItem.type]        = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[List.type]            = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
@@ -1065,7 +1067,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[Header.type]     = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]  = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM)}<!--\n--></code></pre>`
+	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM).slice(0, -1)}<!--\n--></code></pre>`
 	cmapHTML__BEM[ListItem.type]   = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[TaskItem.type]   = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}-li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[List.type]       = data => `<${data.tag} class="${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
