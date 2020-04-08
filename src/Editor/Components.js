@@ -182,7 +182,7 @@ export const TodoItem = React.memo(({ syntax, checked, data }) => {
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={true && attrs.strike.style}>
+		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={done && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
