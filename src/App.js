@@ -7,8 +7,6 @@ import raw from "raw.macro"
 import React from "react"
 import RenderModes from "./Editor/RenderModes"
 
-import "./App.css"
-
 import {
 	toHTML,
 	toHTML__BEM,
@@ -16,43 +14,12 @@ import {
 	toText,
 } from "./Editor/cmap"
 
-// Parses a VDOM representation to other data types.
-//
-// TODO: Lazily parse
-function parseExportTypes(data) {
-	const exportTypes = {
-		[RenderModes.Text]:          toText(data),
-		// [RenderModes.GFM]:        toText(data),
-		[RenderModes.HTML]:          toHTML(data),
-		[RenderModes.HTML__BEM]:     toHTML__BEM(data),
-		// [RenderModes.Alpine_js]:  toText(data), // TODO
-		// [RenderModes.Angular_js]: toText(data), // TODO
-		[RenderModes.React_js]:      toReact_js(data), // TODO
-		// [RenderModes.Svelte_js]:  toText(data), // TODO
-		// [RenderModes.Vue_js]:     toText(data), // TODO
-	}
-	return exportTypes
-}
+import "./App.css"
 
-const RunesPerWord = 6
-const WordsPerMinute = 250
-
-// Parses a text representation to metadata.
-function parseMetadata(text) {
-	const runes = [...text].length
-	const meta = {
-		title: text.split("\n", 1),
-		runes,
-		words: text.split(/\s+/).filter(Boolean).length,
-		seconds: Math.ceil(runes / RunesPerWord / WordsPerMinute * 60),
-	}
-	return meta
-}
-
-const KEY = "codex-app-v2.2"
+const LOCALSTORAGE_KEY = "codex-app-v2.2"
 
 const initialValue = (() => {
-	const cache = localStorage.getItem(KEY)
+	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 	if (!cache) {
 		return raw("./App.md")
 	}
@@ -63,11 +30,45 @@ const initialValue = (() => {
 	return json.data
 })()
 
+// Parses a VDOM representation to other data types.
+//
+// TODO: Lazily parse
+function parseExportTypes(data) {
+	const exportTypes = {
+		[RenderModes.Text]:       toText(data),
+		[RenderModes.GFM]:        "TODO",
+		[RenderModes.HTML]:       toHTML(data),
+		[RenderModes.HTML__BEM]:  toHTML__BEM(data),
+		[RenderModes.Alpine_js]:  "TODO",
+		[RenderModes.Angular_js]: "TODO",
+		[RenderModes.React_js]:   toReact_js(data),
+		[RenderModes.Svelte_js]:  "TODO",
+		[RenderModes.Vue_js]:     "TODO",
+	}
+	return exportTypes
+}
+
+// Parses a text representation to metadata.
+function parseMetadata(text) {
+	// Estimates runes per second; 6 runes per word, 250 words
+	// per minute, and 60 seconds per minute:
+	const runesPerSecond = 6 / 250 * 60
+
+	// Precompute runes to compute seconds:
+	const runes = [...text].length
+	const meta = {
+		title: text.split("\n", 1),
+		runes,
+		words: text.split(/\s+/).filter(Boolean).length,
+		seconds: Math.ceil(runes / runesPerSecond),
+	}
+	return meta
+}
+
 const App = props => {
 	const textareaRef = React.useRef()
 	const editorRef = React.useRef()
 
-	// <textarea (1 of 2):
 	const [value, setValue] = React.useState(() => initialValue)
 
 	// Create state:
@@ -92,17 +93,17 @@ const App = props => {
 		}
 		const id = setTimeout(() => {
 			const data = parseGFM(value)
-			const types = parseExportTypes(data)
+			const exportTypes = parseExportTypes(data)
 			setState(current => ({
 				...current,
 				rect,
 				raw: value,
 				data,
-				types,
-				metadata: parseMetadata(types[RenderModes.Text]),
+				exportTypes,
+				metadata: parseMetadata(exportTypes[RenderModes.Text]),
 			}))
-			// Save to localStorage:
-			localStorage.setItem(KEY, JSON.stringify({ data: value }))
+			// Sync to localStorage:
+			localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data: value }))
 		}, 16.67)
 		return () => {
 			clearTimeout(id)

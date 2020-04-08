@@ -164,25 +164,25 @@ html {
 	padding-bottom: 50%;
 }
 
-.codex-editor[data-feature-read-only] ul > li:not(.checked)::before {
+.codex-editor.feature-read-only ul > li:not(.checked):before {
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
+	width: calc(11.266 / 16 * 1em);
 	content: "•";
-	width: calc(12.7 / 18 * 1em);
 	color: var(--md-blue-a400);
 }
 
-.codex-editor[data-feature-read-only] ul,
-.codex-editor[data-feature-read-only] ol {
-	counter-reset: number;
+.codex-editor.feature-read-only ul > li:first-of-type,
+.codex-editor.feature-read-only ol > li:first-of-type {
+	counter-reset: count;
 }
-.codex-editor[data-feature-read-only] ol > li::before {
+.codex-editor.feature-read-only ol > li:before {
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
-	counter-increment: number;
-	content: counter(number) ". ";
+	counter-increment: count;
+	content: counter(count) ". ";
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }

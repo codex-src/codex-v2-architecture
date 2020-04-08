@@ -23,11 +23,14 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 			{
 				ref,
 
-				"className": !className
-					? "codex-editor"
-					: `codex-editor ${className}`,
+				className:
+					`codex-editor ${
+						!state.readOnly ? "" : " feature-read-only"
+					}${
+						!className ? "" : ` ${className}`
+					}`,
 
-				"style": {
+				style: {
 					MozTabSize: 4,
 					tabSize: 4,
 
@@ -45,7 +48,7 @@ const Editor = React.forwardRef(({ className, style, state, setState, ...props }
 				// contentEditable: !state.readOnly,
 				// suppressContentEditableWarning: !state.readOnly,
 
-				"data-feature-read-only": state.readOnly || null,
+				// "data-feature-read-only": state.readOnly || null,
 			},
 		)
 	)
