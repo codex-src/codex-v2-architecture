@@ -33,6 +33,20 @@ const cmapHTML__BEM = new Map()
 const cmapReact_js  = new Map()
 /* eslint-enable no-multi-spaces */
 
+const escapeReactMap = {
+	"<": "&lt;",
+	">": "&gt;",
+	"{": "&#123;",
+	"}": "&#125;",
+}
+
+// Escapes a string for React.
+//
+// https://github.com/lodash/lodash/blob/3.0.0-npm-packages/lodash.escape/index.js
+function escapeReact(str) {
+	return (str || "").replace(/[<>{}]/g, char => escapeReactMap[char])
+}
+
 // Parses a nested VDOM representation to a string.
 export function toInnerString(children, cmap = cmapText) {
 	const recurse = toInnerString
@@ -42,7 +56,9 @@ export function toInnerString(children, cmap = cmapText) {
 		if (cmap === cmapText) {
 			return children || ""
 		}
-		return escape(children) || (cmap !== cmapReact_js ? "<br>" : "<br />")
+		// Return an escaped string or a break:
+		return (cmap !== cmapReact_js ? escape(children) : escapeReact(children)) ||
+			(cmap !== cmapReact_js ? "<br>" : "<br />")
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
@@ -118,7 +134,7 @@ export function toReact_js(data) {
 	cmapHTML[ListItem.type]             = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[TaskItem.type]             = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[List.type]                 = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML[Image.type]                = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
+	cmapHTML[Image.type]                = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML[Break.type]                = data => "<hr>"
 
 	cmapHTML__BEM[Escape]               = data => data.children
@@ -129,7 +145,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[Code]                 = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
 	cmapHTML__BEM[Strike]               = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
 	cmapHTML__BEM[A]                    = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
-	cmapHTML__BEM[Header.type]          = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
+	cmapHTML__BEM[Header.type]          = data => `<a class="a" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]       = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[BquoteParagraph.type] = data => `<p class="blockquote__p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type]      = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
@@ -137,7 +153,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[ListItem.type]        = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[TaskItem.type]        = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}__li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[List.type]            = data => `<${data.tag} class="${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML__BEM[Image.type]           = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
+	cmapHTML__BEM[Image.type]           = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML__BEM[Break.type]           = data => "<hr class=\"hr\">"
 
 	cmapReact_js[Escape]                = data => data.children
@@ -148,7 +164,7 @@ export function toReact_js(data) {
 	cmapReact_js[Code]                  = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
 	cmapReact_js[Strike]                = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
 	cmapReact_js[A]                     = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
-	cmapReact_js[Header.type]           = data => `<a href="#${data.hash}">\n\t<Header${data.tag === "h1" ? "" : ` ${data.tag}`} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Header>\n</a>`
+	cmapReact_js[Header.type]           = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
 	cmapReact_js[Paragraph.type]        = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[BquoteParagraph.type]  = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[Blockquote.type]       = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
@@ -156,7 +172,7 @@ export function toReact_js(data) {
 	cmapReact_js[ListItem.type]         = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[TaskItem.type]         = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[List.type]             = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
-	cmapReact_js[Image.type]            = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
+	cmapReact_js[Image.type]            = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
 	cmapReact_js[Break.type]            = data => "<Break />"
 	/* eslint-enable no-multi-spaces */
 })()

@@ -471,7 +471,7 @@ export function parseGFM(text) {
 					id: uuidv4(),
 					syntax: [body[x1], body[x2 - 1]],
 					info,
-					// extension: info.split(".").slice(-1)[0].toLowerCase(),
+					extension: info.split(".").slice(-1)[0].toLowerCase(),
 					children: x1 + 1 === x2 - 1
 						? ""
 						: `${body.slice(x1 + 1, x2 - 1).join("\n")}\n`,

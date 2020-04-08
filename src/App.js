@@ -189,7 +189,7 @@ const App = props => {
 								MozTabSize: 2,
 								tabSize: 2,
 							}}
-							info="text"
+							extension="text"
 							children={state.exportTypes[RenderModes.Text]}
 						/>
 					)}
@@ -208,7 +208,7 @@ const App = props => {
 								MozTabSize: 2,
 								tabSize: 2,
 							}}
-							info="html"
+							extension="html"
 							children={state.exportTypes[RenderModes.HTML]}
 						/>
 					)}
@@ -219,7 +219,7 @@ const App = props => {
 								MozTabSize: 2,
 								tabSize: 2,
 							}}
-							info="html"
+							extension="html"
 							children={state.exportTypes[RenderModes.HTML__BEM]}
 						/>
 					)}
@@ -230,7 +230,7 @@ const App = props => {
 								MozTabSize: 2,
 								tabSize: 2,
 							}}
-							info="html"
+							extension="html"
 							children={state.exportTypes[RenderModes.React_js]}
 						/>
 					)}
