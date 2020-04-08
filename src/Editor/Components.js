@@ -93,15 +93,6 @@ export const Blockquote = React.memo(({ id, data }) => {
 	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
 	return (
 		<CompoundNode id={id} style={style}>
-			{/* {data.map((each, index) => ( */}
-			{/* 	<Node key={each.id} id={each.id} className="text-gray-600" style={null}> */}
-			{/* 		<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}> */}
-			{/* 			{toInnerReact(each.children) || ( */}
-			{/* 				<br /> */}
-			{/* 			)} */}
-			{/* 		</Markdown> */}
-			{/* 	</Node> */}
-			{/* ))} */}
 			{data.map(({ type: Type, children: data, ...each }) => (
 				<Type key={each.id} data={data} {...each} />
 			))}
