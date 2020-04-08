@@ -174,7 +174,7 @@ function useChecked(initialValue) {
 	return [checked, attrs]
 }
 
-export const TaskItem = React.memo(({ syntax, checked, data }) => {
+export const TodoItem = React.memo(({ syntax, checked, data }) => {
 	const [$checked, $attrs] = useChecked(checked.value)
 
 	const style = {

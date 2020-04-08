@@ -12,7 +12,7 @@ import {
 	List,
 	ListItem,
 	Paragraph,
-	TaskItem,
+	TodoItem,
 } from "./Components"
 
 import {
@@ -353,7 +353,7 @@ function parseList(range) {
 			checked = { value }
 		}
 		ref.push({
-			type: !checked ? ListItem : TaskItem,
+			type: !checked ? ListItem : TodoItem,
 			tag,
 			id: uuidv4(),
 			syntax: [syntax],

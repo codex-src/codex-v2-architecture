@@ -10,7 +10,7 @@ import {
 	List,
 	ListItem,
 	Paragraph,
-	TaskItem,
+	TodoItem,
 } from "./Components"
 
 import {
@@ -113,7 +113,7 @@ export function toReact_js(data) {
 	cmapText[Blockquote.type]           = data => toString(data.children)
 	cmapText[CodeBlock.type]            = data => data.children.slice(0, -1)
 	cmapText[ListItem.type]             = data => toInnerString(data.children)
-	cmapText[TaskItem.type]             = data => toInnerString(data.children)
+	cmapText[TodoItem.type]             = data => toInnerString(data.children)
 	cmapText[List.type]                 = data => toString(data.children)
 	cmapText[Image.type]                = data => toInnerString(data.children)
 	cmapText[Break.type]                = data => ""
@@ -132,7 +132,7 @@ export function toReact_js(data) {
 	cmapHTML[Blockquote.type]           = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML[CodeBlock.type]            = data => `<pre${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML).slice(0, -1)}<!--\n--></code></pre>`
 	cmapHTML[ListItem.type]             = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
-	cmapHTML[TaskItem.type]             = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
+	cmapHTML[TodoItem.type]             = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[List.type]                 = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	cmapHTML[Image.type]                = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML[Break.type]                = data => "<hr>"
@@ -151,7 +151,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[Blockquote.type]      = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[CodeBlock.type]       = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="pre__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM).slice(0, -1)}<!--\n--></code></pre>`
 	cmapHTML__BEM[ListItem.type]        = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	cmapHTML__BEM[TaskItem.type]        = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}__li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	cmapHTML__BEM[TodoItem.type]        = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}__li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
 	cmapHTML__BEM[List.type]            = data => `<${data.tag} class="${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	cmapHTML__BEM[Image.type]           = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML__BEM[Break.type]           = data => "<hr class=\"hr\">"
@@ -170,7 +170,7 @@ export function toReact_js(data) {
 	cmapReact_js[Blockquote.type]       = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
 	cmapReact_js[CodeBlock.type]        = data => `<Pre${!data.extension ? "" : ` info="${(data.extension).toLowerCase()}"`}>\n{\`${toInnerString(data.children.slice(0, -1)).replace(/`/g, "\\`")}\`}\n</Pre>`
 	cmapReact_js[ListItem.type]         = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	cmapReact_js[TaskItem.type]         = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[TodoItem.type]         = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[List.type]             = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
 	cmapReact_js[Image.type]            = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
 	cmapReact_js[Break.type]            = data => "<Break />"
