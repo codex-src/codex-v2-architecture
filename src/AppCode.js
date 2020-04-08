@@ -1,25 +1,26 @@
 import Prism from "./Prism"
 import React from "react"
 
-const AppCode = ({ lang, style, children }) => {
+const AppCode = ({ info, style, children }) => {
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
-		if (!lang) {
+		const language = info.split(".").slice(-1)[0].toLowerCase()
+		if (!language) {
 			// No-op
 			return
 		}
-		const parser = Prism[lang]
+		const parser = Prism[language]
 		if (!parser) {
 			// No-op
 			return
 		}
 		setHTML((
-			<div className={lang && `language-${lang}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(children, parser, lang),
+			<div className={language && `language-${language}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(children, parser, language),
 			}} />
 		))
-	}, [lang, children])
+	}, [info, children])
 
 	return (
 		<div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={style}>

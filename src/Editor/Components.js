@@ -101,27 +101,28 @@ export const Blockquote = React.memo(({ id, data }) => {
 })
 
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
+export const CodeBlock = React.memo(({ id, syntax, info, data }) => {
 	const [state] = useEditorState()
 
 	const [html, setHTML] = React.useState(null)
 
 	React.useEffect(() => {
-		if (!extension) {
+		const language = info.split(".").slice(-1)[0].toLowerCase()
+		if (!language) {
 			// No-op
 			return
 		}
-		const parser = Prism[extension]
+		const parser = Prism[language]
 		if (!parser) {
 			// No-op
 			return
 		}
 		setHTML((
-			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(data, parser, extension),
+			<div className={language && `language-${language}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(data, parser, language),
 			}} />
 		))
-	}, [extension, data])
+	}, [info, data])
 
 	return (
 		<CompoundNode className="-mx-6 px-6 bg-white shadow-hero rounded" {...attrs.code}>

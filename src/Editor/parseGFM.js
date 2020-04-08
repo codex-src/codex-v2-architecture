@@ -110,7 +110,7 @@ function parseInnerGFM(text) {
 		// <Strong>
 		// <Em>
 		case char === "*" || char === "_":
-			// ***Strong and em***
+			// ***Strong em***
 			if (nchars >= "***x***".length && text.slice(index, index + 3) === char.repeat(3)) {
 				const parsed = registerType(StrongAndEm, char.repeat(3))(text, index)
 				if (!parsed) {
@@ -120,7 +120,8 @@ function parseInnerGFM(text) {
 				data.push(parsed.data)
 				index = parsed.x2 - 1
 				continue
-			// **Strong** or __strong__
+			// **Strong**
+			// __strong__
 			} else if (nchars >= "**x**".length && text.slice(index, index + 2) === char.repeat(2)) {
 				const parsed = registerType(Strong, char.repeat(2))(text, index)
 				if (!parsed) {
@@ -130,7 +131,8 @@ function parseInnerGFM(text) {
 				data.push(parsed.data)
 				index = parsed.x2 - 1
 				continue
-			// _Emphasis_ or *emphasis*
+			// _Emphasis_
+			// *emphasis*
 			} else if (nchars >= "*x*".length) {
 				const parsed = registerType(Em, char)(text, index)
 				if (!parsed) {
@@ -469,7 +471,7 @@ export function parseGFM(text) {
 					id: uuidv4(),
 					syntax: [body[x1], body[x2 - 1]],
 					info,
-					extension: info.split(".").slice(-1)[0].toLowerCase(),
+					// extension: info.split(".").slice(-1)[0].toLowerCase(),
 					children: x1 + 1 === x2 - 1
 						? ""
 						: `${body.slice(x1 + 1, x2 - 1).join("\n")}\n`,
