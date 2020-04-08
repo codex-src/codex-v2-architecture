@@ -1075,7 +1075,7 @@ export function toReact_js(data) {
 	cmapHTML__BEM[Code]            = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
 	cmapHTML__BEM[Strike]          = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
 	cmapHTML__BEM[A]               = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
-	cmapHTML__BEM[Header.type]     = data => `<a class="a--${data.tag}" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
+	cmapHTML__BEM[Header.type]     = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]  = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="pre__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM).slice(0, -1)}<!--\n--></code></pre>`
