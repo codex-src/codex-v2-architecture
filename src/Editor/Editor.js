@@ -1063,8 +1063,8 @@ export function toReact_js(data) {
 	cmapHTML__BEM[StrongAndEm]     = data => `<strong class="strong"><em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
 	cmapHTML__BEM[Code]            = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
 	cmapHTML__BEM[Strike]          = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
-	cmapHTML__BEM[A]               = data => `<a class="anchor" href="${data.href}">${toInnerString(data.children, cmapHTML__BEM)}</a>`
-	cmapHTML__BEM[Header.type]     = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
+	cmapHTML__BEM[A]               = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
+	cmapHTML__BEM[Header.type]     = data => `<a class="a--${data.tag}" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[Paragraph.type]  = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[Blockquote.type] = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[CodeBlock.type]  = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="pre__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM).slice(0, -1)}<!--\n--></code></pre>`
@@ -1082,15 +1082,15 @@ export function toReact_js(data) {
 	cmapReact_js[Code]             = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
 	cmapReact_js[Strike]           = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
 	cmapReact_js[A]                = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
-	cmapReact_js[Header.type]      = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
+	cmapReact_js[Header.type]      = data => `<a href="#${data.hash}">\n\t<Header${data.tag === "h1" ? "" : ` ${data.tag}`} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Header>\n</a>`
 	cmapReact_js[Paragraph.type]   = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[Blockquote.type]  = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
-	cmapReact_js[CodeBlock.type]   = data => `<Pre${!data.extension ? "" : ` info="${(data.extension).toLowerCase()}"`}>\n{\`${toInnerString(data.children).replace(/`/g, "\\`")}\`}\n</Pre>`
-	cmapReact_js[ListItem.type]    = data => `<LI>\n\t${toInnerString(data.children, cmapReact_js)}\n</LI>`
-	cmapReact_js[TaskItem.type]    = data => `<LI>\n\t<Task${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</LI>`
-	cmapReact_js[List.type]        = data => `<${data.tag.toUpperCase()}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag.toUpperCase()}>`
-	cmapReact_js[Image.type]       = data => `<Img src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />`
-	cmapReact_js[Break.type]       = data => "<HR />"
+	cmapReact_js[CodeBlock.type]   = data => `<Pre${!data.extension ? "" : ` info="${(data.extension).toLowerCase()}"`}>\n{\`${toInnerString(data.children.slice(0, -1)).replace(/`/g, "\\`")}\`}\n</Pre>`
+	cmapReact_js[ListItem.type]    = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[TaskItem.type]    = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " checked"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[List.type]        = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
+	cmapReact_js[Image.type]       = data => `<Image src="${data.src}"${!data.alt ? "" : ` alt="${data.alt}"`} />`
+	cmapReact_js[Break.type]       = data => "<Break />"
 	/* eslint-enable no-multi-spaces */
 })()
 
