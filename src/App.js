@@ -10,11 +10,14 @@ import "./App.css"
 import {
 	Editor,
 	parseGFM,
+} from "./Editor/Editor"
+
+import {
 	toHTML,
 	toHTML__BEM,
 	toReact_js,
 	toText,
-} from "./Editor/Editor"
+} from "./Editor/cmap"
 
 // Parses a VDOM representation to other data types.
 //
