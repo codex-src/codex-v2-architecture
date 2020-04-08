@@ -202,7 +202,8 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 	</Node>
 ))
 
-// NOTE: Compound component
+// NOTE (1): Compound component
+// NOTE (2): Uses my-1
 const Blockquote = React.memo(({ id, data }) => {
 	const [state] = useEditorState()
 
@@ -274,6 +275,7 @@ const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 	)
 })
 
+// NOTE: Uses my-1
 const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	<Node tag="li" className="-ml-5 my-1 flex flex-row">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
@@ -287,6 +289,8 @@ const Checkbox = ({ className, ...props }) => (
 )
 
 // Prepares a checked state and functions e.g. {...attrs}.
+//
+// NOTE: Uses my-1
 function useChecked(initialValue) {
 	const [checked, setChecked] = React.useState(initialValue)
 	const attrs = {
