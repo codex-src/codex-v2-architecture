@@ -109,18 +109,9 @@
 	--md-gray-900:  #212121;
 }
 
-/*
-https://rsms.me/inter/lab
-font-feature-settings:
-	"cv05", Lower case L with tail
-	"cv06", Curved lower case r
-	"cv08", Upper-case i with serif
-	"cv11"; Single-storey a
-*/
-
 html {
-	font-family: "Inter var", system-ui, sans-serif;
-	letter-spacing: -0.01em; /* -1% */
+	font-family: "Inter var", sans-serif;
+	letter-spacing: -0.025em;
 }
 
 .font-mono {
@@ -128,6 +119,7 @@ html {
 	-webkit-font-smoothing:  auto;
 
 	font-family: "iA Writer Mono var", monospace;
+	letter-spacing: 0;
 }
 
 .pb-2\/1 {

@@ -183,7 +183,7 @@ const Header = React.memo(({ tag, id, syntax, hash, data }) => (
 	// NOTE: Don’t use <Node tag={tag} ...>
 	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
-			<div className={headerClassNames[tag]} style={{ letterSpacing: "-0.02em" }}>
+			<div className={headerClassNames[tag]}>
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
