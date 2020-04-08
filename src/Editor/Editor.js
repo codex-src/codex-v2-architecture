@@ -171,19 +171,19 @@ function trimAny(str) {
 }
 
 const headerClassNames = {
-	h1: trimAny("font-medium   text-3xl -tracking-px leading-tight"),
-	h2: trimAny("font-medium   text-2xl -tracking-px leading-tight"),
-	h3: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
-	h4: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
-	h5: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
-	h6: trimAny("font-semibold text-xl  -tracking-px leading-tight"),
+	h1: trimAny("font-medium   text-3xl leading-tight"),
+	h2: trimAny("font-medium   text-2xl leading-tight"),
+	h3: trimAny("font-semibold text-xl  leading-tight"),
+	h4: trimAny("font-semibold text-xl  leading-tight"),
+	h5: trimAny("font-semibold text-xl  leading-tight"),
+	h6: trimAny("font-semibold text-xl  leading-tight"),
 }
 
 const Header = React.memo(({ tag, id, syntax, hash, data }) => (
 	// NOTE: Don’t use <Node tag={tag} ...>
 	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
-			<div className={headerClassNames[tag]}>
+			<div className={headerClassNames[tag]} style={{ letterSpacing: "-0.02em" }}>
 				<Markdown syntax={syntax}>
 					{toInnerReact(data) || (
 						<br />
