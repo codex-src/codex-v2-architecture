@@ -158,35 +158,35 @@ export const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 	</Node>
 ))
 
-const Checkbox = ({ className, ...props }) => (
+const Todo = ({ className, ...props }) => (
 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
 )
 
-// Prepares a checked state and functions e.g. {...attrs}.
-function useChecked(initialValue) {
-	const [checked, setChecked] = React.useState(initialValue)
-	const attrs = {
-		checked,
+// Prepares a checked state and functions e.g. {...etc}.
+function useTodo(initialValue) {
+	const [done, setDone] = React.useState(initialValue)
+	const etc = {
+		checked: done,
 		onChange: e => {
-			setChecked(!checked)
+			setDone(!done)
 		},
 	}
-	return [checked, attrs]
+	return [done, etc]
 }
 
 export const TodoItem = React.memo(({ syntax, checked, data }) => {
-	const [$checked, $attrs] = useChecked(checked.value)
+	const [done, etc] = useTodo(checked.value)
 
 	const style = {
 		margin: "0.3125em 0.5em 0 calc((16 - 11.266) / 16 * -1em)",
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={$checked && attrs.strike.style}>
+		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={true && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
-				<Checkbox className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!$checked ? "shadow-hero" : "shadow"} transition duration-150`} style={style} {...$attrs} />
+				<Todo className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!done ? "shadow-hero" : "shadow"} transition duration-150`} style={style} {...etc} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
@@ -210,10 +210,10 @@ const Caption = ({ syntax, data }) => (
 	</div>
 )
 
-// Prepares a hovered state and functions e.g. {...attrs}.
+// Prepares a hovered state and functions e.g. {...etc}.
 function useHovered(initialValue) {
 	const [hovered, setHovered] = React.useState(initialValue)
-	const attrs = {
+	const etc = {
 		onMouseEnter: e => {
 			setHovered(true)
 		},
@@ -221,28 +221,28 @@ function useHovered(initialValue) {
 			setHovered(false)
 		},
 	}
-	return [hovered, attrs]
+	return [hovered, etc]
 }
 
 export const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	const [state] = useEditorState()
 
 	const [loaded, setLoaded] = React.useState(false)
-	const [hovered, $attrs] = useHovered(state.readOnly)
+	const [hovered, etc] = useHovered(state.readOnly)
 
-	const divStyle = {
+	const style1 = {
 		opacity: state.readOnly && (!data || !hovered) ? "0%" : "100%",
 	}
 	// TODO: Guard state.rect?
 	//
-	// let imgStyle = null
+	// let style2 = null
 	// if (state.rect) {
-	// 	Object.assign(imgStyle,
+	// 	Object.assign(style2,
 	// 		maxWidth:  state.rect && state.rect.width,
 	// 		maxHeight: state.rect && state.rect.width * 10 / 16,
 	// 	})
 	// }
-	const imgStyle = {
+	const style2 = {
 		// minHeight: "3em",
 		maxWidth:  state.rect && state.rect.width,
 		minHeight: !loaded ? state.rect && state.rect.width * 9 / 16 : 0,
@@ -250,14 +250,14 @@ export const Image = React.memo(({ id, syntax, src, alt, data }) => {
 	}
 	return (
 		<Node id={id} className="relative flex flex-row justify-center">
-			<div className="absolute inset-0 pointer-events-none" style={divStyle}>
+			<div className="absolute inset-0 pointer-events-none" style={style1}>
 				<div className="px-8 py-2 flex flex-row justify-center items-end h-full">
 					<Caption syntax={syntax} data={data} />
 				</div>
 			</div>
-			{/* <div style={{opacity: !loaded ? "0%" : "100%" }} {...$attrs}> */}
-			<div className={!loaded ? "w-full text-transparent bg-gray-100" : ""} {...$attrs}>
-				<img className="mx-auto" style={imgStyle} src={src} alt={alt} onLoad={e => setLoaded(true)} />
+			{/* <div style={{opacity: !loaded ? "0%" : "100%" }} {...etc}> */}
+			<div className={!loaded ? "w-full text-transparent bg-gray-100" : ""} {...etc}>
+				<img className="mx-auto" style={style2} src={src} alt={alt} onLoad={e => setLoaded(true)} />
 			</div>
 		</Node>
 	)
@@ -265,11 +265,13 @@ export const Image = React.memo(({ id, syntax, src, alt, data }) => {
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [state] = useEditorState()
+
+	const style = { verticalAlign: "15%" }
 	return (
 		<Node id={id}>
 			<Markdown syntax={syntax}>
 				{state.readOnly && (
-					<hr className="inline-block w-full" style={{ verticalAlign: "15%" }} />
+					<hr className="inline-block w-full" style={style} />
 				)}
 			</Markdown>
 		</Node>
