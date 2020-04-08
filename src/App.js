@@ -19,8 +19,8 @@ import {
 // Parses a VDOM representation to other data types.
 //
 // TODO: Lazily parse
-function parseTypes(data) {
-	const types = {
+function parseExportTypes(data) {
+	const exportTypes = {
 		[RenderModes.Text]:          toText(data),
 		// [RenderModes.GFM]:        toText(data),
 		[RenderModes.HTML]:          toHTML(data),
@@ -31,7 +31,7 @@ function parseTypes(data) {
 		// [RenderModes.Svelte_js]:  toText(data), // TODO
 		// [RenderModes.Vue_js]:     toText(data), // TODO
 	}
-	return types
+	return exportTypes
 }
 
 const RunesPerWord = 6
@@ -92,7 +92,7 @@ const App = props => {
 		}
 		const id = setTimeout(() => {
 			const data = parseGFM(value)
-			const types = parseTypes(data)
+			const types = parseExportTypes(data)
 			setState(current => ({
 				...current,
 				rect,
@@ -189,7 +189,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="text"
-							children={state.types[RenderModes.Text]}
+							children={state.exportTypes[RenderModes.Text]}
 						/>
 					)}
 					{state.renderMode === RenderModes.GFM && (
@@ -208,7 +208,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="html"
-							children={state.types[RenderModes.HTML]}
+							children={state.exportTypes[RenderModes.HTML]}
 						/>
 					)}
 					{state.renderMode === RenderModes.HTML__BEM && (
@@ -219,7 +219,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="html"
-							children={state.types[RenderModes.HTML__BEM]}
+							children={state.exportTypes[RenderModes.HTML__BEM]}
 						/>
 					)}
 					{state.renderMode === RenderModes.React_js && (
@@ -230,7 +230,7 @@ const App = props => {
 								tabSize: 2,
 							}}
 							lang="html"
-							children={state.types[RenderModes.React_js]}
+							children={state.exportTypes[RenderModes.React_js]}
 						/>
 					)}
 				</DocumentTitle>

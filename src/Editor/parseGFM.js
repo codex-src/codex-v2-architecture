@@ -1,7 +1,4 @@
 import * as emojiTrie from "emoji-trie"
-import EditorContext from "./EditorContext"
-import React from "react"
-import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 import { toInnerString } from "./cmap"
 
