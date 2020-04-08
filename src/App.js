@@ -1,16 +1,13 @@
 import AppCode from "./AppCode"
 import AppSettings from "./AppSettings"
 import DocumentTitle from "./DocumentTitle"
+import Editor from "./Editor/Editor"
+import parseGFM from "./Editor/parseGFM"
 import raw from "raw.macro"
 import React from "react"
 import RenderModes from "./Editor/RenderModes"
 
 import "./App.css"
-
-import {
-	Editor,
-	parseGFM,
-} from "./Editor/Editor"
 
 import {
 	toHTML,

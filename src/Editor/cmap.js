@@ -33,7 +33,7 @@ const cmapReact_js  = new Map()
 /* eslint-enable no-multi-spaces */
 
 // Parses a nested VDOM representation to a string.
-function toInnerString(children, cmap = cmapText) {
+export function toInnerString(children, cmap = cmapText) {
 	const recurse = toInnerString
 
 	let str = ""
