@@ -4,6 +4,7 @@ import { toInnerString } from "./cmap"
 
 import {
 	Blockquote,
+	BquoteParagraph,
 	Break,
 	CodeBlock,
 	Header,
@@ -425,7 +426,7 @@ export function parseGFM(text) {
 					type: Blockquote,
 					id: uuidv4(),
 					children: body.slice(x1, x2).map(each => ({
-						type: Paragraph,
+						type: BquoteParagraph,
 						id: uuidv4(),
 						syntax: [each.slice(0, 2)],
 						children: parseInnerGFM(each.slice(2)),

@@ -1,0 +1,46 @@
+.codex-editor {
+	font-family: "Inter var", sans-serif;
+	letter-spacing: -0.01875em;
+	line-height: 1.625;
+}
+
+.codex-editor .font-mono {
+	-moz-osx-font-smoothing: auto;
+	-webkit-font-smoothing:  auto;
+
+	font-family: "iA Writer Mono var", monospace;
+	letter-spacing: 0;
+	line-height: 1.375;
+}
+
+.codex-editor .emoji {
+	vertical-align: -10%;
+	font-size: 120%;
+	line-height: 1;
+}
+.codex-editor .emojis {
+	font-size: 208.3333%; /* 208.3333% * 120% = 250% */
+}
+
+.codex-editor.feature-read-only ul > li:not(.checked):before {
+	margin-right: 0.5em;
+	flex-shrink: 0;
+	display: inline-flex;
+	width: calc(11.266 / 16 * 1em);
+	content: "•";
+	color: var(--md-blue-a400);
+}
+
+.codex-editor.feature-read-only ul > li:first-of-type,
+.codex-editor.feature-read-only ol > li:first-of-type {
+	counter-reset: count;
+}
+.codex-editor.feature-read-only ol > li:before {
+	margin-right: 0.5em;
+	flex-shrink: 0;
+	display: inline-flex;
+	counter-increment: count;
+	content: counter(count) ". ";
+	font-feature-settings: "tnum";
+	color: var(--md-blue-a400);
+}

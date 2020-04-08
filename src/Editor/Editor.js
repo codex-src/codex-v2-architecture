@@ -2,6 +2,8 @@ import EditorContext from "./EditorContext"
 import React from "react"
 import ReactDOM from "react-dom"
 
+import "./Editor.css"
+
 const Editor = React.forwardRef(({ className, style, state, setState, ...props }, ref) => {
 
 	// Rerender the React-managed DOM when state.data changes:
