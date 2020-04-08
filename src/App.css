@@ -158,8 +158,8 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor[data-feature-read-only] ol,
-.codex-editor[data-feature-read-only] ul {
+.codex-editor[data-feature-read-only] ul,
+.codex-editor[data-feature-read-only] ol {
 	counter-reset: number;
 }
 .codex-editor[data-feature-read-only] ol > li::before {

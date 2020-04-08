@@ -310,7 +310,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
-				<Checkbox className="flex-shrink-0 w-4 h-4 text-md-blue-a200 shadow transition duration-150" style={checkboxStyle} {...$attrs} />
+				<Checkbox className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!$checked ? "shadow-hero" : "shadow"} transition duration-150`} style={checkboxStyle} {...$attrs} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
@@ -968,6 +968,13 @@ const cmapHTML      = new Map()
 const cmapHTML__BEM = new Map()
 const cmapReact_js  = new Map()
 /* eslint-enable no-multi-spaces */
+
+// TODO: Add selective escapes for React
+//
+// https://github.com/lodash/lodash/blob/3.0.0-npm-packages/lodash.escape/index.js
+//
+// '<': '&lt;',
+// '>': '&gt;',
 
 // Parses a nested VDOM representation to a string.
 function toInnerString(children, cmap = cmapText) {
