@@ -111,7 +111,8 @@
 
 html {
 	font-family: "Inter var", sans-serif;
-	letter-spacing: -0.025em;
+	letter-spacing: -0.02em;
+	line-height: 1.625;
 }
 
 .font-mono {

@@ -180,7 +180,6 @@ const headerClassNames = {
 }
 
 const Header = React.memo(({ tag, id, syntax, hash, data }) => (
-	// NOTE: Don’t use <Node tag={tag} ...>
 	<Node id={id}>
 		<a id={hash} href={`#${hash}`}>
 			<div className={headerClassNames[tag]}>
@@ -203,16 +202,15 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 ))
 
 // NOTE (1): Compound component
-// NOTE (2): Uses my-1
 const Blockquote = React.memo(({ id, data }) => {
 	const [state] = useEditorState()
 
-	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
+	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
 	const eachStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
 	return (
 		<CompoundNode id={id} style={compoundNodeStyle}>
 			{data.map((each, index) => (
-				<Node key={each.id} id={each.id} className="my-1 text-md-blue-a400" style={eachStyle}>
+				<Node key={each.id} id={each.id} className="text-gray-600" style={eachStyle}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -248,8 +246,7 @@ const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 	}, [extension, data])
 
 	return (
-		// NOTE: Doesn’t use py-4 because of <Markdown>
-		<CompoundNode className="-mx-6 px-6 border" {...attrs.code}>
+		<CompoundNode className="px-6 bg-gray-50 shadow-hero rounded" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
 				<Node className="py-px leading-none text-md-blue-a200">
 					<Markdown syntax={[syntax[0]]}>
@@ -275,9 +272,8 @@ const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 	)
 })
 
-// NOTE: Uses my-1
 const ListItem = React.memo(({ syntax, depth, checked, data }) => (
-	<Node tag="li" className="-ml-5 my-1 flex flex-row">
+	<Node tag="li" className="-ml-5 my-2 flex flex-row">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
 			<span>{toInnerReact(data)}</span>
 		</Markdown>
@@ -289,8 +285,6 @@ const Checkbox = ({ className, ...props }) => (
 )
 
 // Prepares a checked state and functions e.g. {...attrs}.
-//
-// NOTE: Uses my-1
 function useChecked(initialValue) {
 	const [checked, setChecked] = React.useState(initialValue)
 	const attrs = {
@@ -310,7 +304,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag="li" className="checked -ml-5 my-1 flex flex-row" style={$checked && attrs.strike.style}>
+		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={$checked && attrs.strike.style}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
