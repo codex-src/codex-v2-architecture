@@ -119,8 +119,15 @@ font-feature-settings:
 */
 
 html {
-	font-family: "Inter var";
+	font-family: "Inter var", system-ui, sans-serif;
 	letter-spacing: -0.01em; /* -1% */
+}
+
+.font-mono {
+	-moz-osx-font-smoothing: auto;
+	-webkit-font-smoothing:  auto;
+
+	font-family: "iA Writer Mono var", monospace;
 }
 
 .pb-2\/1 {

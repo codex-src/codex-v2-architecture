@@ -4,7 +4,7 @@
   font-style: normal;
   font-weight: 100 900;
   font-named-instance: "Regular";
-  src: url("Inter-roman.otf") format("opentype");
+  src: url("Inter-roman.3.12.otf") format("opentype");
 }
 
 @font-face {
@@ -13,5 +13,5 @@
   font-style: italic;
   font-weight: 100 900;
   font-named-instance: "Italic";
-  src: url("Inter-italic.otf") format("opentype");
+  src: url("Inter-italic.3.12.otf") format("opentype");
 }
