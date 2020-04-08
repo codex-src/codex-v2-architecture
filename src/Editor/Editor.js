@@ -1,3 +1,4 @@
+import attrs from "./attrs"
 import EditorContext from "./EditorContext"
 import escape from "lodash/escape"
 import Prism from "../Prism"
@@ -19,37 +20,6 @@ import {
 	isASCIIWhitespace,
 	safeURLRe,
 } from "./spec"
-
-// Shared attributes.
-const attrs = {
-	code: {
-		style: {
-			MozTabSize: 2,
-			tabSize: 2,
-		},
-		spellCheck: false,
-	},
-	strike: {
-		style: {
-			"--red-100": "var(--gray-100)",
-			"--red-600": "currentColor",
-			"--md-blue-a400": "currentColor",
-			"textDecoration": "line-through",
-			"color": "var(--gray-500)",
-		},
-	},
-	a: {
-		target: "_blank",
-		rel: "noopener noreferrer",
-	},
-	li: {
-		style: {
-			MozTabSize: 0,
-			tabSize: 0,
-			fontFeatureSettings: "'tnum'",
-		},
-	},
-}
 
 // Gets syntax from a string or an array of strings.
 function getSyntax(syntax) {
@@ -162,8 +132,31 @@ const A = ({ syntax, href, children }) => (
 	</a>
 )
 
-// Trims extraneous spaces from a string.
-function trimAny(str) {
+// Parses a nested VDOM representation to React components.
+function toInnerReact(children) {
+	const recurse = toInnerReact
+
+	if (children === null || typeof children === "string") {
+		return children
+	}
+	const components = []
+	for (const each of children) {
+		if (each === null || typeof each === "string") {
+			components.push(recurse(each))
+			continue
+		}
+		const { type: Type, ...props } = each
+		components.push((
+			<Type key={components.length} {...props}>
+				{recurse(props.children)}
+			</Type>
+		))
+	}
+	return components
+}
+
+// Cuts extraneous spaces.
+function cutSpaces(str) {
 	const trimmed = str
 		.replace(/ +/, " ") // Trims extra spaces
 		.trim() // Trims start and end spaces
@@ -171,12 +164,12 @@ function trimAny(str) {
 }
 
 const headerClassNames = {
-	h1: trimAny("font-medium   text-3xl leading-tight"),
-	h2: trimAny("font-medium   text-2xl leading-tight"),
-	h3: trimAny("font-semibold text-xl  leading-tight"),
-	h4: trimAny("font-semibold text-xl  leading-tight"),
-	h5: trimAny("font-semibold text-xl  leading-tight"),
-	h6: trimAny("font-semibold text-xl  leading-tight"),
+	h1: cutSpaces("font-medium   text-3xl leading-tight"),
+	h2: cutSpaces("font-medium   text-2xl leading-tight"),
+	h3: cutSpaces("font-semibold text-xl  leading-tight"),
+	h4: cutSpaces("font-semibold text-xl  leading-tight"),
+	h5: cutSpaces("font-semibold text-xl  leading-tight"),
+	h6: cutSpaces("font-semibold text-xl  leading-tight"),
 }
 
 const Header = React.memo(({ tag, id, syntax, hash, data }) => (
@@ -205,12 +198,12 @@ const Paragraph = React.memo(({ id, emojis, data }) => (
 const Blockquote = React.memo(({ id, data }) => {
 	const [state] = useEditorState()
 
-	const compoundNodeStyle = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
-	const eachStyle = state.readOnly && { paddingLeft: "calc((14.266 + 8) / 16 * 1em)" }
+	const style1 = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
+	const style2 = state.readOnly && { paddingLeft: "calc((14.453 + 8) / 16 * 1em)" }
 	return (
-		<CompoundNode id={id} style={compoundNodeStyle}>
+		<CompoundNode id={id} style={style1}>
 			{data.map((each, index) => (
-				<Node key={each.id} id={each.id} className="text-gray-600" style={eachStyle}>
+				<Node key={each.id} id={each.id} className="text-gray-600" style={style2}>
 					<Markdown className="mr-2 text-md-blue-a400" syntax={each.syntax}>
 						{toInnerReact(each.children) || (
 							<br />
@@ -246,9 +239,9 @@ const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 	}, [extension, data])
 
 	return (
-		<CompoundNode className="px-6 bg-gray-50 shadow-hero rounded" {...attrs.code}>
+		<CompoundNode className="-mx-6 px-6 bg-white shadow-hero rounded" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
-				<Node className="py-px leading-none text-md-blue-a200">
+				<Node className="py-px leading-none text-md-blue-a400">
 					<Markdown syntax={[syntax[0]]}>
 						{state.readOnly && (
 							<br />
@@ -260,7 +253,7 @@ const CodeBlock = React.memo(({ id, syntax, info, extension, data }) => {
 						data
 					)}
 				</Node>
-				<Node className="py-px leading-none text-md-blue-a200">
+				<Node className="py-px leading-none text-md-blue-a400">
 					<Markdown syntax={[syntax[1]]}>
 						{state.readOnly && (
 							<br />
@@ -299,8 +292,8 @@ function useChecked(initialValue) {
 const TaskItem = React.memo(({ syntax, checked, data }) => {
 	const [$checked, $attrs] = useChecked(checked.value)
 
-	const checkboxStyle = {
-		margin: "0.1875em 0.5em 0 calc(((14 + 2) - 11.438) / 16 * -1em)",
+	const style = {
+		margin: "0.3125em 0.5em 0 calc((16 - 11.266) / 16 * -1em)",
 		borderRadius: "0.3125em",
 	}
 	return (
@@ -308,7 +301,7 @@ const TaskItem = React.memo(({ syntax, checked, data }) => {
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
 				too dark and overwritten by attrs.strike.style */}
-				<Checkbox className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!$checked ? "shadow-hero" : "shadow"} transition duration-150`} style={checkboxStyle} {...$attrs} />
+				<Checkbox className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!$checked ? "shadow-hero" : "shadow"} transition duration-150`} style={style} {...$attrs} />
 				<span>{toInnerReact(data)}</span>
 			</Markdown>
 		</Node>
@@ -935,27 +928,6 @@ export function parseGFM(text) {
 		})
 	}
 	return data
-}
-
-// Parses a nested VDOM representation to React components.
-function toInnerReact(children) {
-	if (children === null || typeof children === "string") {
-		return children
-	}
-	const components = []
-	for (const each of children) {
-		if (each === null || typeof each === "string") {
-			components.push(toInnerReact(each))
-			continue
-		}
-		const { type: Type, ...props } = each
-		components.push((
-			<Type key={components.length} {...props}>
-				{toInnerReact(props.children)}
-			</Type>
-		))
-	}
-	return components
 }
 
 // Component maps.

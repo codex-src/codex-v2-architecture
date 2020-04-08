@@ -111,7 +111,7 @@
 
 html {
 	font-family: "Inter var", sans-serif;
-	letter-spacing: -0.02em;
+	letter-spacing: -0.01875em;
 	line-height: 1.625;
 }
 
@@ -121,6 +121,7 @@ html {
 
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
+	line-height: 1.375;
 }
 
 .pb-2\/1 {
