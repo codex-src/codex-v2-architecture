@@ -68,6 +68,7 @@ function computePos(rootElement) {
 
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
+	const pointerDown = React.useRef()
 
 	// Renders to the DOM.
 	//
@@ -129,6 +130,30 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
+						// target.current = newNodeIterators()
+					},
+
+					onPointerDown: e => {
+						pointerDown.current = true
+					},
+					onPointerMove: e => {
+						// Editor must be focused:
+						if (!state.focused) {
+							// Reset because pointerDown.current can be true:
+							pointerDown.current = false
+							return
+						}
+						// Editor must be focused AND pointer must be down:
+						if (!pointerDown.current) {
+							// No-op
+							return
+						}
+						const [pos1, pos2] = computePos(ref.current)
+						setState(current => ({ ...current, pos1, pos2 }))
+						// target.current = newNodeIterators()
+					},
+					onPointerUp: e => {
+						pointerDown.current = false
 					},
 
 					contentEditable: true,
