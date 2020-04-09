@@ -61,6 +61,10 @@ function computePos(rootNode) {
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
+	// Renders to the DOM.
+	//
+	// NOTE: Do not use props.children or equivalent because
+	// of contenteditable
 	React.useEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
@@ -86,9 +90,7 @@ const Editor = ({ id, tag, state, setState }) => {
 
 					id,
 
-					style: {
-						outline: "none",
-					},
+					style: { outline: "none" },
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),
 					onBlur:  () => setState(current => ({ ...current, focused: false })),
