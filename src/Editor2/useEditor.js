@@ -15,6 +15,8 @@ function newPos() {
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
+//
+// TODO: Memoize parsed
 function parseGFM(unparsed) {
 	const parsed = []
 	for (const each of unparsed) {
@@ -31,19 +33,13 @@ function parseGFM(unparsed) {
 function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
 		// TODO: Add <Paragraph> parser
-		data: parseGFM(
+		data: parseGFM((
 			// Parse initialValue once:
 			initialValue.split("\n").map(each => ({
 				id: uuidv4(),
 				raw: each,
-			}))),
-		// [
-		// 	{
-		// 		type: typeEnum.P,
-		// 		id: "abc-123-xyz",
-		// 		data: "Hello, world!",
-		// 	},
-		// ],
+			}))
+		)),
 		pos1: newPos(),
 		pos2: newPos(),
 	}))
