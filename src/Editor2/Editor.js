@@ -3,6 +3,7 @@ import newPos from "./newPos"
 import parseGFM from "./parseGFM"
 import React from "react"
 import ReactDOM from "react-dom"
+import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
 
@@ -225,9 +226,13 @@ const Editor = ({ id, tag, state, setState }) => {
 	React.useEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
-
-				// // Sync the user and React-managed DOMs:
-				// const mutations = syncTrees(ref.current, state.reactDOM)
+				// Sync the React-managed DOM tree to the user-
+				// managed DOM tree:
+				const mutations = syncTrees(state.reactDOM, ref.current)
+				if (!mutations) {
+					// No-op
+					return
+				}
 				// if ((!state.components || !mutations) && state.actionType !== "PASTE") {
 				// 	// No-op
 				// 	return
