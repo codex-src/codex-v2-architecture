@@ -8,12 +8,11 @@ const DEBUG = true && process.env.NODE_ENV !== "production"
 
 // Computes a cursor data structure from a DOM node and a
 // start or end range data structure.
-//
-// TODO (1): What’s supposed to happen if rootNode is
-// outside of a data-paragraph node?
-// TODO (2): Remove rootNode parameter?
-function computePosFromRange(rootNode, { node, offset }) {
+function computePosFromRange(rootElement, { node, offset }) {
 	const pos = newPos()
+
+	// TODO: Add guards for when node is outside of a
+	// data-paragraph element or rootElement
 
 	// Iterate to the innermost node:
 	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
@@ -55,14 +54,14 @@ function computePosFromRange(rootNode, { node, offset }) {
 }
 
 // Computes the cursor from a reference to a DOM node.
-function computePos(rootNode) {
+function computePos(rootElement) {
 	const range = document.getSelection().getRangeAt(0)
 	const rangeStart = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePosFromRange(rootNode, rangeStart)
+	const pos1 = computePosFromRange(rootElement, rangeStart)
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) { // TODO: state.hasSelection?
 		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePosFromRange(rootNode, rangeEnd)
+		pos2 = computePosFromRange(rootElement, rangeEnd)
 	}
 	return [pos1, pos2]
 }
