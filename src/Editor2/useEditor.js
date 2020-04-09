@@ -1,5 +1,5 @@
 import newPos from "./newPos"
-import parseGFM from "./parseGFM"
+import parse from "./parser"
 import React from "react"
 import typeEnum from "./typeEnum"
 import uuidv4 from "uuid/v4"
@@ -12,13 +12,13 @@ function useEditor(initialValue, options = null) {
 	}))
 	const reactDOM = document.createElement("div")
 	const [state, setState] = React.useState(() => ({
-		readOnly: false,          // Is read-only?
-		focused: false,           // Is focused?
-		selected: false,          // Has a selection?
-		data: parseGFM(unparsed), // Document data
-		pos1: newPos(),           // Start cursor
-		pos2: newPos(),           // End cursor
-		reactDOM,                 // The React-managed DOM
+		readOnly: false,       // Is read-only?
+		focused: false,        // Is focused?
+		selected: false,       // Has a selection?
+		data: parse(unparsed), // Document data
+		pos1: newPos(),        // Start cursor
+		pos2: newPos(),        // End cursor
+		reactDOM,              // The React-managed DOM
 	}))
 	return [state, setState]
 }

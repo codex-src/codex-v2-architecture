@@ -5,7 +5,9 @@ import typeEnum from "./typeEnum"
 // structure just represents keyed paragraphs.
 //
 // TODO: Memoize parsed
-function parseGFM(unparsed) {
+function parse(unparsed) {
+	// const recurse = parse
+
 	const parsed = []
 	for (const each of unparsed) {
 		parsed.push({
@@ -18,4 +20,4 @@ function parseGFM(unparsed) {
 	return parsed
 }
 
-export default parseGFM
+export default parse

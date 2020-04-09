@@ -1,6 +1,7 @@
 import EditorContext from "./EditorContext"
+import KeyCode from "./KeyCode"
 import newPos from "./newPos"
-import parseGFM from "./parseGFM"
+import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncTrees from "./syncTrees"
@@ -233,6 +234,8 @@ const Editor = ({ id, tag, state, setState }) => {
 					// No-op
 					return
 				}
+				// TODO: Sync the cursor e.g. syncCursors(...)
+
 				// if ((!state.components || !mutations) && state.actionType !== "PASTE") {
 				// 	// No-op
 				// 	return
@@ -332,9 +335,40 @@ const Editor = ({ id, tag, state, setState }) => {
 						pointerDown.current = false
 					},
 
-					onInput: e => {
+					onKeyDown: e => {
+						// // Tab:
+						// if (!e.ctrlKey && e.keyCode === KEY_CODE_TAB) {
+						// 	e.preventDefault()
+						// 	dispatch.tab()
+						// 	return
+						// // Enter:
+						// } else if (e.keyCode === KEY_CODE_ENTER) {
+						// 	e.preventDefault()
+						// 	dispatch.enter()
+						// 	return
+						// // Undo:
+						// } else if (detect.undo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.undo()
+						// 	return
+						// // Redo:
+						// } else if (detect.redo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.redo()
+						// 	return
+						// }
+
+						// Guard e.ctrlKey (browser shortcut):
+						if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
+							e.preventDefault()
+							// e.shiftKey
+							tab(state, setState)
+						}
+					},
+
+					onInput: () => {
 						const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
-						const parsed = parseGFM(unparsed)
+						const parsed = parse(unparsed)
 
 						const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
 						if (index1 === -1) {
@@ -402,6 +436,35 @@ const Editor = ({ id, tag, state, setState }) => {
 
 		</Provider>
 	)
+}
+
+// Tabs at the current selection.
+function tab(state, setState) {
+	if (state.selected) {
+		// No-op
+		return
+	}
+	const index = state.data.findIndex(each => each.id === state.pos1.id)
+	const ref = state.data[index]
+	const unparsed = [{
+		id: ref.id,
+		raw: `${ref.raw.slice(0, state.pos1.offset)}\t${ref.raw.slice(state.pos1.offset)}`,
+	}]
+	setState(current => ({
+		...current,
+		// Merge the parsed data structure:
+		data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
+		// Increment once for tab:
+		pos1: {
+			...state.pos1,
+			offset: state.pos1.offset + 1,
+		},
+		// Reset to pos1 and increment once for tab:
+		pos2: {
+			...state.pos1,
+			offset: state.pos1.offset + 1,
+		},
+	}))
 }
 
 export default Editor
