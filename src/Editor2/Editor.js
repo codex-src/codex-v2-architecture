@@ -12,14 +12,23 @@ const DEBUG = true && process.env.NODE_ENV !== "production"
 // TODO (1): What’s supposed to happen if rootNode is
 // outside of a data-paragraph node?
 // TODO (2): Remove rootNode parameter?
-function computePosFromRange(rootNode, range) {
+function computePosFromRange(rootNode, { node, offset }) {
 	const pos = newPos()
+
+	// Iterate to the innermost node:
+	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
+		node = node.childNodes[offset]
+		offset = 0
+	}
 	// Iterate up to to the closest data-paragraph element:
-	let startNode = range.node
+	let startNode = node
 	while (true) {
 		if (startNode.nodeType === Node.ELEMENT_NODE && startNode.getAttribute("data-paragraph")) {
 			pos.id = startNode.getAttribute("id")
 			break
+		}
+		if (!startNode.parentNode) {
+			throw new Error("computePosFromRange: startNode out of bounds")
 		}
 		startNode = startNode.parentNode
 	}
@@ -27,8 +36,8 @@ function computePosFromRange(rootNode, range) {
 	// Recurse to the range data structure node:
 	const recurse = startNode => {
 		for (const each of startNode.childNodes) {
-			if (each === range.node) {
-				pos.offset += range.offset
+			if (each === node) {
+				pos.offset += offset
 				// Stop recursion:
 				return true
 			}
@@ -41,7 +50,7 @@ function computePosFromRange(rootNode, range) {
 		// Continue recursion:
 		return false
 	}
-	recurse(startNode, range.node)
+	recurse(startNode)
 	return pos
 }
 

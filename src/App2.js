@@ -3,7 +3,11 @@ import React from "react"
 import useEditor from "Editor2/useEditor"
 
 const App = () => {
-	const [state, setState] = useEditor("Hello, world!\n\nHow are you?")
+	const [state, setState] = useEditor(`Hello!
+
+Hello, world!
+
+Hello!`)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
