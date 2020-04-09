@@ -1,12 +1,12 @@
 import React from "react"
-import Type from "./EnumType"
+import typeEnum from "./typeEnum"
 
 function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
 		// TODO: Add <Paragraph> parser
 		data: [
 			{
-				type: Type.P,
+				type: typeEnum.P,
 				id: "abc-123-xyz",
 				data: "Hello, world!",
 			},

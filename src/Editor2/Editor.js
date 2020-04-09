@@ -1,16 +1,7 @@
 import EditorContext from "./EditorContext"
 import React from "react"
 import ReactDOM from "react-dom"
-import Type from "./EnumType"
-
-import {
-	P,
-	// TODO
-} from "./Components"
-
-const typeMap = {
-	[Type.P]: P,
-}
+import typeMap from "./typeMap"
 
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
