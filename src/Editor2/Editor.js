@@ -139,8 +139,7 @@ const Editor = ({ id, tag, state, setState }) => {
 					onPointerMove: () => {
 						// Editor must be focused and pointer must be down:
 						if (!state.focused || !pointerDown.current) {
-							// Reset to be safe:
-							pointerDown.current = false
+							pointerDown.current = false // Reset to be safe
 							return
 						}
 						const [pos1, pos2] = computePos(ref.current)
