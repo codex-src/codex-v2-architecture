@@ -1,6 +1,7 @@
 .codex-editor {
 	font-family: "Inter var", sans-serif;
 	letter-spacing: -0.01em;
+	/* TODO: Use leading-relaxed */
 	line-height: 1.625;
 }
 
@@ -10,6 +11,7 @@
 
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
+	/* TODO: Use leading-snug */
 	line-height: 1.375;
 }
 

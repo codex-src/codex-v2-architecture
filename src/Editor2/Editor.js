@@ -3,6 +3,8 @@ import React from "react"
 import ReactDOM from "react-dom"
 import typeMap from "./typeMap"
 
+const DEBUG = true && process.env.NODE_ENV !== "production"
+
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
@@ -22,22 +24,32 @@ const Editor = ({ id, tag, state, setState }) => {
 	}, [state, setState])
 
 	return (
-		React.createElement(
-			tag || "div",
-			{
-				ref,
+		<div>
 
-				id,
+			{React.createElement(
+				tag || "div",
+				{
+					ref,
 
-				// Imperative styles:
-				style: {
-					outline: "none",
+					id,
+
+					// Imperative styles:
+					style: {
+						outline: "none",
+					},
+
+					contentEditable: true,
+					suppressContentEditableWarning: true,
 				},
+			)}
 
-				contentEditable: true,
-				suppressContentEditableWarning: true,
-			},
-		)
+			{DEBUG && (
+				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
+					{JSON.stringify(state.data, null, "\t")}
+				</div>
+			)}
+
+		</div>
 	)
 }
 
