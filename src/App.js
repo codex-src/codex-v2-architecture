@@ -35,15 +35,15 @@ const initialValue = (() => {
 // TODO: Lazily parse
 function parseExportTypes(data) {
 	const exportTypes = {
-		[RenderModes.Text]:       toText(data),
-		[RenderModes.GFM]:        "TODO",
-		[RenderModes.HTML]:       toHTML(data),
-		[RenderModes.HTML__BEM]:  toHTML__BEM(data),
-		[RenderModes.Alpine_js]:  "TODO",
-		[RenderModes.Angular_js]: "TODO",
-		[RenderModes.React_js]:   toReact_js(data),
-		[RenderModes.Svelte_js]:  "TODO",
-		[RenderModes.Vue_js]:     "TODO",
+		// [RenderModes.GFM]
+		// [RenderModes.Alpine_js]
+		// [RenderModes.Angular_js]
+		// [RenderModes.Svelte_js]
+		// [RenderModes.Vue_js]
+		[RenderModes.Text]:      toText(data),
+		[RenderModes.HTML]:      toHTML(data),
+		[RenderModes.HTML__BEM]: toHTML__BEM(data),
+		[RenderModes.React_js]:  toReact_js(data),
 	}
 	return exportTypes
 }
@@ -147,13 +147,16 @@ const App = props => {
 		}
 		e.preventDefault()
 		const textarea = textareaRef.current
-		const { value, selectionStart: pos1, selectionEnd: pos2 } = textarea
+		let { value, selectionStart: pos1, selectionEnd: pos2 } = textarea
+		if (pos2 > pos1) {
+			;[pos1, pos2] = [pos2, pos1]
+		}
 		// eslint-disable-next-line prefer-template
 		const newValue = value.slice(0, pos1) + "\t" + value.slice(pos2)
 		Object.assign(textarea, {
 			value: newValue,
 			selectionStart: pos1 + "\t".length,
-			selectionEnd: pos2 + "\t".length,
+			selectionEnd: pos1 + "\t".length, // Collapse to pos1
 		})
 		setValue(newValue)
 	}
@@ -190,8 +193,9 @@ const App = props => {
 								tabSize: 2,
 							}}
 							extension="text"
-							children={state.exportTypes[RenderModes.Text]}
-						/>
+						>
+							{state.exportTypes[RenderModes.Text]}
+						</AppCode>
 					)}
 					{state.renderMode === RenderModes.GFM && (
 						<Editor
@@ -209,8 +213,9 @@ const App = props => {
 								tabSize: 2,
 							}}
 							extension="html"
-							children={state.exportTypes[RenderModes.HTML]}
-						/>
+						>
+							{state.exportTypes[RenderModes.HTML]}
+						</AppCode>
 					)}
 					{state.renderMode === RenderModes.HTML__BEM && (
 						<AppCode
@@ -220,8 +225,9 @@ const App = props => {
 								tabSize: 2,
 							}}
 							extension="html"
-							children={state.exportTypes[RenderModes.HTML__BEM]}
-						/>
+						>
+							{state.exportTypes[RenderModes.HTML__BEM]}
+						</AppCode>
 					)}
 					{state.renderMode === RenderModes.React_js && (
 						<AppCode
@@ -231,8 +237,9 @@ const App = props => {
 								tabSize: 2,
 							}}
 							extension="html"
-							children={state.exportTypes[RenderModes.React_js]}
-						/>
+						>
+							{state.exportTypes[RenderModes.React_js]}
+						</AppCode>
 					)}
 				</DocumentTitle>
 

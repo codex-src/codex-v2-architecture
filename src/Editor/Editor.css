@@ -9,7 +9,7 @@
 	-webkit-font-smoothing:  auto;
 
 	font-family: "iA Writer Mono var", monospace;
-	/* letter-spacing: 0; */
+	letter-spacing: 0;
 	line-height: 1.375;
 }
 
