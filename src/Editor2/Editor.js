@@ -38,9 +38,9 @@ function ascendToID(rootElement, node) {
 	return node
 }
 
-// Creates a new range data structure: tracks up to two IDs
-// before and after the current selection.
-function newRange(rootElement, data) {
+// Computes the target IDs (up to two IDs before and after
+// the current selection).
+function computeTargetIDs(rootElement, data) {
 	const range = document.getSelection().getRangeAt(0)
 	const e1 = ascendToID(rootElement, range.startContainer)
 	let e2 = e1
@@ -49,12 +49,10 @@ function newRange(rootElement, data) {
 	}
 	let x1 = data.findIndex(each => each.id === e1.id)
 	let x2 = data.findIndex(each => each.id === e2.id)
-	// Decrement 2x:
 	x1 -= 2
 	if (x1 < 0) {
 		x1 = 0
 	}
-	// Increment 2x:
 	x2 += 2
 	if (x2 >= data.length) {
 		x2 = data.length - 1
@@ -129,9 +127,9 @@ const Editor = ({ id, tag, state, setState }) => {
 	// Tracks whether the pointer is down.
 	const pointerDown = React.useRef()
 
-	// Tracks up to two IDs before and after the current
-	// selection.
-	const targetRange = React.useRef(["", ""])
+	// Tracks the target IDs (up to two IDs before and after
+	// the current selection).
+	const targetIDs = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	//
@@ -199,8 +197,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						targetRange.current = newRange(ref.current, state.data)
-						console.log(targetRange.current)
+						targetIDs.current = computeTargetIDs(ref.current, state.data)
 					},
 
 					onPointerDown: () => {
@@ -214,7 +211,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						// range.current = newRange()
+						targetIDs.current = computeTargetIDs(ref.current, state.data)
 					},
 					onPointerUp: () => {
 						pointerDown.current = false
