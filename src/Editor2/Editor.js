@@ -38,17 +38,10 @@ function ascendToID(rootElement, node) {
 	return node
 }
 
-// Computes the target IDs (up to two IDs before and after
-// the current selection).
-function computeTargetIDs(rootElement, data) {
-	const range = document.getSelection().getRangeAt(0)
-	const e1 = ascendToID(rootElement, range.startContainer)
-	let e2 = e1
-	if (!range.collapsed) {
-		e2 = ascendToID(rootElement, range.endContainer)
-	}
-	let x1 = data.findIndex(each => each.id === e1.id)
-	let x2 = data.findIndex(each => each.id === e2.id)
+// Extends the cursor IDs (up to two before and after).
+function extendPosIDs([pos1, pos2], data) {
+	let x1 = data.findIndex(each => each.id === pos1.id)
+	let x2 = data.findIndex(each => each.id === pos2.id)
 	x1 -= 2
 	if (x1 < 0) {
 		x1 = 0
@@ -75,6 +68,8 @@ function computePosFromRange(rootElement, { node, offset }) {
 		offset = 0
 	}
 	// Iterate up to to the closest data-paragraph element:
+	//
+	// TODO: Reuse ascendToID
 	let startNode = node
 	while (true) {
 		if (startNode.nodeType === Node.ELEMENT_NODE && startNode.id) {
@@ -127,9 +122,9 @@ const Editor = ({ id, tag, state, setState }) => {
 	// Tracks whether the pointer is down.
 	const pointerDown = React.useRef()
 
-	// Tracks the target IDs (up to two IDs before and after
-	// the current selection).
-	const targetIDs = React.useRef(["", ""])
+	// Tracks the extended target IDs (up to two IDs before
+	// and after the current selection).
+	const extendedIDs = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	//
@@ -197,7 +192,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						targetIDs.current = computeTargetIDs(ref.current, state.data)
+						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
+						// console.log(extendedIDs.current)
 					},
 
 					onPointerDown: () => {
@@ -211,7 +207,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						targetIDs.current = computeTargetIDs(ref.current, state.data)
+						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
+						// console.log(extendedIDs.current)
 					},
 					onPointerUp: () => {
 						pointerDown.current = false
