@@ -6,13 +6,70 @@ import typeMap from "./typeMap"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
+// // Creates a new start and end node iterator.
+// //
+// // TODO: Extract to helpers?
+// function newNodeIterators() {
+// 	const range = document.getSelection().getRangeAt(0)
+// 	const { startContainer, endContainer } = range
+// 	// Extend the target start (up to 2x):
+// 	const start = new NodeIterator(startContainer)
+// 	while (start.count < 2 && start.getPrev()) {
+// 		start.prev()
+// 	}
+// 	// Extend the target end (up to 2x):
+// 	const end = new NodeIterator(endContainer)
+// 	while (end.count < 2 && end.getNext()) {
+// 		end.next()
+// 	}
+// 	return [start, end]
+// }
+
+// Ascends to the nearest keyed-paragraph.
+function ascendToID(rootElement, node) {
+	// TODO: Scope to rootElement
+	while (true) {
+		if (node.nodeType === Node.ELEMENT_NODE && node.id) {
+			// No-op
+			break
+		}
+		node = node.parentNode
+	}
+	return node
+}
+
+// Creates a new range data structure: tracks up to two IDs
+// before and after the current selection.
+function newRange(rootElement, data) {
+	const range = document.getSelection().getRangeAt(0)
+	const e1 = ascendToID(rootElement, range.startContainer)
+	let e2 = e1
+	if (!range.collapsed) {
+		e2 = ascendToID(rootElement, range.endContainer)
+	}
+	let x1 = data.findIndex(each => each.id === e1.id)
+	let x2 = data.findIndex(each => each.id === e2.id)
+	// Decrement 2x:
+	x1 -= 2
+	if (x1 < 0) {
+		x1 = 0
+	}
+	// Increment 2x:
+	x2 += 2
+	if (x2 >= data.length) {
+		x2 = data.length - 1
+	}
+	return [data[x1].id, data[x2].id]
+}
+
 // Computes a cursor data structure from a DOM node and a
 // start or end range data structure.
 function computePosFromRange(rootElement, { node, offset }) {
 	const pos = newPos()
 
-	// TODO: Add guards for when node is outside of a
+	// TODO (1): Add guards for when node is outside of a
 	// data-paragraph element or rootElement
+	// TODO (2): Scope to rootElement
 
 	// Iterate to the innermost node:
 	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
@@ -22,8 +79,8 @@ function computePosFromRange(rootElement, { node, offset }) {
 	// Iterate up to to the closest data-paragraph element:
 	let startNode = node
 	while (true) {
-		if (startNode.nodeType === Node.ELEMENT_NODE && startNode.getAttribute("data-paragraph")) {
-			pos.id = startNode.getAttribute("id")
+		if (startNode.nodeType === Node.ELEMENT_NODE && startNode.id) {
+			pos.id = startNode.id
 			break
 		}
 		if (!startNode.parentNode) {
@@ -68,7 +125,13 @@ function computePos(rootElement) {
 
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
+
+	// Tracks whether the pointer is down.
 	const pointerDown = React.useRef()
+
+	// Tracks up to two IDs before and after the current
+	// selection.
+	const targetRange = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	//
@@ -99,7 +162,13 @@ const Editor = ({ id, tag, state, setState }) => {
 
 					id,
 
-					style: { outline: "none" },
+					style: {
+						// NOTE: Imperative styles needed because of
+						// contenteditable
+						whiteSpace: "pre-wrap",
+						outline: "none",
+						overflowWrap: "break-word",
+					},
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),
 					onBlur:  () => setState(current => ({ ...current, focused: false })),
@@ -130,7 +199,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						// target.current = newNodeIterators()
+						targetRange.current = newRange(ref.current, state.data)
+						console.log(targetRange.current)
 					},
 
 					onPointerDown: () => {
@@ -144,14 +214,14 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
-						// target.current = newNodeIterators()
+						// range.current = newRange()
 					},
 					onPointerUp: () => {
 						pointerDown.current = false
 					},
 
-					contentEditable: true,
-					suppressContentEditableWarning: true,
+					contentEditable: !state.readOnly, // Inverse
+					suppressContentEditableWarning: !state.readOnly, // Inverse
 				},
 			)}
 

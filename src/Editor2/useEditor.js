@@ -23,6 +23,7 @@ function parseGFM(unparsed) {
 
 function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
+		readOnly: false, // Is the editor read-only?
 		focused: false,  // Is the editor focused?
 		selected: false, // Does the editor have a selection?
 		data: parseGFM(initialValue.split("\n").map(each => ({
