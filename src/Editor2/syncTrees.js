@@ -1,9 +1,9 @@
 // // Naively syncs two trees.
-// function naiveSyncTrees(treeA, treeB) {
+// function naiveSyncTrees(dst, src) {
 // 	eagerlyDropRange()
-// 	;[...treeA.childNodes].reverse().map(each => each.remove())
-// 	treeA.append(...treeB.cloneNode(true).childNodes)
-// 	return treeA.childNodes.length
+// 	;[...dst.childNodes].reverse().map(each => each.remove())
+// 	dst.append(...src.cloneNode(true).childNodes)
+// 	return dst.childNodes.length
 // }
 
 // Eagerly drops the range (for performance reasons).
@@ -24,34 +24,34 @@ function eagerlyDropRange() {
 //
 // TODO: Reduce the number of mutations for the 90% case
 // from 2 to 1
-function syncTrees(treeA, treeB) {
+function syncTrees(src, dst) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
-	const min = Math.min(treeA.childNodes.length, treeB.childNodes.length)
+	const min = Math.min(dst.childNodes.length, src.childNodes.length)
 	for (; start < min; start++) {
-		if (!treeA.childNodes[start].isEqualNode(treeB.childNodes[start])) {
+		if (!dst.childNodes[start].isEqualNode(src.childNodes[start])) {
 			if (!mutations) {
 				eagerlyDropRange()
 			}
-			const newNode = treeB.childNodes[start].cloneNode(true)
-			treeA.childNodes[start].replaceWith(newNode)
+			const newNode = src.childNodes[start].cloneNode(true)
+			dst.childNodes[start].replaceWith(newNode)
 			mutations++
-			start++ // Eagerly increment because of break
+			start++ // Eagerly increment
 			break
 		}
 	}
 	// Iterate backwards (after replaceWith):
-	let end1 = treeA.childNodes.length
-	let end2 = treeB.childNodes.length
+	let end1 = dst.childNodes.length
+	let end2 = src.childNodes.length
 	if (mutations) { // Not needed but easier to understand
 		for (; end1 > start && end2 > start; end1--, end2--) {
-			if (!treeA.childNodes[end1 - 1].isEqualNode(treeB.childNodes[end2 - 1])) {
+			if (!dst.childNodes[end1 - 1].isEqualNode(src.childNodes[end2 - 1])) {
 				if (!mutations) {
 					eagerlyDropRange()
 				}
-				const newNode = treeB.childNodes[end2 - 1].cloneNode(true)
-				treeA.childNodes[end1 - 1].replaceWith(newNode)
+				const newNode = src.childNodes[end2 - 1].cloneNode(true)
+				dst.childNodes[end1 - 1].replaceWith(newNode)
 				mutations++
 			}
 		}
@@ -62,7 +62,7 @@ function syncTrees(treeA, treeB) {
 			if (!mutations) {
 				eagerlyDropRange()
 			}
-			treeA.childNodes[end1 - 1].remove()
+			dst.childNodes[end1 - 1].remove()
 			mutations++
 		}
 	// Push extraneous DOM nodes:
@@ -71,8 +71,8 @@ function syncTrees(treeA, treeB) {
 			if (!mutations) {
 				eagerlyDropRange()
 			}
-			const newNode = treeB.childNodes[start].cloneNode(true)
-			treeA.insertBefore(newNode, treeA.childNodes[start])
+			const newNode = src.childNodes[start].cloneNode(true)
+			dst.insertBefore(newNode, dst.childNodes[start])
 			mutations++
 		}
 	}
