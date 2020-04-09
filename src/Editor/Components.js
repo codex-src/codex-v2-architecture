@@ -74,7 +74,7 @@ export const Paragraph = React.memo(({ id, emojis, data }) => (
 export const BquoteParagraph = React.memo(({ id, syntax, data }) => {
 	const [state] = useEditorState()
 
-	const style = state.readOnly && { paddingLeft: "calc((14.453 + 8) / 16 * 1em)" }
+	const style = state.readOnly && { paddingLeft: "calc((14.734 + 8) / 16 * 1em)" }
 	return (
 		<Node id={id} className="text-gray-600" style={style}>
 			<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
@@ -178,7 +178,7 @@ export const TodoItem = React.memo(({ syntax, checked, data }) => {
 	const [done, etc] = useTodo(checked.value)
 
 	const style = {
-		margin: "0.3125em 0.5em 0 calc((16 - 11.266) / 16 * -1em)",
+		margin: "0.3125em 0.5em 0 calc((16 - 11.55) / 16 * -1em)",
 		borderRadius: "0.3125em",
 	}
 	return (

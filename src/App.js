@@ -196,7 +196,7 @@ const App = props => {
 					{state.renderMode === RenderModes.GFM && (
 						<Editor
 							ref={editorRef}
-							style={{ fontSize: 17 }}
+							// style={{ fontSize: 17 }}
 							state={state}
 							setState={setState}
 						/>
