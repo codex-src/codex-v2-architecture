@@ -4,7 +4,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import typeMap from "./typeMap"
 
-const DEBUG = true && process.env.NODE_ENV !== "production"
+const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
 // Computes a cursor data structure from a DOM node and a
 // start or end range data structure.
@@ -133,26 +133,21 @@ const Editor = ({ id, tag, state, setState }) => {
 						// target.current = newNodeIterators()
 					},
 
-					onPointerDown: e => {
+					onPointerDown: () => {
 						pointerDown.current = true
 					},
-					onPointerMove: e => {
-						// Editor must be focused:
-						if (!state.focused) {
-							// Reset because pointerDown.current can be true:
+					onPointerMove: () => {
+						// Editor must be focused and pointer must be down:
+						if (!state.focused || !pointerDown.current) {
+							// Reset to be safe:
 							pointerDown.current = false
-							return
-						}
-						// Editor must be focused AND pointer must be down:
-						if (!pointerDown.current) {
-							// No-op
 							return
 						}
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
 						// target.current = newNodeIterators()
 					},
-					onPointerUp: e => {
+					onPointerUp: () => {
 						pointerDown.current = false
 					},
 
@@ -161,7 +156,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				},
 			)}
 
-			{DEBUG && (
+			{DEBUG_MODE && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 					{JSON.stringify(state, null, "\t")}
 				</div>
