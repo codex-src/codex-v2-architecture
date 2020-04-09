@@ -33,10 +33,12 @@ const Editor = ({ id, tag, state, setState }) => {
 
 					id,
 
-					// Imperative styles:
 					style: {
 						outline: "none",
 					},
+
+					// onFocus: dispatch.actionFocus,
+					// onBlur:  dispatch.actionBlur,
 
 					contentEditable: true,
 					suppressContentEditableWarning: true,
@@ -45,7 +47,7 @@ const Editor = ({ id, tag, state, setState }) => {
 
 			{DEBUG && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-					{JSON.stringify(state.data, null, "\t")}
+					{JSON.stringify(state, null, "\t")}
 				</div>
 			)}
 
