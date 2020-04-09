@@ -19,7 +19,7 @@
 	line-height: 1;
 }
 .codex-editor .emojis {
-	font-size: 208.3333%; /* 208.3333% * 120% = 250% */
+	font-size: 208.33%; /* 208.33% * 120% = 250% */
 }
 
 .codex-editor.feature-read-only ul > li:not(.checked):before {
