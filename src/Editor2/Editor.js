@@ -203,14 +203,12 @@ function computePos(rootElement) {
 }
 
 const Document = ({ data }) => (
-	// <EditorContext.Provider value={[state, setState]}>
 	data.map(({ type: T, ...props }) => (
 		React.createElement(typeMap[T], {
 			key: props.id,
 			...props,
 		})
 	))
-	// </EditorContext.Provider>
 )
 
 const Editor = ({ id, tag, state, setState }) => {
@@ -224,11 +222,32 @@ const Editor = ({ id, tag, state, setState }) => {
 	const extendedIDs = React.useRef(["", ""])
 
 	// Renders to the DOM.
-	//
-	// TODO: Change to rendered (counter) pattern?
 	React.useEffect(
 		React.useCallback(() => {
-			ReactDOM.render(<Document data={state.data} />, ref.current, () => {
+			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
+
+				// // Sync the user and React-managed DOMs:
+				// const mutations = syncTrees(ref.current, state.reactDOM)
+				// if ((!state.components || !mutations) && state.actionType !== "PASTE") {
+				// 	// No-op
+				// 	return
+				// }
+				// // Reset the cursor:
+				// const selection = document.getSelection()
+				// if (selection.rangeCount) {
+				// 	selection.removeAllRanges()
+				// }
+				// const range = document.createRange()
+				// const { node, offset } = getRangeFromPos(ref.current, state.pos1.pos)
+				// range.setStart(node, offset)
+				// range.collapse()
+				// if (state.pos1.pos !== state.pos2.pos) {
+				// 	// TODO: Can optimize pos2 by reusing pos1
+				// 	const { node, offset } = getRangeFromPos(ref.current, state.pos2.pos)
+				// 	range.setEnd(node, offset)
+				// }
+				// selection.addRange(range)
+
 				const selection = document.getSelection()
 				selection.removeAllRanges()
 			})
@@ -365,7 +384,14 @@ const Editor = ({ id, tag, state, setState }) => {
 
 			{DEBUG_MODE && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-					{JSON.stringify(state, null, "\t")}
+					{JSON.stringify(
+						{
+							...state,
+							reactDOM: undefined, // Obscure
+						},
+						null,
+						"\t",
+					)}
 				</div>
 			)}
 

@@ -6,16 +6,19 @@ import uuidv4 from "uuid/v4"
 
 // TODO: Refactor options to <Editor> props?
 function useEditor(initialValue, options = null) {
+	const unparsed = initialValue.split("\n").map(each => ({
+		id: uuidv4(),
+		raw: each,
+	}))
+	const reactDOM = document.createElement("div")
 	const [state, setState] = React.useState(() => ({
-		readOnly: false, // Is the editor read-only?
-		focused: false,  // Is the editor focused?
-		selected: false, // Does the editor have a selection?
-		data: parseGFM(initialValue.split("\n").map(each => ({
-			id: uuidv4(),
-			raw: each,
-		}))),
-		pos1: newPos(),
-		pos2: newPos(),
+		readOnly: false,          // Is read-only?
+		focused: false,           // Is focused?
+		selected: false,          // Has a selection?
+		data: parseGFM(unparsed), // Document data
+		pos1: newPos(),           // Start cursor
+		pos2: newPos(),           // End cursor
+		reactDOM,                 // The React-managed DOM
 	}))
 	return [state, setState]
 }
