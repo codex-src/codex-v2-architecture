@@ -25,22 +25,22 @@ function ascendToID(rootElement, node) {
 
 // Extends the cursor IDs (up to two before and after).
 function extendPosIDs([pos1, pos2], data) {
-	let index1 = data.findIndex(each => each.id === pos1.id)
-	// let index2 = index1
+	let x1 = data.findIndex(each => each.id === pos1.id)
+	// let x2 = x1
 	// if (pos2.id !== pos1.id) {
-	// 	index2 = data.findIndex(each => each.id === pos2.id)
+	// 	x2 = data.findIndex(each => each.id === pos2.id)
 	// }
-	let index2 = data.findIndex(each => each.id === pos2.id)
+	let x2 = data.findIndex(each => each.id === pos2.id)
 	// Guard bounds:
-	index1 -= 2
-	if (index1 < 0) {
-		index1 = 0
+	x1 -= 2
+	if (x1 < 0) {
+		x1 = 0
 	}
-	index2 += 2
-	if (index2 >= data.length) {
-		index2 = data.length - 1
+	x2 += 2
+	if (x2 >= data.length) {
+		x2 = data.length - 1
 	}
-	return [data[index1].id, data[index2].id]
+	return [data[x1].id, data[x2].id]
 }
 
 // // Gets (reads) parsed nodes from node iterators.
@@ -126,8 +126,8 @@ function readRawFromExtendedIDs(rootElement, [startID, endID]) {
 		}
 		seenIDs[id] = true
 		const raw = readElement(startElement)
-		// const range = str.split("\n").map((each, index) => ({
-		// 	id: !index ? id : uuidv4(),
+		// const range = str.split("\n").map((each, x) => ({
+		// 	id: !x ? id : uuidv4(),
 		// 	raw: each,
 		// }))
 		unparsed.push({ id, raw })
@@ -371,18 +371,18 @@ const Editor = ({ id, tag, state, setState }) => {
 						const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
 						const parsed = parse(unparsed)
 
-						const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
-						if (index1 === -1) {
-							throw new Error("onInput: index1 is out of bounds")
+						const x1 = state.data.findIndex(each => each.id === unparsed[0].id)
+						if (x1 === -1) {
+							throw new Error("onInput: x1 is out of bounds")
 						}
-						const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
-						if (index2 === -1) {
-							throw new Error("onInput: index2 is out of bounds")
+						const x2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
+						if (x2 === -1) {
+							throw new Error("onInput: x2 is out of bounds")
 						}
 
 						// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 						const data = [...state.data]
-						data.splice(index1, (index2 + 1) - index1, ...parsed)
+						data.splice(x1, (x2 + 1) - x1, ...parsed)
 
 						setState(current => ({
 							...current,
@@ -392,21 +392,21 @@ const Editor = ({ id, tag, state, setState }) => {
 							// TODO: pos1 and pos2
 						}))
 
-						// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
+						// state.body.splice(x1, (x2 + 1) - x1, ...nodes)
 
-						// console.log(index1, index2)
+						// console.log(x1, x2)
 
 						// const key1 = nodes[0].key
-						// const index1 = state.body.findIndex(each => each.key === key1)
-						// if (index1 === -1) {
+						// const x1 = state.body.findIndex(each => each.key === key1)
+						// if (x1 === -1) {
 						// 	throw new Error("FIXME")
 						// }
 						// const key2 = nodes[nodes.length - 1].key
-						// const index2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
-						// if (index2 === -1) {
+						// const x2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
+						// if (x2 === -1) {
 						// 	throw new Error("FIXME")
 						// }
-						// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
+						// state.body.splice(x1, (x2 + 1) - x1, ...nodes)
 						// // Update data, pos1, and pos2:
 						// const data = state.body.map(each => each.data).join("\n")
 						// Object.assign(state, { data, pos1, pos2 })
@@ -445,24 +445,34 @@ function tab(state, setState) {
 		// No-op
 		return
 	}
-	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
-	const index2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
-	const unparsed = []
-	for (let index = index1; index < index2; index++) {
-		const { id, raw } = state.data[index]
-		unparsed.push({
-			id,
-			raw,
-		})
-	}
-	console.log(unparsed)
+	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
+	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
+	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+		...each,
+		raw: `\t${each.raw}`,
+	}))
+	setState(current => ({
+		...current,
+		// Merge the parsed data structure:
+		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		// Increment:
+		pos1: {
+			...state.pos1,
+			pos1: state.pos1.offset + 1,
+		},
+		// Set to pos1 and increment:
+		pos2: {
+			...state.pos1,
+			pos1: state.pos1.offset + 1,
+		},
+	}))
 
 	// if (state.selected) {
 	// 	// No-op
 	// 	return
 	// }
-	// const index = state.data.findIndex(each => each.id === state.pos1.id)
-	// const ref = state.data[index]
+	// const x = state.data.findIndex(each => each.id === state.pos1.id)
+	// const ref = state.data[x]
 	// const unparsed = [{
 	// 	id: ref.id,
 	// 	raw: `${ref.raw.slice(0, state.pos1.offset)}\t${ref.raw.slice(state.pos1.offset)}`,
@@ -470,7 +480,7 @@ function tab(state, setState) {
 	// setState(current => ({
 	// 	...current,
 	// 	// Merge the parsed data structure:
-	// 	data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
+	// 	data: [...state.data.slice(0, x), ...parse(unparsed), ...state.data.slice(x + 1)],
 	// 	// Increment once for tab:
 	// 	pos1: {
 	// 		...state.pos1,
