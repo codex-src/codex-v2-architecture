@@ -32,6 +32,8 @@ function parseGFM(unparsed) {
 
 function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
+		isFocused: false,    // Is focused?
+		hasSelection: false, // Has a selection?
 		data: parseGFM(initialValue.split("\n").map(each => ({
 			id: uuidv4(),
 			raw: each,

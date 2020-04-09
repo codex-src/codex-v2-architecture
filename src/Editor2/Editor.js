@@ -37,8 +37,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						outline: "none",
 					},
 
-					// onFocus: dispatch.actionFocus,
-					// onBlur:  dispatch.actionBlur,
+					onFocus: e => setState({ ...state, isFocused: Boolean(1) }),
+					onBlur:  e => setState({ ...state, isFocused: Boolean(0) }),
 
 					contentEditable: true,
 					suppressContentEditableWarning: true,
