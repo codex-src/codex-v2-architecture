@@ -202,15 +202,15 @@ function computePos(rootElement) {
 	return [pos1, pos2]
 }
 
-const EditorContents = ({ state, setState }) => (
-	<EditorContext.Provider value={[state, setState]}>
-		{state.data.map(({ type: T, ...props }) => (
-			React.createElement(typeMap[T], {
-				key: props.id,
-				...props,
-			})
-		))}
-	</EditorContext.Provider>
+const Document = ({ data }) => (
+	// <EditorContext.Provider value={[state, setState]}>
+	data.map(({ type: T, ...props }) => (
+		React.createElement(typeMap[T], {
+			key: props.id,
+			...props,
+		})
+	))
+	// </EditorContext.Provider>
 )
 
 const Editor = ({ id, tag, state, setState }) => {
@@ -228,7 +228,7 @@ const Editor = ({ id, tag, state, setState }) => {
 	// TODO: Change to rendered (counter) pattern?
 	React.useEffect(
 		React.useCallback(() => {
-			ReactDOM.render(<EditorContents state={state} setState={setState} />, ref.current, () => {
+			ReactDOM.render(<Document data={state.data} />, ref.current, () => {
 				const selection = document.getSelection()
 				selection.removeAllRanges()
 			})
@@ -236,8 +236,9 @@ const Editor = ({ id, tag, state, setState }) => {
 		[state.data],
 	)
 
+	const { Provider } = EditorContext
 	return (
-		<div>
+		<Provider value={[state, setState]}>
 
 			{React.createElement(
 				tag || "div",
@@ -368,7 +369,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				</div>
 			)}
 
-		</div>
+		</Provider>
 	)
 }
 
