@@ -201,7 +201,8 @@ function computePos(rootElement) {
 		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
 		pos2 = computePosFromRange(rootElement, rangeEnd)
 	}
-	return [pos1, pos2]
+	const selected = pos1.id !== pos2.id || pos1.offset !== pos2.offset
+	return { selected, pos1, pos2 }
 }
 
 const Document = ({ data }) => (
@@ -313,8 +314,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
-						const [pos1, pos2] = computePos(ref.current)
-						setState(current => ({ ...current, pos1, pos2 }))
+						const { selected, pos1, pos2 } = computePos(ref.current)
+						setState(current => ({ ...current, selected, pos1, pos2 }))
 						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
 					},
 
@@ -327,8 +328,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							pointerDown.current = false // Reset to be safe
 							return
 						}
-						const [pos1, pos2] = computePos(ref.current)
-						setState(current => ({ ...current, pos1, pos2 }))
+						const { selected, pos1, pos2 } = computePos(ref.current)
+						setState(current => ({ ...current, selected, pos1, pos2 }))
 						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
 					},
 					onPointerUp: () => {
@@ -440,31 +441,47 @@ const Editor = ({ id, tag, state, setState }) => {
 
 // Tabs at the current selection.
 function tab(state, setState) {
-	if (state.selected) {
+	if (!state.selected) {
 		// No-op
 		return
 	}
-	const index = state.data.findIndex(each => each.id === state.pos1.id)
-	const ref = state.data[index]
-	const unparsed = [{
-		id: ref.id,
-		raw: `${ref.raw.slice(0, state.pos1.offset)}\t${ref.raw.slice(state.pos1.offset)}`,
-	}]
-	setState(current => ({
-		...current,
-		// Merge the parsed data structure:
-		data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
-		// Increment once for tab:
-		pos1: {
-			...state.pos1,
-			offset: state.pos1.offset + 1,
-		},
-		// Reset to pos1 and increment once for tab:
-		pos2: {
-			...state.pos1,
-			offset: state.pos1.offset + 1,
-		},
-	}))
+	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
+	const index2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
+	const unparsed = []
+	for (let index = index1; index < index2; index++) {
+		const { id, raw } = state.data[index]
+		unparsed.push({
+			id,
+			raw,
+		})
+	}
+	console.log(unparsed)
+
+	// if (state.selected) {
+	// 	// No-op
+	// 	return
+	// }
+	// const index = state.data.findIndex(each => each.id === state.pos1.id)
+	// const ref = state.data[index]
+	// const unparsed = [{
+	// 	id: ref.id,
+	// 	raw: `${ref.raw.slice(0, state.pos1.offset)}\t${ref.raw.slice(state.pos1.offset)}`,
+	// }]
+	// setState(current => ({
+	// 	...current,
+	// 	// Merge the parsed data structure:
+	// 	data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
+	// 	// Increment once for tab:
+	// 	pos1: {
+	// 		...state.pos1,
+	// 		offset: state.pos1.offset + 1,
+	// 	},
+	// 	// Reset to pos1 and increment once for tab:
+	// 	pos2: {
+	// 		...state.pos1,
+	// 		offset: state.pos1.offset + 1,
+	// 	},
+	// }))
 }
 
 export default Editor
