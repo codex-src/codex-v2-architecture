@@ -3,27 +3,9 @@ import newPos from "./newPos"
 import React from "react"
 import ReactDOM from "react-dom"
 import typeMap from "./typeMap"
+import uuidv4 from "uuid/v4"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
-
-// // Creates a new start and end node iterator.
-// //
-// // TODO: Extract to helpers?
-// function newNodeIterators() {
-// 	const range = document.getSelection().getRangeAt(0)
-// 	const { startContainer, endContainer } = range
-// 	// Extend the target start (up to 2x):
-// 	const start = new NodeIterator(startContainer)
-// 	while (start.count < 2 && start.getPrev()) {
-// 		start.prev()
-// 	}
-// 	// Extend the target end (up to 2x):
-// 	const end = new NodeIterator(endContainer)
-// 	while (end.count < 2 && end.getNext()) {
-// 		end.next()
-// 	}
-// 	return [start, end]
-// }
 
 // Ascends to the nearest keyed-paragraph.
 function ascendToID(rootElement, node) {
@@ -40,17 +22,117 @@ function ascendToID(rootElement, node) {
 
 // Extends the cursor IDs (up to two before and after).
 function extendPosIDs([pos1, pos2], data) {
-	let x1 = data.findIndex(each => each.id === pos1.id)
-	let x2 = data.findIndex(each => each.id === pos2.id)
-	x1 -= 2
-	if (x1 < 0) {
-		x1 = 0
+	let index1 = data.findIndex(each => each.id === pos1.id)
+	// let index2 = index1
+	// if (pos2.id !== pos1.id) {
+	// 	index2 = data.findIndex(each => each.id === pos2.id)
+	// }
+	let index2 = data.findIndex(each => each.id === pos2.id)
+	// Guard bounds:
+	index1 -= 2
+	if (index1 < 0) {
+		index1 = 0
 	}
-	x2 += 2
-	if (x2 >= data.length) {
-		x2 = data.length - 1
+	index2 += 2
+	if (index2 >= data.length) {
+		index2 = data.length - 1
 	}
-	return [data[x1].id, data[x2].id]
+	return [data[index1].id, data[index2].id]
+}
+
+// // Gets (reads) parsed nodes from node iterators.
+// //
+// // TODO: Extract to helpers?
+// function getNodesFromIterators(rootNode, [start, end]) {
+// 	// Re-extend the target start (up to 1x):
+// 	if (!start.count && start.getPrev()) {
+// 		start.prev()
+// 	}
+// 	// NOTE: Do not re-extend the target end
+// 	const atEnd = !end.count
+// 	// Get nodes:
+// 	const seenKeys = {}
+// 	const nodes = []
+// 	while (start.currentNode) {
+// 		// Read the key:
+// 		let key = start.currentNode.getAttribute("data-node")
+// 		if (seenKeys[key]) {
+// 			key = uuidv4()
+// 			start.currentNode.setAttribute("data-node", key)
+// 		}
+// 		// Read the data:
+// 		seenKeys[key] = true
+// 		const data = innerText(start.currentNode)
+// 		nodes.push({ key, data })
+// 		if (start.currentNode === end.currentNode) {
+// 			// No-op
+// 			break
+// 		}
+// 		start.next()
+// 	}
+// 	return { nodes, atEnd }
+// }
+
+// Reads a DOM node.
+function readNode(node) {
+	return node.nodeValue || ""
+}
+
+// Recursively reads a DOM element.
+function readElement(element) {
+	const recurse = readElement
+
+	let str = ""
+	for (const each of element.childNodes) {
+		if (each.nodeType === Node.TEXT_NODE) {
+			str += readNode(each)
+			continue
+		}
+		str += recurse(each)
+		const nextElement = each.nextElementSibling
+		if (nextElement && nextElement.getAttribute("data-paragraph")) {
+			str += "\n"
+		}
+	}
+	return str
+}
+
+// Reads an unparsed (raw) data structure from extended IDs.
+//
+// TODO: Remove rootElement from parameters
+function readRawFromExtendedIDs(rootElement, [startID, endID]) {
+	let startElement = document.getElementById(startID)
+	let endElement = startElement
+	if (endID !== startID) {
+		endElement = document.getElementById(endID)
+	}
+	// Re-extend the start element once:
+	if (startElement.previousElementSibling) {
+		startElement = startElement.previousElementSibling
+	}
+	const seenIDs = {}
+	const unparsed = []
+	while (startElement) {
+		let { id } = startElement
+		if (!id || seenIDs[id]) {
+			id = uuidv4()
+			startElement.id = id
+		}
+		seenIDs[id] = true
+		const raw = readElement(startElement)
+		// const range = str.split("\n").map((each, index) => ({
+		// 	id: !index ? id : uuidv4(),
+		// 	raw: each,
+		// }))
+		unparsed.push({ id, raw })
+		if (startElement === endElement) {
+			// No-op
+			break
+		}
+		startElement = startElement.nextElementSibling
+	}
+	// TODO: atStart, atEnd?
+	return unparsed
 }
 
 // Computes a cursor data structure from a DOM node and a
@@ -212,6 +294,15 @@ const Editor = ({ id, tag, state, setState }) => {
 					},
 					onPointerUp: () => {
 						pointerDown.current = false
+					},
+
+					onInput: e => {
+						const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
+						console.log(unparsed)
+
+						// const { nodes, atEnd } = getNodesFromIterators(ref.current, target.current)
+						// const [pos1, pos2] = getPos(ref.current)
+						// dispatch.actionInput(nodes, atEnd, pos1, pos2)
 					},
 
 					contentEditable: !state.readOnly, // Inverse
