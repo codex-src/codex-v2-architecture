@@ -25,7 +25,6 @@ function computePosFromRange(rootNode, range) {
 	}
 	pos.id = startNode.id
 	// Recurse to the range data structure node:
-	// let offset = 0
 	const recurse = startNode => {
 		for (const each of startNode.childNodes) {
 			if (each === range.node) {
@@ -91,13 +90,35 @@ const Editor = ({ id, tag, state, setState }) => {
 						outline: "none",
 					},
 
-					onFocus: () => setState({ ...state, isFocused: Boolean(1) }),
-					onBlur:  () => setState({ ...state, isFocused: Boolean(0) }),
+					onFocus: () => setState(current => ({ ...current, focused: true })),
+					onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 					onSelect: () => {
+						// Correct the selection when the editor is
+						// selected instead of the innermost start and
+						// end nodes (expected behavior):
+						const selection = document.getSelection()
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current || range.endContainer === ref.current) {
+							// Iterate to the innermost start node:
+							let startNode = ref.current.childNodes[0]
+							while (startNode.childNodes.length) {
+								startNode = startNode.childNodes[0]
+							}
+							// Iterate to the innermost end node:
+							let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
+							while (endNode.childNodes.length) {
+								endNode = endNode.childNodes[endNode.childNodes.length - 1]
+							}
+							// Correct the selection:
+							const range = document.createRange()
+							range.setStart(startNode, 0)
+							range.setEnd(endNode, (endNode.nodeValue || "").length)
+							selection.removeAllRanges()
+							selection.addRange(range)
+						}
 						const [pos1, pos2] = computePos(ref.current)
-						console.log(pos1, pos2)
-						// dispatch.actionSelect(pos1, pos2)
+						setState(current => ({ ...current, pos1, pos2 }))
 					},
 
 					contentEditable: true,
