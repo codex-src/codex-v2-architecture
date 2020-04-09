@@ -8,7 +8,7 @@ const App = () => {
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
-				<Editor tag="main" id="codex-editor" state={state} setState={setState} />
+				<Editor state={state} setState={setState} />
 			</div>
 		</div>
 	)

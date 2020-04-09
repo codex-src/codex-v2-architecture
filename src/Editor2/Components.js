@@ -5,8 +5,8 @@ import {
 	Paragraph,
 } from "./HOC"
 
-export const P = ({ id, data }) => (
+export const P = ({ id, parsed }) => (
 	<Paragraph id={id}>
-		{data}
+		{parsed}
 	</Paragraph>
 )
