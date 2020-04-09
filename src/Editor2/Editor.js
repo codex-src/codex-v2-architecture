@@ -362,8 +362,12 @@ const Editor = ({ id, tag, state, setState }) => {
 						// Guard e.ctrlKey (browser shortcut):
 						if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
 							e.preventDefault()
-							// e.shiftKey
-							tab(state, setState)
+							// let fn = tab
+							// if (e.shiftKey) {
+							// 	fn = detab
+							// }
+							const fn = !e.shiftKey ? tab : detab
+							fn(state, setState)
 						}
 					},
 
@@ -447,7 +451,29 @@ const Editor = ({ id, tag, state, setState }) => {
 // selected: "line"
 // selected: "multiline"
 
-// Tabs at the current selection.
+function detab(state, setState) {
+	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
+	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
+	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+		...each,
+		raw: each.raw.replace(/^\t/, ""),
+	}))
+	const dec1 = unparsed[0].raw.length !== state.data[x1].raw.length
+	const dec2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
+	setState(current => ({
+		...current,
+		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		pos1: {
+			...state.pos1,
+			offset: state.pos1.offset - dec1,
+		},
+		pos2: {
+			...state.pos2,
+			offset: state.pos2.offset - dec2,
+		},
+	}))
+}
+
 function tab(state, setState) {
 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
 	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
@@ -459,17 +485,16 @@ function tab(state, setState) {
 	}))
 	setState(current => ({
 		...current,
-		// Merge the parsed data structure:
 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-		// Increment:
 		pos1: {
 			...state.pos1,
-			pos1: state.pos1.offset + 1,
+			offset: state.pos1.offset + 1,
 		},
-		// Set to pos1 and increment:
 		pos2: {
 			...state.pos1,
-			pos1: state.pos1.offset + 1,
+			offset: !state.selected
+				? state.pos1.offset + 1
+				: state.pos2.offset + 1,
 		},
 	}))
 }
