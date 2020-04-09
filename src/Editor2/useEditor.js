@@ -32,14 +32,10 @@ function parseGFM(unparsed) {
 
 function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
-		// TODO: Add <Paragraph> parser
-		data: parseGFM((
-			// Parse initialValue once:
-			initialValue.split("\n").map(each => ({
-				id: uuidv4(),
-				raw: each,
-			}))
-		)),
+		data: parseGFM(initialValue.split("\n").map(each => ({
+			id: uuidv4(),
+			raw: each,
+		}))),
 		pos1: newPos(),
 		pos2: newPos(),
 	}))

@@ -6,16 +6,16 @@ import {
 	Paragraph,
 } from "./HOC"
 
-// Parses an array of data structures (objects) to React
-// components.
-function toReact(children) {
+// Parses an array of parsed data structures to renderable
+// React components.
+function toReact(parsed) {
 	const recurse = toReact
 
-	if (children === null || typeof children === "string") {
-		return children
+	if (parsed === null || typeof parsed === "string") {
+		return parsed
 	}
 	const components = []
-	for (const each of children) {
+	for (const each of parsed) {
 		if (each === null || typeof each === "string") {
 			components.push(recurse(each))
 			continue
@@ -24,7 +24,7 @@ function toReact(children) {
 		components.push(React.createElement(typeMap[T], {
 			key: components.length,
 			...props,
-		}, recurse(props.children)))
+		}, recurse(props.parsed)))
 	}
 	return components
 }
