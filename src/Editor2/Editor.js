@@ -439,17 +439,23 @@ const Editor = ({ id, tag, state, setState }) => {
 	)
 }
 
+// selectEnum.None
+// selectEnum.Line
+// selectEnum.Multiline
+//
+// selected: "none"
+// selected: "line"
+// selected: "multiline"
+
 // Tabs at the current selection.
 function tab(state, setState) {
-	if (!state.selected) {
-		// No-op
-		return
-	}
 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
 	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
 		...each,
-		raw: `\t${each.raw}`,
+		raw: state.pos1.id === state.pos2.id
+			? `${each.raw.slice(0, state.pos1.offset)}\t${each.raw.slice(state.pos2.offset)}`
+			: `\t${each.raw}`,
 	}))
 	setState(current => ({
 		...current,
@@ -466,32 +472,6 @@ function tab(state, setState) {
 			pos1: state.pos1.offset + 1,
 		},
 	}))
-
-	// if (state.selected) {
-	// 	// No-op
-	// 	return
-	// }
-	// const x = state.data.findIndex(each => each.id === state.pos1.id)
-	// const ref = state.data[x]
-	// const unparsed = [{
-	// 	id: ref.id,
-	// 	raw: `${ref.raw.slice(0, state.pos1.offset)}\t${ref.raw.slice(state.pos1.offset)}`,
-	// }]
-	// setState(current => ({
-	// 	...current,
-	// 	// Merge the parsed data structure:
-	// 	data: [...state.data.slice(0, x), ...parse(unparsed), ...state.data.slice(x + 1)],
-	// 	// Increment once for tab:
-	// 	pos1: {
-	// 		...state.pos1,
-	// 		offset: state.pos1.offset + 1,
-	// 	},
-	// 	// Reset to pos1 and increment once for tab:
-	// 	pos2: {
-	// 		...state.pos1,
-	// 		offset: state.pos1.offset + 1,
-	// 	},
-	// }))
 }
 
 export default Editor
