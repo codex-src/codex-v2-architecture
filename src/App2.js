@@ -1,12 +1,26 @@
 import Enum from "Enum"
 import React from "react"
 
-const Type = new Enum(
-	"P", // Paragraph
+const Type = new Enum("P", // Paragraph
 )
 
+const Paragraph = ({ id, data }) => (
+	<div id={id} data-node>
+		{data}
+	</div>
+)
+
+const typeMap = {
+	[Type.P]: Paragraph,
+}
+
 const Editor = ({ state, setState }) => (
-	"Hello, world!"
+	state.data.map(({ type: T, ...props }) => (
+		React.createElement(typeMap[T], {
+			key: props.id,
+			...props,
+		})
+	))
 )
 
 function useEditor(initialValue, options = null) {
