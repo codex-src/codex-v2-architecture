@@ -5,7 +5,15 @@ import useEditor from "Editor2/useEditor"
 const App = () => {
 	const [state, setState] = useEditor(`Hello!
 
-Hello, world!
+Hello!
+
+Hello!
+
+Hello!
+
+Hello!
+
+Hello!
 
 Hello!`)
 

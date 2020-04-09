@@ -1,5 +1,6 @@
 import EditorContext from "./EditorContext"
 import newPos from "./newPos"
+import parseGFM from "./parseGFM"
 import React from "react"
 import ReactDOM from "react-dom"
 import typeMap from "./typeMap"
@@ -107,6 +108,9 @@ function readRawFromExtendedIDs(rootElement, [startID, endID]) {
 		endElement = document.getElementById(endID)
 	}
 	// Re-extend the start element once:
+	//
+	// TODO: Conditionally re-extend? It’s confusing to always
+	// re-extend
 	if (startElement.previousElementSibling) {
 		startElement = startElement.previousElementSibling
 	}
@@ -210,8 +214,8 @@ const Editor = ({ id, tag, state, setState }) => {
 
 	// Renders to the DOM.
 	//
-	// NOTE: Do not use props.children or equivalent because
-	// of contenteditable
+	// NOTE: Don’t use props.children or equivalent because of
+	// contenteditable
 	React.useEffect(() => {
 		const { Provider } = EditorContext
 		ReactDOM.render(
@@ -225,6 +229,7 @@ const Editor = ({ id, tag, state, setState }) => {
 			</Provider>,
 			ref.current,
 		)
+	// TODO: Change to rendered (counter) pattern?
 	}, [state, setState])
 
 	return (
@@ -298,7 +303,47 @@ const Editor = ({ id, tag, state, setState }) => {
 
 					onInput: e => {
 						const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
-						console.log(unparsed)
+						const parsed = parseGFM(unparsed)
+
+						const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
+						if (index1 === -1) {
+							throw new Error("onInput: index1 is out of bounds")
+						}
+						const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
+						if (index2 === -1) {
+							throw new Error("onInput: index2 is out of bounds")
+						}
+
+						// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+						let data = [...state.data]
+						data.splice(index1, (index2 + 1) - index1, ...parsed)
+						// console.log(data)
+
+						setState(current => ({
+							...current,
+							data,
+							// TODO: pos1 and pos2
+						}))
+
+						// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
+
+						// console.log(index1, index2)
+
+						// const key1 = nodes[0].key
+						// const index1 = state.body.findIndex(each => each.key === key1)
+						// if (index1 === -1) {
+						// 	throw new Error("FIXME")
+						// }
+						// const key2 = nodes[nodes.length - 1].key
+						// const index2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
+						// if (index2 === -1) {
+						// 	throw new Error("FIXME")
+						// }
+						// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
+						// // Update data, pos1, and pos2:
+						// const data = state.body.map(each => each.data).join("\n")
+						// Object.assign(state, { data, pos1, pos2 })
+						// this.render()
 
 						// const { nodes, atEnd } = getNodesFromIterators(ref.current, target.current)
 						// const [pos1, pos2] = getPos(ref.current)
