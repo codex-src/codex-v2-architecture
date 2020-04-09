@@ -202,6 +202,17 @@ function computePos(rootElement) {
 	return [pos1, pos2]
 }
 
+const EditorContents = ({ state, setState }) => (
+	<EditorContext.Provider value={[state, setState]}>
+		{state.data.map(({ type: T, ...props }) => (
+			React.createElement(typeMap[T], {
+				key: props.id,
+				...props,
+			})
+		))}
+	</EditorContext.Provider>
+)
+
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
@@ -214,23 +225,16 @@ const Editor = ({ id, tag, state, setState }) => {
 
 	// Renders to the DOM.
 	//
-	// NOTE: Don’t use props.children or equivalent because of
-	// contenteditable
-	React.useEffect(() => {
-		const { Provider } = EditorContext
-		ReactDOM.render(
-			<Provider value={[state, setState]}>
-				{state.data.map(({ type: T, ...props }) => (
-					React.createElement(typeMap[T], {
-						key: props.id,
-						...props,
-					})
-				))}
-			</Provider>,
-			ref.current,
-		)
 	// TODO: Change to rendered (counter) pattern?
-	}, [state, setState])
+	React.useEffect(
+		React.useCallback(() => {
+			ReactDOM.render(<EditorContents state={state} setState={setState} />, ref.current, () => {
+				const selection = document.getSelection()
+				selection.removeAllRanges()
+			})
+		}, [state, setState]),
+		[state.data],
+	)
 
 	return (
 		<div>
@@ -254,10 +258,14 @@ const Editor = ({ id, tag, state, setState }) => {
 					onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 					onSelect: () => {
+						const selection = document.getSelection()
+						if (!selection.rangeCount) {
+							// No-op
+							return
+						}
 						// Correct the selection when the editor is
 						// selected instead of the innermost start and
 						// end nodes (expected behavior):
-						const selection = document.getSelection()
 						const range = selection.getRangeAt(0)
 						if (range.startContainer === ref.current || range.endContainer === ref.current) {
 							// Iterate to the innermost start node:
@@ -280,7 +288,6 @@ const Editor = ({ id, tag, state, setState }) => {
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
 						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
-						// console.log(extendedIDs.current)
 					},
 
 					onPointerDown: () => {
@@ -295,7 +302,6 @@ const Editor = ({ id, tag, state, setState }) => {
 						const [pos1, pos2] = computePos(ref.current)
 						setState(current => ({ ...current, pos1, pos2 }))
 						extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
-						// console.log(extendedIDs.current)
 					},
 					onPointerUp: () => {
 						pointerDown.current = false
@@ -315,12 +321,13 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 
 						// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-						let data = [...state.data]
+						const data = [...state.data]
 						data.splice(index1, (index2 + 1) - index1, ...parsed)
-						// console.log(data)
 
 						setState(current => ({
 							...current,
+							focused: false,  // DEBUG
+							selected: false, // DEBUG
 							data,
 							// TODO: pos1 and pos2
 						}))

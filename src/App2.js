@@ -3,19 +3,15 @@ import React from "react"
 import useEditor from "Editor2/useEditor"
 
 const App = () => {
-	const [state, setState] = useEditor(`Hello!
+	const [state, setState] = useEditor(`Hello! A
 
-Hello!
+Hello! B
 
-Hello!
+Hello! C
 
-Hello!
+Hello! D
 
-Hello!
-
-Hello!
-
-Hello!`)
+Hello! E`)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
