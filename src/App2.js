@@ -9,7 +9,7 @@ const Editor = ({ state, setState }) => (
 	"Hello, world!"
 )
 
-const App = () => {
+function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
 		data: [
 			{
@@ -27,11 +27,19 @@ const App = () => {
 			offset: "",
 		},
 	}))
+	return [state, setState]
+}
+
+const App = () => {
+	const [state, setState] = useEditor("Hello, world!")
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
-				<Editor />
+				<Editor
+					state={state}
+					setState={setState}
+				/>
 			</div>
 		</div>
 	)
