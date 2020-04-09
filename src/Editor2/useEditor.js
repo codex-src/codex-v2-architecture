@@ -1,16 +1,7 @@
+import newPos from "./newPos"
 import React from "react"
 import typeEnum from "./typeEnum"
 import uuidv4 from "uuid/v4"
-
-// Creates a new cursor data structure. pos stands for
-// position.
-function newPos() {
-	const pos = {
-		id: "",    // The ID of a content node.
-		offset: 0, // The offset of a content node.
-	}
-	return pos
-}
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
