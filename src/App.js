@@ -148,7 +148,7 @@ const App = props => {
 		e.preventDefault()
 		const textarea = textareaRef.current
 		let { value, selectionStart: pos1, selectionEnd: pos2 } = textarea
-		if (pos2 > pos1) {
+		if (pos1 > pos2) {
 			;[pos1, pos2] = [pos2, pos1]
 		}
 		// eslint-disable-next-line prefer-template
