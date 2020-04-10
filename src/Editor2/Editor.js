@@ -519,12 +519,23 @@ const Editor = ({ id, tag, state, setState }) => {
 							// Guard the control key (browser shorcut):
 							if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
 								e.preventDefault()
-								let fn = tabOne
-								if (state.pos2.id !== state.pos1.id) {
+								let fn = null
+								switch (true) {
+								// TODO: state.pos needs to track the nested
+								// paragraph offset
+								case !e.shiftKey && state.pos1.id === state.pos2.id:
+									fn = tabOne
+									break
+								// TODO: state.pos needs to track the nested
+								// paragraph offset
+								case !e.shiftKey && state.pos1.id !== state.pos2.id:
+									fn = tabMany
+									break
+								case e.shiftKey:
 									fn = detabMany
-									if (!e.shiftKey) {
-										fn = tabMany
-									}
+									break
+								default:
+									// No-op
 								}
 								fn(state, setState)
 							}
@@ -603,12 +614,6 @@ const Editor = ({ id, tag, state, setState }) => {
 	)
 }
 
-// selectEnum.None             = "none"
-// selectEnum.PartialLine      = "partial-line"
-// selectEnum.FullLine         = "full-line"
-// selectEnum.PartialMultiline = "partial-multiline"
-// selectEnum.FullMultiline    = "full-multiline"
-
 // Inserts a tab character.
 function tabOne(state, setState) {
 	const x = state.data.findIndex(each => each.id === state.pos1.id)
@@ -623,6 +628,7 @@ function tabOne(state, setState) {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
 		},
+		// Reset to pos1:
 		pos2: {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
@@ -668,48 +674,22 @@ function detabMany(state, setState) {
 		...each,
 		raw: each.raw.replace(/^\t/, ""),
 	}))
-	const decremented1 = unparsed[0].raw.length !== state.data[x1].raw.length
-	const decremented2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
+	const trimmed1 = unparsed[0].raw.length !== state.data[x1].raw.length
+	const trimmed2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
 	setState(current => ({
 		...current,
 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 		pos1: {
 			...state.pos1,
-			offset: state.pos1.offset - decremented1,
+			// Guard bounds:
+			offset: Math.max(0, state.pos1.offset - trimmed1),
 		},
 		pos2: {
 			...state.pos2,
-			offset: state.pos2.offset - decremented2,
+			// Guard bounds:
+			offset: Math.max(0, state.pos2.offset - trimmed2),
 		},
 	}))
 }
-
-// // Removes a tab over multiple lines.
-// function detab(state, setState) {
-// 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-// 	let x2 = x1
-// 	if (state.pos2.id !== state.pos1.id) {
-// 		// TODO: Optimize using x1 e.g. findIndexAfter?
-// 		x2 = state.data.findIndex(each => each.id === state.pos2.id)
-// 	}
-// 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
-// 		...each,
-// 		raw: each.raw.replace(/^\t/, ""),
-// 	}))
-// 	const dec1 = unparsed[0].raw.length !== state.data[x1].raw.length
-// 	const dec2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
-// 	setState(current => ({
-// 		...current,
-// 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-// 		pos1: {
-// 			...state.pos1,
-// 			offset: state.pos1.offset - dec1,
-// 		},
-// 		pos2: {
-// 			...state.pos2,
-// 			offset: state.pos2.offset - dec2,
-// 		},
-// 	}))
-// }
 
 export default Editor
