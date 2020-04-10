@@ -79,22 +79,26 @@ function detabMany(state, setState) {
 
 // Inserts an EOL character.
 function enter(state, setState) {
-	const index = state.data.findIndex(each => each.id === state.pos1.id)
+	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
+	let index2 = index1
+	if (state.pos2.id !== state.pos1.id) {
+		index2 = state.data.findIndex(each => each.id === state.pos2.id)
+	}
 	const unparsed = [
 		{
-			id:  state.data[index].id,
-			raw: state.data[index].raw.slice(0, state.pos1.offset),
+			id:  state.data[index1].id,
+			raw: state.data[index1].raw.slice(0, state.pos1.offset),
 		},
 		{
-			id:  uuidv4(),
-			raw: state.data[index].raw.slice(state.pos1.offset),
+			id:  state.pos1.id === state.pos2.id ? uuidv4() : state.data[index2].id,
+			raw: state.data[index2].raw.slice(state.pos2.offset),
 		},
 	]
 	const id = unparsed.slice(-1)[0].id
 	setState(current => ({
 		...current,
 		// Guard bounds:
-		data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
+		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			id,
 			offset: 0,
