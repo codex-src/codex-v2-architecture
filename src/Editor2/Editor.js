@@ -1,6 +1,6 @@
 import actions from "./actions"
 import EditorContext from "./EditorContext"
-import KeyCode from "./KeyCode"
+import KeyCodes from "./KeyCodes"
 import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
@@ -495,18 +495,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
-							// // Tab:
-							// if (!e.ctrlKey && e.keyCode === KEY_CODE_TAB) {
-							// 	e.preventDefault()
-							// 	dispatch.tab()
-							// 	return
-							// // Enter:
-							// } else if (e.keyCode === KEY_CODE_ENTER) {
-							// 	e.preventDefault()
-							// 	dispatch.enter()
-							// 	return
 							// // Undo:
-							// } else if (detect.undo(e)) {
+							// if (detect.undo(e)) {
 							// 	e.preventDefault()
 							// 	dispatch.undo()
 							// 	return
@@ -517,8 +507,15 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	return
 							// }
 
-							// Guard the control key (browser shorcut):
-							if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
+							if (e.keyCode === KeyCodes.Enter) {
+								e.preventDefault()
+								actions.enter(state, setState)
+								return
+							}
+
+							// Tab (e.ctrlKey must be false because of
+							// common shortcuts):
+							if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
 								e.preventDefault()
 								let fn = null
 								switch (true) {
@@ -539,6 +536,7 @@ const Editor = ({ id, tag, state, setState }) => {
 									// No-op
 								}
 								fn(state, setState)
+								return
 							}
 						},
 

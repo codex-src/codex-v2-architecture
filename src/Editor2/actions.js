@@ -1,8 +1,7 @@
 import parse from "./parser"
+import uuidv4 from "uuid/v4"
 
 // Inserts a tab character.
-//
-// TODO: Add tests
 function tab(state, setState) {
 	const index = state.data.findIndex(each => each.id === state.pos1.id)
 	const unparsed = state.data.slice(index, index + 1).map(each => ({
@@ -25,8 +24,6 @@ function tab(state, setState) {
 }
 
 // Inserts many tab character, each at the start.
-//
-// TODO: Add tests
 function tabMany(state, setState) {
 	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
 	let index2 = index1
@@ -52,8 +49,6 @@ function tabMany(state, setState) {
 }
 
 // Removes many tab character, each at the start.
-//
-// TODO: Add tests
 function detabMany(state, setState) {
 	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
 	let index2 = index1
@@ -71,13 +66,43 @@ function detabMany(state, setState) {
 		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			...state.pos1,
-			// Guard state.pos1.offset bounds:
+			// Guard bounds:
 			offset: Math.max(0, state.pos1.offset - removed1),
 		},
 		pos2: {
 			...state.pos2,
-			// Guard state.pos2.offset bounds:
+			// Guard bounds:
 			offset: Math.max(0, state.pos2.offset - removed2),
+		},
+	}))
+}
+
+// Inserts an EOL character.
+function enter(state, setState) {
+	const index = state.data.findIndex(each => each.id === state.pos1.id)
+	const unparsed = [
+		{
+			id:  state.data[index].id,
+			raw: state.data[index].raw.slice(0, state.pos1.offset),
+		},
+		{
+			id:  uuidv4(),
+			raw: state.data[index].raw.slice(state.pos1.offset),
+		},
+	]
+	const id = unparsed.slice(-1)[0].id
+	setState(current => ({
+		...current,
+		// Guard bounds:
+		data: [...state.data.slice(0, Math.max(0, index - 1)), ...parse(unparsed), ...state.data.slice(index + 1)],
+		pos1: {
+			id,
+			offset: 0,
+		},
+		// Reset to pos1:
+		pos2: {
+			id,
+			offset: 0,
 		},
 	}))
 }
@@ -87,6 +112,7 @@ const actions = {
 	tab,
 	tabMany,
 	detabMany,
+	enter,
 }
 
 export default actions
