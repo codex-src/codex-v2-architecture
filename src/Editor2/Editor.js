@@ -359,12 +359,12 @@ const Editor = ({ id, tag, state, setState }) => {
 						// 	return
 						// }
 
-						// Guard e.ctrlKey (browser shortcut):
+						// Guard the control key (browser shorcut):
 						if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
 							e.preventDefault()
 							let fn = tab
-							// Prefer detab if the cursor is selecting
-							// multiple lines:
+							// Use detab if the shift key was pressed and
+							// the selection is multiline:
 							if (e.shiftKey && state.pos1.id !== state.pos2.id) {
 								fn = detab
 							}
@@ -444,13 +444,11 @@ const Editor = ({ id, tag, state, setState }) => {
 	)
 }
 
-// selectEnum.None
-// selectEnum.Line
-// selectEnum.Multiline
-//
-// selected: "none"
-// selected: "line"
-// selected: "multiline"
+// selectEnum.None             = "none"
+// selectEnum.PartialLine      = "partial-line"
+// selectEnum.FullLine         = "full-line"
+// selectEnum.PartialMultiline = "partial-multiline"
+// selectEnum.FullMultiline    = "full-multiline"
 
 // Removes a leading tab over multiple lines.
 function detab(state, setState) {
