@@ -3,7 +3,9 @@ import React from "react"
 // Higher order components that describe paragraph or
 // multiline paragraph components.
 
-// TODO: Remove data-* attribute? ID may be enough
+// TODO (1): Remove data-* attribute? ID may be enough
+// TOOD (2): Change to id="" and id="uuid"? This is simpler
+// but more subtle
 export const Paragraph = ({ id, tag, style, ...props }) => (
 	React.createElement(tag || "div", {
 		id,
