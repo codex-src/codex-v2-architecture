@@ -78,26 +78,23 @@ function computePos(editorRoot) {
 	return [pos1, pos2]
 }
 
-// // Extends the cursor IDs (up to two before and after).
-// function extendPosIDs(data, [pos1, pos2]) {
-// 	let index1 = data.findIndex(each => each.id === pos1.id)
-// 	// let index2 = data.findIndex(each => each.id === pos2.id)
-// 	let index2 = index1
-// 	if (pos2.id !== pos1.id) {
-// 		index2 = data.findIndex(each => each.id === pos2.id)
-// 	}
-// 	// Guard bounds:
-// 	index1 -= 2
-// 	if (index1 < 0) {
-// 		index1 = 0
-// 	}
-// 	index2 += 2
-// 	if (index2 >= data.length) {
-// 		index2 = data.length - 1
-// 	}
-// 	return [data[index1].id, data[index2].id]
-// }
-//
+// Gets the extended cursor root IDs.
+function getExtendedPosRootIDs(data, [pos1, pos2]) {
+	let index1 = data.findIndex(each => each.id === pos1.root.id)
+	index1 -= 2
+	// Guard bounds:
+	if (index1 < 0) {
+		index1 = 0
+	}
+	let index2 = data.findIndex(each => each.id === pos2.root.id)
+	index2 += 2
+	// Guard bounds:
+	if (index2 >= data.length) {
+		index2 = data.length - 1
+	}
+	return [data[index1].id, data[index2].id]
+}
+
 // // Computes the DOM element root ID and offset from a range
 // // data structure.
 // function computeUUIDAndOffsetFromRange(editorRoot, range) {
@@ -317,12 +314,8 @@ const Document = ({ data }) => (
 const Editor = ({ id, tag, state, setState }) => {
 	const editorRootRef = React.useRef()
 
-	// Tracks whether the pointer is down.
-	const pointerDown = React.useRef()
-
-	// Tracks the extended target IDs (up to two IDs before
-	// and after the current selection).
-	const extendedIDs = React.useRef(["", ""])
+	const pointerDownRef = React.useRef()
+	const extendedPosRootIDsRef = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
@@ -373,12 +366,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 						onSelect: () => {
-							const selection = document.getSelection()
-							if (!selection.rangeCount) { // TODO: Needed?
-								// No-op
-								return
-							}
 							// Correct out of bounds range:
+							const selection = document.getSelection()
 							const range = selection.getRangeAt(0)
 							if (range.startContainer === editorRootRef.current || range.endContainer === editorRootRef.current) {
 								// Iterate to the deepest start node:
@@ -403,19 +392,16 @@ const Editor = ({ id, tag, state, setState }) => {
 								pos1,
 								pos2,
 							}))
-							// // TODO: Rename to extendPos? Use state
-							// // instead of state.data? Should extendedPos
-							// // be a member of state?
-							// extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
+							extendedPosRootIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 
 						onPointerDown: () => {
-							// pointerDown.current = true
+							pointerDownRef.current = true
 						},
 						onPointerMove: () => {
 							// Editor must be focused and pointer must be down:
-							if (!state.focused || !pointerDown.current) {
-								pointerDown.current = false // Reset to be safe
+							if (!state.focused || !pointerDownRef.current) {
+								pointerDownRef.current = false // Reset to be safe
 								return
 							}
 							const [pos1, pos2] = computePos(editorRootRef.current)
@@ -424,13 +410,10 @@ const Editor = ({ id, tag, state, setState }) => {
 								pos1,
 								pos2,
 							}))
-							// // TODO: Rename to extendPos? Use state
-							// // instead of state.data? Should extendedPos
-							// // be a member of state?
-							// extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
+							extendedPosRootIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 						onPointerUp: () => {
-							// pointerDown.current = false
+							pointerDownRef.current = false
 						},
 
 						onKeyDown: e => {
