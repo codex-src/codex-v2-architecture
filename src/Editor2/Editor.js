@@ -417,65 +417,65 @@ const Editor = ({ id, tag, state, setState }) => {
 						onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 						onSelect: () => {
-							const selection = document.getSelection()
-							if (!selection.rangeCount) {
-								// No-op
-								return
-							}
-							// Correct the range when the editor DOM
-							// element is focused:
-							const range = selection.getRangeAt(0)
-							if (range.startContainer === ref.current || range.endContainer === ref.current) {
-								// Iterate to the deepest start node:
-								let startNode = ref.current.childNodes[0]
-								while (startNode.childNodes.length) {
-									startNode = startNode.childNodes[0]
-								}
-								// Iterate to the deepest end node:
-								let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
-								while (endNode.childNodes.length) {
-									endNode = endNode.childNodes[endNode.childNodes.length - 1]
-								}
-								// Correct the range:
-								range.setStart(startNode, 0)
-								range.setEnd(endNode, (endNode.nodeValue || "").length)
-								selection.removeAllRanges()
-								selection.addRange(range)
-							}
-							const [pos1, pos2] = computePos(ref.current)
-							setState(current => ({
-								...current,
-								pos1,
-								pos2,
-							}))
-							// TODO: Rename to extendPos? Use state
-							// instead of state.data? Should extendedPos
-							// be a member of state?
-							extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
+							// const selection = document.getSelection()
+							// if (!selection.rangeCount) {
+							// 	// No-op
+							// 	return
+							// }
+							// // Correct the range when the editor DOM
+							// // element is focused:
+							// const range = selection.getRangeAt(0)
+							// if (range.startContainer === ref.current || range.endContainer === ref.current) {
+							// 	// Iterate to the deepest start node:
+							// 	let startNode = ref.current.childNodes[0]
+							// 	while (startNode.childNodes.length) {
+							// 		startNode = startNode.childNodes[0]
+							// 	}
+							// 	// Iterate to the deepest end node:
+							// 	let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
+							// 	while (endNode.childNodes.length) {
+							// 		endNode = endNode.childNodes[endNode.childNodes.length - 1]
+							// 	}
+							// 	// Correct the range:
+							// 	range.setStart(startNode, 0)
+							// 	range.setEnd(endNode, (endNode.nodeValue || "").length)
+							// 	selection.removeAllRanges()
+							// 	selection.addRange(range)
+							// }
+							// const [pos1, pos2] = computePos(ref.current)
+							// setState(current => ({
+							// 	...current,
+							// 	pos1,
+							// 	pos2,
+							// }))
+							// // TODO: Rename to extendPos? Use state
+							// // instead of state.data? Should extendedPos
+							// // be a member of state?
+							// extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
 						},
 
 						onPointerDown: () => {
-							pointerDown.current = true
+							// pointerDown.current = true
 						},
 						onPointerMove: () => {
-							// Editor must be focused and pointer must be down:
-							if (!state.focused || !pointerDown.current) {
-								pointerDown.current = false // Reset to be safe
-								return
-							}
-							const [pos1, pos2] = computePos(ref.current)
-							setState(current => ({
-								...current,
-								pos1,
-								pos2,
-							}))
-							// TODO: Rename to extendPos? Use state
-							// instead of state.data? Should extendedPos
-							// be a member of state?
-							extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
+							// // Editor must be focused and pointer must be down:
+							// if (!state.focused || !pointerDown.current) {
+							// 	pointerDown.current = false // Reset to be safe
+							// 	return
+							// }
+							// const [pos1, pos2] = computePos(ref.current)
+							// setState(current => ({
+							// 	...current,
+							// 	pos1,
+							// 	pos2,
+							// }))
+							// // TODO: Rename to extendPos? Use state
+							// // instead of state.data? Should extendedPos
+							// // be a member of state?
+							// extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
 						},
 						onPointerUp: () => {
-							pointerDown.current = false
+							// pointerDown.current = false
 						},
 
 						onKeyDown: e => {
@@ -491,59 +491,58 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	return
 							// }
 
-							// Tab (e.ctrlKey must be false because of
-							// common shortcuts):
-							if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
-								e.preventDefault()
-								let action = null
-								switch (true) {
-								// TODO: state.pos.id breaks down for
-								// multiline components
-								case !e.shiftKey && state.pos1.id === state.pos2.id:
-									action = actions.tab
-									break
-								// TODO: state.pos.id breaks down for
-								// multiline components
-								case !e.shiftKey && state.pos1.id !== state.pos2.id:
-									action = actions.tabMany
-									break
-								case e.shiftKey:
-									action = actions.detabMany
-									break
-								default:
-									// No-op
-								}
-								action(state, setState)
-								return
-							}
-							// Enter:
-							if (e.keyCode === KeyCodes.Enter) {
-								e.preventDefault()
-								actions.enter(state, setState)
-								return
-							}
+							// // Tab (e.ctrlKey must be false because of
+							// // common shortcuts):
+							// if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
+							// 	e.preventDefault()
+							// 	let action = null
+							// 	switch (true) {
+							// 	// TODO: state.pos.id breaks down for
+							// 	// multiline components
+							// 	case !e.shiftKey && state.pos1.id === state.pos2.id:
+							// 		action = actions.tab
+							// 		break
+							// 	// TODO: state.pos.id breaks down for
+							// 	// multiline components
+							// 	case !e.shiftKey && state.pos1.id !== state.pos2.id:
+							// 		action = actions.tabMany
+							// 		break
+							// 	case e.shiftKey:
+							// 		action = actions.detabMany
+							// 		break
+							// 	default:
+							// 		// No-op
+							// 	}
+							// 	action(state, setState)
+							// 	return
+							// }
+							// // Enter:
+							// if (e.keyCode === KeyCodes.Enter) {
+							// 	e.preventDefault()
+							// 	actions.enter(state, setState)
+							// 	return
+							// }
 						},
 
 						// TODO: onCompositionEnd
-
 						onInput: () => {
-							// TODO: Extract to action.input(state, setState)
-							const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
-							const parsed = parse(unparsed)
-							const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
-							if (index1 === -1) {
-								throw new Error("onInput: index1 is out of bounds")
-							}
-							const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
-							if (index2 === -1) {
-								throw new Error("onInput: index2 is out of bounds")
-							}
-							const data = [...state.data]
-							data.splice(index1, (index2 + 1) - index1, ...parsed)
-							setState(current => ({
-								...current,
-								data,
-							}))
+							// // TODO: Extract to action.input(state, setState)
+							// const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
+							// const parsed = parse(unparsed)
+							// const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
+							// if (index1 === -1) {
+							// 	throw new Error("onInput: index1 is out of bounds")
+							// }
+							// const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
+							// if (index2 === -1) {
+							// 	throw new Error("onInput: index2 is out of bounds")
+							// }
+							// const data = [...state.data]
+							// data.splice(index1, (index2 + 1) - index1, ...parsed)
+							// setState(current => ({
+							// 	...current,
+							// 	data,
+							// }))
 						},
 
 						contentEditable: !state.readOnly, // Inverse
