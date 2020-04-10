@@ -97,7 +97,6 @@ function enter(state, setState) {
 	const id = unparsed.slice(-1)[0].id
 	setState(current => ({
 		...current,
-		// Guard bounds:
 		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			id,
