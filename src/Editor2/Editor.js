@@ -362,11 +362,12 @@ const Editor = ({ id, tag, state, setState }) => {
 						// Guard e.ctrlKey (browser shortcut):
 						if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
 							e.preventDefault()
-							// let fn = tab
-							// if (e.shiftKey) {
-							// 	fn = detab
-							// }
-							const fn = !e.shiftKey ? tab : detab
+							let fn = tab
+							// Prefer detab if the cursor is selecting
+							// multiple lines:
+							if (e.shiftKey && state.pos1.id !== state.pos2.id) {
+								fn = detab
+							}
 							fn(state, setState)
 						}
 					},
@@ -451,9 +452,14 @@ const Editor = ({ id, tag, state, setState }) => {
 // selected: "line"
 // selected: "multiline"
 
+// Removes a leading tab over multiple lines.
 function detab(state, setState) {
 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
+	let x2 = x1
+	if (state.pos2.id !== state.pos2.id) {
+		// TODO: Optimize using x1 e.g. findIndexAfter?
+		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+	}
 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
 		...each,
 		raw: each.raw.replace(/^\t/, ""),
@@ -474,9 +480,16 @@ function detab(state, setState) {
 	}))
 }
 
+// If the cursor has no selection or is selecting one line,
+// tab inserts a tab character. Otherwise, tab inserts a
+// leading tab over multiple lines.
 function tab(state, setState) {
 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-	const x2 = state.data.findIndex(each => each.id === state.pos2.id) // TODO
+	let x2 = x1
+	if (state.pos2.id !== state.pos2.id) {
+		// TODO: Optimize using x1 e.g. findIndexAfter?
+		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+	}
 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
 		...each,
 		raw: state.pos1.id === state.pos2.id
