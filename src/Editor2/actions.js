@@ -94,7 +94,7 @@ function enter(state, setState) {
 			raw: state.data[index2].raw.slice(state.pos2.offset),
 		},
 	]
-	const id = unparsed.slice(-1)[0].id
+	const { id } = unparsed.slice(-1)[0]
 	setState(current => ({
 		...current,
 		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],

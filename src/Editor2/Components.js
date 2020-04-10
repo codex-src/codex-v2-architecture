@@ -2,8 +2,8 @@ import React from "react"
 import typeMap from "./typeMap"
 
 import {
-	// Multiline,
-	Paragraph,
+	// Node,
+	Root,
 } from "./HOC"
 
 // Parses an array of parsed data structures to renderable
@@ -31,9 +31,9 @@ function toReact(parsed) {
 
 // TODO: parseReact
 export const P = ({ id, parsed }) => (
-	<Paragraph id={id}>
+	<Root id={id}>
 		{toReact(parsed) || (
 			<br />
 		)}
-	</Paragraph>
+	</Root>
 )

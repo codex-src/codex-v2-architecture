@@ -11,18 +11,18 @@ import uuidv4 from "uuid/v4"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
-// Ascends to the nearest keyed-paragraph.
-function ascendToID(rootElement, node) {
-	// TODO: Scope to rootElement
-	while (true) {
-		if (node.nodeType === Node.ELEMENT_NODE && node.id) {
-			// No-op
-			break
-		}
-		node = node.parentNode
-	}
-	return node
-}
+// // Ascends to the nearest keyed-paragraph.
+// function ascendToID(editorRoot, node) {
+// 	// TODO: Scope to editorRoot
+// 	while (true) {
+// 		if (node.nodeType === Node.ELEMENT_NODE && node.id) {
+// 			// No-op
+// 			break
+// 		}
+// 		node = node.parentNode
+// 	}
+// 	return node
+// }
 
 // Extends the cursor IDs (up to two before and after).
 function extendPosIDs(data, [pos1, pos2]) {
@@ -44,9 +44,9 @@ function extendPosIDs(data, [pos1, pos2]) {
 	return [data[index1].id, data[index2].id]
 }
 
-// Computes the UUID-DOM element ID and offset from a range
+// Computes the DOM element root ID and offset from a range
 // data structure.
-function computeUUIDAndOffsetFromRange(rootElement, range) {
+function computeUUIDAndOffsetFromRange(editorRoot, range) {
 	// if (!range.node && !range.offset) {
 	// 	return { id: "", offset: "" }
 	// }
@@ -55,8 +55,8 @@ function computeUUIDAndOffsetFromRange(rootElement, range) {
 	while (node.nodeType !== Node.ELEMENT_NODE || !node.id) {
 		node = node.parentNode
 	}
-	const uuidElement = node
-	const { id } = uuidElement
+	const elementRoot = node
+	const { id } = elementRoot
 	// Recursively counts the offset from an element to a
 	// range node and offset.
 	let offset = 0
@@ -75,13 +75,13 @@ function computeUUIDAndOffsetFromRange(rootElement, range) {
 			// NOTE: Use next.getAttribute instead of next.id
 			// because next.id always returns ""
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("id")) {
+			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
 				offset++
 			}
 		}
 		return false
 	}
-	recurse(uuidElement)
+	recurse(elementRoot)
 	return { id, offset }
 }
 
@@ -89,9 +89,9 @@ function computeUUIDAndOffsetFromRange(rootElement, range) {
 // structure.
 //
 // NOTE: Don’t mutate pos -- copy
-function computeRangeFromPos(rootElement, { ...pos }) {
-	const uuidElement = document.getElementById(pos.id)
-	if (!uuidElement) {
+function computeRangeFromPos(editorRoot, { ...pos }) {
+	const elementRoot = document.getElementById(pos.id)
+	if (!elementRoot) {
 		throw new Error("computeRangeFromPos: no such uuid element")
 	}
 
@@ -114,13 +114,13 @@ function computeRangeFromPos(rootElement, { ...pos }) {
 			// NOTE: Use next.getAttribute instead of next.id
 			// because next.id always returns ""
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("id")) {
+			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
 				pos.offset--
 			}
 		}
 		return false
 	}
-	recurse(uuidElement)
+	recurse(elementRoot)
 	return { node, offset }
 }
 
@@ -141,7 +141,7 @@ function posAreEmpty(pos1, pos2) {
 // Synchronizes the DOM cursor to cursor data structures.
 //
 // TODO: Guard !selection.rangeCount?
-function syncPos(rootElement, pos1, pos2) {
+function syncPos(editorRoot, pos1, pos2) {
 	if (posAreEmpty(pos1, pos2)) {
 		// No-op
 		return
@@ -150,10 +150,10 @@ function syncPos(rootElement, pos1, pos2) {
 	const selection = document.getSelection()
 	if (selection.rangeCount) {
 		const range = selection.getRangeAt(0)
-		const domPos1 = computeUUIDAndOffsetFromRange(rootElement, { node: range.startContainer, offset: range.startOffset })
+		const domPos1 = computeUUIDAndOffsetFromRange(editorRoot, { node: range.startContainer, offset: range.startOffset })
 		let domPos2 = { ...domPos1 }
 		if (!range.collapsed) {
-			domPos2 = computeUUIDAndOffsetFromRange(rootElement, { node: range.endContainer, offset: range.endOffset })
+			domPos2 = computeUUIDAndOffsetFromRange(editorRoot, { node: range.endContainer, offset: range.endOffset })
 		}
 		// Compare the VDOM cursor data structures to the DOM data
 		// structures:
@@ -165,12 +165,12 @@ function syncPos(rootElement, pos1, pos2) {
 	// Synchronize the DOM cursor to the VDOM cursor data
 	// structures:
 	const range = document.createRange()
-	const r1 = computeRangeFromPos(rootElement, pos1)
+	const r1 = computeRangeFromPos(editorRoot, pos1)
 	range.setStart(r1.node, r1.offset)
 	range.collapse()
 	let r2 = { ...r1 }
 	if (!posAreSame(pos1, pos2)) {
-		r2 = computeRangeFromPos(rootElement, pos2)
+		r2 = computeRangeFromPos(editorRoot, pos2)
 		range.setEnd(r2.node, r2.offset)
 	}
 	// // NOTE: syncTrees eagerly calls removeAllRanges
@@ -180,45 +180,14 @@ function syncPos(rootElement, pos1, pos2) {
 	selection.addRange(range)
 }
 
-// // Gets (reads) parsed nodes from node iterators.
-// //
-// // TODO: Extract to helpers?
-// function getNodesFromIterators(rootNode, [start, end]) {
-// 	// Re-extend the target start (up to 1x):
-// 	if (!start.count && start.getPrev()) {
-// 		start.prev()
-// 	}
-// 	// NOTE: Do not re-extend the target end
-// 	const atEnd = !end.count
-// 	// Get nodes:
-// 	const seenKeys = {}
-// 	const nodes = []
-// 	while (start.currentNode) {
-// 		// Read the key:
-// 		let key = start.currentNode.getAttribute("data-node")
-// 		if (seenKeys[key]) {
-// 			key = uuidv4()
-// 			start.currentNode.setAttribute("data-node", key)
-// 		}
-// 		// Read the data:
-// 		seenKeys[key] = true
-// 		const data = innerText(start.currentNode)
-// 		nodes.push({ key, data })
-// 		if (start.currentNode === end.currentNode) {
-// 			// No-op
-// 			break
-// 		}
-// 		start.next()
-// 	}
-// 	return { nodes, atEnd }
-// }
-
 // Reads a DOM node.
 function readNode(node) {
 	return node.nodeValue || ""
 }
 
 // Recursively reads a DOM element.
+//
+// FIXME: DOM element root -> readElementRoot?
 function readElement(element) {
 	const recurse = readElement
 
@@ -229,8 +198,8 @@ function readElement(element) {
 			continue
 		}
 		str += recurse(each)
-		const nextElement = each.nextElementSibling
-		if (nextElement && nextElement.getAttribute("data-paragraph")) {
+		const next = each.nextElementSibling
+		if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
 			str += "\n"
 		}
 	}
@@ -239,8 +208,8 @@ function readElement(element) {
 
 // Reads an unparsed (raw) data structure from extended IDs.
 //
-// TODO: Remove rootElement from parameters
-function readRawFromExtendedIDs(rootElement, [startID, endID]) {
+// TODO: Remove editorRoot from parameters
+function readRawFromExtendedIDs(editorRoot, [startID, endID]) {
 	let startElement = document.getElementById(startID)
 	let endElement = startElement
 	if (endID !== startID) {
@@ -280,12 +249,12 @@ function readRawFromExtendedIDs(rootElement, [startID, endID]) {
 
 // Computes a cursor data structure from a DOM node and a
 // start or end range data structure.
-function computePosFromRange(rootElement, { node, offset }) {
+function computePosFromRange(editorRoot, { node, offset }) {
 	const pos = newPos()
 
 	// TODO (1): Add guards for when node is outside of a
-	// data-paragraph element or rootElement
-	// TODO (2): Scope to rootElement
+	// data-paragraph element or editorRoot
+	// TODO (2): Scope to editorRoot
 
 	// Iterate to the deepest node:
 	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
@@ -329,14 +298,14 @@ function computePosFromRange(rootElement, { node, offset }) {
 }
 
 // Computes the cursor from a reference to a DOM node.
-function computePos(rootElement) {
+function computePos(editorRoot) {
 	const range = document.getSelection().getRangeAt(0)
 	const rangeStart = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePosFromRange(rootElement, rangeStart)
+	const pos1 = computePosFromRange(editorRoot, rangeStart)
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) { // TODO: state.hasSelection?
 		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePosFromRange(rootElement, rangeEnd)
+		pos2 = computePosFromRange(editorRoot, rangeEnd)
 	}
 	return [pos1, pos2]
 }
@@ -386,10 +355,10 @@ const Editor = ({ id, tag, state, setState }) => {
 
 				// // Synchronize the DOM cursor to the VDOM cursor (resets
 				// // the range):
-				// const r1 = computeRangeFromPos(rootElement, pos1)
+				// const r1 = computeRangeFromPos(editorRoot, pos1)
 				// let r2 = { ...r1 }
 				// if (pos1.id !== pos2.id) {
-				// 	r2 = computeRangeFromPos(rootElement, pos2)
+				// 	r2 = computeRangeFromPos(editorRoot, pos2)
 				// }
 				// range.setStart(r1.node, r1.offset)
 				// range.setEnd(r2.node, r2.offset)
@@ -526,25 +495,25 @@ const Editor = ({ id, tag, state, setState }) => {
 							// common shortcuts):
 							if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
 								e.preventDefault()
-								let fn = null
+								let action = null
 								switch (true) {
 								// TODO: state.pos.id breaks down for
 								// multiline components
 								case !e.shiftKey && state.pos1.id === state.pos2.id:
-									fn = actions.tab
+									action = actions.tab
 									break
 								// TODO: state.pos.id breaks down for
 								// multiline components
 								case !e.shiftKey && state.pos1.id !== state.pos2.id:
-									fn = actions.tabMany
+									action = actions.tabMany
 									break
 								case e.shiftKey:
-									fn = actions.detabMany
+									action = actions.detabMany
 									break
 								default:
 									// No-op
 								}
-								fn(state, setState)
+								action(state, setState)
 								return
 							}
 							// Enter:
@@ -559,11 +528,8 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						onInput: () => {
 							// TODO: Extract to action.input(state, setState)
-							//
-							// NOTE: Add computePos?
 							const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
 							const parsed = parse(unparsed)
-
 							const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
 							if (index1 === -1) {
 								throw new Error("onInput: index1 is out of bounds")
@@ -572,10 +538,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							if (index2 === -1) {
 								throw new Error("onInput: index2 is out of bounds")
 							}
-
 							const data = [...state.data]
 							data.splice(index1, (index2 + 1) - index1, ...parsed)
-
 							setState(current => ({
 								...current,
 								data,

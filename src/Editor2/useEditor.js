@@ -4,8 +4,7 @@ import React from "react"
 import typeEnum from "./typeEnum"
 import uuidv4 from "uuid/v4"
 
-// TODO: Refactor options to <Editor> props?
-function useEditor(initialValue, options = null) {
+function useEditor(initialValue) {
 	const unparsed = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,
@@ -14,7 +13,6 @@ function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
 		readOnly: false,       // Is read-only?
 		focused: false,        // Is focused?
-		// selected: false,    // Has a selection?
 		data: parse(unparsed), // Document data
 		pos1: newPos(),        // Start cursor
 		pos2: newPos(),        // End cursor
