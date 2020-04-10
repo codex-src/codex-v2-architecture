@@ -1,5 +1,4 @@
-// Creates a new cursor data structure. pos is short for
-// position.
+// Creates a new cursor data structure.
 function newPos() {
 	const pos = {
 		id: "",
