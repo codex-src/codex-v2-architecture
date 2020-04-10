@@ -366,7 +366,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 						onSelect: () => {
-							// Correct out of bounds range:
+							// Correct range when out of bounds:
 							const selection = document.getSelection()
 							const range = selection.getRangeAt(0)
 							if (range.startContainer === editorRootRef.current || range.endContainer === editorRootRef.current) {
