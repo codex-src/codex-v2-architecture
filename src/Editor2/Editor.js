@@ -247,53 +247,59 @@ function readRawFromExtendedIDs(editorRoot, [startID, endID]) {
 	return unparsed
 }
 
-// Computes a cursor data structure from a DOM node and a
-// start or end range data structure.
-function computePosFromRange(editorRoot, { node, offset }) {
-	const pos = newPos()
-
-	// TODO (1): Add guards for when node is outside of a
-	// data-paragraph element or editorRoot
-	// TODO (2): Scope to editorRoot
-
-	// Iterate to the deepest node:
-	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
-		node = node.childNodes[offset]
-		offset = 0
-	}
-	// Iterate up to to the closest data-paragraph element:
-	//
-	// TODO: Reuse ascendToID
-	let startNode = node
-	while (true) {
-		if (startNode.nodeType === Node.ELEMENT_NODE && startNode.id) {
-			pos.id = startNode.id
-			break
-		}
-		if (!startNode.parentNode) {
-			throw new Error("computePosFromRange: startNode out of bounds")
-		}
-		startNode = startNode.parentNode
-	}
-	pos.id = startNode.id
-	// Recurse to the range data structure node:
-	const recurse = startNode => {
-		for (const each of startNode.childNodes) {
+// Counts the offset from an element to a node.
+function countOffset(element, node) {
+	let offset = 0
+	const recurse = element => {
+		for (const each of element.childNodes) {
 			if (each === node) {
-				pos.offset += offset
-				// Stop recursion:
 				return true
 			}
-			pos.offset += (each.nodeValue || "").length
+			offset += (node.nodeValue || "").length
 			if (recurse(each)) {
-				// Stop recursion:
 				return true
+			}
+			const next = each.nextElementSibling
+			if (next && next.getAttribute("data-node")) {
+				offset++
 			}
 		}
-		// Continue recursion:
 		return false
 	}
-	recurse(startNode)
+	recurse(element)
+	return offset
+}
+
+// Computes a cursor data structure from a range data
+// structure.
+function computePosFromRange(editorRoot, { ...range }) {
+	if (!editorRoot.contains(range.node)) {
+		throw new Error("computePosFromRange: node out of bounds")
+	}
+	const pos = newPos()
+	// Iterate range.node to the deepest node:
+	while (range.node.childNodes && range.node.childNodes.length) {
+		range.node = range.node.childNodes[range.offset]
+		range.offset = 0
+	}
+	// Compute pos.node.id; ascend to the nearest data-node or
+	// data-root element:
+	let node = range.node // eslint-disable-line prefer-destructuring
+	while (!(node.getAttribute && (node.getAttribute("data-node") || node.getAttribute("data-root")))) {
+		node = node.parentElement
+	}
+	pos.node.id = node.id
+	// Compute pos.root.id:; ascend to the nearest data-root
+	// element:
+	let root = node
+	while (!(root.getAttribute && root.getAttribute("data-root"))) {
+		root = root.parentElement
+	}
+	pos.root.id = root.id
+	// Compute the offset from node and root to range.node:
+	pos.node.offset = countOffset(node, range.node) + range.offset
+	pos.root.offset = countOffset(root, range.node) + range.offset
+	// Done:
 	return pos
 }
 
@@ -324,7 +330,7 @@ const Document = ({ data }) => (
 })()
 
 const Editor = ({ id, tag, state, setState }) => {
-	const ref = React.useRef()
+	const editorRootRef = React.useRef()
 
 	// Tracks whether the pointer is down.
 	const pointerDown = React.useRef()
@@ -339,60 +345,25 @@ const Editor = ({ id, tag, state, setState }) => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
 				// Sync the React-managed DOM tree to the user-
 				// managed DOM tree:
-				const mutations = syncTrees(state.reactDOM, ref.current)
+				const mutations = syncTrees(state.reactDOM, editorRootRef.current)
 				if (!mutations) {
 					// No-op
 					return
 				}
-				// Sync the DOM cursor to the VDOM cursor data
-				// structures:
-				// if (posAreEmpty(state.pos1, state.pos2)) {
-				// 	// No-op
-				// 	return
-				// }
-				syncPos(ref.current, state.pos1, state.pos2)
-				console.log("synced the DOM cursor")
-
-				// // Synchronize the DOM cursor to the VDOM cursor (resets
-				// // the range):
-				// const r1 = computeRangeFromPos(editorRoot, pos1)
-				// let r2 = { ...r1 }
-				// if (pos1.id !== pos2.id) {
-				// 	r2 = computeRangeFromPos(editorRoot, pos2)
-				// }
-				// range.setStart(r1.node, r1.offset)
-				// range.setEnd(r2.node, r2.offset)
-				// if (selection.rangeCount) {
-				// 	selection.removeAllRanges()
-				// }
-				// selection.addRange(range)
-
-				// TODO: Sync the cursor e.g. syncCursors(...)
-
-				// if ((!state.components || !mutations) && state.actionType !== "PASTE") {
-				// 	// No-op
-				// 	return
-				// }
-				// // Reset the cursor:
-				// const selection = document.getSelection()
-				// if (selection.rangeCount) {
-				// 	selection.removeAllRanges()
-				// }
-				// const range = document.createRange()
-				// const { node, offset } = getRangeFromPos(ref.current, state.pos1.pos)
-				// range.setStart(node, offset)
-				// range.collapse()
-				// if (state.pos1.pos !== state.pos2.pos) {
-				// 	// TODO: Can optimize pos2 by reusing pos1
-				// 	const { node, offset } = getRangeFromPos(ref.current, state.pos2.pos)
-				// 	range.setEnd(node, offset)
-				// }
-				// selection.addRange(range)
+				// // Sync the DOM cursor to the VDOM cursor data
+				// // structures:
+				// // if (posAreEmpty(state.pos1, state.pos2)) {
+				// // 	// No-op
+				// // 	return
+				// // }
+				// syncPos(editorRootRef.current, state.pos1, state.pos2)
+				// console.log("synced the DOM cursor")
 			})
 		}, [state, setState]),
 		[state.data],
 	)
 
+	// TODO: Register props e.g. readOnly
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, setState]}>
@@ -401,7 +372,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				{React.createElement(
 					tag || "div",
 					{
-						ref,
+						ref: editorRootRef,
 
 						id,
 
@@ -425,14 +396,14 @@ const Editor = ({ id, tag, state, setState }) => {
 							// // Correct the range when the editor DOM
 							// // element is focused:
 							// const range = selection.getRangeAt(0)
-							// if (range.startContainer === ref.current || range.endContainer === ref.current) {
+							// if (range.startContainer === editorRootRef.current || range.endContainer === editorRootRef.current) {
 							// 	// Iterate to the deepest start node:
-							// 	let startNode = ref.current.childNodes[0]
+							// 	let startNode = editorRootRef.current.childNodes[0]
 							// 	while (startNode.childNodes.length) {
 							// 		startNode = startNode.childNodes[0]
 							// 	}
 							// 	// Iterate to the deepest end node:
-							// 	let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
+							// 	let endNode = editorRootRef.current.childNodes[editorRootRef.current.childNodes.length - 1]
 							// 	while (endNode.childNodes.length) {
 							// 		endNode = endNode.childNodes[endNode.childNodes.length - 1]
 							// 	}
@@ -442,7 +413,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	selection.removeAllRanges()
 							// 	selection.addRange(range)
 							// }
-							// const [pos1, pos2] = computePos(ref.current)
+							const [pos1, pos2] = computePos(editorRootRef.current)
+							console.log(pos1)
 							// setState(current => ({
 							// 	...current,
 							// 	pos1,
@@ -463,7 +435,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	pointerDown.current = false // Reset to be safe
 							// 	return
 							// }
-							// const [pos1, pos2] = computePos(ref.current)
+							// const [pos1, pos2] = computePos(editorRootRef.current)
 							// setState(current => ({
 							// 	...current,
 							// 	pos1,
@@ -527,7 +499,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						// TODO: onCompositionEnd
 						onInput: () => {
 							// // TODO: Extract to action.input(state, setState)
-							// const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
+							// const unparsed = readRawFromExtendedIDs(editorRootRef.current, extendedIDs.current)
 							// const parsed = parse(unparsed)
 							// const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
 							// if (index1 === -1) {

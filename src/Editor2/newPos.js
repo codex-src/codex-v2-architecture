@@ -10,11 +10,11 @@
 // Creates a new cursor data structure.
 function newPos() {
 	const pos = {
-		root: {
+		node: {
 			id: "",
 			offset: 0,
 		},
-		node: {
+		root: {
 			id: "",
 			offset: 0,
 		},
