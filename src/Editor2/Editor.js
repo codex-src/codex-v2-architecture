@@ -25,7 +25,7 @@ function ascendToID(rootElement, node) {
 }
 
 // Extends the cursor IDs (up to two before and after).
-function extendPosIDs([pos1, pos2], data) {
+function extendPosIDs(data, [pos1, pos2]) {
 	let index1 = data.findIndex(each => each.id === pos1.id)
 	// let index2 = data.findIndex(each => each.id === pos2.id)
 	let index2 = index1
@@ -287,7 +287,7 @@ function computePosFromRange(rootElement, { node, offset }) {
 	// data-paragraph element or rootElement
 	// TODO (2): Scope to rootElement
 
-	// Iterate to the innermost node:
+	// Iterate to the deepest node:
 	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
 		node = node.childNodes[offset]
 		offset = 0
@@ -338,8 +338,7 @@ function computePos(rootElement) {
 		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
 		pos2 = computePosFromRange(rootElement, rangeEnd)
 	}
-	const selected = pos1.id !== pos2.id || pos1.offset !== pos2.offset
-	return { selected, pos1, pos2 }
+	return [pos1, pos2]
 }
 
 const Document = ({ data }) => (
@@ -454,31 +453,36 @@ const Editor = ({ id, tag, state, setState }) => {
 								// No-op
 								return
 							}
-							// Correct the selection when the editor is
-							// selected instead of the innermost start and
-							// end nodes (expected behavior):
+							// Correct the range when the editor DOM
+							// element is focused:
 							const range = selection.getRangeAt(0)
 							if (range.startContainer === ref.current || range.endContainer === ref.current) {
-								// Iterate to the innermost start node:
+								// Iterate to the deepest start node:
 								let startNode = ref.current.childNodes[0]
 								while (startNode.childNodes.length) {
 									startNode = startNode.childNodes[0]
 								}
-								// Iterate to the innermost end node:
+								// Iterate to the deepest end node:
 								let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
 								while (endNode.childNodes.length) {
 									endNode = endNode.childNodes[endNode.childNodes.length - 1]
 								}
-								// Correct the selection:
-								const range = document.createRange()
+								// Correct the range:
 								range.setStart(startNode, 0)
 								range.setEnd(endNode, (endNode.nodeValue || "").length)
 								selection.removeAllRanges()
 								selection.addRange(range)
 							}
-							const { selected, pos1, pos2 } = computePos(ref.current)
-							setState(current => ({ ...current, selected, pos1, pos2 }))
-							extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
+							const [pos1, pos2] = computePos(ref.current)
+							setState(current => ({
+								...current,
+								pos1,
+								pos2,
+							}))
+							// TODO: Rename to extendPos? Use state
+							// instead of state.data? Should extendedPos
+							// be a member of state?
+							extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
 						},
 
 						onPointerDown: () => {
@@ -490,9 +494,16 @@ const Editor = ({ id, tag, state, setState }) => {
 								pointerDown.current = false // Reset to be safe
 								return
 							}
-							const { selected, pos1, pos2 } = computePos(ref.current)
-							setState(current => ({ ...current, selected, pos1, pos2 }))
-							extendedIDs.current = extendPosIDs([pos1, pos2], state.data)
+							const [pos1, pos2] = computePos(ref.current)
+							setState(current => ({
+								...current,
+								pos1,
+								pos2,
+							}))
+							// TODO: Rename to extendPos? Use state
+							// instead of state.data? Should extendedPos
+							// be a member of state?
+							extendedIDs.current = extendPosIDs(state.data, [pos1, pos2])
 						},
 						onPointerUp: () => {
 							pointerDown.current = false
@@ -511,25 +522,19 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	return
 							// }
 
-							if (e.keyCode === KeyCodes.Enter) {
-								e.preventDefault()
-								actions.enter(state, setState)
-								return
-							}
-
 							// Tab (e.ctrlKey must be false because of
 							// common shortcuts):
 							if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
 								e.preventDefault()
 								let fn = null
 								switch (true) {
-								// TODO: state.pos needs to track nested
-								// paragraphs
+								// TODO: state.pos.id breaks down for
+								// multiline components
 								case !e.shiftKey && state.pos1.id === state.pos2.id:
 									fn = actions.tab
 									break
-								// TODO: state.pos needs to track nested
-								// paragraphs
+								// TODO: state.pos.id breaks down for
+								// multiline components
 								case !e.shiftKey && state.pos1.id !== state.pos2.id:
 									fn = actions.tabMany
 									break
@@ -542,9 +547,20 @@ const Editor = ({ id, tag, state, setState }) => {
 								fn(state, setState)
 								return
 							}
+							// Enter:
+							if (e.keyCode === KeyCodes.Enter) {
+								e.preventDefault()
+								actions.enter(state, setState)
+								return
+							}
 						},
 
+						// TODO: onCompositionEnd
+
 						onInput: () => {
+							// TODO: Extract to action.input(state, setState)
+							//
+							// NOTE: Add computePos?
 							const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
 							const parsed = parse(unparsed)
 
@@ -557,41 +573,13 @@ const Editor = ({ id, tag, state, setState }) => {
 								throw new Error("onInput: index2 is out of bounds")
 							}
 
-							// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 							const data = [...state.data]
 							data.splice(index1, (index2 + 1) - index1, ...parsed)
 
 							setState(current => ({
 								...current,
-								focused: false,  // DEBUG
-								selected: false, // DEBUG
 								data,
-								// TODO: pos1 and pos2
 							}))
-
-							// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
-
-							// console.log(index1, index2)
-
-							// const key1 = nodes[0].key
-							// const index1 = state.body.findIndex(each => each.key === key1)
-							// if (index1 === -1) {
-							// 	throw new Error("FIXME")
-							// }
-							// const key2 = nodes[nodes.length - 1].key
-							// const index2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
-							// if (index2 === -1) {
-							// 	throw new Error("FIXME")
-							// }
-							// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
-							// // Update data, pos1, and pos2:
-							// const data = state.body.map(each => each.data).join("\n")
-							// Object.assign(state, { data, pos1, pos2 })
-							// this.render()
-
-							// const { nodes, atEnd } = getNodesFromIterators(ref.current, target.current)
-							// const [pos1, pos2] = getPos(ref.current)
-							// dispatch.actionInput(nodes, atEnd, pos1, pos2)
 						},
 
 						contentEditable: !state.readOnly, // Inverse

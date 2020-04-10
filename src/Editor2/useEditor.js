@@ -14,8 +14,7 @@ function useEditor(initialValue, options = null) {
 	const [state, setState] = React.useState(() => ({
 		readOnly: false,       // Is read-only?
 		focused: false,        // Is focused?
-		// Depreacte selected?
-		selected: false,       // Has a selection?
+		// selected: false,    // Has a selection?
 		data: parse(unparsed), // Document data
 		pos1: newPos(),        // Start cursor
 		pos2: newPos(),        // End cursor
