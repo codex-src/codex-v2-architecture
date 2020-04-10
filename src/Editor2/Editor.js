@@ -141,11 +141,10 @@ function posAreEmpty(pos1, pos2) {
 //
 // TODO: Guard !selection.rangeCount?
 function syncPos(rootElement, pos1, pos2) {
-	// if (posAreEmpty(pos1, pos2)) {
-	// 	// No-op
-	// 	return
-	// }
-
+	if (posAreEmpty(pos1, pos2)) {
+		// No-op
+		return
+	}
 	// Get the cursor data structures from the DOM cursors:
 	const selection = document.getSelection()
 	if (selection.rangeCount) {
@@ -374,11 +373,12 @@ const Editor = ({ id, tag, state, setState }) => {
 				}
 				// Sync the DOM cursor to the VDOM cursor data
 				// structures:
-				if (posAreEmpty(state.pos1, state.pos2)) {
-					// No-op
-					return
-				}
+				// if (posAreEmpty(state.pos1, state.pos2)) {
+				// 	// No-op
+				// 	return
+				// }
 				syncPos(ref.current, state.pos1, state.pos2)
+				console.log("synced the DOM cursor")
 
 				// // Synchronize the DOM cursor to the VDOM cursor (resets
 				// // the range):
@@ -519,11 +519,12 @@ const Editor = ({ id, tag, state, setState }) => {
 							// Guard the control key (browser shorcut):
 							if (!e.ctrlKey && e.keyCode === KeyCode.Tab) {
 								e.preventDefault()
-								let fn = tab
-								// Use detab if the shift key was pressed and
-								// the selection is multiline:
-								if (e.shiftKey && state.pos1.id !== state.pos2.id) {
-									fn = detab
+								let fn = tabOne
+								if (state.pos2.id !== state.pos1.id) {
+									fn = detabMany
+									if (!e.shiftKey) {
+										fn = tabMany
+									}
 								}
 								fn(state, setState)
 							}
@@ -608,49 +609,38 @@ const Editor = ({ id, tag, state, setState }) => {
 // selectEnum.PartialMultiline = "partial-multiline"
 // selectEnum.FullMultiline    = "full-multiline"
 
-// Removes a leading tab over multiple lines.
-function detab(state, setState) {
-	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-	let x2 = x1
-	if (state.pos1.id !== state.pos2.id) {
-		// TODO: Optimize using x1 e.g. findIndexAfter?
-		x2 = state.data.findIndex(each => each.id === state.pos2.id)
-	}
-	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+// Inserts a tab character.
+function tabOne(state, setState) {
+	const x = state.data.findIndex(each => each.id === state.pos1.id)
+	const unparsed = state.data.slice(x, x + 1).map(each => ({
 		...each,
-		raw: each.raw.replace(/^\t/, ""),
+		raw: `${each.raw.slice(0, state.pos1.offset)}\t${each.raw.slice(state.pos2.offset)}`,
 	}))
-	const dec1 = unparsed[0].raw.length !== state.data[x1].raw.length
-	const dec2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
 	setState(current => ({
 		...current,
-		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		data: [...state.data.slice(0, x), ...parse(unparsed), ...state.data.slice(x + 1)],
 		pos1: {
 			...state.pos1,
-			offset: state.pos1.offset - dec1,
+			offset: state.pos1.offset + 1,
 		},
 		pos2: {
-			...state.pos2,
-			offset: state.pos2.offset - dec2,
+			...state.pos1,
+			offset: state.pos1.offset + 1,
 		},
 	}))
 }
 
-// If the cursor has no selection or is selecting one line,
-// tab inserts a tab character. Otherwise, tab inserts a
-// leading tab over multiple lines.
-function tab(state, setState) {
+// Inserts many tab characters (each at start).
+function tabMany(state, setState) {
+	// TODO: Extract to a function?
 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
 	let x2 = x1
-	if (state.pos1.id !== state.pos2.id) {
-		// TODO: Optimize using x1 e.g. findIndexAfter?
+	if (state.pos2.id !== state.pos1.id) {
 		x2 = state.data.findIndex(each => each.id === state.pos2.id)
 	}
 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
 		...each,
-		raw: state.pos1.id === state.pos2.id
-			? `${each.raw.slice(0, state.pos1.offset)}\t${each.raw.slice(state.pos2.offset)}`
-			: `\t${each.raw}`,
+		raw: `\t${each.raw}`,
 	}))
 	setState(current => ({
 		...current,
@@ -660,12 +650,66 @@ function tab(state, setState) {
 			offset: state.pos1.offset + 1,
 		},
 		pos2: {
-			...state.pos1,
-			offset: !state.selected
-				? state.pos1.offset + 1
-				: state.pos2.offset + 1,
+			...state.pos2,
+			offset: state.pos2.offset + 1,
 		},
 	}))
 }
+
+// Removes many tab characters (each at start).
+function detabMany(state, setState) {
+	// TODO: Extract to a function?
+	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
+	let x2 = x1
+	if (state.pos2.id !== state.pos1.id) {
+		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+	}
+	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+		...each,
+		raw: each.raw.replace(/^\t/, ""),
+	}))
+	const decremented1 = unparsed[0].raw.length !== state.data[x1].raw.length
+	const decremented2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
+	setState(current => ({
+		...current,
+		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		pos1: {
+			...state.pos1,
+			offset: state.pos1.offset - decremented1,
+		},
+		pos2: {
+			...state.pos2,
+			offset: state.pos2.offset - decremented2,
+		},
+	}))
+}
+
+// // Removes a tab over multiple lines.
+// function detab(state, setState) {
+// 	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
+// 	let x2 = x1
+// 	if (state.pos2.id !== state.pos1.id) {
+// 		// TODO: Optimize using x1 e.g. findIndexAfter?
+// 		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+// 	}
+// 	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+// 		...each,
+// 		raw: each.raw.replace(/^\t/, ""),
+// 	}))
+// 	const dec1 = unparsed[0].raw.length !== state.data[x1].raw.length
+// 	const dec2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
+// 	setState(current => ({
+// 		...current,
+// 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+// 		pos1: {
+// 			...state.pos1,
+// 			offset: state.pos1.offset - dec1,
+// 		},
+// 		pos2: {
+// 			...state.pos2,
+// 			offset: state.pos2.offset - dec2,
+// 		},
+// 	}))
+// }
 
 export default Editor
