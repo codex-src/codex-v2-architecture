@@ -95,142 +95,6 @@ function getExtendedPosRootIDs(data, [pos1, pos2]) {
 	return [data[index1].id, data[index2].id]
 }
 
-// // Computes the DOM element root ID and offset from a range
-// // data structure.
-// function computeUUIDAndOffsetFromRange(editorRoot, range) {
-// 	// if (!range.node && !range.offset) {
-// 	// 	return { id: "", offset: "" }
-// 	// }
-//
-// 	let { node } = range
-// 	while (node.nodeType !== Node.ELEMENT_NODE || !node.id) {
-// 		node = node.parentNode
-// 	}
-// 	const elementRoot = node
-// 	const { id } = elementRoot
-// 	// Recursively counts the offset from an element to a
-// 	// range node and offset.
-// 	let offset = 0
-// 	const recurse = element => {
-// 		for (const each of element.childNodes) {
-// 			if (each === range.node) {
-// 				offset += range.offset
-// 				// Stop recursion:
-// 				return true
-// 			}
-// 			offset += (each.nodeValue || "").length
-// 			if (recurse(each)) {
-// 				// Stop recursion:
-// 				return true
-// 			}
-// 			// NOTE: Use next.getAttribute instead of next.id
-// 			// because next.id always returns ""
-// 			const next = each.nextElementSibling
-// 			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
-// 				offset++
-// 			}
-// 		}
-// 		return false
-// 	}
-// 	recurse(elementRoot)
-// 	return { id, offset }
-// }
-//
-// // Computes a range data structure from a cursor data
-// // structure.
-// //
-// // NOTE: Don’t mutate pos -- copy
-// function computeRangeFromPos(editorRoot, { ...pos }) {
-// 	const elementRoot = document.getElementById(pos.id)
-// 	if (!elementRoot) {
-// 		throw new Error("computeRangeFromPos: no such uuid element")
-// 	}
-//
-// 	let node = null
-// 	let offset = 0
-// 	const recurse = element => {
-// 		for (const each of element.childNodes) {
-// 			const { length } = each.nodeValue || ""
-// 			if (pos.offset - length <= 0) {
-// 				node = each
-// 				offset = pos.offset
-// 				// Stop recursion:
-// 				return true
-// 			}
-// 			pos.offset -= length
-// 			if (recurse(each)) {
-// 				// Stop recursion:
-// 				return true
-// 			}
-// 			// NOTE: Use next.getAttribute instead of next.id
-// 			// because next.id always returns ""
-// 			const next = each.nextElementSibling
-// 			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
-// 				pos.offset--
-// 			}
-// 		}
-// 		return false
-// 	}
-// 	recurse(elementRoot)
-// 	return { node, offset }
-// }
-//
-// // Compares two cursor data structures.
-// function posAreSame(pos1, pos2) {
-// 	const ok = (
-// 		pos1.id === pos2.id &&
-// 		pos1.offset === pos2.offset
-// 	)
-// 	return ok
-// }
-//
-// // Returns whether cursor data structures are empty.
-// function posAreEmpty(pos1, pos2) {
-// 	return [pos1, pos2].every(each => !each.id && !each.offset)
-// }
-//
-// // Synchronizes the DOM cursor to cursor data structures.
-// //
-// // TODO: Guard !selection.rangeCount?
-// function syncPos(editorRoot, pos1, pos2) {
-// 	if (posAreEmpty(pos1, pos2)) {
-// 		// No-op
-// 		return
-// 	}
-// 	// Get the cursor data structures from the DOM cursors:
-// 	const selection = document.getSelection()
-// 	if (selection.rangeCount) {
-// 		const range = selection.getRangeAt(0)
-// 		const domPos1 = computeUUIDAndOffsetFromRange(editorRoot, { node: range.startContainer, offset: range.startOffset })
-// 		let domPos2 = { ...domPos1 }
-// 		if (!range.collapsed) {
-// 			domPos2 = computeUUIDAndOffsetFromRange(editorRoot, { node: range.endContainer, offset: range.endOffset })
-// 		}
-// 		// Compare the VDOM cursor data structures to the DOM data
-// 		// structures:
-// 		if (posAreSame(pos1, domPos1) && posAreSame(pos2, domPos2)) {
-// 			// No-op
-// 			return
-// 		}
-// 	}
-// 	// Synchronize the DOM cursor to the VDOM cursor data
-// 	// structures:
-// 	const range = document.createRange()
-// 	const r1 = computeRangeFromPos(editorRoot, pos1)
-// 	range.setStart(r1.node, r1.offset)
-// 	range.collapse()
-// 	let r2 = { ...r1 }
-// 	if (!posAreSame(pos1, pos2)) {
-// 		r2 = computeRangeFromPos(editorRoot, pos2)
-// 		range.setEnd(r2.node, r2.offset)
-// 	}
-// 	// // NOTE: syncTrees eagerly calls removeAllRanges
-// 	// if (selection.rangeCount) {
-// 	// 	selection.removeAllRanges()
-// 	// }
-// 	selection.addRange(range)
-// }
-//
 // // Reads a DOM node.
 // function readNode(node) {
 // 	return node.nodeValue || ""
@@ -256,7 +120,7 @@ function getExtendedPosRootIDs(data, [pos1, pos2]) {
 // 	}
 // 	return str
 // }
-//
+
 // // Reads an unparsed (raw) data structure from extended IDs.
 // //
 // // TODO: Remove editorRoot from parameters
@@ -298,6 +162,94 @@ function getExtendedPosRootIDs(data, [pos1, pos2]) {
 // 	return unparsed
 // }
 
+// - hello
+// 	- hello
+// 			- hello
+// 	- hello
+// - hello
+
+/*
+
+<div data-root>
+	<div data-node>
+		hello, world!
+	</div>
+	<div data-node>
+		<div>
+			<div>
+				hello, world!
+			</div>
+		</div>
+	</div>
+	<div data-node>
+		hello, world!
+	</div>
+</div>
+
+*/
+
+// Reads a data-root element. Returns an array of unparsed
+// data structures.
+function readRoot(root) {
+	const unparsed = [
+		{
+			id: root.id,
+			raw: "",
+		},
+	]
+	const recurse = element => {
+		for (const each of element.childNodes) {
+			unparsed[unparsed.length - 1].raw += each.nodeValue || ""
+			recurse(each)
+			const next = each.nextElementSibling
+			if (next && next.getAttribute("data-node")) {
+				unparsed.push({
+					id: next.id,
+					raw: "",
+				})
+			}
+		}
+	}
+	recurse(root)
+	return unparsed
+}
+
+// Reads a range of data-root element IDs. Returns an array
+// of unparsed data structures.
+function readRootIDs(editorRoot, [extendedID1, extendedID2]) {
+	// Get root1:
+	let root1 = document.getElementById(extendedID1)
+	if (!root1 || !editorRoot.contains(root1)) {
+		throw new Error(`readRootIDs: no such root1 (id=${root1.id || ""}) or out of bounds`)
+	}
+	// Extend root1 when was at the start:
+	const prev = root1.previousElementSibling
+	if (prev && !prev.previousElementSibling) {
+		root1 = prev
+	}
+	// Get root2:
+	const root2 = document.getElementById(extendedID2)
+	if (!root2 || !editorRoot.contains(root2)) {
+		throw new Error(`readRootIDs: no such root2 (id=${root2.id || ""}) or out of bounds`)
+	}
+	// Read unparsed:
+	const unparsed = []
+	let root = root1
+	while (root) {
+		const seen = !root.id || unparsed.some(each => each.id === root.id)
+		if (seen) {
+			root.id = uuidv4()
+		}
+		unparsed.push(...readRoot(root))
+		if (root == root2) {
+			// No-op
+			break
+		}
+		root = root.nextElementSibling
+	}
+	return unparsed
+}
+
 const Document = ({ data }) => (
 	data.map(({ type: T, ...props }) => (
 		React.createElement(typeMap[T], {
@@ -315,7 +267,7 @@ const Editor = ({ id, tag, state, setState }) => {
 	const editorRootRef = React.useRef()
 
 	const pointerDownRef = React.useRef()
-	const extendedPosRootIDsRef = React.useRef(["", ""])
+	const extendedIDsRef = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
@@ -392,7 +344,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								pos1,
 								pos2,
 							}))
-							extendedPosRootIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
+							extendedIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 
 						onPointerDown: () => {
@@ -410,7 +362,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								pos1,
 								pos2,
 							}))
-							extendedPosRootIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
+							extendedIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 						onPointerUp: () => {
 							pointerDownRef.current = false
@@ -464,6 +416,9 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
+							const unparsed = readRootIDs(editorRootRef.current, extendedIDsRef.current)
+							console.log(unparsed)
+
 							// // TODO: Extract to action.input(state, setState)
 							// const unparsed = readRawFromExtendedIDs(editorRootRef.current, extendedIDs.current)
 							// const parsed = parse(unparsed)
