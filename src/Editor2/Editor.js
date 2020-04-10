@@ -25,22 +25,22 @@ function ascendToID(rootElement, node) {
 
 // Extends the cursor IDs (up to two before and after).
 function extendPosIDs([pos1, pos2], data) {
-	let x1 = data.findIndex(each => each.id === pos1.id)
-	// let x2 = data.findIndex(each => each.id === pos2.id)
-	let x2 = x1
+	let index1 = data.findIndex(each => each.id === pos1.id)
+	// let index2 = data.findIndex(each => each.id === pos2.id)
+	let index2 = index1
 	if (pos2.id !== pos1.id) {
-		x2 = data.findIndex(each => each.id === pos2.id)
+		index2 = data.findIndex(each => each.id === pos2.id)
 	}
 	// Guard bounds:
-	x1 -= 2
-	if (x1 < 0) {
-		x1 = 0
+	index1 -= 2
+	if (index1 < 0) {
+		index1 = 0
 	}
-	x2 += 2
-	if (x2 >= data.length) {
-		x2 = data.length - 1
+	index2 += 2
+	if (index2 >= data.length) {
+		index2 = data.length - 1
 	}
-	return [data[x1].id, data[x2].id]
+	return [data[index1].id, data[index2].id]
 }
 
 // Computes the UUID-DOM element ID and offset from a range
@@ -262,8 +262,8 @@ function readRawFromExtendedIDs(rootElement, [startID, endID]) {
 		}
 		seenIDs[id] = true
 		const raw = readElement(startElement)
-		// const range = str.split("\n").map((each, x) => ({
-		// 	id: !x ? id : uuidv4(),
+		// const range = str.split("\n").map((each, index) => ({
+		// 	id: !index ? id : uuidv4(),
 		// 	raw: each,
 		// }))
 		unparsed.push({ id, raw })
@@ -524,7 +524,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								// TODO: state.pos needs to track the nested
 								// paragraph offset
 								case !e.shiftKey && state.pos1.id === state.pos2.id:
-									fn = tabOne
+									fn = tab
 									break
 								// TODO: state.pos needs to track the nested
 								// paragraph offset
@@ -545,18 +545,18 @@ const Editor = ({ id, tag, state, setState }) => {
 							const unparsed = readRawFromExtendedIDs(ref.current, extendedIDs.current)
 							const parsed = parse(unparsed)
 
-							const x1 = state.data.findIndex(each => each.id === unparsed[0].id)
-							if (x1 === -1) {
-								throw new Error("onInput: x1 is out of bounds")
+							const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
+							if (index1 === -1) {
+								throw new Error("onInput: index1 is out of bounds")
 							}
-							const x2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
-							if (x2 === -1) {
-								throw new Error("onInput: x2 is out of bounds")
+							const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
+							if (index2 === -1) {
+								throw new Error("onInput: index2 is out of bounds")
 							}
 
 							// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 							const data = [...state.data]
-							data.splice(x1, (x2 + 1) - x1, ...parsed)
+							data.splice(index1, (index2 + 1) - index1, ...parsed)
 
 							setState(current => ({
 								...current,
@@ -566,21 +566,21 @@ const Editor = ({ id, tag, state, setState }) => {
 								// TODO: pos1 and pos2
 							}))
 
-							// state.body.splice(x1, (x2 + 1) - x1, ...nodes)
+							// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
 
-							// console.log(x1, x2)
+							// console.log(index1, index2)
 
 							// const key1 = nodes[0].key
-							// const x1 = state.body.findIndex(each => each.key === key1)
-							// if (x1 === -1) {
+							// const index1 = state.body.findIndex(each => each.key === key1)
+							// if (index1 === -1) {
 							// 	throw new Error("FIXME")
 							// }
 							// const key2 = nodes[nodes.length - 1].key
-							// const x2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
-							// if (x2 === -1) {
+							// const index2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
+							// if (index2 === -1) {
 							// 	throw new Error("FIXME")
 							// }
-							// state.body.splice(x1, (x2 + 1) - x1, ...nodes)
+							// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
 							// // Update data, pos1, and pos2:
 							// const data = state.body.map(each => each.data).join("\n")
 							// Object.assign(state, { data, pos1, pos2 })
@@ -615,15 +615,15 @@ const Editor = ({ id, tag, state, setState }) => {
 }
 
 // Inserts a tab character.
-function tabOne(state, setState) {
-	const x = state.data.findIndex(each => each.id === state.pos1.id)
-	const unparsed = state.data.slice(x, x + 1).map(each => ({
+function tab(state, setState) {
+	const index = state.data.findIndex(each => each.id === state.pos1.id)
+	const unparsed = state.data.slice(index, index + 1).map(each => ({
 		...each,
 		raw: `${each.raw.slice(0, state.pos1.offset)}\t${each.raw.slice(state.pos2.offset)}`,
 	}))
 	setState(current => ({
 		...current,
-		data: [...state.data.slice(0, x), ...parse(unparsed), ...state.data.slice(x + 1)],
+		data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
 		pos1: {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
@@ -636,21 +636,20 @@ function tabOne(state, setState) {
 	}))
 }
 
-// Inserts many tab characters (each at start).
+// Inserts many tab character, each at the start.
 function tabMany(state, setState) {
-	// TODO: Extract to a function?
-	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-	let x2 = x1
+	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
+	let index2 = index1
 	if (state.pos2.id !== state.pos1.id) {
-		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+		index2 = state.data.findIndex(each => each.id === state.pos2.id)
 	}
-	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+	const unparsed = state.data.slice(index1, index2 + 1).map(each => ({
 		...each,
 		raw: `\t${each.raw}`,
 	}))
 	setState(current => ({
 		...current,
-		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
@@ -662,32 +661,31 @@ function tabMany(state, setState) {
 	}))
 }
 
-// Removes many tab characters (each at start).
+// Removes many tab character, each at the start.
 function detabMany(state, setState) {
-	// TODO: Extract to a function?
-	const x1 = state.data.findIndex(each => each.id === state.pos1.id)
-	let x2 = x1
+	const index1 = state.data.findIndex(each => each.id === state.pos1.id)
+	let index2 = index1
 	if (state.pos2.id !== state.pos1.id) {
-		x2 = state.data.findIndex(each => each.id === state.pos2.id)
+		index2 = state.data.findIndex(each => each.id === state.pos2.id)
 	}
-	const unparsed = state.data.slice(x1, x2 + 1).map(each => ({
+	const unparsed = state.data.slice(index1, index2 + 1).map(each => ({
 		...each,
 		raw: each.raw.replace(/^\t/, ""),
 	}))
-	const trimmed1 = unparsed[0].raw.length !== state.data[x1].raw.length
-	const trimmed2 = unparsed.slice(-1)[0].raw.length !== state.data[x2].raw.length
+	const removed1 = unparsed[0].raw.length !== state.data[index1].raw.length
+	const removed2 = unparsed.slice(-1)[0].raw.length !== state.data[index2].raw.length
 	setState(current => ({
 		...current,
-		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			...state.pos1,
 			// Guard bounds:
-			offset: Math.max(0, state.pos1.offset - trimmed1),
+			offset: Math.max(0, state.pos1.offset - removed1),
 		},
 		pos2: {
 			...state.pos2,
 			// Guard bounds:
-			offset: Math.max(0, state.pos2.offset - trimmed2),
+			offset: Math.max(0, state.pos2.offset - removed2),
 		},
 	}))
 }
