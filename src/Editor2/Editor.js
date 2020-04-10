@@ -351,6 +351,10 @@ const Document = ({ data }) => (
 	))
 )
 
+;(() => {
+	document.body.classList.toggle("debug-css")
+})()
+
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
@@ -362,7 +366,7 @@ const Editor = ({ id, tag, state, setState }) => {
 	const extendedIDs = React.useRef(["", ""])
 
 	// Renders to the DOM.
-	React.useEffect(
+	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
 				// Sync the React-managed DOM tree to the user-

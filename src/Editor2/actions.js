@@ -94,7 +94,7 @@ function enter(state, setState) {
 	setState(current => ({
 		...current,
 		// Guard bounds:
-		data: [...state.data.slice(0, Math.max(0, index - 1)), ...parse(unparsed), ...state.data.slice(index + 1)],
+		data: [...state.data.slice(0, index), ...parse(unparsed), ...state.data.slice(index + 1)],
 		pos1: {
 			id,
 			offset: 0,
