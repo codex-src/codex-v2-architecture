@@ -171,7 +171,6 @@ const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
-	// const extendedIDsRef = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
@@ -184,6 +183,9 @@ const Editor = ({ id, tag, state, setState }) => {
 					// No-op
 					return
 				}
+				// NOTE: syncPos is needed when an event is
+				// prevented and the editor is mutated, e.g. enter,
+				// tab, etc.
 				// // Sync the DOM cursor to the VDOM cursor data
 				// // structures:
 				// // if (posAreEmpty(state.pos1, state.pos2)) {
@@ -327,19 +329,21 @@ const Editor = ({ id, tag, state, setState }) => {
 						// TODO: onCompositionEnd
 						onInput: () => {
 							const posRange = state.extendedPosRange
-							const index1 = state.data.findIndex(each => each.id === posRange[0])
-							if (index1 === -1) {
-								throw new Error("onInput: posRange[0] is out of bounds")
-							}
-							const index2 = state.data.findIndex(each => each.id === posRange[1])
-							if (index2 === -1) {
-								throw new Error("onInput: posRange[1] is out of bounds")
-							}
-							const unparsed = readPosRange(ref.current, posRange)
-							setState(current => ({
-								...current,
-								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
-							}))
+							console.log(posRange)
+							// const posRange = state.extendedPosRange
+							// const index1 = state.data.findIndex(each => each.id === posRange[0])
+							// if (index1 === -1) {
+							// 	throw new Error("onInput: posRange[0] is out of bounds")
+							// }
+							// const index2 = state.data.findIndex(each => each.id === posRange[1])
+							// if (index2 === -1) {
+							// 	throw new Error("onInput: posRange[1] is out of bounds")
+							// }
+							// const unparsed = readPosRange(ref.current, posRange)
+							// setState(current => ({
+							// 	...current,
+							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+							// }))
 						},
 
 						contentEditable: !state.readOnly, // Inverse
