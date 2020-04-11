@@ -95,13 +95,14 @@ function extendPosRange(data, [pos1, pos2]) {
 	return [data[index1].id, data[index2].id]
 }
 
-// Reads a data-root element. Returns an array of unparsed
-// data structures.
+// Reads a data-root element.
 function readRoot(root) {
-	const unparsed = [{
-		id: root.id,
-		raw: "",
-	}]
+	const unparsed = [
+		{
+			id: root.id,
+			raw: "",
+		},
+	]
 	const recurse = element => {
 		for (const each of element.childNodes) {
 			unparsed[unparsed.length - 1].raw += each.nodeValue || ""
@@ -119,52 +120,51 @@ function readRoot(root) {
 	return unparsed
 }
 
-// Reads a cursor ID (root ID) range.
-function readPosRange(editorRoot, [pos1ID, pos2ID]) {
-	// TODO: Extract to getRootsAndReextend(editorRoot, [pos1ID, pos2ID])
-	// ... readRoots(editorRoot, root1, root2)
-
-	// Get root1:
-	let root1 = document.getElementById(pos1ID)
-	if (!root1 || !editorRoot.contains(root1)) {
-		throw new Error(`readPosRange: no such id=${pos1ID || ""} or out of bounds`)
-	}
-	const prev = root1.previousElementSibling
-	if (prev && !prev.previousElementSibling) {
-		root1 = prev
-	}
-	// Get root2:
-	let root2 = document.getElementById(pos2ID)
-	if (!root2 || !editorRoot.contains(root2)) {
-		throw new Error(`readPosRange: no such id=${pos2ID || ""} or out of bounds`)
-	}
-	const next = root2.nextElementSibling
-	if (next && !next.nextElementSibling) {
-		// Guard repeat IDs:
-		if (!next.id || next.id === root2.id) {
-			next.id = uuidv4()
-		}
-		root2 = next
-	}
-	// Read unparsed:
+// Reads a range of data-root elements.
+function readRoots(editorRoot, [startRoot, endRoot]) {
 	const unparsed = []
-	let root = root1
-	while (root) {
+	const seen = {}
+	while (startRoot) {
 		// Guard repeat IDs:
-		//
-		// eslint-disable-next-line no-loop-func
-		const seen = !root.id || unparsed.some(each => each.id === root.id)
-		if (seen) {
-			root.id = uuidv4()
+		if (!startRoot.id || seen[startRoot.id]) {
+			startRoot.id = uuidv4()
 		}
-		unparsed.push(...readRoot(root))
-		if (root === root2) {
+		seen[startRoot.id] = true
+		unparsed.push(...readRoot(startRoot))
+		if (startRoot === endRoot) {
 			// No-op
 			break
 		}
-		root = root.nextElementSibling
+		startRoot = startRoot.nextElementSibling
 	}
 	return unparsed
+}
+
+// Queries root elements for a cursor ID (root ID) range.
+function queryRoots(editorRoot, [startID, endID]) {
+	// Get the start root:
+	const startRoot = document.getElementById(startID)
+	if (!startRoot || !editorRoot.contains(startRoot)) {
+		throw new Error(`readRoots: no such id=${startID || ""} or out of bounds`)
+	}
+	// Guard a repeat ID:
+	const startNext = startRoot.nextElementSibling
+	if (startNext && (!startNext.id || startNext.id === startRoot.id)) {
+		startNext.id = uuidv4()
+		// NOTE: Don’t set startRoot to startNext
+	}
+	// Get the end root:
+	let endRoot = document.getElementById(endID)
+	if (!endRoot || !editorRoot.contains(endRoot)) {
+		throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
+	}
+	// Guard a repeat ID:
+	const endNext = endRoot.nextElementSibling
+	if (endNext && (!endNext.id || endNext.id === endRoot.id)) {
+		endNext.id = uuidv4()
+		endRoot = endNext
+	}
+	return [startRoot, endRoot]
 }
 
 const Document = ({ data }) => (
@@ -341,23 +341,20 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							// const posRange = state.extendedPosRange
-							// console.log(posRange)
-							const posRange = state.extendedPosRange
-							const index1 = state.data.findIndex(each => each.id === posRange[0])
+							const roots = queryRoots(ref.current, state.extendedPosRange)
+							const index1 = state.data.findIndex(each => each.id === roots[0].id)
 							if (index1 === -1) {
-								throw new Error("onInput: posRange[0] is out of bounds")
+								throw new Error("onInput: index1 out of bounds")
 							}
-							const index2 = state.data.findIndex(each => each.id === posRange[1])
+							const index2 = state.data.findIndex(each => each.id === roots[1].id)
 							if (index2 === -1) {
-								throw new Error("onInput: posRange[1] is out of bounds")
+								throw new Error("onInput: index2 out of bounds")
 							}
-							const unparsed = readPosRange(ref.current, posRange)
-							console.log(unparsed)
-							// setState(current => ({
-							// 	...current,
-							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
-							// }))
+							const unparsed = readRoots(ref.current, roots)
+							setState(current => ({
+								...current,
+								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+							}))
 						},
 
 						contentEditable: !state.readOnly, // Inverse
