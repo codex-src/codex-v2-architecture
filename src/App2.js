@@ -5,11 +5,15 @@ import useEditor from "Editor2/useEditor"
 const App = () => {
 	const [state, setState] = useEditor(`A
 
+
 B
+
 
 C
 
+
 D
+
 
 E`)
 

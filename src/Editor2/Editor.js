@@ -153,21 +153,21 @@ function queryRoots(editorRoot, [startID, endID]) {
 	if (!startRoot || !editorRoot.contains(startRoot)) {
 		throw new Error(`readRoots: no such id=${startID || ""} or out of bounds`)
 	}
-	const startNext = startRoot.nextElementSibling
-	if (startNext && (!startNext.id || startNext.id === startRoot.id)) {
-		startNext.id = uuidv4()
-		// NOTE: Don’t set startRoot to startNext
-	}
+	// const startNext = startRoot.nextElementSibling
+	// if (startNext && (!startNext.id || startNext.id === startRoot.id)) {
+	// 	startNext.id = uuidv4()
+	// 	// NOTE: Don’t set startRoot to startNext
+	// }
 	// Get the end root:
 	let endRoot = document.getElementById(endID)
 	if (!endRoot || !editorRoot.contains(endRoot)) {
 		throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
 	}
-	const endNext = endRoot.nextElementSibling
-	if (endNext && (!endNext.id || endNext.id === endRoot.id)) {
-		endNext.id = uuidv4()
-		endRoot = endNext
-	}
+	// const endNext = endRoot.nextElementSibling
+	// if (endNext && (!endNext.id || endNext.id === endRoot.id)) {
+	// 	endNext.id = uuidv4()
+	// 	endRoot = endNext
+	// }
 	// const atStart = startRoot.previousElementSibling
 	const atEnd = !endRoot.nextElementSibling
 	return { roots: [startRoot, endRoot], atEnd }
@@ -200,7 +200,7 @@ const Document = ({ data }) => (
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
-	const pointerDownRef = React.useRef()
+	const isPointerDownRef = React.useRef()
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
@@ -219,8 +219,22 @@ const Editor = ({ id, tag, state, setState }) => {
 				}
 				// Sync the DOM and VDOM cursors:
 				syncPosRoots(ref.current, posRoots)
-				console.log("synced pos roots")
+				console.log("synced pos")
 			})
+			// Update extendedPosRange for edge-cases such as
+			// forward-backspace:
+			if (!state.focused) {
+				// No-op
+				return
+			}
+			const [pos1, pos2] = computePosRange(ref.current)
+			const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
+			setState(current => ({
+				...current,
+				pos1,
+				pos2,
+				extendedPosRange,
+			}))
 		}, [state, setState]),
 		[state.data],
 	)
@@ -285,12 +299,12 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onPointerDown: () => {
-							pointerDownRef.current = true
+							isPointerDownRef.current = true
 						},
 						onPointerMove: () => {
 							// Editor must be focused and pointer must be down:
-							if (!state.focused || !pointerDownRef.current) {
-								pointerDownRef.current = false // Reset to be safe
+							if (!state.focused || !isPointerDownRef.current) {
+								isPointerDownRef.current = false // Reset to be safe
 								return
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
@@ -303,7 +317,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							}))
 						},
 						onPointerUp: () => {
-							pointerDownRef.current = false
+							isPointerDownRef.current = false
 						},
 
 						onKeyDown: e => {
@@ -359,7 +373,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							if (index1 === -1) {
 								throw new Error("onInput: index1 out of bounds")
 							}
-							const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
+							// const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
+							const index2 = state.data.findIndex(each => each.id === roots[1].id)
 							if (index2 === -1) {
 								throw new Error("onInput: index2 out of bounds")
 							}
@@ -371,6 +386,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								pos1,
 								pos2,
 							}))
+							// console.log(unparsed)
 						},
 
 						contentEditable: !state.readOnly, // Inversed
@@ -382,8 +398,11 @@ const Editor = ({ id, tag, state, setState }) => {
 					<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 						{JSON.stringify(
 							{
-								...state,
-								reactDOM: undefined, // Obscure
+								extendedPosRange: state.extendedPosRange,
+								id: state.data.map(each => each.id),
+
+								// ...state,
+								// reactDOM: undefined, // Obscure
 							},
 							null,
 							"\t",
