@@ -390,11 +390,14 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
+							// Force a re-render when empty (update
+							// state.data reference):
 							if (!ref.current.childNodes.length) {
 								// No-op
 								setState(current => ({
 									...current,
 									data: [...state.data],
+									// TODO: Add forceRender member?
 								}))
 								return
 							}
@@ -414,7 +417,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							// }
 							// console.log(rootPosRange)
 
-							let [startID, endID] = state.extRootPosRange
+							const [startID, endID] = state.extRootPosRange
 
 							// Query the start root:
 							const startRoot = document.getElementById(startID)
@@ -517,11 +520,11 @@ const Editor = ({ id, tag, state, setState }) => {
 					<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 						{JSON.stringify(
 							{
-								extRootPosRange: state.extRootPosRange,
-								id: state.data.map(each => each.id),
+								// extRootPosRange: state.extRootPosRange,
+								// id: state.data.map(each => each.id),
 
-								// ...state,
-								// reactDOM: undefined, // Obscure
+								...state,
+								reactDOM: undefined, // Obscure
 							},
 							null,
 							"\t",
