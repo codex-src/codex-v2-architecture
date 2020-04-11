@@ -412,12 +412,14 @@ const Editor = ({ id, tag, state, setState }) => {
 							// If backspaced was pressed on the end root,
 							// query the second-to-end root:
 							if (!endRoot) {
+								// alert("test")
 								let index = state.data.length - 2
 								if (index < 0) {
 									index = 0
 								}
 								endID	= state.data[index].id
 								endRoot = document.getElementById(endID)
+								atEnd = true
 							// If enter was pressed on the end root, re-
 							// extend the end root 1x:
 							} else if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
