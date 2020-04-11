@@ -224,6 +224,10 @@ const Editor = ({ id, tag, state, setState }) => {
 						onSelect: () => {
 							// Correct range when out of bounds:
 							const selection = document.getSelection()
+							if (!selection.rangeCount) {
+								// No-op
+								return
+							}
 							const range = selection.getRangeAt(0)
 							if (range.startContainer === ref.current || range.endContainer === ref.current) {
 								// Iterate to the deepest start node:
