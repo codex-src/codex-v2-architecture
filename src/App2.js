@@ -9,14 +9,7 @@ const App = () => {
 B
 
 
-C
-
-
-D
-
-
-E`)
-
+C`)
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">

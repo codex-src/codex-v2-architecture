@@ -82,14 +82,14 @@ function computePosRange(editorRoot) {
 }
 
 // Creates an extended cursor ID (root ID) range.
-function extendPosRange(data, [pos1, pos2]) {
-	let index1 = data.findIndex(each => each.id === pos1.root.id)
+function extendRootPostRange(data, [rootPos1, rootPos2]) {
+	let index1 = data.findIndex(each => each.id === rootPos1.id)
 	index1 -= 2 // Decrement 2x
 	// Guard bounds:
 	if (index1 < 0) {
 		index1 = 0
 	}
-	let index2 = data.findIndex(each => each.id === pos2.root.id)
+	let index2 = data.findIndex(each => each.id === rootPos2.id)
 	index2 += 2 // Increment 2x
 	// Guard bounds:
 	if (index2 >= data.length) {
@@ -97,6 +97,33 @@ function extendPosRange(data, [pos1, pos2]) {
 	}
 	return [data[index1].id, data[index2].id]
 }
+
+// // Creates an extended cursor ID (root ID) range.
+// function extendRootPostRange(data, [pos1, pos2]) {
+// 	// const posRangeInfo = {
+// 	// 	pos1: {
+// 	// 		id: "",     // The ID
+// 	// 		toStart: 0, // The number of IDs to the start
+// 	// 	},
+// 	// 	pos2: {
+// 	// 		id: ""      // The ID
+// 	// 		toEnd: 0,   // The number of IDs to the end
+// 	// 	},
+// 	// }
+// 	let index1 = data.findIndex(each => each.id === pos1.root.id)
+// 	index1 -= 2 // Decrement 2x
+// 	// Guard bounds:
+// 	if (index1 < 0) {
+// 		index1 = 0
+// 	}
+// 	let index2 = data.findIndex(each => each.id === pos2.root.id)
+// 	index2 += 2 // Increment 2x
+// 	// Guard bounds:
+// 	if (index2 >= data.length) {
+// 		index2 = data.length - 1
+// 	}
+// 	return [data[index1].id, data[index2].id]
+// }
 
 // Reads a data-root element.
 function readRoot(root) {
@@ -153,24 +180,23 @@ function queryRoots(editorRoot, [startID, endID]) {
 	if (!startRoot || !editorRoot.contains(startRoot)) {
 		throw new Error(`readRoots: no such id=${startID || ""} or out of bounds`)
 	}
-	// const startNext = startRoot.nextElementSibling
-	// if (startNext && (!startNext.id || startNext.id === startRoot.id)) {
-	// 	startNext.id = uuidv4()
-	// 	// NOTE: Don’t set startRoot to startNext
-	// }
 	// Get the end root:
-	let endRoot = document.getElementById(endID)
+	const endRoot = document.getElementById(endID)
 	if (!endRoot || !editorRoot.contains(endRoot)) {
 		throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
 	}
-	// const endNext = endRoot.nextElementSibling
-	// if (endNext && (!endNext.id || endNext.id === endRoot.id)) {
-	// 	endNext.id = uuidv4()
-	// 	endRoot = endNext
+	// // When next has no ID or a repeat ID, extend endRoot,
+	// // correct the ID, and set atEnd to true:
+	// let atEnd = false
+	// const next = endRoot.nextElementSibling
+	// if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
+	// 	// alert("test")
+	// 	endRoot = next
+	// 	endRoot.id = uuidv4()
+	// 	atEnd	= true
 	// }
-	// const atStart = startRoot.previousElementSibling
-	const atEnd = !endRoot.nextElementSibling
-	return { roots: [startRoot, endRoot], atEnd }
+	// return { roots: [startRoot, endRoot], atEnd }
+	return { roots: [startRoot, endRoot] /* , atEnd */ }
 }
 
 const Document = ({ data }) => (
@@ -185,17 +211,6 @@ const Document = ({ data }) => (
 ;(() => {
 	document.body.classList.toggle("debug-css")
 })()
-
-// // Returns whether cursor data structures are empty.
-// function posAreEmpty(pos) {
-// 	return pos.some(each => !each.id)
-// 	// for (const each of pos) {
-// 	// 	if (!each.root.id) {
-// 	// 		return true
-// 	// 	}
-// 	// }
-// 	// return false
-// }
 
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
@@ -221,19 +236,19 @@ const Editor = ({ id, tag, state, setState }) => {
 				syncPosRoots(ref.current, posRoots)
 				console.log("synced pos")
 			})
-			// Update extendedPosRange for edge-cases such as
+			// Update extRootPosRange for edge-cases such as
 			// forward-backspace:
 			if (!state.focused) {
 				// No-op
 				return
 			}
 			const [pos1, pos2] = computePosRange(ref.current)
-			const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
+			const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 			setState(current => ({
 				...current,
 				pos1,
 				pos2,
-				extendedPosRange,
+				extRootPosRange,
 			}))
 		}, [state, setState]),
 		[state.data],
@@ -289,12 +304,12 @@ const Editor = ({ id, tag, state, setState }) => {
 								selection.addRange(range)
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
-							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
+							const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
-								extendedPosRange,
+								extRootPosRange,
 							}))
 						},
 
@@ -308,12 +323,12 @@ const Editor = ({ id, tag, state, setState }) => {
 								return
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
-							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
+							const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
-								extendedPosRange,
+								extRootPosRange,
 							}))
 						},
 						onPointerUp: () => {
@@ -368,25 +383,106 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
-							const index1 = state.data.findIndex(each => each.id === roots[0].id)
-							if (index1 === -1) {
-								throw new Error("onInput: index1 out of bounds")
+							// TODO: Rename syncPosRoots to syncRootPos
+
+							// let rootPosRange = state.extRootPosRange
+							// // Guard the extended end root ID; when a user
+							// // enters or backspaces on the end root, the
+							// // DOM and VDOM become out of sync:
+							// if (state.data.findIndex(each => each.id === rootPosRange[1]) === -1) {
+							// 	let index = state.data.length - 2
+							// 	if (index < 0) {
+							// 		index = 0
+							// 	}
+							// 	rootPosRange[1] = state.data[index].id
+							// }
+							// console.log(rootPosRange)
+
+							let [startID, endID] = state.extRootPosRange
+
+							// Query the start root:
+							const startRoot = document.getElementById(startID)
+							if (!startRoot || !ref.current.contains(startRoot)) {
+								throw new Error("readRoots: no such startRoot or out of bounds")
 							}
-							// const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
-							const index2 = state.data.findIndex(each => each.id === roots[1].id)
-							if (index2 === -1) {
-								throw new Error("onInput: index2 out of bounds")
+							// Query the end root:
+							let endRoot = document.getElementById(endID)
+							const next = endRoot && endRoot.nextElementSibling
+							let atEnd = false // Is endRoot at the end?
+							// If backspaced was pressed on the end root,
+							// query the second-to-end root:
+							if (!endRoot) {
+								let index = state.data.length - 2
+								if (index < 0) {
+									index = 0
+								}
+								endID	= state.data[index].id
+								endRoot = document.getElementById(endID)
+							// If enter was pressed on the end root, re-
+							// extend the end root 1x:
+							} else if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
+								// Correct the ID:
+								next.id = uuidv4()
+								endRoot = next
+								atEnd = true
 							}
-							const unparsed = readRoots(ref.current, roots)
+							if (!endRoot || !ref.current.contains(endRoot)) {
+								throw new Error("readRoots: no such endRoot or out of bounds")
+							}
+
+							const startIndex = state.data.findIndex(each => each.id === startRoot.id)
+							if (startIndex === -1) {
+								throw new Error("onInput: startIndex out of bounds")
+							}
+							const endIndex = !atEnd ? state.data.findIndex(each => each.id === endRoot.id) : state.data.length - 1
+							if (endIndex === -1) {
+								throw new Error("onInput: endIndex out of bounds")
+							}
+							const unparsed = readRoots(ref.current, [startRoot, endRoot])
 							const [pos1, pos2] = computePosRange(ref.current)
 							setState(current => ({
 								...current,
-								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+								data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
 								pos1,
 								pos2,
 							}))
 							// console.log(unparsed)
+
+							// if (!endRoot || !editorRoot.contains(endRoot)) {
+							// 	throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
+							// }
+							// // // When next has no ID or a repeat ID, extend endRoot,
+							// // // correct the ID, and set atEnd to true:
+							// // let atEnd = false
+							// // const next = endRoot.nextElementSibling
+							// // if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
+							// // 	// alert("test")
+							// // 	endRoot = next
+							// // 	endRoot.id = uuidv4()
+							// // 	atEnd	= true
+							// // }
+							// // return { roots: [startRoot, endRoot], atEnd }
+							// return { roots: [startRoot, endRoot] /* , atEnd */ }
+
+							// const { roots, atEnd } = queryRoots(ref.current, state.extRootPosRange)
+							// console.log(...roots)
+							// const index1 = state.data.findIndex(each => each.id === roots[0].id)
+							// if (index1 === -1) {
+							// 	throw new Error("onInput: index1 out of bounds")
+							// }
+							// const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
+							// if (index2 === -1) {
+							// 	throw new Error("onInput: index2 out of bounds")
+							// }
+							// const unparsed = readRoots(ref.current, roots)
+							// const [pos1, pos2] = computePosRange(ref.current)
+							// setState(current => ({
+							// 	...current,
+							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+							// 	pos1,
+							// 	pos2,
+							// }))
+							// // console.log(unparsed)
 						},
 
 						contentEditable: !state.readOnly, // Inversed
@@ -398,7 +494,7 @@ const Editor = ({ id, tag, state, setState }) => {
 					<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 						{JSON.stringify(
 							{
-								extendedPosRange: state.extendedPosRange,
+								extRootPosRange: state.extRootPosRange,
 								id: state.data.map(each => each.id),
 
 								// ...state,
