@@ -147,7 +147,6 @@ function queryRoots(editorRoot, [startID, endID]) {
 	if (!startRoot || !editorRoot.contains(startRoot)) {
 		throw new Error(`readRoots: no such id=${startID || ""} or out of bounds`)
 	}
-	// Guard a repeat ID:
 	const startNext = startRoot.nextElementSibling
 	if (startNext && (!startNext.id || startNext.id === startRoot.id)) {
 		startNext.id = uuidv4()
@@ -158,13 +157,14 @@ function queryRoots(editorRoot, [startID, endID]) {
 	if (!endRoot || !editorRoot.contains(endRoot)) {
 		throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
 	}
-	// Guard a repeat ID:
 	const endNext = endRoot.nextElementSibling
 	if (endNext && (!endNext.id || endNext.id === endRoot.id)) {
 		endNext.id = uuidv4()
 		endRoot = endNext
 	}
-	return [startRoot, endRoot]
+	// const atStart = startRoot.previousElementSibling
+	const atEnd = !endRoot.nextElementSibling
+	return { roots: [startRoot, endRoot], atEnd }
 }
 
 const Document = ({ data }) => (
@@ -341,12 +341,12 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							const roots = queryRoots(ref.current, state.extendedPosRange)
+							const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
 							const index1 = state.data.findIndex(each => each.id === roots[0].id)
 							if (index1 === -1) {
 								throw new Error("onInput: index1 out of bounds")
 							}
-							const index2 = state.data.findIndex(each => each.id === roots[1].id)
+							const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
 							if (index2 === -1) {
 								throw new Error("onInput: index2 out of bounds")
 							}
