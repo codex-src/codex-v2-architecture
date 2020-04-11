@@ -1,7 +1,7 @@
 import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
-import typeEnum from "./typeEnum"
+// import typeEnum from "./typeEnum"
 import uuidv4 from "uuid/v4"
 
 function useEditor(initialValue) {

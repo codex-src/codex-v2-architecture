@@ -1,8 +1,8 @@
-import actions from "./actions"
+// import actions from "./actions"
 import EditorContext from "./EditorContext"
-import KeyCodes from "./KeyCodes"
+// import KeyCodes from "./KeyCodes"
 import newPos from "./newPos"
-import parse from "./parser"
+// import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncTrees from "./syncTrees"
@@ -236,12 +236,13 @@ function readRootIDs(editorRoot, [extendedID1, extendedID2]) {
 	const unparsed = []
 	let root = root1
 	while (root) {
+		// eslint-disable-next-line no-loop-func
 		const seen = !root.id || unparsed.some(each => each.id === root.id)
 		if (seen) {
 			root.id = uuidv4()
 		}
 		unparsed.push(...readRoot(root))
-		if (root == root2) {
+		if (root === root2) {
 			// No-op
 			break
 		}
