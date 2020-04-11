@@ -224,7 +224,23 @@ const Editor = ({ id, tag, state, setState }) => {
 				// Sync the React and user DOMs:
 				const mutations = syncRoots(state.reactDOM, ref.current) // TODO: Rename to syncRoots
 				if (!mutations) {
-					// No-op
+					// // No-op
+					// return
+
+					// Update extRootPosRange for edge-cases such as
+					// forward-backspace:
+					if (!state.focused) {
+						// No-op
+						return
+					}
+					const [pos1, pos2] = computePosRange(ref.current)
+					const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
+					setState(current => ({
+						...current,
+						pos1,
+						pos2,
+						extRootPosRange,
+					}))
 					return
 				}
 				const posRoots = [state.pos1.root, state.pos2.root]
@@ -236,20 +252,6 @@ const Editor = ({ id, tag, state, setState }) => {
 				syncPosRoots(ref.current, posRoots)
 				console.log("synced pos")
 			})
-			// // Update extRootPosRange for edge-cases such as
-			// // forward-backspace:
-			// if (!state.focused) {
-			// 	// No-op
-			// 	return
-			// }
-			// const [pos1, pos2] = computePosRange(ref.current)
-			// const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
-			// setState(current => ({
-			// 	...current,
-			// 	pos1,
-			// 	pos2,
-			// 	extRootPosRange,
-			// }))
 		}, [state, setState]),
 		[state.data],
 	)
