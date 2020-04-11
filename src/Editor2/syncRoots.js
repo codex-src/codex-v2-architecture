@@ -18,13 +18,12 @@ function eagerlyDropRange() {
 	selection.removeAllRanges()
 }
 
-// Syncs two DOM trees (elements); DOM nodes are
-// incrementally cloned and replaced forwards and then
-// backwards. Note that the root nodes are not synced.
+// Syncs two roots elements; nodes are cloned and replaced
+// forwards and then backwards. Note that the root elements
+// are not synced.
 //
-// TODO: Reduce the number of mutations for the 90% case
-// from 2 to 1
-function syncTrees(src, dst) {
+// TODO: Reduce mutations from 2 to 1 for the 90% case
+function syncRoots(src, dst) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
@@ -56,7 +55,7 @@ function syncTrees(src, dst) {
 			}
 		}
 	}
-	// Drop extraneous DOM nodes:
+	// Drop extraneous nodes:
 	if (start < end1) {
 		for (; start < end1; end1--) { // Iterate backwards
 			if (!mutations) {
@@ -65,7 +64,7 @@ function syncTrees(src, dst) {
 			dst.childNodes[end1 - 1].remove()
 			mutations++
 		}
-	// Push extraneous DOM nodes:
+	// Push extraneous nodes:
 	} else if (start < end2) {
 		for (; start < end2; start++) {
 			if (!mutations) {
@@ -79,4 +78,4 @@ function syncTrees(src, dst) {
 	return mutations
 }
 
-export default syncTrees
+export default syncRoots

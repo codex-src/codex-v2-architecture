@@ -106,7 +106,8 @@ function eagerlyRemoveRange() {
 	selection.removeAllRanges()
 }
 
-// Synchronizes the DOM cursor.
+// Synchronizes the DOM cursor based on root cursor data
+// structures.
 function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	const selection = document.getSelection()
 
