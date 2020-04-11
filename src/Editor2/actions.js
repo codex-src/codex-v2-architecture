@@ -15,7 +15,6 @@ function tab(state, setState) {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
 		},
-		// Reset to pos1:
 		pos2: {
 			...state.pos1,
 			offset: state.pos1.offset + 1,
@@ -66,12 +65,10 @@ function detabMany(state, setState) {
 		data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
 		pos1: {
 			...state.pos1,
-			// Guard bounds:
 			offset: Math.max(0, state.pos1.offset - removed1),
 		},
 		pos2: {
 			...state.pos2,
-			// Guard bounds:
 			offset: Math.max(0, state.pos2.offset - removed2),
 		},
 	}))
@@ -102,12 +99,27 @@ function enter(state, setState) {
 			id,
 			offset: 0,
 		},
-		// Reset to pos1:
 		pos2: {
 			id,
 			offset: 0,
 		},
 	}))
+}
+
+function input(state, setState) {
+	// const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
+	// if (index1 === -1) {
+	// 	throw new Error("onInput: unparsed[0].id is out of bounds")
+	// }
+	// const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
+	// if (index2 === -1) {
+	// 	throw new Error("onInput: unparsed.slice(-1)[0].id is out of bounds")
+	// }
+	// const unparsed = readRootIDs(editorRootRef.current, extendedIDsRef.current)
+	// setState(current => ({
+	// 	...current,
+	// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+	// }))
 }
 
 const actions = {
@@ -116,6 +128,7 @@ const actions = {
 	tabMany,
 	detabMany,
 	enter,
+	input,
 }
 
 export default actions

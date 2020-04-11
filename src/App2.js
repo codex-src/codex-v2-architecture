@@ -5,7 +5,13 @@ import useEditor from "Editor2/useEditor"
 const App = () => {
 	const [state, setState] = useEditor(`Hello! A
 
-Hello! B`)
+Hello! B
+
+Hello! C
+
+Hello! D
+
+Hello! E`)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">

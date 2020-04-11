@@ -1,8 +1,8 @@
 // import actions from "./actions"
-import EditorContext from "./EditorContext"
 // import KeyCodes from "./KeyCodes"
+import EditorContext from "./EditorContext"
 import newPos from "./newPos"
-// import parse from "./parser"
+import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncTrees from "./syncTrees"
@@ -78,16 +78,16 @@ function computePos(editorRoot) {
 	return [pos1, pos2]
 }
 
-// Gets the extended cursor root IDs.
-function getExtendedPosRootIDs(data, [pos1, pos2]) {
+// Creates an extended cursor ID (root ID) range.
+function extendPosRange(data, [pos1, pos2]) {
 	let index1 = data.findIndex(each => each.id === pos1.root.id)
-	index1 -= 2
+	index1 -= 2 // Decrement 2x
 	// Guard bounds:
 	if (index1 < 0) {
 		index1 = 0
 	}
 	let index2 = data.findIndex(each => each.id === pos2.root.id)
-	index2 += 2
+	index2 += 2 // Increment 2x
 	// Guard bounds:
 	if (index2 >= data.length) {
 		index2 = data.length - 1
@@ -95,108 +95,13 @@ function getExtendedPosRootIDs(data, [pos1, pos2]) {
 	return [data[index1].id, data[index2].id]
 }
 
-// // Reads a DOM node.
-// function readNode(node) {
-// 	return node.nodeValue || ""
-// }
-//
-// // Recursively reads a DOM element.
-// //
-// // FIXME: DOM element root -> readElementRoot?
-// function readElement(element) {
-// 	const recurse = readElement
-//
-// 	let str = ""
-// 	for (const each of element.childNodes) {
-// 		if (each.nodeType === Node.TEXT_NODE) {
-// 			str += readNode(each)
-// 			continue
-// 		}
-// 		str += recurse(each)
-// 		const next = each.nextElementSibling
-// 		if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
-// 			str += "\n"
-// 		}
-// 	}
-// 	return str
-// }
-
-// // Reads an unparsed (raw) data structure from extended IDs.
-// //
-// // TODO: Remove editorRoot from parameters
-// function readRawFromExtendedIDs(editorRoot, [startID, endID]) {
-// 	let startElement = document.getElementById(startID)
-// 	let endElement = startElement
-// 	if (endID !== startID) {
-// 		endElement = document.getElementById(endID)
-// 	}
-// 	// Re-extend the start element once:
-// 	//
-// 	// TODO: Conditionally re-extend? It’s confusing to always
-// 	// re-extend
-// 	if (startElement.previousElementSibling) {
-// 		startElement = startElement.previousElementSibling
-// 	}
-// 	const seenIDs = {}
-// 	const unparsed = []
-// 	while (startElement) {
-// 		let { id } = startElement
-// 		if (!id || seenIDs[id]) {
-// 			id = uuidv4()
-// 			startElement.id = id
-// 		}
-// 		seenIDs[id] = true
-// 		const raw = readElement(startElement)
-// 		// const range = str.split("\n").map((each, index) => ({
-// 		// 	id: !index ? id : uuidv4(),
-// 		// 	raw: each,
-// 		// }))
-// 		unparsed.push({ id, raw })
-// 		if (startElement === endElement) {
-// 			// No-op
-// 			break
-// 		}
-// 		startElement = startElement.nextElementSibling
-// 	}
-// 	// TODO: atStart, atEnd?
-// 	return unparsed
-// }
-
-// - hello
-// 	- hello
-// 			- hello
-// 	- hello
-// - hello
-
-/*
-
-<div data-root>
-	<div data-node>
-		hello, world!
-	</div>
-	<div data-node>
-		<div>
-			<div>
-				hello, world!
-			</div>
-		</div>
-	</div>
-	<div data-node>
-		hello, world!
-	</div>
-</div>
-
-*/
-
 // Reads a data-root element. Returns an array of unparsed
 // data structures.
 function readRoot(root) {
-	const unparsed = [
-		{
-			id: root.id,
-			raw: "",
-		},
-	]
+	const unparsed = [{
+		id: root.id,
+		raw: "",
+	}]
 	const recurse = element => {
 		for (const each of element.childNodes) {
 			unparsed[unparsed.length - 1].raw += each.nodeValue || ""
@@ -214,23 +119,21 @@ function readRoot(root) {
 	return unparsed
 }
 
-// Reads a range of data-root element IDs. Returns an array
-// of unparsed data structures.
-function readRootIDs(editorRoot, [extendedID1, extendedID2]) {
-	// Get root1:
-	let root1 = document.getElementById(extendedID1)
+// Reads a cursor ID (root ID) range.
+function readPosRange(editorRoot, [pos1ID, pos2ID]) {
+	// Query root1 and root2:
+	let root1 = document.getElementById(pos1ID)
 	if (!root1 || !editorRoot.contains(root1)) {
-		throw new Error(`readRootIDs: no such root1 (id=${root1.id || ""}) or out of bounds`)
+		throw new Error(`readPosRange: no such id=${pos1ID || ""} or out of bounds`)
 	}
-	// Extend root1 when was at the start:
+	// Extend root1:
 	const prev = root1.previousElementSibling
 	if (prev && !prev.previousElementSibling) {
 		root1 = prev
 	}
-	// Get root2:
-	const root2 = document.getElementById(extendedID2)
+	const root2 = document.getElementById(pos2ID)
 	if (!root2 || !editorRoot.contains(root2)) {
-		throw new Error(`readRootIDs: no such root2 (id=${root2.id || ""}) or out of bounds`)
+		throw new Error(`readPosRange: no such id=${pos2ID || ""} or out of bounds`)
 	}
 	// Read unparsed:
 	const unparsed = []
@@ -265,10 +168,10 @@ const Document = ({ data }) => (
 })()
 
 const Editor = ({ id, tag, state, setState }) => {
-	const editorRootRef = React.useRef()
+	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
-	const extendedIDsRef = React.useRef(["", ""])
+	// const extendedIDsRef = React.useRef(["", ""])
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
@@ -276,7 +179,7 @@ const Editor = ({ id, tag, state, setState }) => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
 				// Sync the React-managed DOM tree to the user-
 				// managed DOM tree:
-				const mutations = syncTrees(state.reactDOM, editorRootRef.current)
+				const mutations = syncTrees(state.reactDOM, ref.current)
 				if (!mutations) {
 					// No-op
 					return
@@ -287,7 +190,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				// // 	// No-op
 				// // 	return
 				// // }
-				// syncPos(editorRootRef.current, state.pos1, state.pos2)
+				// syncPos(ref.current, state.pos1, state.pos2)
 				// console.log("synced the DOM cursor")
 			})
 		}, [state, setState]),
@@ -303,7 +206,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				{React.createElement(
 					tag || "div",
 					{
-						ref: editorRootRef,
+						ref,
 
 						id,
 
@@ -322,14 +225,14 @@ const Editor = ({ id, tag, state, setState }) => {
 							// Correct range when out of bounds:
 							const selection = document.getSelection()
 							const range = selection.getRangeAt(0)
-							if (range.startContainer === editorRootRef.current || range.endContainer === editorRootRef.current) {
+							if (range.startContainer === ref.current || range.endContainer === ref.current) {
 								// Iterate to the deepest start node:
-								let startNode = editorRootRef.current.childNodes[0]
+								let startNode = ref.current.childNodes[0]
 								while (startNode.childNodes.length) {
 									startNode = startNode.childNodes[0]
 								}
 								// Iterate to the deepest end node:
-								let endNode = editorRootRef.current.childNodes[editorRootRef.current.childNodes.length - 1]
+								let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
 								while (endNode.childNodes.length) {
 									endNode = endNode.childNodes[endNode.childNodes.length - 1]
 								}
@@ -339,13 +242,14 @@ const Editor = ({ id, tag, state, setState }) => {
 								selection.removeAllRanges()
 								selection.addRange(range)
 							}
-							const [pos1, pos2] = computePos(editorRootRef.current)
+							const [pos1, pos2] = computePos(ref.current)
+							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
+								extendedPosRange,
 							}))
-							extendedIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 
 						onPointerDown: () => {
@@ -357,13 +261,14 @@ const Editor = ({ id, tag, state, setState }) => {
 								pointerDownRef.current = false // Reset to be safe
 								return
 							}
-							const [pos1, pos2] = computePos(editorRootRef.current)
+							const [pos1, pos2] = computePos(ref.current)
+							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
+								extendedPosRange,
 							}))
-							extendedIDsRef.current = getExtendedPosRootIDs(state.data, [pos1, pos2])
 						},
 						onPointerUp: () => {
 							pointerDownRef.current = false
@@ -417,26 +322,20 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							const unparsed = readRootIDs(editorRootRef.current, extendedIDsRef.current)
-							console.log(unparsed)
-
-							// // TODO: Extract to action.input(state, setState)
-							// const unparsed = readRawFromExtendedIDs(editorRootRef.current, extendedIDs.current)
-							// const parsed = parse(unparsed)
-							// const index1 = state.data.findIndex(each => each.id === unparsed[0].id)
-							// if (index1 === -1) {
-							// 	throw new Error("onInput: index1 is out of bounds")
-							// }
-							// const index2 = state.data.findIndex(each => each.id === unparsed.slice(-1)[0].id)
-							// if (index2 === -1) {
-							// 	throw new Error("onInput: index2 is out of bounds")
-							// }
-							// const data = [...state.data]
-							// data.splice(index1, (index2 + 1) - index1, ...parsed)
-							// setState(current => ({
-							// 	...current,
-							// 	data,
-							// }))
+							const posRange = state.extendedPosRange
+							const index1 = state.data.findIndex(each => each.id === posRange[0])
+							if (index1 === -1) {
+								throw new Error("onInput: posRange[0] is out of bounds")
+							}
+							const index2 = state.data.findIndex(each => each.id === posRange[1])
+							if (index2 === -1) {
+								throw new Error("onInput: posRange[1] is out of bounds")
+							}
+							const unparsed = readPosRange(ref.current, posRange)
+							setState(current => ({
+								...current,
+								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+							}))
 						},
 
 						contentEditable: !state.readOnly, // Inverse
