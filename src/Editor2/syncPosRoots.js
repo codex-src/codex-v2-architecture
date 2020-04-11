@@ -85,14 +85,14 @@ function computeRange(editorRoot, { ...posRoot }) {
 	return { node, offset }
 }
 
-// Compares two cursor data structures.
-function posAreSame(pos1, pos2) {
-	const ok = (
-		pos1.id === pos2.id &&
-		pos1.offset === pos2.offset
-	)
-	return ok
-}
+// // Compares two cursor data structures.
+// function areEqual(pos1, pos2) {
+// 	const ok = (
+// 		pos1.id === pos2.id &&
+// 		pos1.offset === pos2.offset
+// 	)
+// 	return ok
+// }
 
 // Eagerly removes the range (for performance reasons).
 //
@@ -108,6 +108,8 @@ function eagerlyRemoveRange() {
 
 // Synchronizes the DOM cursor based on root cursor data
 // structures.
+//
+// TODO: Extract to syncPosRoots.js
 function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	const selection = document.getSelection()
 
@@ -120,7 +122,7 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	// 	}
 	// 	// Compare the VDOM cursor data structures to the DOM data
 	// 	// structures:
-	// 	if (posAreSame(posRoot1, domPos1) && posAreSame(posRoot2, domPos2)) {
+	// 	if (areEqual(posRoot1, domPos1) && areEqual(posRoot2, domPos2)) {
 	// 		// No-op
 	// 		return
 	// 	}
@@ -130,7 +132,7 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	const range = document.createRange()
 	const startRange = computeRange(editorRoot, posRoot1)
 	let endRange = { ...startRange }
-	if (!posAreSame(posRoot1, posRoot2)) {
+	if (posRoot1.id !== posRoot2.id || posRoot1.offset !== posRoot2.offset) {
 		endRange = computeRange(editorRoot, posRoot2)
 	}
 	range.setStart(startRange.node, startRange.offset)
@@ -142,7 +144,7 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	// 	const range = document.createRange()
 	// 	const startRange = computeRange(editorRoot, posRoot1)
 	// 	let endRange = { ...startRange }
-	// 	if (!posAreSame(posRoot1, posRoot2)) {
+	// 	if (!areEqual(posRoot1, posRoot2)) {
 	// 		endRange = computeRange(editorRoot, posRoot2)
 	// 	}
 	// 	range.setStart(startRange.node, startRange.offset)
@@ -163,7 +165,7 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	// 	}
 	// 	// Compare the VDOM cursor data structures to the DOM data
 	// 	// structures:
-	// 	if (posAreSame(posRoot1, domPos1) && posAreSame(posRoot2, domPos2)) {
+	// 	if (areEqual(posRoot1, domPos1) && areEqual(posRoot2, domPos2)) {
 	// 		// No-op
 	// 		return
 	// 	}
@@ -175,7 +177,7 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	// range.setStart(startRange.node, startRange.offset)
 	// range.collapse()
 	// let endRange = { ...startRange }
-	// if (!posAreSame(posRoot1, posRoot2)) {
+	// if (!areEqual(posRoot1, posRoot2)) {
 	// 	endRange = computeRange(editorRoot, posRoot2)
 	// 	range.setEnd(endRange.node, endRange.offset)
 	// }

@@ -6,7 +6,7 @@ import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncPosRoots from "./syncPosRoots"
-import syncTrees from "./syncTrees"
+import syncRoots from "./syncRoots"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
 
@@ -206,9 +206,8 @@ const Editor = ({ id, tag, state, setState }) => {
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
-				// Sync the React-managed DOM tree to the user-
-				// managed DOM tree:
-				const mutations = syncTrees(state.reactDOM, ref.current) // TODO: Rename to syncRoots
+				// Sync the React and user DOMs:
+				const mutations = syncRoots(state.reactDOM, ref.current) // TODO: Rename to syncRoots
 				if (!mutations) {
 					// No-op
 					return
@@ -218,8 +217,9 @@ const Editor = ({ id, tag, state, setState }) => {
 					// No-op
 					return
 				}
+				// Sync the DOM and VDOM cursors:
 				syncPosRoots(ref.current, posRoots)
-				// console.log("synced pos")
+				console.log("synced pos roots")
 			})
 		}, [state, setState]),
 		[state.data],
