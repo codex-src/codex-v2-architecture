@@ -1,67 +1,86 @@
-// Computes the DOM element root ID and offset from a range
-// data structure.
-function computeUUIDAndOffsetFromRange(editorRoot, range) {
-	// if (!range.node && !range.offset) {
-	// 	return { id: "", offset: "" }
-	// }
-
-	let { node } = range
-	while (node.nodeType !== Node.ELEMENT_NODE || !node.id) {
-		node = node.parentNode
-	}
-	const root = node
-	const { id } = root
-	// Recursively counts the offset from an element to a
-	// range node and offset.
-	let offset = 0
-	const recurse = element => {
-		for (const each of element.childNodes) {
-			if (each === range.node) {
-				offset += range.offset
-				return true
-			}
-			offset += (each.nodeValue || "").length
-			if (recurse(each)) {
-				return true
-			}
-			// NOTE: Use next.getAttribute instead of next.id
-			// because next.id always returns ""
-			const next = each.nextElementSibling
-			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
-				offset++
-			}
-		}
-		return false
-	}
-	recurse(root)
-	return { id, offset }
-}
+// // Computes the DOM element root ID and offset from a range
+// // data structure.
+// function computeUUIDAndOffsetFromRange(editorRoot, range) {
+// 	// if (!range.node && !range.offset) {
+// 	// 	return { id: "", offset: "" }
+// 	// }
+//
+// 	let { node } = range
+// 	while (node.nodeType !== Node.ELEMENT_NODE || !node.id) {
+// 		node = node.parentNode
+// 	}
+// 	const root = node
+// 	const { id } = root
+// 	// Recursively counts the offset from an element to a
+// 	// range node and offset.
+// 	let offset = 0
+// 	const recurse = element => {
+// 		for (const each of element.childNodes) {
+// 			if (each === range.node) {
+// 				offset += range.offset
+// 				return true
+// 			}
+// 			offset += (each.nodeValue || "").length
+// 			if (recurse(each)) {
+// 				return true
+// 			}
+// 			// NOTE: Use next.getAttribute instead of next.id
+// 			// because next.id always returns ""
+// 			const next = each.nextElementSibling
+// 			if (next && (next.getAttribute("data-node") || next.getAttribute("data-root"))) {
+// 				offset++
+// 			}
+// 		}
+// 		return false
+// 	}
+// 	recurse(root)
+// 	return { id, offset }
+// }
 
 // Computes a range data structure.
-function computeRange(editorRoot, { ...pos }) {
-	const root = document.getElementById(pos.root.id)
+function computeRange(editorRoot, { ...posRoot }) {
+	const root = document.getElementById(posRoot.id)
 	if (!root || !editorRoot.contains(root)) {
 		throw new Error("computeRange: no such root or out of bounds")
 	}
 	let node = null
 	let offset = 0
-	const recurse = element => {
-		for (const each of element.childNodes) {
-			const { length } = each.nodeValue || ""
-			if (pos.root.offset - length <= 0) {
-				node = each
-				offset = pos.root.offset
-				return true
-			}
-			pos.root.offset -= length
+	const recurse = any => {
+		const { length } = any.nodeValue || ""
+		if (posRoot.offset - length <= 0) {
+			node = any
+			offset = posRoot.offset // offset becomes posRoot.offset; the remainder
+			return true
+		}
+		for (const each of any.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
+			posRoot.offset -= length
 			const next = each.nextElementSibling
-			pos.root.offset -= Boolean(next && next.getAttribute("data-node"))
+			if (next && next.getAttribute("data-node")) {
+				offset--
+			}
 		}
 		return false
 	}
+	// const recurse = element => {
+	// 	for (const each of element.childNodes) {
+	// 		const { length } = each.nodeValue || ""
+	// 		if (pos.root.offset - length <= 0) {
+	// 			node = each
+	// 			offset = pos.root.offset
+	// 			return true
+	// 		}
+	// 		pos.root.offset -= length
+	// 		if (recurse(each)) {
+	// 			return true
+	// 		}
+	// 		const next = each.nextElementSibling
+	// 		pos.root.offset -= Boolean(next && next.getAttribute("data-node"))
+	// 	}
+	// 	return false
+	// }
 	recurse(root)
 	return { node, offset }
 }
@@ -87,8 +106,8 @@ function eagerlyRemoveRange() {
 	selection.removeAllRanges()
 }
 
-// Synchronizes the DOM cursor to cursor data structures.
-function syncPos(editorRoot, [pos1, pos2]) {
+// Synchronizes the DOM cursor.
+function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	const selection = document.getSelection()
 
 	// if (selection.rangeCount) {
@@ -100,7 +119,7 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	// 	}
 	// 	// Compare the VDOM cursor data structures to the DOM data
 	// 	// structures:
-	// 	if (posAreSame(pos1, domPos1) && posAreSame(pos2, domPos2)) {
+	// 	if (posAreSame(posRoot1, domPos1) && posAreSame(posRoot2, domPos2)) {
 	// 		// No-op
 	// 		return
 	// 	}
@@ -108,10 +127,10 @@ function syncPos(editorRoot, [pos1, pos2]) {
 
 	eagerlyRemoveRange()
 	const range = document.createRange()
-	const startRange = computeRange(editorRoot, pos1)
+	const startRange = computeRange(editorRoot, posRoot1)
 	let endRange = { ...startRange }
-	if (!posAreSame(pos1, pos2)) {
-		endRange = computeRange(editorRoot, pos2)
+	if (!posAreSame(posRoot1, posRoot2)) {
+		endRange = computeRange(editorRoot, posRoot2)
 	}
 	range.setStart(startRange.node, startRange.offset)
 	range.setEnd(endRange.node, endRange.offset)
@@ -120,10 +139,10 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	// if (!selection.rangeCount) {
 	// 	eagerlyRemoveRange()
 	// 	const range = document.createRange()
-	// 	const startRange = computeRange(editorRoot, pos1)
+	// 	const startRange = computeRange(editorRoot, posRoot1)
 	// 	let endRange = { ...startRange }
-	// 	if (!posAreSame(pos1, pos2)) {
-	// 		endRange = computeRange(editorRoot, pos2)
+	// 	if (!posAreSame(posRoot1, posRoot2)) {
+	// 		endRange = computeRange(editorRoot, posRoot2)
 	// 	}
 	// 	range.setStart(startRange.node, startRange.offset)
 	// 	range.setEnd(endRange.node, endRange.offset)
@@ -143,7 +162,7 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	// 	}
 	// 	// Compare the VDOM cursor data structures to the DOM data
 	// 	// structures:
-	// 	if (posAreSame(pos1, domPos1) && posAreSame(pos2, domPos2)) {
+	// 	if (posAreSame(posRoot1, domPos1) && posAreSame(posRoot2, domPos2)) {
 	// 		// No-op
 	// 		return
 	// 	}
@@ -151,12 +170,12 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	// // Synchronize the DOM cursor to the VDOM cursor data
 	// // structures:
 	// const range = document.createRange()
-	// const startRange = computeRange(editorRoot, pos1)
+	// const startRange = computeRange(editorRoot, posRoot1)
 	// range.setStart(startRange.node, startRange.offset)
 	// range.collapse()
 	// let endRange = { ...startRange }
-	// if (!posAreSame(pos1, pos2)) {
-	// 	endRange = computeRange(editorRoot, pos2)
+	// if (!posAreSame(posRoot1, posRoot2)) {
+	// 	endRange = computeRange(editorRoot, posRoot2)
 	// 	range.setEnd(endRange.node, endRange.offset)
 	// }
 	// // // NOTE: syncTrees eagerly calls removeAllRanges
@@ -166,4 +185,4 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	// selection.addRange(range)
 }
 
-export default syncPos
+export default syncPosRoots

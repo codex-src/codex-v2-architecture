@@ -5,7 +5,7 @@ import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
-import syncPos from "./syncPos"
+import syncPosRoots from "./syncPosRoots"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
@@ -107,7 +107,6 @@ function readRoot(root) {
 		},
 	]
 	const recurse = any => {
-		// Concatenate:
 		if (any.nodeType === Node.TEXT_NODE) {
 			unparsed[unparsed.length - 1].raw += any.nodeValue
 			return
@@ -116,15 +115,14 @@ function readRoot(root) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {
-				// Push a new keyed-paragraph.
 				unparsed.push({
 					id: next.id,
 					raw: "",
 				})
 			}
 		}
-		return false
 	}
+	recurse(root)
 	return unparsed
 }
 
@@ -188,16 +186,16 @@ const Document = ({ data }) => (
 	document.body.classList.toggle("debug-css")
 })()
 
-// Returns whether cursor data structures are empty.
-function posAreEmpty(pos) {
-	// return pos.some(each => !each.id)
-	for (const each of pos) {
-		if (!each.root.id) {
-			return true
-		}
-	}
-	return false
-}
+// // Returns whether cursor data structures are empty.
+// function posAreEmpty(pos) {
+// 	return pos.some(each => !each.id)
+// 	// for (const each of pos) {
+// 	// 	if (!each.root.id) {
+// 	// 		return true
+// 	// 	}
+// 	// }
+// 	// return false
+// }
 
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
@@ -210,18 +208,17 @@ const Editor = ({ id, tag, state, setState }) => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
 				// Sync the React-managed DOM tree to the user-
 				// managed DOM tree:
-				const mutations = syncTrees(state.reactDOM, ref.current)
+				const mutations = syncTrees(state.reactDOM, ref.current) // TODO: Rename to syncRoots
 				if (!mutations) {
 					// No-op
 					return
 				}
-				const pos = [state.pos1, state.pos2]
-				if (posAreEmpty(pos)) {
+				const posRoots = [state.pos1.root, state.pos2.root]
+				if (posRoots.every(each => !each.id)) {
 					// No-op
 					return
 				}
-				console.log(state.pos1)
-				// syncPos(ref.current, [state.pos1, state.pos2])
+				syncPosRoots(ref.current, posRoots)
 				// console.log("synced pos")
 			})
 		}, [state, setState]),
@@ -357,25 +354,23 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							// debugger
-
-							// const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
-							// const index1 = state.data.findIndex(each => each.id === roots[0].id)
-							// if (index1 === -1) {
-							// 	throw new Error("onInput: index1 out of bounds")
-							// }
-							// const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
-							// if (index2 === -1) {
-							// 	throw new Error("onInput: index2 out of bounds")
-							// }
-							// const unparsed = readRoots(ref.current, roots)
-							// const [pos1, pos2] = computePosRange(ref.current)
-							// setState(current => ({
-							// 	...current,
-							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
-							// 	pos1,
-							// 	pos2,
-							// }))
+							const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
+							const index1 = state.data.findIndex(each => each.id === roots[0].id)
+							if (index1 === -1) {
+								throw new Error("onInput: index1 out of bounds")
+							}
+							const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
+							if (index2 === -1) {
+								throw new Error("onInput: index2 out of bounds")
+							}
+							const unparsed = readRoots(ref.current, roots)
+							const [pos1, pos2] = computePosRange(ref.current)
+							setState(current => ({
+								...current,
+								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+								pos1,
+								pos2,
+							}))
 						},
 
 						contentEditable: !state.readOnly, // Inversed
