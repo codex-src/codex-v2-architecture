@@ -236,20 +236,20 @@ const Editor = ({ id, tag, state, setState }) => {
 				syncPosRoots(ref.current, posRoots)
 				console.log("synced pos")
 			})
-			// Update extRootPosRange for edge-cases such as
-			// forward-backspace:
-			if (!state.focused) {
-				// No-op
-				return
-			}
-			const [pos1, pos2] = computePosRange(ref.current)
-			const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
-			setState(current => ({
-				...current,
-				pos1,
-				pos2,
-				extRootPosRange,
-			}))
+			// // Update extRootPosRange for edge-cases such as
+			// // forward-backspace:
+			// if (!state.focused) {
+			// 	// No-op
+			// 	return
+			// }
+			// const [pos1, pos2] = computePosRange(ref.current)
+			// const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
+			// setState(current => ({
+			// 	...current,
+			// 	pos1,
+			// 	pos2,
+			// 	extRootPosRange,
+			// }))
 		}, [state, setState]),
 		[state.data],
 	)
@@ -279,7 +279,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						onBlur:  () => setState(current => ({ ...current, focused: false })),
 
 						onSelect: () => {
-							// Correct range when out of bounds:
+							// Guard out of bounds range:
 							const selection = document.getSelection()
 							if (!selection.rangeCount) {
 								// No-op
@@ -336,6 +336,11 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
+							// if (!ref.current.childNodes.length) {
+							// 	e.preventDefault()
+							// 	return
+							// }
+
 							// // Undo:
 							// if (detect.undo(e)) {
 							// 	e.preventDefault()
@@ -383,6 +388,15 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
+							if (!ref.current.childNodes.length) {
+								// No-op
+								setState(current => ({
+									...current,
+									data: [...state.data],
+								}))
+								return
+							}
+
 							// TODO: Rename syncPosRoots to syncRootPos
 
 							// let rootPosRange = state.extRootPosRange
@@ -447,7 +461,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							}
 							const unparsed = readRoots(ref.current, [startRoot, endRoot])
 							const [pos1, pos2] = computePosRange(ref.current)
-							setState(current => ({
+							setState(current => ({ // FIXME: Use current
 								...current,
 								data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
 								pos1,
