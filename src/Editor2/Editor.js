@@ -121,24 +121,37 @@ function readRoot(root) {
 
 // Reads a cursor ID (root ID) range.
 function readPosRange(editorRoot, [pos1ID, pos2ID]) {
-	// Query root1 and root2:
+	// TODO: Extract to getRootsAndReextend(editorRoot, [pos1ID, pos2ID])
+	// ... readRoots(editorRoot, root1, root2)
+
+	// Get root1:
 	let root1 = document.getElementById(pos1ID)
 	if (!root1 || !editorRoot.contains(root1)) {
 		throw new Error(`readPosRange: no such id=${pos1ID || ""} or out of bounds`)
 	}
-	// Extend root1:
 	const prev = root1.previousElementSibling
 	if (prev && !prev.previousElementSibling) {
 		root1 = prev
 	}
-	const root2 = document.getElementById(pos2ID)
+	// Get root2:
+	let root2 = document.getElementById(pos2ID)
 	if (!root2 || !editorRoot.contains(root2)) {
 		throw new Error(`readPosRange: no such id=${pos2ID || ""} or out of bounds`)
+	}
+	const next = root2.nextElementSibling
+	if (next && !next.nextElementSibling) {
+		// Guard repeat IDs:
+		if (!next.id || next.id === root2.id) {
+			next.id = uuidv4()
+		}
+		root2 = next
 	}
 	// Read unparsed:
 	const unparsed = []
 	let root = root1
 	while (root) {
+		// Guard repeat IDs:
+		//
 		// eslint-disable-next-line no-loop-func
 		const seen = !root.id || unparsed.some(each => each.id === root.id)
 		if (seen) {
@@ -328,18 +341,19 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							const posRange = state.extendedPosRange
-							console.log(posRange)
 							// const posRange = state.extendedPosRange
-							// const index1 = state.data.findIndex(each => each.id === posRange[0])
-							// if (index1 === -1) {
-							// 	throw new Error("onInput: posRange[0] is out of bounds")
-							// }
-							// const index2 = state.data.findIndex(each => each.id === posRange[1])
-							// if (index2 === -1) {
-							// 	throw new Error("onInput: posRange[1] is out of bounds")
-							// }
-							// const unparsed = readPosRange(ref.current, posRange)
+							// console.log(posRange)
+							const posRange = state.extendedPosRange
+							const index1 = state.data.findIndex(each => each.id === posRange[0])
+							if (index1 === -1) {
+								throw new Error("onInput: posRange[0] is out of bounds")
+							}
+							const index2 = state.data.findIndex(each => each.id === posRange[1])
+							if (index2 === -1) {
+								throw new Error("onInput: posRange[1] is out of bounds")
+							}
+							const unparsed = readPosRange(ref.current, posRange)
+							console.log(unparsed)
 							// setState(current => ({
 							// 	...current,
 							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
