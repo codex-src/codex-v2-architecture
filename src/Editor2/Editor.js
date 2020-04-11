@@ -5,6 +5,7 @@ import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
+import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
@@ -14,17 +15,19 @@ const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 // Counts the offset from an element to a node.
 function countOffset(element, node) {
 	let offset = 0
-	const recurse = element => {
-		for (const each of element.childNodes) {
-			if (each === node) {
-				return true
-			}
-			offset += (node.nodeValue || "").length
+	const recurse = any => {
+		if (any === node) {
+			return true
+		}
+		for (const each of any.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
+			offset += (node.nodeValue || "").length
 			const next = each.nextElementSibling
-			offset += next && Boolean(next.getAttribute("data-node"))
+			if (next && next.getAttribute("data-node")) {
+				offset++
+			}
 		}
 		return false
 	}
@@ -34,13 +37,13 @@ function countOffset(element, node) {
 
 // Computes a cursor data structure from a range data
 // structure.
-function computePosFromRange(editorRoot, { ...range }) {
-	if (!editorRoot.contains(range.node)) {
-		throw new Error("computePosFromRange: node out of bounds")
+function computePos(editorRoot, { ...range }) {
+	if (!range.node || !editorRoot.contains(range.node)) {
+		throw new Error("computePos: no such node or out of bounds")
 	}
 	const pos = newPos()
 	// Iterate range.node to the deepest node:
-	while (range.node.childNodes && range.node.childNodes.length) {
+	while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
 	}
@@ -65,15 +68,15 @@ function computePosFromRange(editorRoot, { ...range }) {
 	return pos
 }
 
-// Computes the cursor data structures.
-function computePos(editorRoot) {
+// Computes cursor data structures.
+function computePosRange(editorRoot) {
 	const range = document.getSelection().getRangeAt(0)
 	const rangeStart = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePosFromRange(editorRoot, rangeStart)
+	const pos1 = computePos(editorRoot, rangeStart)
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
 		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePosFromRange(editorRoot, rangeEnd)
+		pos2 = computePos(editorRoot, rangeEnd)
 	}
 	return [pos1, pos2]
 }
@@ -103,20 +106,25 @@ function readRoot(root) {
 			raw: "",
 		},
 	]
-	const recurse = element => {
-		for (const each of element.childNodes) {
-			unparsed[unparsed.length - 1].raw += each.nodeValue || ""
+	const recurse = any => {
+		// Concatenate:
+		if (any.nodeType === Node.TEXT_NODE) {
+			unparsed[unparsed.length - 1].raw += any.nodeValue
+			return
+		}
+		for (const each of any.childNodes) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {
+				// Push a new keyed-paragraph.
 				unparsed.push({
 					id: next.id,
 					raw: "",
 				})
 			}
 		}
+		return false
 	}
-	recurse(root)
 	return unparsed
 }
 
@@ -180,6 +188,17 @@ const Document = ({ data }) => (
 	document.body.classList.toggle("debug-css")
 })()
 
+// Returns whether cursor data structures are empty.
+function posAreEmpty(pos) {
+	// return pos.some(each => !each.id)
+	for (const each of pos) {
+		if (!each.root.id) {
+			return true
+		}
+	}
+	return false
+}
+
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
@@ -196,17 +215,14 @@ const Editor = ({ id, tag, state, setState }) => {
 					// No-op
 					return
 				}
-				// NOTE: syncPos is needed when an event is
-				// prevented and the editor is mutated, e.g. enter,
-				// tab, etc.
-				// // Sync the DOM cursor to the VDOM cursor data
-				// // structures:
-				// // if (posAreEmpty(state.pos1, state.pos2)) {
-				// // 	// No-op
-				// // 	return
-				// // }
-				// syncPos(ref.current, state.pos1, state.pos2)
-				// console.log("synced the DOM cursor")
+				const pos = [state.pos1, state.pos2]
+				if (posAreEmpty(pos)) {
+					// No-op
+					return
+				}
+				console.log(state.pos1)
+				// syncPos(ref.current, [state.pos1, state.pos2])
+				// console.log("synced pos")
 			})
 		}, [state, setState]),
 		[state.data],
@@ -261,7 +277,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								selection.removeAllRanges()
 								selection.addRange(range)
 							}
-							const [pos1, pos2] = computePos(ref.current)
+							const [pos1, pos2] = computePosRange(ref.current)
 							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
 							setState(current => ({
 								...current,
@@ -280,7 +296,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								pointerDownRef.current = false // Reset to be safe
 								return
 							}
-							const [pos1, pos2] = computePos(ref.current)
+							const [pos1, pos2] = computePosRange(ref.current)
 							const extendedPosRange = extendPosRange(state.data, [pos1, pos2])
 							setState(current => ({
 								...current,
@@ -341,24 +357,29 @@ const Editor = ({ id, tag, state, setState }) => {
 
 						// TODO: onCompositionEnd
 						onInput: () => {
-							const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
-							const index1 = state.data.findIndex(each => each.id === roots[0].id)
-							if (index1 === -1) {
-								throw new Error("onInput: index1 out of bounds")
-							}
-							const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
-							if (index2 === -1) {
-								throw new Error("onInput: index2 out of bounds")
-							}
-							const unparsed = readRoots(ref.current, roots)
-							setState(current => ({
-								...current,
-								data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
-							}))
+							// debugger
+
+							// const { roots, atEnd } = queryRoots(ref.current, state.extendedPosRange)
+							// const index1 = state.data.findIndex(each => each.id === roots[0].id)
+							// if (index1 === -1) {
+							// 	throw new Error("onInput: index1 out of bounds")
+							// }
+							// const index2 = !atEnd ? state.data.findIndex(each => each.id === roots[1].id) : state.data.length - 1
+							// if (index2 === -1) {
+							// 	throw new Error("onInput: index2 out of bounds")
+							// }
+							// const unparsed = readRoots(ref.current, roots)
+							// const [pos1, pos2] = computePosRange(ref.current)
+							// setState(current => ({
+							// 	...current,
+							// 	data: [...state.data.slice(0, index1), ...parse(unparsed), ...state.data.slice(index2 + 1)],
+							// 	pos1,
+							// 	pos2,
+							// }))
 						},
 
-						contentEditable: !state.readOnly, // Inverse
-						suppressContentEditableWarning: !state.readOnly, // Inverse
+						contentEditable: !state.readOnly, // Inversed
+						suppressContentEditableWarning: !state.readOnly, // Inversed
 					},
 				)}
 
