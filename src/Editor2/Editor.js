@@ -403,23 +403,27 @@ const Editor = ({ id, tag, state, setState }) => {
 							// Query the start root:
 							const startRoot = document.getElementById(startID)
 							if (!startRoot || !ref.current.contains(startRoot)) {
+								console.error(`startID=${startID}`)
 								throw new Error("readRoots: no such startRoot or out of bounds")
 							}
 							// Query the end root:
 							let endRoot = document.getElementById(endID)
-							const next = endRoot && endRoot.nextElementSibling
 							let atEnd = false // Is endRoot at the end?
+							const next = endRoot && endRoot.nextElementSibling
 							// If backspaced was pressed on the end root,
 							// query the second-to-end root:
 							if (!endRoot) {
-								// alert("test")
-								let index = state.data.length - 2
-								if (index < 0) {
-									index = 0
-								}
-								endID	= state.data[index].id
-								endRoot = document.getElementById(endID)
-								atEnd = true
+								endRoot = ref.current.children[ref.current.children.length - 1]
+								atEnd	= true
+								// // FIXME: Change to x2 from startRoot?
+								// let index = state.data.length - 2
+								// if (index < 0) {
+								// 	index = 0
+								// }
+								// endID	= state.data[index].id
+								// alert(`endID=${endID}`)
+								// endRoot = document.getElementById(endID)
+								// atEnd = true
 							// If enter was pressed on the end root, re-
 							// extend the end root 1x:
 							} else if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
@@ -429,6 +433,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								atEnd = true
 							}
 							if (!endRoot || !ref.current.contains(endRoot)) {
+								console.error(`endID=${endID}`)
 								throw new Error("readRoots: no such endRoot or out of bounds")
 							}
 
