@@ -1,3 +1,4 @@
+// @flow
 import Editor from "Editor2/Editor"
 import React from "react"
 import useEditor from "Editor2/useEditor"

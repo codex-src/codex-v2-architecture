@@ -14,10 +14,10 @@
     "uuidv4": "^6.0.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "flow && react-scripts start",
+    "build": "flow && react-scripts build",
+    "test": "flow && react-scripts test",
+    "eject": "flow && react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "debug.css": "https://github.com/codex-src/debug.css",
+    "flow-bin": "^0.122.0",
     "raw.macro": "^0.3.0",
     "serve": "^11.3.0"
   }
