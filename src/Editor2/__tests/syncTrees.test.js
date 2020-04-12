@@ -1,6 +1,6 @@
 import React from "react"
 import renderDOM from "renderDOM"
-import syncRoots from "../syncRoots"
+import syncTrees from "../syncTrees"
 
 document.getSelection = () => ({
 	rangeCount: 1,
@@ -31,11 +31,11 @@ describe("group 1", () => {
 				{/* ... */}
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(0)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -48,11 +48,11 @@ describe("group 1", () => {
 				<div>A</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(1)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -65,11 +65,11 @@ describe("group 1", () => {
 				{/* ... */}
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(1)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -82,11 +82,11 @@ describe("group 1", () => {
 				<div />
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(0)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 })
 
@@ -119,11 +119,11 @@ describe("group 2 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -139,11 +139,11 @@ describe("group 2 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -159,11 +159,11 @@ describe("group 2 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 })
 
@@ -196,11 +196,11 @@ describe("group 2 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -216,11 +216,11 @@ describe("group 2 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -236,11 +236,11 @@ describe("group 2 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 })
 
@@ -285,11 +285,11 @@ describe("group 3 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -309,11 +309,11 @@ describe("group 3 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -333,11 +333,11 @@ describe("group 3 (1 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -357,11 +357,11 @@ describe("group 3 (1 of 2)", () => {
 				</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(1)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 })
 
@@ -406,11 +406,11 @@ describe("group 3 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -430,11 +430,11 @@ describe("group 3 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -454,11 +454,11 @@ describe("group 3 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(2)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 	test("", () => {
 		const Component1 = props => (
@@ -478,10 +478,10 @@ describe("group 3 (2 of 2)", () => {
 				<div>C</div>
 			</div>
 		)
-		const rootA = renderDOM(<Component1 />)
-		const rootB = renderDOM(<Component2 />)
-		const mutations = syncRoots(rootA, rootB)
+		const treeA = renderDOM(<Component1 />)
+		const treeB = renderDOM(<Component2 />)
+		const mutations = syncTrees(treeA, treeB)
 		expect(mutations).toBe(1)
-		expect(rootA.isEqualNode(rootB)).toBe(true)
+		expect(treeA.isEqualNode(treeB)).toBe(true)
 	})
 })

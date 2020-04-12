@@ -91,7 +91,6 @@ function enter(state, setState) {
 			raw: each,
 		})),
 	]
-	// console.log(unparsed[1].id)
 	setState(current => ({
 		...current,
 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
@@ -112,80 +111,36 @@ function enter(state, setState) {
 		},
 	}))
 
-	// console.log([...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)])
-
-	// const x1 = state.data.findIndex(each => each.id === state.pos1.root.id)
-	// let x2 = x1
-	// if (state.pos2.root.id !== state.pos1.root.id) {
-	// 	x2 = state.data.findIndex(each => each.id === state.pos2.root.id)
-	// }
-	// // Create LHS:
-	// const substr1 = state.data[x1].raw.slice(0, state.pos1.root.offset)
-	// const lhs = substr1.split("\n").map((each, index) => ({
-	// 	id:  uuidv4(),
-	// 	raw: each,
-	// }))
-	// lhs[0].id = state.data[x1].id
-	// // Create RHS:
-	// const substr2 = state.data[x2].raw.slice(state.pos2.root.offset)
-	// const rhs = substr2.split("\n").map((each, index) => ({
-	// 	id:  uuidv4(),
-	// 	raw: each,
-	// }))
-	// rhs[rhs.length - 1].id = state.data[x2].id
-	// // Set state:
-	// setState(current => ({
-	// 	...current,
-	// 	data: [...state.data.slice(0, x1), ...parse([lhs, rhs]), ...state.data.slice(x2 + 1)],
-	// 	pos1: {
-	// 		...state.pos1,
-	// 		root: {
-	// 			id: lhs[0].id,
-	// 			offset: 0,
-	// 		},
-	// 	},
-	// 	pos2: {
-	// 		...state.pos1,
-	// 		root: {
-	// 			id: lhs[0].id,
-	// 			offset: 0,
-	// 		},
-	// 	},
-	// }))
-
-	// const unparsed =
-	// state.data[startIndex].raw.slice(0, state.pos1.root.offset),
-	// state.data[endIndex].raw.slice(state.pos2.root.offset)
-
-	// const startIndex = state.data.findIndex(each => each.id === state.pos1.root.id)
-	// let endIndex = startIndex
-	// if (state.pos2.root.id !== state.pos1.root.id) {
-	// 	endIndex = state.data.findIndex(each => each.id === state.pos2.root.id)
-	// }
-	// // TODO: Fixme for compound components?
-	// const unparsed = [
-	// 	{
-	// 		id:  state.data[startIndex].id,
-	// 		raw: state.data[startIndex].raw.slice(0, state.pos1.root.offset),
-	// 	},
-	// 	{
-	// 		id:  state.pos1.root.id === state.pos2.root.id ? uuidv4() : state.data[endIndex].id,
-	// 		raw: state.data[endIndex].raw.slice(state.pos2.root.offset),
-	// 	},
-	// ]
-	// const { id } = unparsed.slice(-1)[0]
-	// setState(current => ({
-	// 	...current,
-	// 	data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
-	// 	pos1: {
-	// 		...state.pos,
-	// 		root: { id, offset: 0 },
-	// 	},
-	// 	pos2: {
-	// 		...state.pos,
-	// 		root: { id, offset: 0 },
-	// 	},
-	// }))
+	// Old implementation:
+	// // const startIndex = state.data.findIndex(each => each.id === state.pos1.root.id)
+	// // let endIndex = startIndex
+	// // if (state.pos2.root.id !== state.pos1.root.id) {
+	// // 	endIndex = state.data.findIndex(each => each.id === state.pos2.root.id)
+	// // }
+	// // // TODO: Fixme for compound components?
+	// // const unparsed = [
+	// // 	{
+	// // 		id:  state.data[startIndex].id,
+	// // 		raw: state.data[startIndex].raw.slice(0, state.pos1.root.offset),
+	// // 	},
+	// // 	{
+	// // 		id:  state.pos1.root.id === state.pos2.root.id ? uuidv4() : state.data[endIndex].id,
+	// // 		raw: state.data[endIndex].raw.slice(state.pos2.root.offset),
+	// // 	},
+	// // ]
+	// // const { id } = unparsed.slice(-1)[0]
+	// // setState(current => ({
+	// // 	...current,
+	// // 	data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
+	// // 	pos1: {
+	// // 		...state.pos,
+	// // 		root: { id, offset: 0 },
+	// // 	},
+	// // 	pos2: {
+	// // 		...state.pos,
+	// // 		root: { id, offset: 0 },
+	// // 	},
+	// // }))
 }
 
 function input(state, setState) {

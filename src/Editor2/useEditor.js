@@ -1,8 +1,7 @@
-import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
-// import typeEnum from "./typeEnum"
 import uuidv4 from "uuid/v4"
+import { newPos } from "./constructors"
 
 function useEditor(initialValue) {
 	const unparsed = initialValue.split("\n").map(each => ({

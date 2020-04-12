@@ -1,85 +1,16 @@
 import actions from "./actions"
+import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
 import keyCodes from "./keyCodes"
-import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncPos from "./syncPos"
-import syncRoots from "./syncRoots"
+import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
-
-// Counts the offset from an element to a node.
-function countOffset(element, node) {
-	let offset = 0
-	const recurse = any => {
-		if (any === node) {
-			return true
-		}
-		for (const each of any.childNodes) {
-			if (recurse(each)) {
-				return true
-			}
-			offset += (node.nodeValue || "").length
-			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-node")) {
-				offset++
-			}
-		}
-		return false
-	}
-	recurse(element)
-	return offset
-}
-
-// Computes a cursor data structure from a range data
-// structure.
-function computePos(editorRoot, { ...range }) {
-	if (!range.node || !editorRoot.contains(range.node)) {
-		throw new Error("computePos: no such node or out of bounds")
-	}
-	const pos = newPos()
-	// Iterate range.node to the deepest node:
-	while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
-		range.node = range.node.childNodes[range.offset]
-		range.offset = 0
-	}
-	// Compute pos.node.id; ascend to the nearest data-node or
-	// data-root element:
-	let node = range.node // eslint-disable-line prefer-destructuring
-	while (!(node.getAttribute && (node.getAttribute("data-node") || node.getAttribute("data-root")))) {
-		node = node.parentElement
-	}
-	pos.node.id = node.id
-	// Compute pos.root.id:; ascend to the nearest data-root
-	// element:
-	let root = node
-	while (!(root.getAttribute && root.getAttribute("data-root"))) {
-		root = root.parentElement
-	}
-	pos.root.id = root.id
-	// Compute the offset from node and root to range.node:
-	pos.node.offset = countOffset(node, range.node) + range.offset
-	pos.root.offset = countOffset(root, range.node) + range.offset
-	// Done:
-	return pos
-}
-
-// Computes cursor data structures.
-function computePosRange(editorRoot) {
-	const range = document.getSelection().getRangeAt(0)
-	const rangeStart = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePos(editorRoot, rangeStart)
-	let pos2 = { ...pos1 }
-	if (!range.collapsed) {
-		const rangeEnd = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePos(editorRoot, rangeEnd)
-	}
-	return [pos1, pos2]
-}
 
 // Creates an extended cursor ID (root ID) range.
 function extendPosRange(state, [pos1, pos2]) {
@@ -144,32 +75,6 @@ function readRoots(editorRoot, [startRoot, endRoot]) {
 	return unparsed
 }
 
-// // Queries root elements for a cursor ID (root ID) range.
-// function queryRoots(editorRoot, [startID, endID]) {
-// 	// Get the start root:
-// 	const startRoot = document.getElementById(startID)
-// 	if (!startRoot || !editorRoot.contains(startRoot)) {
-// 		throw new Error(`readRoots: no such id=${startID || ""} or out of bounds`)
-// 	}
-// 	// Get the end root:
-// 	const endRoot = document.getElementById(endID)
-// 	if (!endRoot || !editorRoot.contains(endRoot)) {
-// 		throw new Error(`readRoots: no such id=${endID || ""} or out of bounds`)
-// 	}
-// 	// // When next has no ID or a repeat ID, extend endRoot,
-// 	// // correct the ID, and set atEnd to true:
-// 	// let atEnd = false
-// 	// const next = endRoot.nextElementSibling
-// 	// if (next && next.getAttribute("data-root") && (!next.id || next.id === endRoot.id)) {
-// 	// 	// alert("test")
-// 	// 	endRoot = next
-// 	// 	endRoot.id = uuidv4()
-// 	// 	atEnd	= true
-// 	// }
-// 	// return { roots: [startRoot, endRoot], atEnd }
-// 	return { roots: [startRoot, endRoot] /* , atEnd */ }
-// }
-
 const Document = ({ data }) => (
 	data.map(({ type: T, ...props }) => (
 		React.createElement(typeMap[T], {
@@ -189,23 +94,23 @@ const Editor = ({ id, tag, state, setState }) => {
 	const isPointerDownRef = React.useRef()
 
 	// Renders to the DOM.
+	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
-				// Sync DOM:
-				const mutations = syncRoots(state.reactDOM, ref.current)
-				if (mutations) {
-					console.log(`synced roots: ${mutations} mutation${!mutations ? "" : "s"}`)
-				}
-				const pos = [state.pos1.root, state.pos2.root]
-				if (pos.every(each => !each.id)) {
-					// No-op
+				// Sync user-managed DOM to the React-managed DOM:
+				const mutations = syncTrees(state.reactDOM, ref.current)
+				if (!mounted.current) {
+					mounted.current = true
 					return
 				}
-				// Sync DOM cursor:
-				const syncedPos = syncPos(ref.current, pos)
+				if (mutations) {
+					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
+				}
+				// Sync DOM cursors to the VDOM cursors:
+				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
 				if (syncedPos) {
-					console.log("synced pos")
+					console.log("syncPos")
 				}
 				// Update extPosRange for edge-cases such as
 				// forward-backspace:
