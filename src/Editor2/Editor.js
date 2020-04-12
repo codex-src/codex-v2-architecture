@@ -91,7 +91,7 @@ const Document = ({ data }) => (
 const Editor = ({ id, tag, state, setState }) => {
 	const ref = React.useRef()
 
-	const isPointerDownRef = React.useRef()
+	const pointerDownRef = React.useRef()
 
 	// Renders to the DOM.
 	const mounted = React.useRef()
@@ -187,12 +187,12 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onPointerDown: () => {
-							isPointerDownRef.current = true
+							pointerDownRef.current = true
 						},
 						onPointerMove: () => {
 							// Editor must be focused and pointer must be down:
-							if (!state.focused || !isPointerDownRef.current) {
-								isPointerDownRef.current = false // Reset to be safe
+							if (!state.focused || !pointerDownRef.current) {
+								pointerDownRef.current = false // Reset to be safe
 								return
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
@@ -205,7 +205,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							}))
 						},
 						onPointerUp: () => {
-							isPointerDownRef.current = false
+							pointerDownRef.current = false
 						},
 
 						onKeyDown: e => {
