@@ -83,62 +83,18 @@ function computePosRange(editorRoot) {
 
 // Creates an extended cursor ID (root ID) range.
 function extendPosRange(state, [pos1, pos2]) {
-	// let startIndex = state.data.findIndex(each => each.id === pos1.root.id)
-	// let endIndex = startIndex
-	// if (pos2.root.id !== pos1.root.id) {
-	// 	endIndex = state.data.findIndex(each => each.id === pos2.root.id)
-	// }
-	// startIndex -= 2
-	// if (startIndex < 0) {
-	// 	startIndex = 0
-	// }
-	// endIndex += 2
-	// if (endIndex >= state.data.length - 1) {
-	// 	endIndex = state.data.length - 1
-	// }
-	// // const ext1 = Math.max(startIndex - 2, 0)
-	// // const ext2 = Math.min(endIndex + 2, data.length - 1)
-	// return state.data.slice(startIndex, endIndex + 1).map(each => each.id)
-
-	let index1 = state.data.findIndex(each => each.id === pos1.root.id)
-	index1 -= 2 // Decrement 2x
-	if (index1 < 0) {
-		index1 = 0
+	let startIndex = state.data.findIndex(each => each.id === pos1.root.id)
+	startIndex -= 2 // Decrement 2x
+	if (startIndex < 0) {
+		startIndex = 0
 	}
-	let index2 = state.data.findIndex(each => each.id === pos2.root.id)
-	index2 += 2 // Increment 2x
-	if (index2 >= state.data.length) {
-		index2 = state.data.length - 1
+	let endIndex = state.data.findIndex(each => each.id === pos2.root.id)
+	endIndex += 2 // Increment 2x
+	if (endIndex >= state.data.length) {
+		endIndex = state.data.length - 1
 	}
-	return [state.data[index1].id, state.data[index2].id]
+	return [state.data[startIndex].id, state.data[endIndex].id]
 }
-
-// // Creates an extended cursor ID (root ID) range.
-// function extendPosRange(data, [pos1, pos2]) {
-// 	// const posRangeInfo = {
-// 	// 	pos1: {
-// 	// 		id: "",     // The ID
-// 	// 		toStart: 0, // The number of IDs to the start
-// 	// 	},
-// 	// 	pos2: {
-// 	// 		id: ""      // The ID
-// 	// 		toEnd: 0,   // The number of IDs to the end
-// 	// 	},
-// 	// }
-// 	let index1 = data.findIndex(each => each.id === pos1.root.id)
-// 	index1 -= 2 // Decrement 2x
-// 	// Guard bounds:
-// 	if (index1 < 0) {
-// 		index1 = 0
-// 	}
-// 	let index2 = data.findIndex(each => each.id === pos2.root.id)
-// 	index2 += 2 // Increment 2x
-// 	// Guard bounds:
-// 	if (index2 >= data.length) {
-// 		index2 = data.length - 1
-// 	}
-// 	return [data[index1].id, data[index2].id]
-// }
 
 // Reads a data-root element.
 function readRoot(root) {
@@ -239,9 +195,6 @@ const Editor = ({ id, tag, state, setState }) => {
 				// Sync the React and user DOMs:
 				const mutations = syncRoots(state.reactDOM, ref.current) // TODO: Rename to syncRoots
 				if (!mutations) {
-					// // No-op
-					// return
-
 					// Update extPosRange for edge-cases such as
 					// forward-backspace:
 					if (!state.focused) {
@@ -353,6 +306,8 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
+							// TODO: Prevent shift-enter
+
 							// // Tab (e.ctrlKey must be false because of
 							// // common shortcuts):
 							// if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
@@ -399,8 +354,6 @@ const Editor = ({ id, tag, state, setState }) => {
 								}))
 								return
 							}
-
-							// const { extPosRange } = state
 
 							// Query the start root:
 							const startRoot = document.getElementById(state.extPosRange[0])
