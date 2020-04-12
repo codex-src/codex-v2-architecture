@@ -136,11 +136,12 @@ const Editor = ({ id, tag, state, setState }) => {
 					className: "codex-editor",
 
 					style: {
-						// NOTE: Imperative styles needed because of
-						// contenteditable
+						// Imperative styles because of contenteditable:
 						whiteSpace: "pre-wrap",
 						outline: "none",
 						overflowWrap: "break-word",
+
+						caretColor: "black",
 					},
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),

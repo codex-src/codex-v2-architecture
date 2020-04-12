@@ -51,16 +51,16 @@ export const Header = React.memo(({
 	hash,   // Header URL e.g. "Hello, world!" -> "hello-world"
 	parsed, // Parsed data
 }) => (
-	<Root id={id}>
-		<a id={hash} href={`#${hash}`}>
-			<div className={headerClassNames[tag]}>
+	<Root id={id} className={headerClassNames[tag]}>
+		{/* <a id={hash} href={`#${hash}`}> */}
+			{/* <div className={headerClassNames[tag]}> */}
 				<Markdown syntax={syntax}>
 					{toReact(parsed) || (
 						<br />
 					)}
 				</Markdown>
-			</div>
-		</a>
+			{/* </div> */}
+		{/* </a> */}
 	</Root>
 ))
 
