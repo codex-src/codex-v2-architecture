@@ -1,8 +1,8 @@
 import Enum from "Enum"
 
 const typeEnum = new Enum(
-	"P", // Paragraph
-	"TODO",
+	"Header",
+	"P",
 )
 
 export default typeEnum
