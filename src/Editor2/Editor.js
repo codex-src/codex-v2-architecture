@@ -1,6 +1,6 @@
 // import actions from "./actions"
-// import KeyCodes from "./KeyCodes"
 import EditorContext from "./EditorContext"
+import keyCodes from "./keyCodes"
 import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
@@ -306,11 +306,14 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
-							// TODO: Prevent shift-enter
+							if (e.keyCode === keyCodes.Enter && e.shiftKey) {
+								e.preventDefault()
+								return
+							}
 
 							// // Tab (e.ctrlKey must be false because of
 							// // common shortcuts):
-							// if (!e.ctrlKey && e.keyCode === KeyCodes.Tab) {
+							// if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 							// 	e.preventDefault()
 							// 	let action = null
 							// 	switch (true) {
@@ -334,7 +337,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							// 	return
 							// }
 							// // Enter:
-							// if (e.keyCode === KeyCodes.Enter) {
+							// if (e.keyCode === keyCodes.Enter) {
 							// 	e.preventDefault()
 							// 	actions.enter(state, setState)
 							// 	return
