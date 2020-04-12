@@ -209,7 +209,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
-							if (e.keyCode === keyCodes.Enter) {
+							if (e.keyCode === keyCodes.Enter /* && e.shiftKey */) {
 								e.preventDefault()
 								actions.enter(state, setState)
 								return
@@ -257,7 +257,6 @@ const Editor = ({ id, tag, state, setState }) => {
 								setState(current => ({
 									...current,
 									data: [...state.data],
-									// TODO: Add forceRender member?
 								}))
 								return
 							}
@@ -281,13 +280,6 @@ const Editor = ({ id, tag, state, setState }) => {
 							} else if (!endRoot) {
 								endRoot = ref.current.children[ref.current.children.length - 1]
 								endRootAtEnd = true
-								// let endIndex = extPosRange.length - 2
-								// if (endIndex < 0) {
-								// 	endIndex = 0
-								// }
-								// // console.log(extPosRange[endIndex])
-								// endRoot = document.getElementById(extPosRange[endIndex])
-								// endRootAtEnd = true
 							}
 							if (!endRoot || !ref.current.contains(endRoot)) {
 								// console.error(`endID=${endID}`)
@@ -309,11 +301,13 @@ const Editor = ({ id, tag, state, setState }) => {
 								data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
 								pos1,
 								pos2,
+								// NOTE: Do not extendPosRange here; defer
+								// to end of useLayoutEffect
 							}))
 						},
 
-						contentEditable: !state.readOnly, // Inversed
-						suppressContentEditableWarning: !state.readOnly, // Inversed
+						contentEditable: !state.readOnly,
+						suppressContentEditableWarning: !state.readOnly,
 					},
 				)}
 
