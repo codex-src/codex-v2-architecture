@@ -136,6 +136,7 @@ function syncPos(editorRoot, [posRoot1, posRoot2]) {
 	range.setStart(startRange.node, startRange.offset)
 	range.setEnd(endRange.node, endRange.offset)
 	selection.addRange(range)
+	return true
 
 	// if (!selection.rangeCount) {
 	// 	eagerlyRemoveRange()

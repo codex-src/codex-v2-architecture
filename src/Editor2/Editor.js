@@ -1,4 +1,4 @@
-// import actions from "./actions"
+import actions from "./actions"
 import EditorContext from "./EditorContext"
 import keyCodes from "./keyCodes"
 import newPos from "./newPos"
@@ -192,33 +192,31 @@ const Editor = ({ id, tag, state, setState }) => {
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
-				// Sync the React and user DOMs:
-				const mutations = syncRoots(state.reactDOM, ref.current) // TODO: Rename to syncRoots
-				if (!mutations) {
-					// Update extPosRange for edge-cases such as
-					// forward-backspace:
-					if (!state.focused) {
-						// No-op
-						return
-					}
-					const [pos1, pos2] = computePosRange(ref.current)
-					const extPosRange = extendPosRange(state, [pos1, pos2])
-					setState(current => ({
-						...current,
-						pos1,
-						pos2,
-						extPosRange,
-					}))
-					return
+				// Sync DOM:
+				const mutations = syncRoots(state.reactDOM, ref.current)
+				if (mutations) {
+					console.log(`synced roots: ${mutations} mutation${!mutations ? "" : "s"}`)
 				}
-				const posRoots = [state.pos1.root, state.pos2.root]
-				if (posRoots.every(each => !each.id)) {
+				const pos = [state.pos1.root, state.pos2.root]
+				if (pos.every(each => !each.id)) {
 					// No-op
 					return
 				}
-				// Sync the DOM and VDOM cursors:
-				syncPos(ref.current, posRoots)
-				console.log("synced pos")
+				// Sync DOM cursor:
+				const syncedPos = syncPos(ref.current, pos)
+				if (syncedPos) {
+					console.log("synced pos")
+				}
+				// Update extPosRange for edge-cases such as
+				// forward-backspace:
+				const [pos1, pos2] = computePosRange(ref.current)
+				const extPosRange = extendPosRange(state, [pos1, pos2])
+				setState(current => ({
+					...current,
+					pos1,
+					pos2,
+					extPosRange,
+				}))
 			})
 		}, [state, setState]),
 		[state.data],
@@ -306,8 +304,9 @@ const Editor = ({ id, tag, state, setState }) => {
 						},
 
 						onKeyDown: e => {
-							if (e.keyCode === keyCodes.Enter && e.shiftKey) {
+							if (e.keyCode === keyCodes.Enter) {
 								e.preventDefault()
+								actions.enter(state, setState)
 								return
 							}
 
