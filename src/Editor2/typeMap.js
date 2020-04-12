@@ -1,3 +1,4 @@
+// @flow
 import typeEnum from "./typeEnum"
 
 import {
