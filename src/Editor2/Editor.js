@@ -5,6 +5,7 @@ import keyCodes from "./keyCodes"
 import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
+import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
@@ -27,52 +28,31 @@ function extendPosRange(state, [pos1, pos2]) {
 	return [state.data[startIndex].id, state.data[endIndex].id]
 }
 
-// Reads a data-root element.
-function readRoot(root) {
-	const unparsed = [
-		{
-			id: root.id,
-			raw: "",
-		},
-	]
-	const recurse = any => {
-		if (any.nodeType === Node.TEXT_NODE) {
-			unparsed[unparsed.length - 1].raw += any.nodeValue
-			return
-		}
-		for (const each of any.childNodes) {
-			recurse(each)
-			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-node")) {
-				unparsed.push({
-					id: next.id,
-					raw: "",
-				})
-			}
-		}
+// Queries data-root elements.
+function queryRoots(editorRoot, extPosRange) {
+	// Query the start root:
+	const root1 = document.getElementById(extPosRange[0])
+	if (!root1 || !editorRoot.contains(root1)) {
+		throw new Error("queryRoots: no such root1 or out of bounds")
 	}
-	recurse(root)
-	return unparsed
-}
-
-// Reads a range of data-root elements.
-function readRoots(editorRoot, [startRoot, endRoot]) {
-	const unparsed = []
-	const seen = {}
-	while (startRoot) {
-		// Guard repeat IDs:
-		if (!startRoot.id || seen[startRoot.id]) {
-			startRoot.id = uuidv4()
-		}
-		seen[startRoot.id] = true
-		unparsed.push(...readRoot(startRoot))
-		if (startRoot === endRoot) {
-			// No-op
-			break
-		}
-		startRoot = startRoot.nextElementSibling
+	// Query the end root:
+	let root2 = document.getElementById(extPosRange[1])
+	let root2AtEnd = false
+	// Guard enter pressed on root2:
+	const nextRoot = root2 && root2.nextElementSibling
+	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
+		nextRoot.id = uuidv4() // Correct the ID
+		root2 = nextRoot
+		root2AtEnd = true
+	// Guard backspaced pressed on root2:
+	} else if (!root2) {
+		root2 = editorRoot.children[editorRoot.children.length - 1]
+		root2AtEnd = true
 	}
-	return unparsed
+	if (!root2 || !editorRoot.contains(root2)) {
+		throw new Error("queryRoots: no such root2 or out of bounds")
+	}
+	return { roots: [root1, root2], root2AtEnd }
 }
 
 const Document = ({ data }) => (
@@ -214,38 +194,6 @@ const Editor = ({ id, tag, state, setState }) => {
 								actions.enter(state, setState)
 								return
 							}
-
-							// // Tab (e.ctrlKey must be false because of
-							// // common shortcuts):
-							// if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
-							// 	e.preventDefault()
-							// 	let action = null
-							// 	switch (true) {
-							// 	// TODO: state.pos.id breaks down for
-							// 	// multiline components
-							// 	case !e.shiftKey && state.pos1.id === state.pos2.id:
-							// 		action = actions.tab
-							// 		break
-							// 	// TODO: state.pos.id breaks down for
-							// 	// multiline components
-							// 	case !e.shiftKey && state.pos1.id !== state.pos2.id:
-							// 		action = actions.tabMany
-							// 		break
-							// 	case e.shiftKey:
-							// 		action = actions.detabMany
-							// 		break
-							// 	default:
-							// 		// No-op
-							// 	}
-							// 	action(state, setState)
-							// 	return
-							// }
-							// // Enter:
-							// if (e.keyCode === keyCodes.Enter) {
-							// 	e.preventDefault()
-							// 	actions.enter(state, setState)
-							// 	return
-							// }
 						},
 
 						// TODO: onCompositionEnd
@@ -260,45 +208,20 @@ const Editor = ({ id, tag, state, setState }) => {
 								}))
 								return
 							}
-
-							// Query the start root:
-							const startRoot = document.getElementById(state.extPosRange[0])
-							if (!startRoot || !ref.current.contains(startRoot)) {
-								// console.error(`startID=${startID}`)
-								throw new Error("readRoots: no such startRoot or out of bounds")
+							const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
+							const x1 = state.data.findIndex(each => each.id === root1.id)
+							if (x1 === -1) {
+								throw new Error("onInput: x1 out of bounds")
 							}
-							// Query the end root:
-							let endRoot = document.getElementById(state.extPosRange[1])
-							let endRootAtEnd = false
-							// Guard enter pressed on endRoot:
-							const nextRoot = endRoot && endRoot.nextElementSibling
-							if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === endRoot.id)) {
-								nextRoot.id = uuidv4() // Correct the ID
-								endRoot = nextRoot
-								endRootAtEnd = true
-							// Guard backspaced pressed on endRoot:
-							} else if (!endRoot) {
-								endRoot = ref.current.children[ref.current.children.length - 1]
-								endRootAtEnd = true
+							const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
+							if (x2 === -1) {
+								throw new Error("onInput: x2 out of bounds")
 							}
-							if (!endRoot || !ref.current.contains(endRoot)) {
-								// console.error(`endID=${endID}`)
-								throw new Error("readRoots: no such endRoot or out of bounds")
-							}
-
-							const startIndex = state.data.findIndex(each => each.id === startRoot.id)
-							if (startIndex === -1) {
-								throw new Error("onInput: startIndex out of bounds")
-							}
-							const endIndex = !endRootAtEnd ? state.data.findIndex(each => each.id === endRoot.id) : state.data.length - 1
-							if (endIndex === -1) {
-								throw new Error("onInput: endIndex out of bounds")
-							}
-							const unparsed = readRoots(ref.current, [startRoot, endRoot])
+							const unparsed = readRoots(ref.current, [root1, root2])
 							const [pos1, pos2] = computePosRange(ref.current)
 							setState(current => ({ // FIXME: Use current
 								...current,
-								data: [...state.data.slice(0, startIndex), ...parse(unparsed), ...state.data.slice(endIndex + 1)],
+								data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 								pos1,
 								pos2,
 								// NOTE: Do not extendPosRange here; defer

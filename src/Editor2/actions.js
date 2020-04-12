@@ -1,3 +1,4 @@
+// import readRoots from "./readRoots"
 import parse from "./parser"
 import uuidv4 from "uuid/v4"
 
@@ -38,8 +39,31 @@ function enter(state, setState) {
 	}))
 }
 
+// // Inputs character data
+// function input(state, setState, { roots: [root1, root2], root2AtEnd }) {
+// 	const x1 = state.data.findIndex(each => each.id === root1.id)
+// 	if (x1 === -1) {
+// 		throw new Error("onInput: x1 out of bounds")
+// 	}
+// 	const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
+// 	if (x2 === -1) {
+// 		throw new Error("onInput: x2 out of bounds")
+// 	}
+// 	const unparsed = readRoots(ref.current, [root1, root2])
+// 	const [pos1, pos2] = computePosRange(ref.current)
+// 	setState(current => ({ // FIXME: Use current
+// 		...current,
+// 		data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+// 		pos1,
+// 		pos2,
+// 		// NOTE: Do not extendPosRange here; defer
+// 		// to end of useLayoutEffect
+// 	}))
+// }
+
 const actions = {
 	enter,
+	// input,
 }
 
 export default actions
