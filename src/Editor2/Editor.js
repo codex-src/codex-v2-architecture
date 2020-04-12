@@ -11,6 +11,8 @@ import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
 
+import "./Editor.css"
+
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
 // Creates an extended cursor ID (root ID) range.
@@ -124,6 +126,14 @@ const Editor = ({ id, tag, state, setState }) => {
 					ref,
 
 					id,
+
+					// className:
+					// 	`codex-editor ${
+					// 		!state.readOnly ? "" : " feature-read-only"
+					// 	}${
+					// 		!className ? "" : ` ${className}`
+					// 	}`,
+					className: "codex-editor",
 
 					style: {
 						// NOTE: Imperative styles needed because of
