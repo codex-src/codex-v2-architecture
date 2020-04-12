@@ -77,181 +77,185 @@ const Editor = ({ id, tag, state, setState }) => {
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
-			ReactDOM.render(<Document data={state.data} />, state.reactDOM, () => {
-				// Sync user-managed DOM to the React-managed DOM:
-				const mutations = syncTrees(state.reactDOM, ref.current)
-				if (!mounted.current) {
-					mounted.current = true
-					return
-				}
-				if (mutations) {
-					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
-				}
-				// Sync DOM cursors to the VDOM cursors:
-				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-				if (syncedPos) {
-					console.log("syncPos")
-				}
-				// Update extPosRange for edge-cases such as
-				// forward-backspace:
-				const [pos1, pos2] = computePosRange(ref.current)
-				const extPosRange = extendPosRange(state, [pos1, pos2])
-				setState(current => ({
-					...current,
-					pos1,
-					pos2,
-					extPosRange,
-				}))
-			})
+			const { Provider } = EditorContext
+			ReactDOM.render(
+				<Provider value={[state, setState]}>
+					<Document data={state.data} />
+				</Provider>,
+				state.reactDOM,
+				() => {
+					// Sync user-managed DOM to the React-managed DOM:
+					const mutations = syncTrees(state.reactDOM, ref.current)
+					if (!mounted.current) {
+						mounted.current = true
+						return
+					}
+					if (mutations) {
+						console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
+					}
+					// Sync DOM cursors to the VDOM cursors:
+					const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+					if (syncedPos) {
+						console.log("syncPos")
+					}
+					// Update extPosRange for edge-cases such as
+					// forward-backspace:
+					const [pos1, pos2] = computePosRange(ref.current)
+					const extPosRange = extendPosRange(state, [pos1, pos2])
+					setState(current => ({
+						...current,
+						pos1,
+						pos2,
+						extPosRange,
+					}))
+				},
+			)
 		}, [state, setState]),
 		[state.data],
 	)
 
 	// TODO: Register props e.g. readOnly
-	const { Provider } = EditorContext
 	return (
-		<Provider value={[state, setState]}>
-			<div>
+		<div>
 
-				{React.createElement(
-					tag || "div",
-					{
-						ref,
+			{React.createElement(
+				tag || "div",
+				{
+					ref,
 
-						id,
+					id,
 
-						style: {
-							// NOTE: Imperative styles needed because of
-							// contenteditable
-							whiteSpace: "pre-wrap",
-							outline: "none",
-							overflowWrap: "break-word",
-						},
-
-						onFocus: () => setState(current => ({ ...current, focused: true })),
-						onBlur:  () => setState(current => ({ ...current, focused: false })),
-
-						onSelect: () => {
-							// Guard out of bounds range:
-							const selection = document.getSelection()
-							if (!selection.rangeCount) {
-								// No-op
-								return
-							}
-							const range = selection.getRangeAt(0)
-							if (range.startContainer === ref.current || range.endContainer === ref.current) {
-								// Iterate to the deepest start node:
-								let startNode = ref.current.childNodes[0]
-								while (startNode.childNodes.length) {
-									startNode = startNode.childNodes[0]
-								}
-								// Iterate to the deepest end node:
-								let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
-								while (endNode.childNodes.length) {
-									endNode = endNode.childNodes[endNode.childNodes.length - 1]
-								}
-								// Correct range:
-								range.setStart(startNode, 0)
-								range.setEnd(endNode, (endNode.nodeValue || "").length)
-								selection.removeAllRanges()
-								selection.addRange(range)
-							}
-							const [pos1, pos2] = computePosRange(ref.current)
-							const extPosRange = extendPosRange(state, [pos1, pos2])
-							setState(current => ({
-								...current,
-								pos1,
-								pos2,
-								extPosRange,
-							}))
-						},
-
-						onPointerDown: () => {
-							pointerDownRef.current = true
-						},
-						onPointerMove: () => {
-							// Editor must be focused and pointer must be down:
-							if (!state.focused || !pointerDownRef.current) {
-								pointerDownRef.current = false // Reset to be safe
-								return
-							}
-							const [pos1, pos2] = computePosRange(ref.current)
-							const extPosRange = extendPosRange(state.data, [pos1.root, pos2.root])
-							setState(current => ({
-								...current,
-								pos1,
-								pos2,
-								extPosRange,
-							}))
-						},
-						onPointerUp: () => {
-							pointerDownRef.current = false
-						},
-
-						onKeyDown: e => {
-							if (e.keyCode === keyCodes.Enter /* && e.shiftKey */) {
-								e.preventDefault()
-								actions.enter(state, setState)
-								return
-							}
-						},
-
-						// TODO: onCompositionEnd
-						onInput: () => {
-							// Force a re-render when empty (Update
-							// state.data reference):
-							if (!ref.current.childNodes.length) {
-								// No-op
-								setState(current => ({
-									...current,
-									data: [...state.data],
-								}))
-								return
-							}
-							const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
-							const x1 = state.data.findIndex(each => each.id === root1.id)
-							if (x1 === -1) {
-								throw new Error("onInput: x1 out of bounds")
-							}
-							const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
-							if (x2 === -1) {
-								throw new Error("onInput: x2 out of bounds")
-							}
-							const unparsed = readRoots(ref.current, [root1, root2])
-							const [pos1, pos2] = computePosRange(ref.current)
-							setState(current => ({ // FIXME: Use current
-								...current,
-								data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-								pos1,
-								pos2,
-								// NOTE: Do not extendPosRange here; defer
-								// to end of useLayoutEffect
-							}))
-						},
-
-						contentEditable: !state.readOnly,
-						suppressContentEditableWarning: !state.readOnly,
+					style: {
+						// NOTE: Imperative styles needed because of
+						// contenteditable
+						whiteSpace: "pre-wrap",
+						outline: "none",
+						overflowWrap: "break-word",
 					},
-				)}
 
-				{DEBUG_MODE && (
-					<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-						{JSON.stringify(
-							{
-								// extPosRange: state.extPosRange,
-								// id: state.data.map(each => each.id),
+					onFocus: () => setState(current => ({ ...current, focused: true })),
+					onBlur:  () => setState(current => ({ ...current, focused: false })),
 
-								...state,
-								reactDOM: undefined, // Obscure
-							},
-							null,
-							"\t",
-						)}
-					</div>
-				)}
+					onSelect: () => {
+						// Guard out of bounds range:
+						const selection = document.getSelection()
+						if (!selection.rangeCount) {
+							// No-op
+							return
+						}
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current || range.endContainer === ref.current) {
+							// Iterate to the deepest start node:
+							let startNode = ref.current.childNodes[0]
+							while (startNode.childNodes.length) {
+								startNode = startNode.childNodes[0]
+							}
+							// Iterate to the deepest end node:
+							let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
+							while (endNode.childNodes.length) {
+								endNode = endNode.childNodes[endNode.childNodes.length - 1]
+							}
+							// Correct range:
+							range.setStart(startNode, 0)
+							range.setEnd(endNode, (endNode.nodeValue || "").length)
+							selection.removeAllRanges()
+							selection.addRange(range)
+						}
+						const [pos1, pos2] = computePosRange(ref.current)
+						const extPosRange = extendPosRange(state, [pos1, pos2])
+						setState(current => ({
+							...current,
+							pos1,
+							pos2,
+							extPosRange,
+						}))
+					},
 
-			</div>
-		</Provider>
+					onPointerDown: () => {
+						pointerDownRef.current = true
+					},
+					onPointerMove: () => {
+						// Editor must be focused and pointer must be down:
+						if (!state.focused || !pointerDownRef.current) {
+							pointerDownRef.current = false // Reset to be safe
+							return
+						}
+						const [pos1, pos2] = computePosRange(ref.current)
+						const extPosRange = extendPosRange(state.data, [pos1.root, pos2.root])
+						setState(current => ({
+							...current,
+							pos1,
+							pos2,
+							extPosRange,
+						}))
+					},
+					onPointerUp: () => {
+						pointerDownRef.current = false
+					},
+
+					onKeyDown: e => {
+						if (e.keyCode === keyCodes.Enter /* && e.shiftKey */) {
+							e.preventDefault()
+							actions.enter(state, setState)
+							return
+						}
+					},
+
+					// TODO: onCompositionEnd
+					onInput: () => {
+						// Force a re-render when empty (Update
+						// state.data reference):
+						if (!ref.current.childNodes.length) {
+							// No-op
+							setState(current => ({
+								...current,
+								data: [...state.data],
+							}))
+							return
+						}
+						const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
+						const x1 = state.data.findIndex(each => each.id === root1.id)
+						if (x1 === -1) {
+							throw new Error("onInput: x1 out of bounds")
+						}
+						const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
+						if (x2 === -1) {
+							throw new Error("onInput: x2 out of bounds")
+						}
+						const unparsed = readRoots(ref.current, [root1, root2])
+						const [pos1, pos2] = computePosRange(ref.current)
+						setState(current => ({ // FIXME: Use current
+							...current,
+							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+							pos1,
+							pos2,
+							// NOTE: Do not extendPosRange here; defer
+							// to end of useLayoutEffect
+						}))
+					},
+
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
+				},
+			)}
+
+			{DEBUG_MODE && (
+				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
+					{JSON.stringify(
+						{
+							// extPosRange: state.extPosRange,
+							// id: state.data.map(each => each.id),
+
+							...state,
+							reactDOM: undefined, // Obscure
+						},
+						null,
+						"\t",
+					)}
+				</div>
+			)}
+
+		</div>
 	)
 }
 
