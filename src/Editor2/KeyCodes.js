@@ -1,3 +1,5 @@
+// @flow
+
 const keyCodes = {
 	Tab:   9,
 	Enter: 13,

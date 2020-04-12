@@ -1,5 +1,8 @@
+// @flow
+import PosType from "./__types"
+
 // Creates a new cursor data structure.
-export function newPos() {
+export function newPos(): PosType {
 	const pos = {
 		node: {
 			id: "",
