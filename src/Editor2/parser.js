@@ -47,6 +47,7 @@ function parse(unparsed) {
 					// hash: newHash(toInnerString(parseInnerGFM(each.raw.slice(syntax.length)))),
 					hash: "TODO",
 					// children: parseInnerGFM(each.raw.slice(syntax.length)),
+					raw: each.raw,
 					parsed: each.raw.slice(syntax.length),
 				})
 				continue

@@ -7,9 +7,7 @@ import "./App2.css"
 const App = () => {
 	const [state, setState] = useEditor(`# Hello, world!
 
-B
-
-C`)
+`)
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">

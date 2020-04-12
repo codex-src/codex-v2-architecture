@@ -3,6 +3,7 @@ import { newPos } from "./constructors"
 // Counts the offset from an element to a node.
 function countOffset(element, node) {
 	let offset = 0
+	// console.log(element, node)
 	const recurse = any => {
 		if (any === node) {
 			return true
@@ -11,7 +12,7 @@ function countOffset(element, node) {
 			if (recurse(each)) {
 				return true
 			}
-			offset += (node.nodeValue || "").length
+			offset += (each.nodeValue || "").length
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {
 				offset++

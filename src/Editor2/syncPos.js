@@ -1,9 +1,10 @@
 import computePosRange from "./computePosRange"
 // import removeRange from "./removeRange"
 
-// Computes a range data structure.
+// Computes a range data structure. Code based on
+// computePosRange.countOffset.
 function computeRange(editorRoot, pos) {
-	// NOTE: Copy pos members:
+	// NOTE: Copy pos:
 	pos = { root: { ...pos.root } }
 
 	const root = document.getElementById(pos.root.id)
@@ -13,23 +14,43 @@ function computeRange(editorRoot, pos) {
 	let node = null
 	let offset = 0
 	const recurse = any => {
+		// if ((any.nodeValue || "").length <= 0) {
 		const { length } = any.nodeValue || ""
 		if (pos.root.offset - length <= 0) {
 			node = any
-			offset = pos.root.offset // offset becomes pos.root.offset; the remainder
+			offset = pos.root.offset
 			return true
 		}
 		for (const each of any.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
-			pos.root.offset -= length
+			// offset += (node.nodeValue || "").length
+			pos.root.offset -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {
-				offset--
+				pos.root.offset--
 			}
 		}
 		return false
+
+		// const { length } = any.nodeValue || ""
+		// if (pos.root.offset - length <= 0) {
+		// 	node = any
+		// 	offset = pos.root.offset // offset becomes pos.root.offset; the remainder
+		// 	return true
+		// }
+		// for (const each of any.childNodes) {
+		// 	if (recurse(each)) {
+		// 		return true
+		// 	}
+		// 	pos.root.offset -= length
+		// 	const next = each.nextElementSibling
+		// 	if (next && next.getAttribute("data-node")) {
+		// 		offset--
+		// 	}
+		// }
+		// return false
 	}
 	recurse(root)
 	return { node, offset }
