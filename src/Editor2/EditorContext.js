@@ -1,5 +1,5 @@
 // @flow
+import * as Types from "./__types"
 import React from "react"
-import { EditorState } from "./__types"
 
-export default React.createContext<EditorState>()
+export default React.createContext<Types.EditorState>()

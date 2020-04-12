@@ -1,11 +1,11 @@
 // @flow
+import * as Types from "./__types"
 import typeEnum from "./typeEnum"
-import { UnparsedElements } from "./__types"
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-function parse(unparsed: UnparsedElements) {
+function parse(unparsed: Types.UnparsedElements) {
 	// const parsed = []
 	// for (const each of unparsed) {
 	// 	parsed.push({
