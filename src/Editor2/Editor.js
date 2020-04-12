@@ -5,7 +5,7 @@ import newPos from "./newPos"
 import parse from "./parser"
 import React from "react"
 import ReactDOM from "react-dom"
-import syncPosRoots from "./syncPosRoots"
+import syncPos from "./syncPos"
 import syncRoots from "./syncRoots"
 import typeMap from "./typeMap"
 import uuidv4 from "uuid/v4"
@@ -227,19 +227,19 @@ const Editor = ({ id, tag, state, setState }) => {
 					// // No-op
 					// return
 
-					// Update extRootPosRange for edge-cases such as
+					// Update rootPosRange for edge-cases such as
 					// forward-backspace:
 					if (!state.focused) {
 						// No-op
 						return
 					}
 					const [pos1, pos2] = computePosRange(ref.current)
-					const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
+					const rootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 					setState(current => ({
 						...current,
 						pos1,
 						pos2,
-						extRootPosRange,
+						rootPosRange,
 					}))
 					return
 				}
@@ -249,7 +249,7 @@ const Editor = ({ id, tag, state, setState }) => {
 					return
 				}
 				// Sync the DOM and VDOM cursors:
-				syncPosRoots(ref.current, posRoots)
+				syncPos(ref.current, posRoots)
 				console.log("synced pos")
 			})
 		}, [state, setState]),
@@ -306,12 +306,12 @@ const Editor = ({ id, tag, state, setState }) => {
 								selection.addRange(range)
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
-							const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
+							const rootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
-								extRootPosRange,
+								rootPosRange,
 							}))
 						},
 
@@ -325,12 +325,12 @@ const Editor = ({ id, tag, state, setState }) => {
 								return
 							}
 							const [pos1, pos2] = computePosRange(ref.current)
-							const extRootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
+							const rootPosRange = extendRootPostRange(state.data, [pos1.root, pos2.root])
 							setState(current => ({
 								...current,
 								pos1,
 								pos2,
-								extRootPosRange,
+								rootPosRange,
 							}))
 						},
 						onPointerUp: () => {
@@ -402,9 +402,7 @@ const Editor = ({ id, tag, state, setState }) => {
 								return
 							}
 
-							// TODO: Rename syncPosRoots to syncRootPos
-
-							// let rootPosRange = state.extRootPosRange
+							// let rootPosRange = state.rootPosRange
 							// // Guard the extended end root ID; when a user
 							// // enters or backspaces on the end root, the
 							// // DOM and VDOM become out of sync:
@@ -417,7 +415,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							// }
 							// console.log(rootPosRange)
 
-							const [startID, endID] = state.extRootPosRange
+							const [startID, endID] = state.rootPosRange
 
 							// Query the start root:
 							const startRoot = document.getElementById(startID)
@@ -490,7 +488,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							// // return { roots: [startRoot, endRoot], atEnd }
 							// return { roots: [startRoot, endRoot] /* , atEnd */ }
 
-							// const { roots, atEnd } = queryRoots(ref.current, state.extRootPosRange)
+							// const { roots, atEnd } = queryRoots(ref.current, state.rootPosRange)
 							// console.log(...roots)
 							// const index1 = state.data.findIndex(each => each.id === roots[0].id)
 							// if (index1 === -1) {
@@ -520,7 +518,7 @@ const Editor = ({ id, tag, state, setState }) => {
 					<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 						{JSON.stringify(
 							{
-								// extRootPosRange: state.extRootPosRange,
+								// rootPosRange: state.rootPosRange,
 								// id: state.data.map(each => each.id),
 
 								...state,

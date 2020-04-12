@@ -108,9 +108,7 @@ function eagerlyRemoveRange() {
 
 // Synchronizes the DOM cursor based on root cursor data
 // structures.
-//
-// TODO: Extract to syncPosRoots.js
-function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
+function syncPos(editorRoot, [posRoot1, posRoot2]) {
 	const selection = document.getSelection()
 
 	// if (selection.rangeCount) {
@@ -188,4 +186,4 @@ function syncPosRoots(editorRoot, [posRoot1, posRoot2]) {
 	// selection.addRange(range)
 }
 
-export default syncPosRoots
+export default syncPos

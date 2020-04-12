@@ -11,13 +11,13 @@ function useEditor(initialValue) {
 	}))
 	const reactDOM = document.createElement("div")
 	const [state, setState] = React.useState(() => ({
-		readOnly: false,           // Is read-only?
-		focused: false,            // Is focused?
-		data: parse(unparsed),     // Document data
-		pos1: newPos(),            // Start cursor data structure
-		pos2: newPos(),            // End cursor data structure
-		extRootPosRange: ["", ""], // Extended cursor ID (root ID) range
-		reactDOM,                  // The React-managed DOM
+		readOnly: false,         // Is read-only?
+		focused: false,          // Is focused?
+		data: parse(unparsed),   // Document data
+		pos1: newPos(),          // Start cursor data structure
+		pos2: newPos(),          // End cursor data structure
+		rootPostRange: ["", ""], // Extended cursor ID (root ID) range
+		reactDOM,                // The React-managed DOM
 	}))
 	return [state, setState]
 }
