@@ -17,17 +17,17 @@ const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
 // Creates an extended cursor ID (root ID) range.
 function extendPosRange(state, [pos1, pos2]) {
-	let startIndex = state.data.findIndex(each => each.id === pos1.root.id)
-	startIndex -= 2 // Decrement 2x
-	if (startIndex < 0) {
-		startIndex = 0
+	let x1 = state.data.findIndex(each => each.id === pos1.root.id)
+	x1 -= 2 // Decrement 2x
+	if (x1 < 0) {
+		x1 = 0
 	}
-	let endIndex = state.data.findIndex(each => each.id === pos2.root.id)
-	endIndex += 2 // Increment 2x
-	if (endIndex >= state.data.length) {
-		endIndex = state.data.length - 1
+	let x2 = state.data.findIndex(each => each.id === pos2.root.id)
+	x2 += 2 // Increment 2x
+	if (x2 >= state.data.length) {
+		x2 = state.data.length - 1
 	}
-	return [state.data[startIndex].id, state.data[endIndex].id]
+	return [state.data[x1].id, state.data[x2].id]
 }
 
 // Queries data-root elements.
@@ -192,7 +192,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							return
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
-						const extPosRange = extendPosRange(state.data, [pos1.root, pos2.root])
+						const extPosRange = extendPosRange(state, [pos1, pos2])
 						setState(current => ({
 							...current,
 							pos1,

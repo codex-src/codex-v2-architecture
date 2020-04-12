@@ -52,14 +52,13 @@ export const Header = React.memo(({
 	parsed, // Parsed data
 }) => (
 	<Root id={id} className={headerClassNames[tag]}>
+		{/* TODO: Add <IfWrapper> pattern */}
 		{/* <a id={hash} href={`#${hash}`}> */}
-			{/* <div className={headerClassNames[tag]}> */}
-				<Markdown syntax={syntax}>
-					{toReact(parsed) || (
-						<br />
-					)}
-				</Markdown>
-			{/* </div> */}
+		<Markdown syntax={syntax}>
+			{toReact(parsed) || (
+				<br />
+			)}
+		</Markdown>
 		{/* </a> */}
 	</Root>
 ))
