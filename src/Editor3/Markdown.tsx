@@ -47,12 +47,12 @@ const Markdown = ({ syntax, ...props }: MarkdownProps): React.ReactElement => {
 	return (
 		<React.Fragment>
 
-			{/* LHS */}
+			{/* Start: */}
 			<Syntax {...props}>
 				{s1}
 			</Syntax>
 
-			{/* RHS */}
+			{/* End: */}
 			{props.children}
 			<Syntax {...props}>
 				{s2}

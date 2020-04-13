@@ -37,9 +37,26 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 				{
 					ref,
 
-					// TODO: Etc.
+					className: "codex-editor",
+
+					style: {
+						// Imperative styles needed because of
+						// contenteditable:
+						whiteSpace: "pre-wrap",
+						outline: "none",
+						overflowWrap: "break-word",
+
+						caretColor: "black",
+					},
+
+					onFocus: () => setState(current => ({ ...current, focused: true })),
+					onBlur:  () => setState(current => ({ ...current, focused: false })),
 				},
 			)}
+
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
+				{JSON.stringify(state, null, "\t")}
+			</div>
 
 		</div>
 	)
