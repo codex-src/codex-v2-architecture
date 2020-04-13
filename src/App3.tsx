@@ -1,8 +1,7 @@
 import * as Types from "Editor3/__types"
 import React from "react"
 import ReactDOM from "react-dom"
-import uuidv4 from "uuid/v4"
-import { newPos } from "Editor3/constructors"
+import useEditor from "Editor3/useEditor"
 
 const EditorContext = React.createContext<null | Types.EditorSetState>(null)
 
@@ -36,29 +35,13 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 				"div",
 				{
 					ref,
+
 					// TODO: Etc.
 				},
 			)}
 
 		</div>
 	)
-}
-
-function useEditor(initialValue: string): Types.EditorSetState {
-	const data = initialValue.split("\n").map(each => ({
-		id: uuidv4(),
-		raw: each,
-	}))
-	const [state, setState] = React.useState(() => ({
-		readOnly: false,
-		focused: false,
-		data,
-		pos1: newPos(),
-		pos2: newPos(),
-		extPosRange: ["", ""],
-		reactDOM: document.createElement("div"),
-	}))
-	return [state, setState]
 }
 
 const App = () => {
