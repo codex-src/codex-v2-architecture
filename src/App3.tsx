@@ -1,54 +1,14 @@
+import * as Types from "Editor3/__types"
 import React from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
-/* eslint-disable no-multi-spaces */
-
-type PosFragment = {
-	id:     string, // Node or root UUID
-	offset: number, // Offset to the cursor from the node or root
-}
-
-// Describes a cursor data structure.
-type Pos = {
-	node: PosFragment,
-	root: PosFragment,
-}
-
-// Describes an unparsed element.
-type UnparsedElement = {
-	id:  string, // The UUID
-	raw: string, // The raw-text
-}
-
-// Describes an editor state.
-type EditorState = {
-	readOnly:    boolean,           // Is the editor read-only?
-	focused:     boolean,           // Is the editor focused?
-	data:        UnparsedElement[], // The document data
-	pos1:        Pos,               // The start cursor
-	pos2:        Pos,               // The end cursor
-	extPosRange: string[],          // The extended cursor range (root ID)
-	reactDOM:    HTMLDivElement,    // The React-managed DOM -- obscured from the user
-}
-
-
-type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorState>>
-
-type EditorSetState = [EditorState, EditorSetStateAction]
-
-type EditorProps = {
-	state:    EditorState,
-	setState: EditorSetStateAction,
-	// TODO: Etc.
-}
-
 /* eslint-enable no-multi-spaces */
 
-const EditorContext = React.createContext<null | EditorSetState>(null)
+const EditorContext = React.createContext<null | Types.EditorSetState>(null)
 
 // Constructor for a new cursor data structure.
-function newPos(): Pos {
+function newPos(): Types.Pos {
 	const pos = {
 		node: {
 			id: "",
@@ -62,7 +22,7 @@ function newPos(): Pos {
 	return pos
 }
 
-const Editor = ({ state, setState }: EditorProps) => {
+const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
 	React.useEffect(
@@ -99,7 +59,7 @@ const Editor = ({ state, setState }: EditorProps) => {
 	)
 }
 
-function useEditor(initialValue: string): EditorSetState {
+function useEditor(initialValue: string): Types.EditorSetState {
 	const data = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,
