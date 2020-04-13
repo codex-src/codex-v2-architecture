@@ -39,30 +39,42 @@ export type EditorSetState = [EditorState, EditorSetStateAction]
 export type EditorProps = {
 	state:    EditorState,
 	setState: EditorSetStateAction,
-	// TODO: Etc.
 }
 
-export type HeaderProps = {
-	type:   TypeEnum,
-	tag:    string,
-	id:     string,
-	syntax: string | string[],
-	hash:   string,
-	raw:    string,
-	parsed: string, // React.ReactNode,
-}
-
-export type ParagraphProps = {
-	type:   TypeEnum,
-	id:     string,
-	raw:    string,
-	parsed: string, // React.ReactNode,
-}
+// export type HeaderProps = {
+// 	type:   TypeEnum,
+// 	tag:    string,
+// 	id:     string,
+// 	syntax: string | string[],
+// 	hash:   string,
+// 	raw:    string,
+// 	parsed: string, // React.ReactNode,
+// }
 
 // Describes a parsed element.
-export type ParsedElement = ParagraphProps
+export type ParsedElement =
 	// HeaderProps &
-	// ParagraphProps
+	ParagraphElement
+
+// <Paragraph>
+type ParagraphElement = {
+	type:   TypeEnum.Paragraph,
+	id:     string,
+	raw:    string,
+  parsed: string,
+}
+
+// // <Header>
+// type HeaderElement = {
+// 	type:   TypeEnum.Header,
+// 	id:     string,
+//
+// 	syntax: string
+// 	hash:   string,
+//
+// 	raw:    string,
+//   parsed: string,
+// }
 
 // // Describes a parsed element.
 // export type ParsedElement = {
