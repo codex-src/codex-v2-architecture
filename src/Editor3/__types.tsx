@@ -1,6 +1,5 @@
-import React from "react"
-
 /* eslint-disable no-multi-spaces */
+import React from "react"
 
 // Describes a fragment of a cursor data structure.
 export type PosFragment = {
@@ -42,5 +41,3 @@ export type EditorProps = {
 	setState: EditorSetStateAction,
 	// TODO: Etc.
 }
-
-/* eslint-enable no-multi-spaces */

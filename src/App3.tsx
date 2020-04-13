@@ -2,25 +2,9 @@ import * as Types from "Editor3/__types"
 import React from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
-
-/* eslint-enable no-multi-spaces */
+import { newPos } from "Editor3/constructors"
 
 const EditorContext = React.createContext<null | Types.EditorSetState>(null)
-
-// Constructor for a new cursor data structure.
-function newPos(): Types.Pos {
-	const pos = {
-		node: {
-			id: "",
-			offset: 0,
-		},
-		root: {
-			id: "",
-			offset: 0,
-		},
-	}
-	return pos
-}
 
 const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
@@ -52,6 +36,7 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 				"div",
 				{
 					ref,
+					// TODO: Etc.
 				},
 			)}
 
