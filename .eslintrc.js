@@ -7,8 +7,11 @@ module.exports = {
 		node:    true,
 	},
 	extends: ["eslint:recommended"],
-	parser: "babel-eslint",
+	// parser: "babel-eslint",
 	parserOptions: { sourceType: "module" },
+	// https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md#installation
+	parser: "@typescript-eslint/parser",
+	plugins: ["@typescript-eslint"],
 	rules: {
 		"no-unused-vars":                   0, // disallow unused variables
 

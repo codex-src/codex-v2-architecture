@@ -41,6 +41,8 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "debug.css": "https://github.com/codex-src/debug.css",
     "raw.macro": "^0.3.0",
     "serve": "^11.3.0"

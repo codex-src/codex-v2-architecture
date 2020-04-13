@@ -1,4 +1,5 @@
 import * as Types from "./__types"
+import Markdown from "./Markdown"
 import React from "react"
 
 import {
@@ -34,28 +35,33 @@ function toReact(parsed: string): React.ReactNode {
 // function trim(str: string): string {
 // 	return str.replace(/ +/, " ") // Trims extra spaces
 // }
-//
-// const headerClassNames = {
-// 	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
-// 	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
-// 	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-// 	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-// 	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-// 	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-// }
-//
+
+const headerClassNames: {
+	[key: string]: string,
+} = {
+	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
+	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
+	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+}
+
 // // console.log(headerClassNames["h1"])
 
-export const Header = React.memo((props: Types.HeaderElement) => (
-	// console.log(typeof tag), false || (
-	<Root id={props.id} /* className={headerClassNames["h1"]} */>
-		{/* <Markdown syntax={syntax}> */}
-			{toReact(props.parsed) || (
+export const Header = React.memo(({
+	tag,
+	id,
+	syntax,
+	parsed,
+}: Types.HeaderElement) => (
+	<Root id={id} className={headerClassNames[tag]}>
+		<Markdown syntax={syntax}>
+			{toReact(parsed) || (
 				<br />
 			)}
-		{/* </Markdown> */}
+		</Markdown>
 	</Root>
-	// )
 ))
 
 export const Paragraph = React.memo(({ id, parsed }: Types.ParagraphElement) => (
