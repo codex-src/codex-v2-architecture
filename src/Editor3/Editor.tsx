@@ -85,15 +85,14 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
-						computePos(ref.current!)
-						// const [pos1, pos2] = computePos(ref.current)
+						const [pos1, pos2] = computePos(ref.current!)
 						// const extPosRange = extendPosRange(state, [pos1, pos2])
-						// setState(current => ({
-						// 	...current,
-						// 	pos1,
-						// 	pos2,
-						// 	extPosRange,
-						// }))
+						setState(current => ({
+							...current,
+							pos1,
+							pos2,
+							// extPosRange,
+						}))
 					},
 
 					contentEditable: !state.readOnly,
