@@ -1,18 +1,19 @@
 import * as Types from "./__types"
+import parse from "./parser"
 import React from "react"
 import uuidv4 from "uuid/v4"
 import { newPos } from "./constructors"
 
 // Returns an EditorStateState initializer.
 function useEditor(initialValue: string): Types.EditorSetState {
-	const data = initialValue.split("\n").map(each => ({
+	const unparsed = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,
 	}))
 	const [state, setState] = React.useState(() => ({
 		readOnly: false,
 		focused: false,
-		data,
+		data: parse(unparsed),
 		pos1: newPos(),
 		pos2: newPos(),
 		extPosRange: ["", ""],

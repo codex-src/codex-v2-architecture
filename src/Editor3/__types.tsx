@@ -1,5 +1,6 @@
 /* eslint-disable no-multi-spaces */
 import React from "react"
+import TypeEnum from "./TypeEnum"
 
 // Describes a fragment of a cursor data structure.
 export type PosFragment = {
@@ -19,17 +20,26 @@ export type UnparsedElement = {
 	raw: string, // The raw-text
 }
 
-// TODO: ParsedElement
+// Describes a parsed element.
+export type ParsedElement = {
+	type:       TypeEnum,
+  tag?:       string,
+	id:         string,
+	className?: string,
+	style?:     React.CSSProperties,
+	raw:        string,
+	parsed:     string, // React.ReactNode,
+}
 
 // Describes an editor state.
 export type EditorState = {
-	readOnly:    boolean,           // Is the editor read-only?
-	focused:     boolean,           // Is the editor focused?
-	data:        UnparsedElement[], // The document data
-	pos1:        Pos,               // The start cursor
-	pos2:        Pos,               // The end cursor
-	extPosRange: string[],          // The extended cursor range (root ID)
-	reactDOM:    HTMLDivElement,    // The React-managed DOM -- obscured from the user
+	readOnly:    boolean,         // Is the editor read-only?
+	focused:     boolean,         // Is the editor focused?
+	data:        ParsedElement[], // The parsed document data
+	pos1:        Pos,             // The start cursor
+	pos2:        Pos,             // The end cursor
+	extPosRange: string[],        // The extended cursor range (root ID)
+	reactDOM:    HTMLDivElement,  // The React-managed DOM -- obscured from the user
 }
 
 // Describes a setState function for EditorState.
@@ -42,10 +52,3 @@ export type EditorProps = {
 	setState: EditorSetStateAction,
 	// TODO: Etc.
 }
-
-// export type HOCProps = {
-// 	id:       string,
-// 	tag?:     string,
-// 	style?:   React.CSSProperties,
-//   children: React.ReactNode,
-// }

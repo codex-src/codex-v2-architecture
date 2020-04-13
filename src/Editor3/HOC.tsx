@@ -2,10 +2,11 @@
 import React from "react"
 
 type HOCProps = {
-	id:       string,
-	tag?:     string,
-	style?:   React.CSSProperties,
-  children: React.ReactNode,
+	id:         string,
+	tag?:       string,
+	className?: string,
+	style?:     React.CSSProperties,
+  children:   React.ReactNode,
 }
 
 // NOTE: Shadows browser API
