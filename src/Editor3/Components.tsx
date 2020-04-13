@@ -29,16 +29,51 @@ function toReact(parsed: string): React.ReactNode {
 	return "TODO"
 }
 
-type ParagraphProps = {
+// // Trims extraneous spaces.
+// function trim(str: string): string {
+// 	return str.replace(/ +/, " ") // Trims extra spaces
+// }
+
+const headerClassNames = {
+	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
+	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
+	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+}
+
+// console.log(headerClassNames["h1"])
+
+type HeaderProps = {
+	tag:    string,
 	id:     string,
-	raw:    string,
+	syntax: string | string[],
+	hash:   string,
 	parsed: string, // React.ReactNode,
 }
 
-export const Paragraph = ({ id, parsed }: ParagraphProps) => (
+export const Header = React.memo(({ tag, id,  syntax, hash, parsed }: HeaderProps) => (
+	// console.log(typeof tag), false || (
+	<Root id={id} className={headerClassNames["h1"]}>
+		{/* <Markdown syntax={syntax}> */}
+			{toReact(parsed) || (
+				<br />
+			)}
+		{/* </Markdown> */}
+	</Root>
+	// )
+))
+
+type ParagraphProps = {
+	id:     string,
+	parsed: string, // React.ReactNode,
+}
+
+export const Paragraph = React.memo(({ id, parsed }: ParagraphProps) => (
 	<Root id={id}>
 		{toReact(parsed) || (
 			<br />
 		)}
 	</Root>
-)
+))

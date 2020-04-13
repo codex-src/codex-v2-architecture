@@ -20,17 +20,6 @@ export type UnparsedElement = {
 	raw: string, // The raw-text
 }
 
-// Describes a parsed element.
-export type ParsedElement = {
-	type:       TypeEnum,
-  tag?:       string,
-	id:         string,
-	className?: string,
-	style?:     React.CSSProperties,
-	raw:        string,
-	parsed:     string, // React.ReactNode,
-}
-
 // Describes an editor state.
 export type EditorState = {
 	readOnly:    boolean,         // Is the editor read-only?
@@ -52,3 +41,36 @@ export type EditorProps = {
 	setState: EditorSetStateAction,
 	// TODO: Etc.
 }
+
+export type HeaderProps = {
+	type:   TypeEnum,
+	tag:    string,
+	id:     string,
+	syntax: string | string[],
+	hash:   string,
+	raw:    string,
+	parsed: string, // React.ReactNode,
+}
+
+export type ParagraphProps = {
+	type:   TypeEnum,
+	id:     string,
+	raw:    string,
+	parsed: string, // React.ReactNode,
+}
+
+// Describes a parsed element.
+export type ParsedElement = ParagraphProps
+	// HeaderProps &
+	// ParagraphProps
+
+// // Describes a parsed element.
+// export type ParsedElement = {
+// 	type:       TypeEnum,
+//   tag?:       string,
+// 	id:         string,
+// 	className?: string,
+// 	style?:     React.CSSProperties,
+// 	raw:        string,
+// 	parsed:     string, // React.ReactNode,
+// }

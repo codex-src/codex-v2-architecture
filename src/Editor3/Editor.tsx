@@ -16,6 +16,7 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 					{state.data.map(({ type: T, ...each }) => (
 						React.createElement(
 							TypeMap[T], {
+								type: T, // FIXME
 								key: each.id,
 								...each,
 							},

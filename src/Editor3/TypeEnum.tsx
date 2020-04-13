@@ -1,6 +1,6 @@
 enum TypeEnum {
+  // Header = "Header",
   Paragraph = "Paragraph",
-	// TODO: Etc.
 }
 
 export default TypeEnum
