@@ -4,16 +4,15 @@ import uuidv4 from "uuid/v4"
 
 /* eslint-disable no-multi-spaces */
 
-// Describes a cursor data structure (pos: position).
+type PosFragment = {
+	id:     string, // Node or root UUID
+	offset: number, // Offset to the cursor from the node or root
+}
+
+// Describes a cursor data structure.
 type Pos = {
-	node: {
-		id: string,     // Node UUID
-		offset: number, // Offset to the cursor from the node
-	},
-	root: {
-		id: string,     // Root UUID
-		offset: number, // Offset to the cursor from the root
-	},
+	node: PosFragment,
+	root: PosFragment,
 }
 
 // Describes an unparsed element.
@@ -33,17 +32,20 @@ type EditorState = {
 	reactDOM:    HTMLDivElement,    // The React-managed DOM -- obscured from the user
 }
 
-type EditorSetState = React.Dispatch<React.SetStateAction<EditorState>>
+
+type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorState>>
+
+type EditorSetState = [EditorState, EditorSetStateAction]
 
 type EditorProps = {
 	state:    EditorState,
-	setState: EditorSetState,
-	// etc.
+	setState: EditorSetStateAction,
+	// TODO: Etc.
 }
 
 /* eslint-enable no-multi-spaces */
 
-const EditorContext = React.createContext<null | [EditorState, EditorSetState]>(null)
+const EditorContext = React.createContext<null | EditorSetState>(null)
 
 // Constructor for a new cursor data structure.
 function newPos(): Pos {
@@ -97,7 +99,7 @@ const Editor = ({ state, setState }: EditorProps) => {
 	)
 }
 
-function useEditor(initialValue: string): [EditorState, EditorSetState] {
+function useEditor(initialValue: string): EditorSetState {
 	const data = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,
