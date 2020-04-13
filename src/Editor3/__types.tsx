@@ -41,34 +41,21 @@ export type EditorProps = {
 	setState: EditorSetStateAction,
 }
 
-// export type HeaderProps = {
-// 	type:   TypeEnum,
-// 	tag:    string,
-// 	id:     string,
-// 	syntax: string | string[],
-// 	hash:   string,
-// 	raw:    string,
-// 	parsed: string, // React.ReactNode,
-// }
-
 // Describes a parsed element.
 export type ParsedElement =
-	ParagraphElement |
-	HeaderElement
-	// ParagraphElement
+	HeaderElement |
+	ParagraphElement
 
-// <Paragraph>
 export type ParagraphElement = {
-	type:   TypeEnum, // .Paragraph,
+	type:   TypeEnum, // Do not use type?: TypeEnum
 	id:     string,
 
 	raw:    string,
   parsed: string,
 }
 
-// <Header>
 export type HeaderElement = {
-	type:   TypeEnum, // .Header,
+	type:   TypeEnum, // Do not use type?: TypeEnum
 	id:     string,
 
 	tag:    string,
@@ -78,14 +65,3 @@ export type HeaderElement = {
 	raw:    string,
   parsed: string,
 }
-
-// // Describes a parsed element.
-// export type ParsedElement = {
-// 	type:       TypeEnum,
-//   tag?:       string,
-// 	id:         string,
-// 	className?: string,
-// 	style?:     React.CSSProperties,
-// 	raw:        string,
-// 	parsed:     string, // React.ReactNode,
-// }

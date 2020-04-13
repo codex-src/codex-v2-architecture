@@ -1,4 +1,3 @@
-// import TypeEnum from "./TypeEnum"
 import * as Types from "Editor3/__types"
 import EditorContext from "Editor3/EditorContext"
 import React from "react"
@@ -12,16 +11,17 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 		React.useCallback(() => {
 			const { Provider } = EditorContext
 			ReactDOM.render(
-				<Provider value={[state, setState]}>
-					{state.data.map((each) => (
-						React.createElement(
-							TypeMap[each.type], {
+				<pre className="text-xs" style={{ tabSize: 2 }}>
+					<Provider value={[state, setState]}>
+						{state.data.map(({ type: T, ...each }) => (
+							React.createElement(TypeMap[T], {
 								key: each.id,
 								...each,
-							},
-						)
-					))}
-				</Provider>,
+							// NOTE: Array.map drops type -- I think?
+							} as any)
+						))}
+					</Provider>
+				</pre>,
 				ref.current,
 				() => {
 					// TODO

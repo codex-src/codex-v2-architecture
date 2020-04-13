@@ -1,10 +1,6 @@
 import * as Types from "./__types"
 import TypeEnum from "./TypeEnum"
 
-// const { id, raw } = each
-// const { length } = raw
-// const char = each.raw.charAt(0)
-
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
@@ -14,7 +10,6 @@ function parse(unparsed: Types.UnparsedElement[]): Types.ParsedElement[] /* Need
 		const each = unparsed[x]
 		const char = each.raw.charAt(0)
 		const nchars = each.raw.length
-
 		switch (true) {
 		// <Header>
 		case char === "#":
@@ -51,7 +46,6 @@ function parse(unparsed: Types.UnparsedElement[]): Types.ParsedElement[] /* Need
 			// No-op
 			break
 		}
-
 		// <Paragraph>
 		// const children = parseInnerGFM(each)
 		parsed.push({
