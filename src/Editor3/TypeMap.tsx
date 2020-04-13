@@ -1,12 +1,12 @@
 import TypeEnum from "./TypeEnum"
 
 import {
-	// Header,
+	Header,
 	Paragraph,
 } from "./Components"
 
 const TypeMap = {
-	// [TypeEnum.Header]: Header,
+	[TypeEnum.Header]: Header,
 	[TypeEnum.Paragraph]: Paragraph,
 }
 

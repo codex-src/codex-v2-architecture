@@ -1,5 +1,5 @@
 enum TypeEnum {
-  // Header = "Header",
+  Header = "Header",
   Paragraph = "Paragraph",
 }
 

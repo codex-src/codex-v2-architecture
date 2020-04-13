@@ -45,18 +45,18 @@ function toReact(parsed: string): React.ReactNode {
 // }
 //
 // // console.log(headerClassNames["h1"])
-//
-// export const Header = React.memo((props: Types.HeaderElement) => (
-// 	// console.log(typeof tag), false || (
-// 	<Root id={props.id} /* className={headerClassNames["h1"]} */>
-// 		{/* <Markdown syntax={syntax}> */}
-// 			{toReact(props.parsed) || (
-// 				<br />
-// 			)}
-// 		{/* </Markdown> */}
-// 	</Root>
-// 	// )
-// ))
+
+export const Header = React.memo((props: Types.HeaderElement) => (
+	// console.log(typeof tag), false || (
+	<Root id={props.id} /* className={headerClassNames["h1"]} */>
+		{/* <Markdown syntax={syntax}> */}
+			{toReact(props.parsed) || (
+				<br />
+			)}
+		{/* </Markdown> */}
+	</Root>
+	// )
+))
 
 export const Paragraph = React.memo(({ id, parsed }: Types.ParagraphElement) => (
 	<Root id={id}>

@@ -52,8 +52,9 @@ export type EditorProps = {
 // }
 
 // Describes a parsed element.
-export type ParsedElement = ParagraphElement
-	// HeaderElement &
+export type ParsedElement =
+	ParagraphElement |
+	HeaderElement
 	// ParagraphElement
 
 // <Paragraph>
