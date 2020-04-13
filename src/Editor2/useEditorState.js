@@ -1,4 +1,4 @@
-// @flow
+// // @flow
 import EditorContext from "./EditorContext"
 import React from "react"
 

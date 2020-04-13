@@ -1,4 +1,4 @@
-// @flow
+// // @flow
 import Enum from "Enum"
 
 const typeEnum = new Enum(
