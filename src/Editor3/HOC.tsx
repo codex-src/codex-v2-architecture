@@ -1,8 +1,15 @@
-import * as Types from "./__types"
+// import * as Types from "./__types"
 import React from "react"
 
+type HOCProps = {
+	id:       string,
+	tag?:     string,
+	style?:   React.CSSProperties,
+  children: React.ReactNode,
+}
+
 // NOTE: Shadows browser API
-export const Node = ({ id, tag, style, ...props }: Types.HOCProps) => (
+export const Node = ({ id, tag, style, ...props }: HOCProps) => (
 	React.createElement(tag || "div", {
 		id,
 		"style": {
@@ -16,7 +23,7 @@ export const Node = ({ id, tag, style, ...props }: Types.HOCProps) => (
 	})
 )
 
-export const Root = ({ id, tag, style, ...props }: Types.HOCProps) => (
+export const Root = ({ id, tag, style, ...props }: HOCProps) => (
 	React.createElement(tag || "div", {
 		id,
 		"style": {

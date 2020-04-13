@@ -32,6 +32,7 @@ export type EditorState = {
 	reactDOM:    HTMLDivElement,    // The React-managed DOM -- obscured from the user
 }
 
+// Describes a setState function for EditorState.
 export type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorState>>
 
 export type EditorSetState = [EditorState, EditorSetStateAction]
@@ -42,9 +43,9 @@ export type EditorProps = {
 	// TODO: Etc.
 }
 
-export type HOCProps = {
-	id:       string,
-	tag?:     string,
-	style?:   React.CSSProperties,
-  children: React.ReactNode,
-}
+// export type HOCProps = {
+// 	id:       string,
+// 	tag?:     string,
+// 	style?:   React.CSSProperties,
+//   children: React.ReactNode,
+// }

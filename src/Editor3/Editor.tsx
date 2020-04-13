@@ -7,14 +7,16 @@ import {
 	Root,
 } from "./HOC"
 
-type Temp = {
+type ParagraphProps = {
 	id:  string,
 	raw: string,
 }
 
-const P = ({ id, raw }: Temp) => (
+const Paragraph = ({ id, raw }: ParagraphProps) => (
 	<Root id={id}>
-		{raw}
+		{raw || (
+			<br />
+		)}
 	</Root>
 )
 
@@ -27,7 +29,7 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 			ReactDOM.render(
 				<Provider value={[state, setState]}>
 					{state.data.map(each => (
-						<P key={each.id} {...each} />
+						<Paragraph key={each.id} {...each} />
 					))}
 				</Provider>,
 				ref.current,
