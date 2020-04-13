@@ -43,8 +43,8 @@ export type EditorProps = {
 }
 
 export type HOCProps = {
-	id:    string,
-	tag:   string,
-	style: null | Object, // FIXME?
-	props: null | Object, // FIXME?
+	id:       string,
+	tag?:     string,
+	style?:   React.CSSProperties,
+  children: React.ReactNode,
 }

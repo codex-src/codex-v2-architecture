@@ -3,6 +3,21 @@ import EditorContext from "Editor3/EditorContext"
 import React from "react"
 import ReactDOM from "react-dom"
 
+import {
+	Root,
+} from "./HOC"
+
+type Temp = {
+	id:  string,
+	raw: string,
+}
+
+const P = ({ id, raw }: Temp) => (
+	<Root id={id}>
+		{raw}
+	</Root>
+)
+
 const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
@@ -12,9 +27,7 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 			ReactDOM.render(
 				<Provider value={[state, setState]}>
 					{state.data.map(each => (
-						<p key={each.id}>
-							{each.raw}
-						</p>
+						<P key={each.id} {...each} />
 					))}
 				</Provider>,
 				ref.current,
