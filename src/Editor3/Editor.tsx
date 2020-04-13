@@ -13,9 +13,9 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 			const { Provider } = EditorContext
 			ReactDOM.render(
 				<Provider value={[state, setState]}>
-					{state.data.map(({ type: T, ...each }) => (
+					{state.data.map((each) => (
 						React.createElement(
-							TypeMap[T], {
+							TypeMap[each.type], {
 								key: each.id,
 								...each,
 							},

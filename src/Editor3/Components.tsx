@@ -1,3 +1,4 @@
+import * as Types from "./__types"
 import React from "react"
 
 import {
@@ -33,44 +34,31 @@ function toReact(parsed: string): React.ReactNode {
 // function trim(str: string): string {
 // 	return str.replace(/ +/, " ") // Trims extra spaces
 // }
+//
+// const headerClassNames = {
+// 	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
+// 	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
+// 	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+// 	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+// 	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+// 	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+// }
+//
+// // console.log(headerClassNames["h1"])
+//
+// export const Header = React.memo((props: Types.HeaderElement) => (
+// 	// console.log(typeof tag), false || (
+// 	<Root id={props.id} /* className={headerClassNames["h1"]} */>
+// 		{/* <Markdown syntax={syntax}> */}
+// 			{toReact(props.parsed) || (
+// 				<br />
+// 			)}
+// 		{/* </Markdown> */}
+// 	</Root>
+// 	// )
+// ))
 
-const headerClassNames = {
-	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
-	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
-	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-}
-
-// console.log(headerClassNames["h1"])
-
-type HeaderProps = {
-	tag:    string,
-	id:     string,
-	syntax: string | string[],
-	hash:   string,
-	parsed: string, // React.ReactNode,
-}
-
-export const Header = React.memo(({ tag, id,  syntax, hash, parsed }: HeaderProps) => (
-	// console.log(typeof tag), false || (
-	<Root id={id} className={headerClassNames["h1"]}>
-		{/* <Markdown syntax={syntax}> */}
-			{toReact(parsed) || (
-				<br />
-			)}
-		{/* </Markdown> */}
-	</Root>
-	// )
-))
-
-type ParagraphProps = {
-	id:     string,
-	parsed: string, // React.ReactNode,
-}
-
-export const Paragraph = React.memo(({ id, parsed }: ParagraphProps) => (
+export const Paragraph = React.memo(({ id, parsed }: Types.ParagraphElement) => (
 	<Root id={id}>
 		{toReact(parsed) || (
 			<br />

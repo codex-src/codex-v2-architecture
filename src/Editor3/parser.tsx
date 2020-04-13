@@ -8,7 +8,7 @@ import TypeEnum from "./TypeEnum"
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-function parse(unparsed: Types.UnparsedElement[]): Types.ParsedElement[] {
+function parse(unparsed: Types.UnparsedElement[]): Types.ParsedElement[] /* Needed? */ {
 	const parsed = []
 	for (let x = 0; x < unparsed.length; x++) {
 		const each = unparsed[x]

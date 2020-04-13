@@ -52,29 +52,31 @@ export type EditorProps = {
 // }
 
 // Describes a parsed element.
-export type ParsedElement =
-	// HeaderProps &
-	ParagraphElement
+export type ParsedElement = ParagraphElement
+	// HeaderElement &
+	// ParagraphElement
 
 // <Paragraph>
-type ParagraphElement = {
-	type:   TypeEnum.Paragraph,
+export type ParagraphElement = {
+	type:   TypeEnum, // .Paragraph,
 	id:     string,
+
 	raw:    string,
   parsed: string,
 }
 
-// // <Header>
-// type HeaderElement = {
-// 	type:   TypeEnum.Header,
-// 	id:     string,
-//
-// 	syntax: string
-// 	hash:   string,
-//
-// 	raw:    string,
-//   parsed: string,
-// }
+// <Header>
+export type HeaderElement = {
+	type:   TypeEnum, // .Header,
+	id:     string,
+
+	tag:    string,
+	syntax: string | string[],
+	hash:   string,
+
+	raw:    string,
+  parsed: string,
+}
 
 // // Describes a parsed element.
 // export type ParsedElement = {
