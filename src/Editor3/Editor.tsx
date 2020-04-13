@@ -1,6 +1,7 @@
 import * as Types from "Editor3/__types"
 import computePos from "./computePos"
 import EditorContext from "Editor3/EditorContext"
+import extendPosRange from "./extendPosRange"
 import React from "react"
 import ReactDOM from "react-dom"
 import TypeMap from "./TypeMap"
@@ -86,12 +87,12 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 							selection.addRange(range)
 						}
 						const [pos1, pos2] = computePos(ref.current!)
-						// const extPosRange = extendPosRange(state, [pos1, pos2])
+						const extPosRange = extendPosRange(state, [pos1, pos2])
 						setState(current => ({
 							...current,
 							pos1,
 							pos2,
-							// extPosRange,
+							extPosRange,
 						}))
 					},
 
@@ -102,7 +103,15 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 
 			{DEBUG_ENABLED && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-					{JSON.stringify(state, null, "\t")}
+					{/* {JSON.stringify(state, null, "\t")} */}
+					{JSON.stringify(
+						{
+							extPosRange: state.extPosRange,
+							id: state.data.map(each => each.id),
+						},
+						null,
+						"\t",
+					)}
 				</div>
 			)}
 
