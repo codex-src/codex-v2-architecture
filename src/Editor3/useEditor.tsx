@@ -3,6 +3,7 @@ import React from "react"
 import uuidv4 from "uuid/v4"
 import { newPos } from "./constructors"
 
+// Returns an EditorStateState initializer.
 function useEditor(initialValue: string): Types.EditorSetState {
 	const data = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
