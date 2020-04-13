@@ -2,7 +2,7 @@ import React from "react"
 import useEditorSetState from "./useEditorSetState"
 
 // Gets syntax from a string or an array of strings.
-function getSyntax(syntax: string | string[]): string[] {
+function getSyntax(syntax: string | string[]) {
 	let s1 = ""
 	let s2 = ""
 	if (syntax === null) {
@@ -25,7 +25,7 @@ type SyntaxProps = {
 	children?: React.ReactNode,
 }
 
-const Syntax = (props: SyntaxProps): null | React.ReactElement => {
+const Syntax = (props: SyntaxProps) => {
 	// NOTE: Use ! to assert [state, setState]
 	const [state] = useEditorSetState()!
 	if (!props.children || state.readOnly) {
@@ -42,7 +42,7 @@ type MarkdownProps = {
 	children?: React.ReactNode,
 }
 
-const Markdown = ({ syntax, ...props }: MarkdownProps): React.ReactElement => {
+const Markdown = ({ syntax, ...props }: MarkdownProps) => {
 	const [s1, s2] = getSyntax(syntax)
 	return (
 		<React.Fragment>

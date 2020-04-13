@@ -8,7 +8,7 @@ import {
 
 // Parses an array of parsed data structures to renderable
 // React components.
-function toReact(parsed: string): React.ReactNode {
+function toReact(parsed: string) {
 	const recurse = toReact
 
 	if (parsed === null || typeof parsed === "string") {
@@ -31,23 +31,21 @@ function toReact(parsed: string): React.ReactNode {
 	return "TODO"
 }
 
-// // Trims extraneous spaces.
-// function trim(str: string): string {
-// 	return str.replace(/ +/, " ") // Trims extra spaces
-// }
+// Trims extraneous spaces.
+function trim(str: string) {
+	return str.replace(/ +/, " ") // Trims extra spaces
+}
 
 const headerClassNames: {
 	[key: string]: string,
 } = {
-	h1: "font-medium   text-3xl leading-tight", // trim("font-medium   text-3xl leading-tight"),
-	h2: "font-medium   text-2xl leading-tight", // trim("font-medium   text-2xl leading-tight"),
-	h3: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h4: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h5: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
-	h6: "font-semibold text-xl  leading-tight", // trim("font-semibold text-xl  leading-tight"),
+	h1: trim("font-medium   text-3xl leading-tight"),
+	h2: trim("font-medium   text-2xl leading-tight"),
+	h3: trim("font-semibold text-xl  leading-tight"),
+	h4: trim("font-semibold text-xl  leading-tight"),
+	h5: trim("font-semibold text-xl  leading-tight"),
+	h6: trim("font-semibold text-xl  leading-tight"),
 }
-
-// // console.log(headerClassNames["h1"])
 
 export const Header = React.memo(({
 	tag,
@@ -64,7 +62,10 @@ export const Header = React.memo(({
 	</Root>
 ))
 
-export const Paragraph = React.memo(({ id, parsed }: Types.ParagraphElement) => (
+export const Paragraph = React.memo(({
+	id,
+	parsed,
+}: Types.ParagraphElement) => (
 	<Root id={id}>
 		{toReact(parsed) || (
 			<br />

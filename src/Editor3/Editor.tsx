@@ -4,6 +4,8 @@ import React from "react"
 import ReactDOM from "react-dom"
 import TypeMap from "./TypeMap"
 
+const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
+
 const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
@@ -16,7 +18,8 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 						React.createElement(TypeMap[T], {
 							key: each.id,
 							...each,
-						// NOTE: Array.map drops type -- I think?
+						// NOTE: Use as any or expect errors; Array.map
+						// drops the type -- I think?
 						} as any)
 					))}
 				</Provider>,
@@ -54,9 +57,11 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 				},
 			)}
 
-			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-				{JSON.stringify(state, null, "\t")}
-			</div>
+			{DEBUG_ENABLED && (
+				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
+					{JSON.stringify(state, null, "\t")}
+				</div>
+			)}
 
 		</div>
 	)

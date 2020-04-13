@@ -1,7 +1,5 @@
-import * as Types from "./__types"
-
 // Constructor for a new cursor data structure.
-export function newPos(): Types.Pos {
+export function newPos() {
 	const pos = {
 		node: {
 			id: "",
