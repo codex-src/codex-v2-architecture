@@ -41,3 +41,10 @@ export type EditorProps = {
 	setState: EditorSetStateAction,
 	// TODO: Etc.
 }
+
+export type HOCProps = {
+	id:    string,
+	tag:   string,
+	style: null | Object, // FIXME?
+	props: null | Object, // FIXME?
+}
