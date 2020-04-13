@@ -2,6 +2,8 @@ import Editor from "Editor3/Editor"
 import React from "react"
 import useEditor from "Editor3/useEditor"
 
+import "./App.css"
+
 const App = () => {
 	const [state, setState] = useEditor("hello\n\n# hello\n\nhello")
 

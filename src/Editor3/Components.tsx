@@ -9,7 +9,7 @@ import {
 // Parses an array of parsed data structures to renderable
 // React components.
 function toReact(parsed: string) {
-	const recurse = toReact
+	// const recurse = toReact
 
 	if (parsed === null || typeof parsed === "string") {
 		return parsed
@@ -72,3 +72,4 @@ export const Paragraph = React.memo(({
 		)}
 	</Root>
 ))
+
