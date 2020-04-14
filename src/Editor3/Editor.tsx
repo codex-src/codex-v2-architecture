@@ -2,9 +2,11 @@ import * as Types from "Editor3/__types"
 import computePos from "./computePos"
 import EditorContext from "Editor3/EditorContext"
 import extendPosRange from "./extendPosRange"
+import parse from "./parser"
 import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
+import readRoots from "./readRoots"
 import TypeMap from "./TypeMap"
 
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
@@ -33,7 +35,7 @@ type EditorProps = {
 }
 
 const Editor = ({ state, setState }: EditorProps) => {
-	const ref = React.useRef<null | HTMLDivElement>(null)
+	const ref = React.useRef<null | HTMLElement>(null)
 
 	// Tracks whether a pointer is down.
 	const pointerIsDownRef = React.useRef<null | boolean>()
@@ -129,37 +131,34 @@ const Editor = ({ state, setState }: EditorProps) => {
 					},
 
 					onInput: () => {
-						// queryRoots(ref.current, state.extPosRange)
-
-						// // Force a re-render when empty (Update
-						// // state.data reference):
-						// if (!ref.current.childNodes.length) {
-						// 	// No-op
-						// 	setState(current => ({
-						// 		...current,
-						// 		data: [...state.data],
-						// 	}))
-						// 	return
-						// }
-						// const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
-						// const x1 = state.data.findIndex(each => each.id === root1.id)
-						// if (x1 === -1) {
-						// 	throw new Error("onInput: x1 out of bounds")
-						// }
-						// const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
-						// if (x2 === -1) {
-						// 	throw new Error("onInput: x2 out of bounds")
-						// }
-						// const unparsed = readRoots(ref.current, [root1, root2])
-						// const [pos1, pos2] = computePosRange(ref.current)
-						// setState(current => ({ // FIXME: Use current
-						// 	...current,
-						// 	data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-						// 	pos1,
-						// 	pos2,
-						// 	// NOTE: Do not extendPosRange here; defer
-						// 	// to end of useLayoutEffect
-						// }))
+						// Force a re-render when empty:
+						if (!ref.current!.childNodes.length) {
+							// No-op
+							setState(current => ({
+								...current,
+								data: [...state.data],
+							}))
+							return
+						}
+						const { roots: [r1, r2], atEnd } = queryRoots(ref.current!, state.extPosRange)
+						const x1 = state.data.findIndex(each => each.id === r1.id)
+						if (x1 === -1) {
+							throw new Error("onInput: x1 out of bounds")
+						}
+						const x2 = !atEnd ? state.data.findIndex(each => each.id === r2.id) : state.data.length - 1
+						if (x2 === -1) {
+							throw new Error("onInput: x2 out of bounds")
+						}
+						const unparsed = readRoots(ref.current!, [r1, r2])
+						const [pos1, pos2] = computePos(ref.current!)
+						setState(current => ({
+							...current,
+							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+							pos1,
+							pos2,
+							// NOTE: Do not extendPosRange here; defer
+							// to end of useLayoutEffect
+						}))
 					},
 
 					contentEditable: !state.readOnly,
@@ -169,15 +168,15 @@ const Editor = ({ state, setState }: EditorProps) => {
 
 			{DEBUG_ENABLED && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-					{/* {JSON.stringify(state, null, "\t")} */}
-					{JSON.stringify(
-						{
-							extPosRange: state.extPosRange,
-							id: state.data.map(each => each.id),
-						},
-						null,
-						"\t",
-					)}
+					{JSON.stringify(state, null, "\t")}
+					{/* {JSON.stringify( */}
+					{/* 	{ */}
+					{/* 		extPosRange: state.extPosRange, */}
+					{/* 		id: state.data.map(each => each.id), */}
+					{/* 	}, */}
+					{/* 	null, */}
+					{/* 	"\t", */}
+					{/* )} */}
 				</div>
 			)}
 
