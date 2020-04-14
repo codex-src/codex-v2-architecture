@@ -8,6 +8,33 @@ import TypeMap from "./TypeMap"
 
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
 
+// // Queries data-root elements.
+// function queryRoots(editorRoot, extPosRange) {
+// 	// Query the start root:
+// 	const root1 = document.getElementById(extPosRange[0])
+// 	if (!root1 || !editorRoot.contains(root1)) {
+// 		throw new Error("queryRoots: no such root1 or out of bounds")
+// 	}
+// 	// Query the end root:
+// 	let root2 = document.getElementById(extPosRange[1])
+// 	let root2AtEnd = false
+// 	// Guard enter pressed on root2:
+// 	const nextRoot = root2 && root2.nextElementSibling
+// 	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
+// 		nextRoot.id = uuidv4() // Correct the ID
+// 		root2 = nextRoot
+// 		root2AtEnd = true
+// 	// Guard backspaced pressed on root2:
+// 	} else if (!root2) {
+// 		root2 = editorRoot.children[editorRoot.children.length - 1]
+// 		root2AtEnd = true
+// 	}
+// 	if (!root2 || !editorRoot.contains(root2)) {
+// 		throw new Error("queryRoots: no such root2 or out of bounds")
+// 	}
+// 	return { roots: [root1, root2], root2AtEnd }
+// }
+
 const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
@@ -94,6 +121,60 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 							pos2,
 							extPosRange,
 						}))
+					},
+
+					onPointerDown: () => {
+						pointerIsDownRef.current = true
+					},
+					onPointerMove: () => {
+						// Editor must be focused and pointer must be down:
+						if (!state.focused || !pointerIsDownRef.current) {
+							pointerIsDownRef.current = false // Reset to be safe
+							return
+						}
+						const [pos1, pos2] = computePos(ref.current!)
+						const extPosRange = extendPosRange(state, [pos1, pos2])
+						setState(current => ({
+							...current,
+							pos1,
+							pos2,
+							extPosRange,
+						}))
+					},
+					onPointerUp: () => {
+						pointerIsDownRef.current = false
+					},
+
+					onInput: () => {
+						// // Force a re-render when empty (Update
+						// // state.data reference):
+						// if (!ref.current.childNodes.length) {
+						// 	// No-op
+						// 	setState(current => ({
+						// 		...current,
+						// 		data: [...state.data],
+						// 	}))
+						// 	return
+						// }
+						// const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
+						// const x1 = state.data.findIndex(each => each.id === root1.id)
+						// if (x1 === -1) {
+						// 	throw new Error("onInput: x1 out of bounds")
+						// }
+						// const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
+						// if (x2 === -1) {
+						// 	throw new Error("onInput: x2 out of bounds")
+						// }
+						// const unparsed = readRoots(ref.current, [root1, root2])
+						// const [pos1, pos2] = computePosRange(ref.current)
+						// setState(current => ({ // FIXME: Use current
+						// 	...current,
+						// 	data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+						// 	pos1,
+						// 	pos2,
+						// 	// NOTE: Do not extendPosRange here; defer
+						// 	// to end of useLayoutEffect
+						// }))
 					},
 
 					contentEditable: !state.readOnly,

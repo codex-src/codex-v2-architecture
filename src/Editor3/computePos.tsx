@@ -38,7 +38,7 @@ function computePosFromRange(editorRoot: HTMLElement, { ...range }: Range) {
 	if (!range.node || !editorRoot.contains(range.node)) {
 		throw new Error("computePosFromRange: no such node or out of bounds")
 	}
-	// Iterate range.node to the deepest node:
+	// Iterate to the deepest node (range.node):
 	while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
@@ -82,12 +82,10 @@ function computePos(editorRoot: HTMLElement) {
 		throw new Error("computePos: no such selection")
 	}
 	const range = selection.getRangeAt(0)
-	const r1 = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePosFromRange(editorRoot, r1)
+	const pos1 = computePosFromRange(editorRoot, { node: range.startContainer, offset: range.startOffset })
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
-		const r2 = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePosFromRange(editorRoot, r2)
+		pos2 = computePosFromRange(editorRoot, { node: range.endContainer, offset: range.endOffset })
 	}
 	return [pos1, pos2]
 }
