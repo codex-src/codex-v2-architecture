@@ -36,9 +36,9 @@ type EditorProps = {
 	setState: Types.EditorSetStateAction,
 }
 
-;(() => {
-	document.body.classList.toggle("debug-css")
-})()
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
 
 const Editor = ({ state, setState }: EditorProps) => {
 	const ref = React.useRef<null | HTMLElement>(null)
@@ -186,7 +186,7 @@ const Editor = ({ state, setState }: EditorProps) => {
 							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 							pos1,
 							pos2,
-							// NOTE: Do not extendPosRange here; defer to
+							// NOTE: Do not extendPosRange yet; defer to
 							// useLayoutEffect
 						}))
 					},
