@@ -45,18 +45,19 @@ const Editor = ({ state, setState }: EditorProps) => {
 	// Tracks whether a pointer is down.
 	const pointerIsDownRef = React.useRef<null | boolean>()
 
+	const mounted = React.useRef<null | boolean>()
 	React.useEffect(
 		React.useCallback(() => {
-			ReactDOM.render(<Document state={state} setState={setState} />, ref.current, () => {
-				// // Sync user-managed DOM to the React-managed DOM:
-				// const mutations = syncTrees(state.reactDOM, ref.current)
-				// if (!mounted.current) {
-				// 	mounted.current = true
-				// 	return
-				// }
-				// if (mutations) {
-				// 	console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
-				// }
+			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
+				// Sync user-managed DOM to the React-managed DOM:
+				const mutations = syncTrees(state.reactDOM, ref.current!)
+				if (!mounted.current) {
+					mounted.current = true
+					return
+				}
+				if (mutations) {
+					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
+				}
 				// // Sync DOM cursors to the VDOM cursors:
 				// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
 				// if (syncedPos) {
