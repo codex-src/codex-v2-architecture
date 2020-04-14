@@ -35,6 +35,32 @@ const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
 // 	return { roots: [root1, root2], root2AtEnd }
 // }
 
+type DocumentProps = {
+	state:    Types.EditorState,
+	setState: Types.EditorSetStateAction,
+}
+
+const Document = ({ state, setState }: DocumentProps) => {
+	const { Provider } = EditorContext
+	return (
+		<Provider value={[state, setState]}>
+			{state.data.map(({ type: T, ...each }) => (
+				React.createElement(TypeMap[T], {
+					key: each.id,
+					...each,
+				// NOTE: Use as any or expect errors; Array.map
+				// drops the type -- I think?
+				} as any)
+			))}
+		</Provider>
+	)
+}
+
+type EditorProps = {
+	state:    Types.EditorState,
+	setState: Types.EditorSetStateAction,
+}
+
 const Editor = ({ state, setState }: Types.EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
@@ -43,23 +69,9 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 
 	React.useEffect(
 		React.useCallback(() => {
-			const { Provider } = EditorContext
-			ReactDOM.render(
-				<Provider value={[state, setState]}>
-					{state.data.map(({ type: T, ...each }) => (
-						React.createElement(TypeMap[T], {
-							key: each.id,
-							...each,
-						// NOTE: Use as any or expect errors; Array.map
-						// drops the type -- I think?
-						} as any)
-					))}
-				</Provider>,
-				ref.current,
-				() => {
-					// TODO
-				},
-			)
+			ReactDOM.render(<Document state={state} setState={setState} />, ref.current, () => {
+				// TODO
+			})
 		}, [state, setState]),
 		[state.data],
 	)
