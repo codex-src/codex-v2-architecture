@@ -14,7 +14,7 @@ import TypeMap from "./TypeMap"
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
 
 type DocumentProps = {
-	state:    Types.EditorState,
+	state: Types.EditorState,
 	setState: Types.EditorSetStateAction,
 }
 
@@ -32,7 +32,7 @@ const Document = ({ state, setState }: DocumentProps) => (
 )
 
 type EditorProps = {
-	state:    Types.EditorState,
+	state: Types.EditorState,
 	setState: Types.EditorSetStateAction,
 }
 
@@ -64,16 +64,16 @@ const Editor = ({ state, setState }: EditorProps) => {
 				if (syncedPos) {
 					console.log("syncPos")
 				}
-				// // Update extPosRange for edge-cases such as
-				// // forward-backspace:
-				// const [pos1, pos2] = computePosRange(ref.current)
-				// const extPosRange = extendPosRange(state, [pos1, pos2])
-				// setState(current => ({
-				// 	...current,
-				// 	pos1,
-				// 	pos2,
-				// 	extPosRange,
-				// }))
+				// Update extPosRange for edge-cases such as
+				// forward-backspace:
+				const [pos1, pos2] = computePos(ref.current!)
+				const extPosRange = extendPosRange(state, [pos1, pos2])
+				setState(current => ({
+					...current,
+					pos1,
+					pos2,
+					extPosRange,
+				}))
 			})
 		}, [state, setState]),
 		[state.data],
