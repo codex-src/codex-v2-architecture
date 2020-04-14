@@ -34,6 +34,10 @@ type EditorProps = {
 	setState: Types.EditorSetStateAction,
 }
 
+;(() => {
+	document.body.classList.toggle("debug-css")
+})()
+
 const Editor = ({ state, setState }: EditorProps) => {
 	const ref = React.useRef<null | HTMLElement>(null)
 
@@ -140,24 +144,24 @@ const Editor = ({ state, setState }: EditorProps) => {
 							}))
 							return
 						}
-						const { roots: [r1, r2], atEnd } = queryRoots(ref.current!, state.extPosRange)
-						const x1 = state.data.findIndex(each => each.id === r1.id)
+						const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current!, state.extPosRange)
+						const x1 = state.data.findIndex(each => each.id === root1.id)
 						if (x1 === -1) {
 							throw new Error("onInput: x1 out of bounds")
 						}
-						const x2 = !atEnd ? state.data.findIndex(each => each.id === r2.id) : state.data.length - 1
+						const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
 						if (x2 === -1) {
 							throw new Error("onInput: x2 out of bounds")
 						}
-						const unparsed = readRoots(ref.current!, [r1, r2])
+						const unparsed = readRoots(ref.current!, [root1, root2])
 						const [pos1, pos2] = computePos(ref.current!)
 						setState(current => ({
 							...current,
 							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 							pos1,
 							pos2,
-							// NOTE: Do not extendPosRange here; defer
-							// to end of useLayoutEffect
+							// NOTE: Do not extendPosRange here; defer to
+							// useLayoutEffect
 						}))
 					},
 

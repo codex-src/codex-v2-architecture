@@ -2,27 +2,27 @@ import uuidv4 from "uuid/v4"
 
 // Queries data-root elements.
 function queryRoots(editorRoot: HTMLElement, extPosRange: string[]) {
-	const r1 = document.getElementById(extPosRange[0])
-	if (!r1 || !editorRoot.contains(r1)) {
-		throw new Error("queryRoots: no such r1 or out of bounds")
+	const root1 = document.getElementById(extPosRange[0])
+	if (!root1 || !editorRoot.contains(root1)) {
+		throw new Error("queryRoots: no such root1 or out of bounds")
 	}
-	let r2 = document.getElementById(extPosRange[1])
-	let atEnd = false
-	// Guard enter pressed on r2:
-	const nextRoot = r2 && r2.nextElementSibling as HTMLElement
-	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === r2!.id)) {
-		nextRoot.id = uuidv4() // Correct the ID
-		r2 = nextRoot
-		atEnd = true
-	// Guard backspaced pressed on r2:
-	} else if (!r2) {
-		r2 = editorRoot.children[editorRoot.children.length - 1] as HTMLElement
-		atEnd = true
+	let root2 = document.getElementById(extPosRange[1])
+	let root2AtEnd = false
+	// Guard enter pressed on root2:
+	const next = root2 && root2.nextElementSibling as HTMLElement
+	if (next && next.getAttribute("data-root") && (!next.id || next.id === root2!.id)) {
+		next.id = uuidv4() // Correct the ID
+		root2 = next
+		root2AtEnd = true
+	// Guard backspaced pressed on root2:
+	} else if (!root2) {
+		root2 = editorRoot.children[editorRoot.children.length - 1] as HTMLElement
+		root2AtEnd = true
 	}
-	if (!r2 || !editorRoot.contains(r2)) {
-		throw new Error("queryRoots: no such r2 or out of bounds")
+	if (!root2 || !editorRoot.contains(root2)) {
+		throw new Error("queryRoots: no such root2 or out of bounds")
 	}
-	return { roots: [r1, r2], atEnd }
+	return { roots: [root1, root2], root2AtEnd }
 }
 
 export default queryRoots
