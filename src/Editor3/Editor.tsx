@@ -2,66 +2,37 @@ import * as Types from "Editor3/__types"
 import computePos from "./computePos"
 import EditorContext from "Editor3/EditorContext"
 import extendPosRange from "./extendPosRange"
+import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import TypeMap from "./TypeMap"
 
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
 
-// // Queries data-root elements.
-// function queryRoots(editorRoot, extPosRange) {
-// 	// Query the start root:
-// 	const root1 = document.getElementById(extPosRange[0])
-// 	if (!root1 || !editorRoot.contains(root1)) {
-// 		throw new Error("queryRoots: no such root1 or out of bounds")
-// 	}
-// 	// Query the end root:
-// 	let root2 = document.getElementById(extPosRange[1])
-// 	let root2AtEnd = false
-// 	// Guard enter pressed on root2:
-// 	const nextRoot = root2 && root2.nextElementSibling
-// 	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
-// 		nextRoot.id = uuidv4() // Correct the ID
-// 		root2 = nextRoot
-// 		root2AtEnd = true
-// 	// Guard backspaced pressed on root2:
-// 	} else if (!root2) {
-// 		root2 = editorRoot.children[editorRoot.children.length - 1]
-// 		root2AtEnd = true
-// 	}
-// 	if (!root2 || !editorRoot.contains(root2)) {
-// 		throw new Error("queryRoots: no such root2 or out of bounds")
-// 	}
-// 	return { roots: [root1, root2], root2AtEnd }
-// }
-
 type DocumentProps = {
 	state:    Types.EditorState,
 	setState: Types.EditorSetStateAction,
 }
 
-const Document = ({ state, setState }: DocumentProps) => {
-	const { Provider } = EditorContext
-	return (
-		<Provider value={[state, setState]}>
-			{state.data.map(({ type: T, ...each }) => (
-				React.createElement(TypeMap[T], {
-					key: each.id,
-					...each,
-				// NOTE: Use as any or expect errors; Array.map
-				// drops the type -- I think?
-				} as any)
-			))}
-		</Provider>
-	)
-}
+const Document = ({ state, setState }: DocumentProps) => (
+	<EditorContext.Provider value={[state, setState]}>
+		{state.data.map(({ type: T, ...each }) => (
+			React.createElement(TypeMap[T], {
+				key: each.id,
+				...each,
+			// NOTE: Use as any or expect errors; Array.map drops
+			// the type -- I think?
+			} as any)
+		))}
+	</EditorContext.Provider>
+)
 
 type EditorProps = {
 	state:    Types.EditorState,
 	setState: Types.EditorSetStateAction,
 }
 
-const Editor = ({ state, setState }: Types.EditorProps) => {
+const Editor = ({ state, setState }: EditorProps) => {
 	const ref = React.useRef<null | HTMLDivElement>(null)
 
 	// Tracks whether a pointer is down.
@@ -158,6 +129,8 @@ const Editor = ({ state, setState }: Types.EditorProps) => {
 					},
 
 					onInput: () => {
+						// queryRoots(ref.current, state.extPosRange)
+
 						// // Force a re-render when empty (Update
 						// // state.data reference):
 						// if (!ref.current.childNodes.length) {

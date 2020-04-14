@@ -28,18 +28,13 @@ export type EditorState = {
 	pos1:        Pos,             // The start cursor
 	pos2:        Pos,             // The end cursor
 	extPosRange: string[],        // The extended cursor range (root ID)
-	reactDOM:    HTMLDivElement,  // The React-managed DOM -- obscured from the user
+	reactDOM:    HTMLElement,     // The React-managed DOM -- obscured from the user
 }
 
 // Describes a setState function for EditorState.
 export type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorState>>
 
 export type EditorSetState = [EditorState, EditorSetStateAction]
-
-export type EditorProps = {
-	state:    EditorState,
-	setState: EditorSetStateAction,
-}
 
 // Describes a parsed element.
 export type ParsedElement =
@@ -51,7 +46,7 @@ export type ParagraphElement = {
 	id:     string,
 
 	raw:    string,
-  parsed: string,
+  parsed: string, // TODO
 }
 
 export type HeaderElement = {
@@ -63,5 +58,5 @@ export type HeaderElement = {
 	hash:   string,
 
 	raw:    string,
-  parsed: string,
+  parsed: string, // TODO
 }

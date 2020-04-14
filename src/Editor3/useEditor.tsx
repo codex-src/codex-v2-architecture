@@ -7,7 +7,7 @@ import { newPos } from "./constructors"
 // Returns an EditorStateState initializer.
 //
 // NOTE: Use Types.EditorSetState or expect errors
-function useEditor(initialValue: string): Types.EditorSetState {
+function useEditor(initialValue: string) {
 	const unparsed = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,
@@ -19,9 +19,11 @@ function useEditor(initialValue: string): Types.EditorSetState {
 		pos1: newPos(),
 		pos2: newPos(),
 		extPosRange: ["", ""],
-		reactDOM: document.createElement("div"),
+		reactDOM: document.createElement("div") as HTMLElement,
 	}))
-	return [state, setState]
+	// NOTE: Use as const because state and setState cannot be
+	// mutated
+	return [state, setState] as const
 }
 
 export default useEditor
