@@ -28,7 +28,8 @@ const App = () => {
 	// Write to localStorage:
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data: state.data.map(each => each.raw).join("\n") }))
+			const data = state.data.map(each => each.raw).join("\n")
+			localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data }))
 		}, 100)
 		return () => {
 			clearTimeout(id)
