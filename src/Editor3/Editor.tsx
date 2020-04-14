@@ -7,6 +7,7 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
+import syncTrees from "./syncTrees"
 import TypeMap from "./TypeMap"
 
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
@@ -47,7 +48,30 @@ const Editor = ({ state, setState }: EditorProps) => {
 	React.useEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document state={state} setState={setState} />, ref.current, () => {
-				// TODO
+				// // Sync user-managed DOM to the React-managed DOM:
+				// const mutations = syncTrees(state.reactDOM, ref.current)
+				// if (!mounted.current) {
+				// 	mounted.current = true
+				// 	return
+				// }
+				// if (mutations) {
+				// 	console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
+				// }
+				// // Sync DOM cursors to the VDOM cursors:
+				// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				// if (syncedPos) {
+				// 	console.log("syncPos")
+				// }
+				// // Update extPosRange for edge-cases such as
+				// // forward-backspace:
+				// const [pos1, pos2] = computePosRange(ref.current)
+				// const extPosRange = extendPosRange(state, [pos1, pos2])
+				// setState(current => ({
+				// 	...current,
+				// 	pos1,
+				// 	pos2,
+				// 	extPosRange,
+				// }))
 			})
 		}, [state, setState]),
 		[state.data],
@@ -135,7 +159,7 @@ const Editor = ({ state, setState }: EditorProps) => {
 					},
 
 					onInput: () => {
-						// Force a re-render when empty:
+						// Force re-render when empty:
 						if (!ref.current!.childNodes.length) {
 							// No-op
 							setState(current => ({
@@ -172,7 +196,14 @@ const Editor = ({ state, setState }: EditorProps) => {
 
 			{DEBUG_ENABLED && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
-					{JSON.stringify(state, null, "\t")}
+					{JSON.stringify(
+						{
+							...state,
+							reactDOM: undefined,
+						},
+						null,
+						"\t",
+					)}
 					{/* {JSON.stringify( */}
 					{/* 	{ */}
 					{/* 		extPosRange: state.extPosRange, */}
