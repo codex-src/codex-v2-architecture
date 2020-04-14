@@ -7,6 +7,7 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
+import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import TypeMap from "./TypeMap"
 
@@ -46,7 +47,7 @@ const Editor = ({ state, setState }: EditorProps) => {
 	const pointerIsDownRef = React.useRef<null | boolean>()
 
 	const mounted = React.useRef<null | boolean>()
-	React.useEffect(
+	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
 				// Sync user-managed DOM to the React-managed DOM:
@@ -58,11 +59,11 @@ const Editor = ({ state, setState }: EditorProps) => {
 				if (mutations) {
 					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
 				}
-				// // Sync DOM cursors to the VDOM cursors:
-				// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-				// if (syncedPos) {
-				// 	console.log("syncPos")
-				// }
+				// Sync DOM cursors to the VDOM cursors:
+				const syncedPos = syncPos(ref.current!, [state.pos1, state.pos2])
+				if (syncedPos) {
+					console.log("syncPos")
+				}
 				// // Update extPosRange for edge-cases such as
 				// // forward-backspace:
 				// const [pos1, pos2] = computePosRange(ref.current)
