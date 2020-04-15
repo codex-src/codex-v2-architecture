@@ -1,7 +1,9 @@
 .codex-editor {
 	font-family: "Inter var", sans-serif;
 	letter-spacing: -0.01em;
-	/* line-height: 1.625; */
+	line-height: 1.625;
+
+	caret-color: #000;
 }
 
 .codex-editor .font-mono {
@@ -10,7 +12,7 @@
 
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
-	/* line-height: 1.375; */
+	line-height: 1.375;
 }
 
 /* .codex-editor .emoji { */

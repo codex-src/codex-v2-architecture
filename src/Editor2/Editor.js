@@ -121,7 +121,7 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 						...style, // Takes precedence
 
 						...attrs.contenteditable,
-						caretColor: "black", // Move to CSS?
+						// caretColor: "black", // Move to CSS?
 					},
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),
