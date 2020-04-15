@@ -73,7 +73,7 @@ const Editor = ({ tag, id, state, setState }) => {
 		],
 	)
 
-	// Bind read-only shortcut:
+	// Binds read-only shortcut.
 	React.useEffect(
 		React.useCallback(() => {
 			const handler = e => {
@@ -179,10 +179,8 @@ const Editor = ({ tag, id, state, setState }) => {
 
 					// TODO: onCompositionEnd
 					onInput: () => {
-						// Force a re-render when empty (Update
-						// state.data reference):
+						// Force re-render when empty:
 						if (!ref.current.childNodes.length) {
-							// No-op
 							setState(current => ({
 								...current,
 								data: [...state.data],
