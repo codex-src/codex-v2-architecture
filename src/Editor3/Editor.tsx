@@ -20,10 +20,11 @@ type DocumentProps = {
 
 const Document = ({ state, setState }: DocumentProps) => (
 	<EditorContext.Provider value={[state, setState]}>
-		{state.data.map(({ type: T, ...each }) => (
-			React.createElement(ElementsMap[T], {
+		{state.data.map(each => (
+			React.createElement(ElementsMap[each.type], {
 				key: each.id,
 				...each,
+			// NOTE: Use as any to escape type context
 			} as any)
 		))}
 	</EditorContext.Provider>

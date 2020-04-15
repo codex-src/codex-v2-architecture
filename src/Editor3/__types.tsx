@@ -70,7 +70,7 @@ export type NestedElement =
 	// ParsedInlineElement[]
 
 export type HeaderElement = {
-	type:   ElementsEnum, // .Header,
+	type:   ElementsEnum,
 	tag:    string,
 	id:     string,
 	syntax: Syntax,
@@ -80,7 +80,7 @@ export type HeaderElement = {
 }
 
 export type ParagraphElement = {
-	type:   ElementsEnum, // .Paragraph,
+	type:   ElementsEnum,
 	id:     string,
 	raw:    string,
 	parsed: NestedElement,
