@@ -1,5 +1,6 @@
 /* eslint-disable no-multi-spaces */
 import ElementsEnum from "./ElementsEnum"
+import InlineElementsEnum from "./InlineElementsEnum"
 import React from "react"
 
 // Describes a fragment of a cursor data structure.
@@ -70,21 +71,21 @@ export type ParsedElement =
  * Inline elements
  */
 export type EmphasisElement = {
-	type:     ElementsEnum,
+	type:     InlineElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongElement = {
-	type:     ElementsEnum,
+	type:     InlineElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongEmphasisElement = {
-	type:     ElementsEnum,
+	type:     InlineElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?
