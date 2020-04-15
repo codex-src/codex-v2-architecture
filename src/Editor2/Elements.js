@@ -44,22 +44,16 @@ const headerClassNames = {
 	h6: trim("font-semibold text-xl  leading-tight"),
 }
 
-export const Header = React.memo(({
-	tag,    // Header tag e.g. "h1", etc.
-	id,     // ID
-	syntax, // Markdown syntax
-	hash,   // Header URL e.g. "Hello, world!" -> "hello-world"
-	parsed, // Parsed data
-}) => (
+export const Header = React.memo(({ tag, id, syntax, hash, parsed }) => (
 	<Root id={id} className={headerClassNames[tag]}>
-		{/* TODO: Add <IfWrapper> pattern */}
-		{/* <a id={hash} href={`#${hash}`}> */}
-		<Markdown syntax={syntax}>
-			{toReact(parsed) || (
-				<br />
-			)}
-		</Markdown>
-		{/* </a> */}
+		{/* NOTE: Use block because of contenteditable */}
+		<a id={hash} className="block" href={`#${hash}`}>
+			<Markdown syntax={syntax}>
+				{toReact(parsed) || (
+					<br />
+				)}
+			</Markdown>
+		</a>
 	</Root>
 ))
 
