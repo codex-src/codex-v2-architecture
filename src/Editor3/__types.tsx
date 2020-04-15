@@ -31,15 +31,16 @@ export type EditorState = {
 	reactDOM:    HTMLElement,     // The React-managed DOM -- obscured from the user
 }
 
-// Describes a setState function for EditorState.
 export type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorState>>
 
 export type EditorSetState = [EditorState, EditorSetStateAction]
 
-// Describes a parsed element.
-export type ParsedElement =
-	HeaderElement |
-	ParagraphElement
+// TODO
+export type Syntax = string | string[]
+
+/*
+ * Elements
+ */
 
 export type ParagraphElement = {
 	type:   TypeEnum, // Do not use type?: TypeEnum
@@ -51,12 +52,48 @@ export type ParagraphElement = {
 
 export type HeaderElement = {
 	type:   TypeEnum, // Do not use type?: TypeEnum
-	id:     string,
-
 	tag:    string,
-	syntax: string | string[],
+	id:     string,
+	syntax: Syntax,
 	hash:   string,
-
 	raw:    string,
   parsed: string, // TODO
 }
+
+// Describes a parsed element.
+//
+// TODO: Rename Components to Elements and InlineElements?
+export type ParsedElement =
+	HeaderElement |
+	ParagraphElement
+
+/*
+ * Inline elements
+ */
+export type EmphasisElement = {
+	type:   TypeEnum,
+	syntax: Syntax,
+	raw:    string,
+	parsed: ParsedInlineElement,
+}
+
+export type StrongElement = {
+	type:   TypeEnum,
+	syntax: Syntax,
+	raw:    string,
+	parsed: ParsedInlineElement,
+}
+
+export type StrongEmphasisElement = {
+	type:   TypeEnum,
+	syntax: Syntax,
+	raw:    string,
+	parsed: ParsedInlineElement,
+}
+
+export type ParsedInlineElement =
+	null |
+	string |
+	EmphasisElement |
+	StrongElement |
+	StrongEmphasisElement

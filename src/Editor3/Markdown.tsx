@@ -1,8 +1,9 @@
+import * as Types from "./__types"
 import React from "react"
 import useEditorSetState from "./useEditorSetState"
 
 // Gets syntax from a string or an array of strings.
-function getSyntax(syntax: string | string[]) {
+function getSyntax(syntax: Types.Syntax) {
 	let s1 = ""
 	let s2 = ""
 	if (syntax === null) {
@@ -36,7 +37,7 @@ const Syntax = (props: SyntaxProps) => {
 }
 
 type MarkdownProps = {
-	syntax: string | string[],
+	syntax: Types.Syntax,
 	className?: string,
 	style?: React.CSSProperties,
 	children?: React.ReactNode,
