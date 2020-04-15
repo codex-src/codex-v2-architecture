@@ -28,9 +28,9 @@ const Document = ({ state, setState }) => (
 	</EditorContext.Provider>
 )
 
-;(() => {
-	document.body.classList.toggle("debug-css")
-})()
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
 
 function shouldRenderPos(state) {
 	const ok = (

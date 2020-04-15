@@ -315,9 +315,8 @@ function parse(unparsed) {
 					syntax: [syntax],
 					// hash: newHash(toInnerString(parseInline(each.raw.slice(syntax.length)))),
 					hash: "TODO",
-					// children: parseInline(each.raw.slice(syntax.length)),
 					raw: each.raw,
-					children: each.raw.slice(syntax.length),
+					children: parseInline(each.raw.slice(syntax.length)),
 				})
 				continue
 			}

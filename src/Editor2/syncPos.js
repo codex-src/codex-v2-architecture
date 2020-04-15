@@ -60,7 +60,6 @@ function syncPos(editorRoot, [pos1, pos2]) {
 		range2 = computeRange(editorRoot, pos2)
 	}
 	const domRange = document.createRange()
-	console.log(range1, range2)
 	domRange.setStart(range1.node, range1.offset)
 	domRange.setEnd(range2.node, range2.offset)
 	selection.removeAllRanges()
