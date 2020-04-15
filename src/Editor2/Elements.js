@@ -55,7 +55,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</Root>
 ))
 
-export const P = ({ id, children }) => (
+export const Paragraph = ({ id, children }) => (
 	<Root id={id}>
 		{toReact(children) || (
 			<br />

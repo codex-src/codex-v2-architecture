@@ -1,12 +1,12 @@
+// import uuidv4 from "uuid/v4"
 import typeEnum from "./typeEnum"
-import uuidv4 from "uuid/v4"
 
 import {
-	HTTP,
-	HTTPS,
+	// HTTP,
+	// HTTPS,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
-	safeURLRe,
+	// safeURLRe,
 } from "./spec"
 
 // Registers a type for parseInline.
@@ -152,31 +152,33 @@ function parseInline(str) {
 		// 	}
 		// 	// No-op
 		// 	break
-		// // <Code>
-		// case char === "`":
-		// 	// ```Code```
-		// 	if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
-		// 		const parsed = registerType(Code, "```", { recurse: false })(str, index)
-		// 		if (!parsed) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push(parsed.data)
-		// 		index = parsed.x2 - 1
-		// 		continue
-		// 	// `Code`
-		// 	} else if (nchars >= "`x`".length) {
-		// 		const parsed = registerType(Code, "`", { recurse: false })(str, index)
-		// 		if (!parsed) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push(parsed.data)
-		// 		index = parsed.x2 - 1
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
+
+		// <Code>
+		case char === "`":
+			// ```Code```
+			if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
+				const parsed = registerType(typeEnum.Code, "```", { recurse: false })(str, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.data)
+				index = parsed.x2 - 1
+				continue
+			// `Code`
+			} else if (nchars >= "`x`".length) {
+				const parsed = registerType(typeEnum.Code, "`", { recurse: false })(str, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.data)
+				index = parsed.x2 - 1
+				continue
+			}
+			// No-op
+			break
+
 		// // <A> (1 of 2)
 		// case char === "h":
 		// 	// https://
@@ -327,7 +329,7 @@ function parse(unparsed) {
 		// <Paragraph>
 		const children = parseInline(each.raw)
 		parsed.push({
-			type: typeEnum.P,
+			type: typeEnum.Paragraph,
 			id: each.id,
 			// emojis: (
 			// 	children &&
@@ -338,7 +340,6 @@ function parse(unparsed) {
 			children,
 		})
 	}
-	console.log(parsed)
 	return parsed
 }
 

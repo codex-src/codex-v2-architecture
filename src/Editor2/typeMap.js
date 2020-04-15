@@ -2,10 +2,11 @@ import typeEnum from "./typeEnum"
 
 import {
 	Header,
-	P,
+	Paragraph,
 } from "./Elements"
 
 import {
+	Code,
 	Emphasis,
 	Strong,
 	StrongEmphasis,
@@ -14,12 +15,13 @@ import {
 const typeMap = {
 	// Elements:
 	[typeEnum.Header]: Header,
-	[typeEnum.P]: P,
+	[typeEnum.Paragraph]: Paragraph,
 
 	// Inline elements:
 	[typeEnum.Emphasis]: Emphasis,
 	[typeEnum.Strong]: Strong,
 	[typeEnum.StrongEmphasis]: StrongEmphasis,
+	[typeEnum.Code]: Code,
 }
 
 export default typeMap

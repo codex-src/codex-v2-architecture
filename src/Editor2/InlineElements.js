@@ -44,13 +44,13 @@ export const StrongEmphasis = ({ syntax, children }) => (
 	</span>
 )
 
-// export const Code = ({ syntax, children }) => (
-// 	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
-// 		<Markdown className="text-red-600" syntax={syntax}>
-// 			{children}
-// 		</Markdown>
-// 	</span>
-// )
+export const Code = ({ syntax, children }) => (
+	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
+		<Markdown className="text-red-600" syntax={syntax}>
+			{children}
+		</Markdown>
+	</span>
+)
 //
 // export const Strike = ({ syntax, children }) => (
 // 	<span {...attrs.strike}>
