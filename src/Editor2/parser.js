@@ -1,4 +1,283 @@
 import typeEnum from "./typeEnum"
+import uuidv4 from "uuid/v4"
+
+import {
+	HTTP,
+	HTTPS,
+	isASCIIPunctuation,
+	isASCIIWhitespace,
+	safeURLRe,
+} from "./spec"
+
+// Registers a type for parseInline.
+//
+// FIXME
+function registerType(type, syntax, opts = { recurse: true }) {
+	// Escape syntax for regex:
+	let pattern = syntax.split("").map(each => `\\${each}`).join("")
+	let patternOffset = 0
+	if (syntax[0] === "_") {
+		// https://github.github.com/gfm/#example-369
+		pattern = `[^\\\\]${pattern}(\\s|[\\u0021-\\u002f\\u003a-\\u0040\\u005b-\\u0060\\u007b-\\u007e]|$)`
+		patternOffset++
+	} else if (syntax[0] === "`") {
+		// No-op
+		//
+		// https://github.github.com/gfm/#example-348
+	} else {
+		pattern = `[^\\\\]${pattern}`
+		patternOffset++
+	}
+	const parse = (str, index, { minOffset } = { minOffset: 1 }) => {
+		// Guard: Character before start underscore syntax must
+		// be whitespace or punctutation:
+		//
+		// https://github.github.com/gfm/#example-369
+		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(str[index - 1]) && !isASCIIPunctuation(str[index - 1]))) {
+			return null
+		}
+		// Guard: Most syntax cannot surround spaces:
+		const offset = str.slice(index + syntax.length).search(pattern) + patternOffset
+		if (
+			offset < minOffset ||
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length])) ||           // Exempt <Code> and <A>
+			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
+		) {
+			return null
+		}
+		index += syntax.length
+		const data = {
+			type,
+			syntax,
+			children: !opts.recurse
+				? str.slice(index, index + offset)
+				: parseInline(str.slice(index, index + offset)),
+		}
+		index += syntax.length + offset
+		return { data, x2: index }
+	}
+	return parse
+}
+
+// Parses a GitHub Flavored Markdown (GFM) inline data
+// structure from a string.
+//
+// TODO: https://github.github.com/gfm/#delimiter-stack
+function parseInline(str) {
+	if (!str) {
+		return null
+	}
+	const data = []
+	for (let index = 0; index < str.length; index++) {
+		const char = str[index]
+		const nchars = str.length - index
+		switch (true) {
+
+		// // <Escape>
+		// case char === "\\":
+	 	// 	if (index + 1 < str.length && isASCIIPunctuation(str[index + 1])) {
+		// 		data.push({
+		// 			type: Escape,
+		// 			syntax: [char],
+		// 			children: str[index + 1],
+		// 		})
+		// 		index++
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+
+		// <StrongEm>
+		// <Strong>
+		// <Em>
+		case char === "*" || char === "_":
+			// ***Strong em***
+			if (nchars >= "***x***".length && str.slice(index, index + 3) === char.repeat(3)) {
+				const parsed = registerType(typeEnum.StrongEmphasis, char.repeat(3))(str, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.data)
+				index = parsed.x2 - 1
+				continue
+			// **Strong**
+			// __strong__
+			} else if (nchars >= "**x**".length && str.slice(index, index + 2) === char.repeat(2)) {
+				const parsed = registerType(typeEnum.Strong, char.repeat(2))(str, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.data)
+				index = parsed.x2 - 1
+				continue
+			// _Emphasis_
+			// *emphasis*
+			} else if (nchars >= "*x*".length) {
+				const parsed = registerType(typeEnum.Emphasis, char)(str, index)
+				if (!parsed) {
+					// No-op
+					break
+				}
+				data.push(parsed.data)
+				index = parsed.x2 - 1
+				continue
+			}
+			// No-op
+			break
+
+		// // <Strike>
+		// case char === "~":
+		// 	// ~~Strike~~
+		// 	if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
+		// 		const parsed = registerType(Strike, "~~")(str, index)
+		// 		if (!parsed) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push(parsed.data)
+		// 		index = parsed.x2 - 1
+		// 		continue
+		// 	// ~Strike~
+		// 	} else if (nchars >= "~x~".length) {
+		// 		const parsed = registerType(Strike, "~")(str, index)
+		// 		if (!parsed) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push(parsed.data)
+		// 		index = parsed.x2 - 1
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+		// // <Code>
+		// case char === "`":
+		// 	// ```Code```
+		// 	if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
+		// 		const parsed = registerType(Code, "```", { recurse: false })(str, index)
+		// 		if (!parsed) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push(parsed.data)
+		// 		index = parsed.x2 - 1
+		// 		continue
+		// 	// `Code`
+		// 	} else if (nchars >= "`x`".length) {
+		// 		const parsed = registerType(Code, "`", { recurse: false })(str, index)
+		// 		if (!parsed) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push(parsed.data)
+		// 		index = parsed.x2 - 1
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+		// // <A> (1 of 2)
+		// case char === "h":
+		// 	// https://
+		// 	//
+		// 	// TODO: Eat "www."
+		// 	if (nchars >= HTTPS.length && str.slice(index, index + HTTPS.length) === HTTPS) {
+		// 		const matches = safeURLRe.exec(str.slice(index))
+		// 		let offset = 0
+		// 		if (matches) {
+		// 			offset = matches[0].length
+		// 		}
+		// 		data.push({
+		// 			type: A,
+		// 			syntax: [HTTPS],
+		// 			href: matches[0],
+		// 			children: matches[0].slice(HTTPS.length),
+		// 		})
+		// 		index += offset - 1
+		// 		continue
+		// 	// http://
+		// 	//
+		// 	// TODO: Eat "www."
+		// 	} else if (nchars >= HTTP.length && str.slice(index, index + HTTP.length) === HTTP) {
+		// 		const matches = safeURLRe.exec(str.slice(index))
+		// 		let offset = 0
+		// 		if (matches) {
+		// 			offset = matches[0].length
+		// 		}
+		// 		data.push({
+		// 			type: A,
+		// 			syntax: [HTTP],
+		// 			href: matches[0],
+		// 			children: matches[0].slice(HTTP.length),
+		// 		})
+		// 		index += offset - 1
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+		// // <A> (2 of 2)
+		// case char === "[":
+		// 	// [A](href)
+		// 	if (nchars >= "[x](x)".length) {
+		// 		const lhs = registerType(null, "]")(str, index)
+		// 		if (!lhs) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		// Check ( syntax:
+		// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		const rhs = registerType(null, ")", { recurse: false })(str, lhs.x2)
+		// 		if (!rhs) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push({
+		// 			type: A,
+		// 			// syntax: ["[", "](…)"],
+		// 			syntax: ["[", `](${rhs.data.children})`],
+		// 			href: rhs.data.children.trim(),
+		// 			children: lhs.data.children,
+		// 		})
+		// 		index = rhs.x2 - 1
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+
+		default:
+
+			// // <E>
+			// //
+			// // eslint-disable-next-line no-case-declarations
+			// const e = emojiTrie.atStart(str.slice(index))
+			// if (e && e.status === "fully-qualified") {
+			// 	data.push({
+			// 		type: E,
+			// 		description: e.description,
+			// 		children: e.emoji,
+			// 	})
+			// 	index += e.emoji.length - 1
+			// 	continue
+			// }
+
+			break
+		}
+		if (!data.length || typeof data[data.length - 1] !== "string") {
+			data.push(char)
+			continue
+		}
+		data[data.length - 1] += char
+	}
+	// Return a string or an array of objects:
+	if (data.length === 1 && typeof data[0] === "string") {
+		return data[0]
+	}
+	return data
+}
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
@@ -32,11 +311,11 @@ function parse(unparsed) {
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// hash: newHash(toInnerString(parseInnerGFM(each.raw.slice(syntax.length)))),
+					// hash: newHash(toInnerString(parseInline(each.raw.slice(syntax.length)))),
 					hash: "TODO",
-					// children: parseInnerGFM(each.raw.slice(syntax.length)),
+					// children: parseInline(each.raw.slice(syntax.length)),
 					raw: each.raw,
-					parsed: each.raw.slice(syntax.length),
+					children: each.raw.slice(syntax.length),
 				})
 				continue
 			}
@@ -46,7 +325,7 @@ function parse(unparsed) {
 			break
 		}
 		// <Paragraph>
-		// const children = parseInnerGFM(each)
+		const children = parseInline(each.raw)
 		parsed.push({
 			type: typeEnum.P,
 			id: each.id,
@@ -56,19 +335,19 @@ function parse(unparsed) {
 			// 	children.every(each => each.type === E)
 			// ),
 			raw: each.raw,
-			// children,
-			parsed: each.raw,
+			children,
 		})
 	}
+	console.log(parsed)
 	return parsed
 }
 
-// // Parses GFM text to a VDOM representation.
-// export function parseGFM(text) {
+// // Parses GFM str to a VDOM representation.
+// export function parseGFM(str) {
 // 	const newHash = newHashEpoch()
 //
 // 	const data = []
-// 	const body = text.split("\n")
+// 	const body = str.split("\n")
 // 	for (let index = 0; index < body.length; index++) {
 // 		const each = body[index]
 // 		const char = each.charAt(0)
@@ -96,8 +375,8 @@ function parse(unparsed) {
 // 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 // 					id: uuidv4(),
 // 					syntax: [syntax],
-// 					hash: newHash(toInnerString(parseInnerGFM(each.slice(syntax.length)))),
-// 					children: parseInnerGFM(each.slice(syntax.length)),
+// 					hash: newHash(toInnerString(parseInline(each.slice(syntax.length)))),
+// 					children: parseInline(each.slice(syntax.length)),
 // 				})
 // 				continue
 // 			}
@@ -130,7 +409,7 @@ function parse(unparsed) {
 // 						type: BquoteParagraph,
 // 						id: uuidv4(),
 // 						syntax: [each.slice(0, 2)],
-// 						children: parseInnerGFM(each.slice(2)),
+// 						children: parseInline(each.slice(2)),
 // 					})),
 // 				})
 // 				index = x2 - 1
@@ -208,7 +487,7 @@ function parse(unparsed) {
 // 			break
 // 		// <Image>
 // 		//
-// 		// TODO: Move to parseInnerGFM to support
+// 		// TODO: Move to parseInline to support
 // 		// [![Image](href)](href) syntax?
 // 		case char === "!":
 // 			// ![Image](href)
@@ -259,7 +538,7 @@ function parse(unparsed) {
 // 			break
 // 		}
 // 		// <Paragraph>
-// 		const children = parseInnerGFM(each)
+// 		const children = parseInline(each)
 // 		data.push({
 // 			type: Paragraph,
 // 			id: uuidv4(),

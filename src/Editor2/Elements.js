@@ -7,24 +7,23 @@ import {
 	Root,
 } from "./HOC"
 
-// Parses an array of parsed data structures to renderable
+// Converts a parsed data structure (children) to renderable
 // React components.
-function toReact(parsed) {
-	if (parsed === null || typeof parsed === "string") {
-		return parsed
+function toReact(children) {
+	if (children === null || typeof children === "string") {
+		return children
 	}
 	const components = []
-	for (const each of parsed) {
+	for (const each of children) {
 		if (each === null || typeof each === "string") {
 			components.push(toReact(each))
 			continue
 		}
 		const { type: T, ...props } = each
-		// NOTE: Uses children instead of parsed
 		components.push(React.createElement(typeMap[T], {
 			key: components.length,
 			...props,
-		}, toReact(props.parsed)))
+		}, toReact(props.children)))
 	}
 	return components
 }
@@ -43,12 +42,12 @@ const headerClassNames = {
 	h6: trim("font-semibold text-xl  leading-tight"),
 }
 
-export const Header = React.memo(({ tag, id, syntax, hash, parsed }) => (
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<Root id={id} className={headerClassNames[tag]}>
 		{/* NOTE: Use block because of contenteditable */}
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
-				{toReact(parsed) || (
+				{toReact(children) || (
 					<br />
 				)}
 			</Markdown>
@@ -56,9 +55,9 @@ export const Header = React.memo(({ tag, id, syntax, hash, parsed }) => (
 	</Root>
 ))
 
-export const P = ({ id, parsed }) => (
+export const P = ({ id, children }) => (
 	<Root id={id}>
-		{toReact(parsed) || (
+		{toReact(children) || (
 			<br />
 		)}
 	</Root>

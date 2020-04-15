@@ -44,16 +44,13 @@ const Editor = ({ tag, id, state, setState }) => {
 			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
 				// Sync user-managed DOM to the React-managed DOM:
 				const mutations = syncTrees(state.reactDOM, ref.current)
-				if (!mounted.current) {
+				if (!mounted.current || !state.focused) {
 					mounted.current = true
 					return
 				}
 				if (mutations) {
-					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
-				}
-				if (!state.focused) {
-					// No-op
-					return
+					const s = !mutations ? "" : "s"
+					console.log(`syncTrees: ${mutations} mutation${s}`)
 				}
 				// Sync DOM cursors to the VDOM cursors:
 				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
