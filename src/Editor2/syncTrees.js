@@ -1,5 +1,3 @@
-import removeRange from "./removeRange"
-
 // // Naively syncs two trees.
 // function naiveSyncTrees(dst, src) {
 // 	removeRange()
@@ -7,6 +5,18 @@ import removeRange from "./removeRange"
 // 	dst.append(...src.cloneNode(true).childNodes)
 // 	return dst.childNodes.length
 // }
+
+// Removes the range (for performance reasons).
+//
+// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
+function removeRange() {
+	const selection = document.getSelection()
+	if (!selection.rangeCount) {
+		// No-op
+		return
+	}
+	selection.removeAllRanges()
+}
 
 // Syncs two DOM trees; nodes are cloned and replaced
 // forwards and then backwards. Note that the root elements

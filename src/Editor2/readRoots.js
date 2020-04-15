@@ -8,12 +8,12 @@ function readRoot(root) {
 			raw: "",
 		},
 	]
-	const recurse = any => {
-		if (any.nodeType === Node.TEXT_NODE) {
-			unparsed[unparsed.length - 1].raw += any.nodeValue
+	const recurse = on => {
+		if (on.nodeType === Node.TEXT_NODE) {
+			unparsed[unparsed.length - 1].raw += on.nodeValue
 			return
 		}
-		for (const each of any.childNodes) {
+		for (const each of on.childNodes) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {

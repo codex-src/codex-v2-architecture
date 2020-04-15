@@ -9,7 +9,7 @@ function useEditor(initialValue) {
 		raw: each,
 	}))
 	const reactDOM = document.createElement("div")
-	const [state, setState] = React.useState(()/* : Types.EditorState */ => ({
+	const [state, setState] = React.useState(() => ({
 		readOnly: false,            // Is read-only?
 		focused: false,             // Is focused?
 		data: parse(unparsed),      // Document data

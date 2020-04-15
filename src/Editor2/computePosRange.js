@@ -3,12 +3,11 @@ import { newPos } from "./constructors"
 // Counts the offset from an element to a node.
 function countOffset(element, node) {
 	let offset = 0
-	// console.log(element, node)
-	const recurse = any => {
-		if (any === node) {
+	const recurse = on => {
+		if (on === node) {
 			return true
 		}
-		for (const each of any.childNodes) {
+		for (const each of on.childNodes) {
 			if (recurse(each)) {
 				return true
 			}

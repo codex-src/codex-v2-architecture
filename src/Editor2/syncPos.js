@@ -1,10 +1,9 @@
-// import removeRange from "./removeRange"
 import computePosRange from "./computePosRange"
 
 // Computes a range data structure. Code based on
 // computePosRange.countOffset.
 function computeRange(editorRoot, pos) {
-	// NOTE: Copy pos:
+	// NOTE: Copy pos -- do not mutate reference
 	pos = { root: { ...pos.root } }
 
 	const root = document.getElementById(pos.root.id)
@@ -13,19 +12,16 @@ function computeRange(editorRoot, pos) {
 	}
 	let node = null
 	let offset = 0
-	const recurse = any => {
-		// if ((any.nodeValue || "").length <= 0) {
-		const { length } = any.nodeValue || ""
-		if (pos.root.offset - length <= 0) {
-			node = any
+	const recurse = on => {
+		if (pos.root.offset - (on.nodeValue || "").length <= 0) {
+			node = on
 			offset = pos.root.offset
 			return true
 		}
-		for (const each of any.childNodes) {
+		for (const each of on.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
-			// offset += (node.nodeValue || "").length
 			pos.root.offset -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-node")) {
@@ -33,24 +29,6 @@ function computeRange(editorRoot, pos) {
 			}
 		}
 		return false
-
-		// const { length } = any.nodeValue || ""
-		// if (pos.root.offset - length <= 0) {
-		// 	node = any
-		// 	offset = pos.root.offset // offset becomes pos.root.offset; the remainder
-		// 	return true
-		// }
-		// for (const each of any.childNodes) {
-		// 	if (recurse(each)) {
-		// 		return true
-		// 	}
-		// 	pos.root.offset -= length
-		// 	const next = each.nextElementSibling
-		// 	if (next && next.getAttribute("data-node")) {
-		// 		offset--
-		// 	}
-		// }
-		// return false
 	}
 	recurse(root)
 	return { node, offset }
@@ -68,7 +46,7 @@ function areEqual(pos1, pos2) {
 // Synchronizes DOM cursors.
 function syncPos(editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
-	if (!selection.rangeCount) { // NOTE: Do not remove; needed to guard computePosRange
+	if (!selection.rangeCount) {
 		// No-op; defer to end
 	} else {
 		const [domPos1, domPos2] = computePosRange(editorRoot)

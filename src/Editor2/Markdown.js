@@ -1,8 +1,9 @@
 import React from "react"
-import useEditorState from "./useEditorState"
+import useEditorSetState from "./useEditorSetState"
 
-// Gets syntax from a string or an array of strings.
-function getSyntax(syntax) {
+// Parses syntax from a string or array of strings to an
+// array of strings.
+function parseSyntax(syntax) {
 	let s1 = ""
 	let s2 = ""
 	if (syntax === null) {
@@ -20,7 +21,7 @@ function getSyntax(syntax) {
 }
 
 const Syntax = props => {
-	const [state] = useEditorState()
+	const [state] = useEditorSetState()
 	if (!props.children || state.readOnly) {
 		return null
 	}
@@ -29,7 +30,7 @@ const Syntax = props => {
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const [s1, s2] = getSyntax(syntax)
+	const [s1, s2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 
