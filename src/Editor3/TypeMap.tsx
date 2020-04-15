@@ -3,7 +3,7 @@ import TypeEnum from "./TypeEnum"
 import {
 	Header,
 	Paragraph,
-} from "./Components"
+} from "./Elements"
 
 const TypeMap = {
 	[TypeEnum.Header]: Header,

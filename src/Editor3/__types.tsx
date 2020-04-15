@@ -35,7 +35,6 @@ export type EditorSetStateAction = React.Dispatch<React.SetStateAction<EditorSta
 
 export type EditorSetState = [EditorState, EditorSetStateAction]
 
-// TODO
 export type Syntax = string | string[]
 
 /*
@@ -71,24 +70,24 @@ export type ParsedElement =
  * Inline elements
  */
 export type EmphasisElement = {
-	type:   TypeEnum,
-	syntax: Syntax,
-	raw:    string,
-	parsed: ParsedInlineElement,
+	type:     TypeEnum,
+	syntax:   Syntax,
+	raw:      string,
+	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongElement = {
-	type:   TypeEnum,
-	syntax: Syntax,
-	raw:    string,
-	parsed: ParsedInlineElement,
+	type:     TypeEnum,
+	syntax:   Syntax,
+	raw:      string,
+	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongEmphasisElement = {
-	type:   TypeEnum,
-	syntax: Syntax,
-	raw:    string,
-	parsed: ParsedInlineElement,
+	type:     TypeEnum,
+	syntax:   Syntax,
+	raw:      string,
+	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type ParsedInlineElement =
