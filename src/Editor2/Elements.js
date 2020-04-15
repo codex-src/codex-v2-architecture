@@ -1,6 +1,6 @@
 import Markdown from "./Markdown"
 import React from "react"
-import typeMap from "./typeMap"
+import TypeMap from "./TypeMap"
 
 import {
 	// Node,
@@ -22,7 +22,7 @@ function toReact(parsed) {
 			continue
 		}
 		const { type: T, ...props } = each
-		components.push(React.createElement(typeMap[T], {
+		components.push(React.createElement(TypeMap[T], {
 			key: components.length,
 			...props,
 		}, recurse(props.parsed)))

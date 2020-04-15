@@ -8,7 +8,7 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
-import typeMap from "./typeMap"
+import TypeMap from "./TypeMap"
 import uuidv4 from "uuid/v4"
 
 import "./Editor.css"
@@ -31,14 +31,14 @@ function extendPosRange(state, [pos1, pos2]) {
 }
 
 // Queries data-root elements.
-function queryRoots(editorRoot, extPosRange) {
+function queryRoots(editorRoot, extendedPosRange) {
 	// Query the start root:
-	const root1 = document.getElementById(extPosRange[0])
+	const root1 = document.getElementById(extendedPosRange[0])
 	if (!root1 || !editorRoot.contains(root1)) {
 		throw new Error("queryRoots: no such root1 or out of bounds")
 	}
 	// Query the end root:
-	let root2 = document.getElementById(extPosRange[1])
+	let root2 = document.getElementById(extendedPosRange[1])
 	let root2AtEnd = false
 	// Guard enter pressed on root2:
 	const nextRoot = root2 && root2.nextElementSibling
@@ -59,7 +59,7 @@ function queryRoots(editorRoot, extPosRange) {
 
 const Document = ({ data }) => (
 	data.map(({ type: T, ...props }) => (
-		React.createElement(typeMap[T], {
+		React.createElement(TypeMap[T], {
 			key: props.id,
 			...props,
 		})
@@ -100,15 +100,15 @@ const Editor = ({ id, tag, state, setState }) => {
 					if (syncedPos) {
 						console.log("syncPos")
 					}
-					// Update extPosRange for edge-cases such as
+					// Update extendedPosRange for edge-cases such as
 					// forward-backspace:
 					const [pos1, pos2] = computePosRange(ref.current)
-					const extPosRange = extendPosRange(state, [pos1, pos2])
+					const extendedPosRange = extendPosRange(state, [pos1, pos2])
 					setState(current => ({
 						...current,
 						pos1,
 						pos2,
-						extPosRange,
+						extendedPosRange,
 					}))
 				},
 			)
@@ -173,12 +173,12 @@ const Editor = ({ id, tag, state, setState }) => {
 							selection.addRange(range)
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
-						const extPosRange = extendPosRange(state, [pos1, pos2])
+						const extendedPosRange = extendPosRange(state, [pos1, pos2])
 						setState(current => ({
 							...current,
 							pos1,
 							pos2,
-							extPosRange,
+							extendedPosRange,
 						}))
 					},
 
@@ -192,12 +192,12 @@ const Editor = ({ id, tag, state, setState }) => {
 							return
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
-						const extPosRange = extendPosRange(state, [pos1, pos2])
+						const extendedPosRange = extendPosRange(state, [pos1, pos2])
 						setState(current => ({
 							...current,
 							pos1,
 							pos2,
-							extPosRange,
+							extendedPosRange,
 						}))
 					},
 					onPointerUp: () => {
@@ -224,7 +224,7 @@ const Editor = ({ id, tag, state, setState }) => {
 							}))
 							return
 						}
-						const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extPosRange)
+						const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extendedPosRange)
 						const x1 = state.data.findIndex(each => each.id === root1.id)
 						if (x1 === -1) {
 							throw new Error("onInput: x1 out of bounds")
@@ -254,7 +254,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 					{JSON.stringify(
 						{
-							// extPosRange: state.extPosRange,
+							// extendedPosRange: state.extendedPosRange,
 							// id: state.data.map(each => each.id),
 
 							...state,
