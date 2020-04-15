@@ -52,6 +52,11 @@
 	font-weight: 650;
 }
 
+.codex-editor:not(.feature-read-only) [data-node] > span,
+.codex-editor:not(.feature-read-only) [data-root] > span {
+	background-color: #2979ff0f;
+}
+
 /* .codex-editor .emoji { */
 /* 	vertical-align: -10%; */
 /* 	font-size: 120%; */

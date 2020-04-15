@@ -112,9 +112,9 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 
 					className:
 						`codex-editor${
-							!state.readOnly ? "" : " feature-read-only" // Needed?
-						}${
 							!className ? "" : ` ${className}`
+						}${
+							!state.readOnly ? "" : " feature-read-only" // Needed?
 						}`,
 
 					style: {
