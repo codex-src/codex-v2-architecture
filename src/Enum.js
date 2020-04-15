@@ -1,6 +1,6 @@
 // https://stackoverflow.com/a/6672823
 class Enum {
-	constructor(...keys) {
+	constructor(...keys: string[]) {
 		for (const key of keys) {
 			this[key] = key
 		}

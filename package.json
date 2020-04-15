@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "debug.css": "https://github.com/codex-src/debug.css",
-    "flow-bin": "^0.122.0",
     "raw.macro": "^0.3.0",
     "serve": "^11.3.0"
   }
