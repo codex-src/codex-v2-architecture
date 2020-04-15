@@ -32,12 +32,7 @@ const Document = ({ state, setState }) => (
 	document.body.classList.toggle("debug-css")
 })()
 
-const Editor = ({
-	tag,
-	id,
-	state,
-	setState,
-}) => {
+const Editor = ({ tag, id, state, setState }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -78,6 +73,7 @@ const Editor = ({
 		],
 	)
 
+	// Bind read-only shortcut:
 	React.useEffect(
 		React.useCallback(() => {
 			const handler = e => {
@@ -88,7 +84,7 @@ const Editor = ({
 				e.preventDefault()
 				setState(current => ({
 					...current,
-					readOnly: !current.readOnly,
+					readOnly: !state.readOnly,
 				}))
 			}
 			document.addEventListener("keydown", handler)
@@ -96,14 +92,12 @@ const Editor = ({
 				document.removeEventListener("keydown", handler)
 			}
 		}, [state, setState]),
-		[],
+		[state.readOnly],
 	)
 
-	// TODO: Register props e.g. readOnly
 	return (
 		<div>
 
-			{/* Editor */}
 			{React.createElement(
 				tag || "div",
 				{
@@ -221,7 +215,6 @@ const Editor = ({
 				},
 			)}
 
-			{/* Debugger */}
 			{DEBUG_MODE && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 					{JSON.stringify(
