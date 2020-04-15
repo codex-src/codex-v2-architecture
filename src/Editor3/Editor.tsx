@@ -24,7 +24,7 @@ const Document = ({ state, setState }: DocumentProps) => (
 			React.createElement(ElementsMap[each.type], {
 				key: each.id,
 				...each,
-			// NOTE: Use as any to escape type context
+			// NOTE: Use as any or expect errors
 			} as any)
 		))}
 	</EditorContext.Provider>
