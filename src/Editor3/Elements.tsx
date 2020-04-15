@@ -8,7 +8,7 @@ import {
 
 // Parses an array of parsed data structures to renderable
 // React components.
-function toReact(parsed: string) {
+function toReact(parsed: null | string) {
 	// const recurse = toReact
 
 	if (parsed === null || typeof parsed === "string") {
@@ -51,6 +51,7 @@ export const Header = React.memo(({
 	tag,
 	id,
 	syntax,
+	raw,
 	parsed,
 }: Types.HeaderElement) => (
 	<Root id={id} className={headerClassNames[tag]}>
@@ -64,6 +65,7 @@ export const Header = React.memo(({
 
 export const Paragraph = React.memo(({
 	id,
+	raw,
 	parsed,
 }: Types.ParagraphElement) => (
 	<Root id={id}>
@@ -72,4 +74,3 @@ export const Paragraph = React.memo(({
 		)}
 	</Root>
 ))
-

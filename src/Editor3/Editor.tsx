@@ -1,6 +1,7 @@
 import * as Types from "Editor3/__types"
 import computePos from "./computePos"
 import EditorContext from "Editor3/EditorContext"
+import ElementsMap from "./ElementsMap"
 import extendPosRange from "./extendPosRange"
 import parse from "./parser"
 import queryRoots from "./queryRoots"
@@ -9,7 +10,6 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
-import TypeMap from "./TypeMap"
 
 const DEBUG_ENABLED = true && process.env.NODE_ENV !== "production"
 
@@ -21,11 +21,9 @@ type DocumentProps = {
 const Document = ({ state, setState }: DocumentProps) => (
 	<EditorContext.Provider value={[state, setState]}>
 		{state.data.map(({ type: T, ...each }) => (
-			React.createElement(TypeMap[T], {
+			React.createElement(ElementsMap[T], {
 				key: each.id,
 				...each,
-			// NOTE: Use as any or expect errors; Array.map drops
-			// the type -- I think?
 			} as any)
 		))}
 	</EditorContext.Provider>

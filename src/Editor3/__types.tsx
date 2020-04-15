@@ -38,18 +38,18 @@ export type EditorSetState = [EditorState, EditorSetStateAction]
 
 export type Syntax = string | string[]
 
-// Describes contract for a parsed element.
-export interface IParsedElement {
-	id:     string,
-	raw:    string,
-	parsed: NestedElement,
-}
+// // Describes contract for a parsed element.
+// export interface IParsedElement {
+// 	id:     string,
+// 	raw:    string,
+// 	parsed: any, // NestedElement,
+// }
 
-// Describes contract for a parsed inline element.
-export interface IParsedInlineElement {
-	raw:    string,
-	parsed: NestedInlineElement,
-}
+// // Describes contract for a parsed inline element.
+// export interface IParsedInlineElement {
+// 	raw:    string,
+// 	parsed: NestedInlineElement,
+// }
 
 /*
  * Elements
@@ -63,13 +63,14 @@ export type ParsedElement =
 // Describes all nestable elements.
 export type NestedElement =
 	null |
-	string |
-	ParsedElement |
-	ParsedElement[] |
-	ParsedInlineElement |
-	ParsedInlineElement[]
+	string // |
+	// ParsedElement |
+	// ParsedElement[] |
+	// ParsedInlineElement |
+	// ParsedInlineElement[]
 
 export type HeaderElement = {
+	type:   ElementsEnum, // .Header,
 	tag:    string,
 	id:     string,
 	syntax: Syntax,
@@ -79,6 +80,7 @@ export type HeaderElement = {
 }
 
 export type ParagraphElement = {
+	type:   ElementsEnum, // .Paragraph,
 	id:     string,
 	raw:    string,
 	parsed: NestedElement,
@@ -88,33 +90,33 @@ export type ParagraphElement = {
  * Inline elements
  */
 
-// Describes all inline elements.
-export type ParsedInlineElement =
-	EmphasisElement |
-	StrongElement |
-	StrongEmphasisElement
+// // Describes all inline elements.
+// export type ParsedInlineElement =
+// 	EmphasisElement |
+// 	StrongElement |
+// 	StrongEmphasisElement
 
 // Describes all nestable inline elements.
 export type NestedInlineElement =
 	null |
-	string |
-	ParsedInlineElement |
-	ParsedInlineElement[]
+	string // |
+	// ParsedInlineElement |
+	// ParsedInlineElement[]
 
 export type EmphasisElement = {
-	syntax: Syntax,
-	raw:    string,
-	parsed: NestedInlineElement,
+	syntax:   Syntax,
+	raw:      string,
+	children: NestedInlineElement,
 }
 
 export type StrongElement = {
-	syntax: Syntax,
-	raw:    string,
-	parsed: NestedInlineElement,
+	syntax:   Syntax,
+	raw:      string,
+	children: NestedInlineElement,
 }
 
 export type StrongEmphasisElement = {
-	syntax: Syntax,
-	raw:    string,
-	parsed: NestedInlineElement,
+	syntax:   Syntax,
+	raw:      string,
+	children: NestedInlineElement,
 }
