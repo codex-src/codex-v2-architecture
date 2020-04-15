@@ -40,7 +40,7 @@ function shouldRenderPos(state) {
 	return ok
 }
 
-const Editor = ({ tag, id, state, setState }) => {
+const Editor = ({ tag, id, className, style, state, setState }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -110,17 +110,18 @@ const Editor = ({ tag, id, state, setState }) => {
 
 					id,
 
-					// className:
-					// 	`codex-editor ${
-					// 		!state.readOnly ? "" : " feature-read-only"
-					// 	}${
-					// 		!className ? "" : ` ${className}`
-					// 	}`,
-					className: "codex-editor",
+					className:
+						`codex-editor${
+							!state.readOnly ? "" : " feature-read-only" // Needed?
+						}${
+							!className ? "" : ` ${className}`
+						}`,
 
 					style: {
+						...style, // Takes precedence
+
 						...attrs.contenteditable,
-						caretColor: "black",
+						caretColor: "black", // Move to CSS?
 					},
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),

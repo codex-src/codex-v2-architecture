@@ -37,10 +37,14 @@ const App = () => {
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
+
 				<Editor
+					id="main-editor"
+					style={{ fontSize: 17 }}
 					state={state}
 					setState={setState}
 				/>
+
 			</div>
 		</div>
 	)
