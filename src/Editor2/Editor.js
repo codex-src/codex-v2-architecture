@@ -32,6 +32,14 @@ const Document = ({ state, setState }) => (
 	document.body.classList.toggle("debug-css")
 })()
 
+function shouldRenderPos(state) {
+	const ok = (
+		state.focused &&
+		!state.readOnly
+	)
+	return ok
+}
+
 const Editor = ({ tag, id, state, setState }) => {
 	const ref = React.useRef()
 
@@ -44,7 +52,7 @@ const Editor = ({ tag, id, state, setState }) => {
 			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
 				// Sync user-managed DOM to the React-managed DOM:
 				const mutations = syncTrees(state.reactDOM, ref.current)
-				if (!mounted.current || !state.focused) {
+				if (!mounted.current || !shouldRenderPos(state)) {
 					mounted.current = true
 					return
 				}

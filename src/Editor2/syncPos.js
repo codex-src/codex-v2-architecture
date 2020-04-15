@@ -54,16 +54,17 @@ function syncPos(editorRoot, [pos1, pos2]) {
 			return false
 		}
 	}
-	const startRange = computeRange(editorRoot, pos1)
-	let endRange = { ...startRange }
+	const range1 = computeRange(editorRoot, pos1)
+	let range2 = { ...range1 }
 	if (pos1.root.id !== pos2.root.id || pos1.root.offset !== pos2.root.offset) {
-		endRange = computeRange(editorRoot, pos2)
+		range2 = computeRange(editorRoot, pos2)
 	}
-	const range = document.createRange()
-	range.setStart(startRange.node, startRange.offset)
-	range.setEnd(endRange.node, endRange.offset)
+	const domRange = document.createRange()
+	console.log(range1, range2)
+	domRange.setStart(range1.node, range1.offset)
+	domRange.setEnd(range2.node, range2.offset)
 	selection.removeAllRanges()
-	selection.addRange(range)
+	selection.addRange(domRange)
 	return true
 }
 
