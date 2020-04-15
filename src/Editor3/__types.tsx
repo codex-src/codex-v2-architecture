@@ -102,19 +102,25 @@ export type ParsedInlineElement =
 
 
 
-
-interface IParsedElement {
+// Describes contract for a parsed element.
+export interface IParsedElement {
 	id:     string,
 	raw:    string,
 	parsed: NestedElement,
 }
 
+// Describes contract for a parsed inline element.
+export interface IParsedInlineElement {
+	raw:    string,
+	parsed: NestedElement,
+}
+
 // Describes all elements.
-type ParsedElement2 =
+export type ParsedElement2 =
 	ParagraphElement2
 
 // Describes all nestable elements.
-type NestedElement =
+export type NestedElement =
 	null |
 	string |
 	ParsedElement2 |
@@ -122,36 +128,30 @@ type NestedElement =
 	ParsedInlineElement2 |
 	ParsedInlineElement2[]
 
-type ParagraphElement2 = {
-	id:     string,
-	raw:    string,
-	parsed: NestedElement,
-}
-
-interface IParsedInlineElement {
+export type ParagraphElement2 = {
 	id:     string,
 	raw:    string,
 	parsed: NestedElement,
 }
 
 // Describes all inline elements.
-type ParsedInlineElement2 =
+export type ParsedInlineElement2 =
 	EmphasisElement2 |
 	StrongElement2
 
 // Describes all nestable inline elements.
-type NestedInlineElement =
+export type NestedInlineElement =
 	null |
 	string |
 	ParsedInlineElement2 |
 	ParsedInlineElement2[]
 
-type EmphasisElement2 = {
+export type EmphasisElement2 = {
 	raw:    string,
 	parsed: NestedInlineElement,
 }
 
-type StrongElement2 = {
+export type StrongElement2 = {
 	raw:    string,
 	parsed: NestedInlineElement,
 }
