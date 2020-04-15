@@ -97,3 +97,61 @@ export type ParsedInlineElement =
 	EmphasisElement |
 	StrongElement |
 	StrongEmphasisElement
+
+
+
+
+
+
+interface IParsedElement {
+	id:     string,
+	raw:    string,
+	parsed: NestedElement,
+}
+
+// Describes all elements.
+type ParsedElement2 =
+	ParagraphElement2
+
+// Describes all nestable elements.
+type NestedElement =
+	null |
+	string |
+	ParsedElement2 |
+	ParsedElement2[] |
+	ParsedInlineElement2 |
+	ParsedInlineElement2[]
+
+type ParagraphElement2 = {
+	id:     string,
+	raw:    string,
+	parsed: NestedElement,
+}
+
+interface IParsedInlineElement {
+	id:     string,
+	raw:    string,
+	parsed: NestedElement,
+}
+
+// Describes all inline elements.
+type ParsedInlineElement2 =
+	EmphasisElement2 |
+	StrongElement2
+
+// Describes all nestable inline elements.
+type NestedInlineElement =
+	null |
+	string |
+	ParsedInlineElement2 |
+	ParsedInlineElement2[]
+
+type EmphasisElement2 = {
+	raw:    string,
+	parsed: NestedInlineElement,
+}
+
+type StrongElement2 = {
+	raw:    string,
+	parsed: NestedInlineElement,
+}
