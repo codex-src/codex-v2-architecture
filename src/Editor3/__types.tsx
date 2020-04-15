@@ -1,6 +1,6 @@
 /* eslint-disable no-multi-spaces */
+import ElementsEnum from "./ElementsEnum"
 import React from "react"
-import TypeEnum from "./TypeEnum"
 
 // Describes a fragment of a cursor data structure.
 export type PosFragment = {
@@ -42,7 +42,7 @@ export type Syntax = string | string[]
  */
 
 export type ParagraphElement = {
-	type:   TypeEnum, // Do not use type?: TypeEnum
+	type:   ElementsEnum, // Do not use type?: ElementsEnum
 	id:     string,
 
 	raw:    string,
@@ -50,7 +50,7 @@ export type ParagraphElement = {
 }
 
 export type HeaderElement = {
-	type:   TypeEnum, // Do not use type?: TypeEnum
+	type:   ElementsEnum, // Do not use type?: ElementsEnum
 	tag:    string,
 	id:     string,
 	syntax: Syntax,
@@ -70,21 +70,21 @@ export type ParsedElement =
  * Inline elements
  */
 export type EmphasisElement = {
-	type:     TypeEnum,
+	type:     ElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongElement = {
-	type:     TypeEnum,
+	type:     ElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?
 }
 
 export type StrongEmphasisElement = {
-	type:     TypeEnum,
+	type:     ElementsEnum,
 	syntax:   Syntax,
 	raw:      string,
 	children: ParsedInlineElement, // TODO: Rename to parsed?

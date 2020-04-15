@@ -20,7 +20,7 @@ import React from "react"
 // )
 
 // TODO: Rename children to parsed?
-export const Em = ({ syntax, children }: Types.EmphasisElement) => (
+export const Emphasis = ({ syntax, children }: Types.EmphasisElement) => (
 	<span className="italic">
 		<Markdown syntax={syntax}>
 			{children}

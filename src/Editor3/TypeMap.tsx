@@ -1,13 +1,25 @@
-import TypeEnum from "./TypeEnum"
+import ElementsEnum from "./ElementsEnum"
 
 import {
 	Header,
 	Paragraph,
 } from "./Elements"
 
+// import {
+// 	Emphasis,
+// 	Strong,
+// 	StrongEmphasis,
+// } from "./InlineElements"
+
 const TypeMap = {
-	[TypeEnum.Header]: Header,
-	[TypeEnum.Paragraph]: Paragraph,
+	// Elements:
+	[ElementsEnum.Header]: Header,
+	[ElementsEnum.Paragraph]: Paragraph,
+
+	// // Inline elements:
+	// [ElementsEnum.Emphasis]: Emphasis,
+	// [ElementsEnum.Strong]: Strong,
+	// [ElementsEnum.StrongEmphasis]: StrongEmphasis,
 }
 
 export default TypeMap
