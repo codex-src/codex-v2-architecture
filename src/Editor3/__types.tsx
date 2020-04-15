@@ -38,70 +38,6 @@ export type EditorSetState = [EditorState, EditorSetStateAction]
 
 export type Syntax = string | string[]
 
-/*
- * Elements
- */
-
-export type ParagraphElement = {
-	type:   ElementsEnum, // Do not use type?: ElementsEnum
-	id:     string,
-
-	raw:    string,
-  parsed: string, // TODO
-}
-
-export type HeaderElement = {
-	type:   ElementsEnum, // Do not use type?: ElementsEnum
-	tag:    string,
-	id:     string,
-	syntax: Syntax,
-	hash:   string,
-	raw:    string,
-  parsed: string, // TODO
-}
-
-// Describes a parsed element.
-//
-// TODO: Rename Components to Elements and InlineElements?
-export type ParsedElement =
-	HeaderElement |
-	ParagraphElement
-
-/*
- * Inline elements
- */
-export type EmphasisElement = {
-	type:     InlineElementsEnum,
-	syntax:   Syntax,
-	raw:      string,
-	children: ParsedInlineElement, // TODO: Rename to parsed?
-}
-
-export type StrongElement = {
-	type:     InlineElementsEnum,
-	syntax:   Syntax,
-	raw:      string,
-	children: ParsedInlineElement, // TODO: Rename to parsed?
-}
-
-export type StrongEmphasisElement = {
-	type:     InlineElementsEnum,
-	syntax:   Syntax,
-	raw:      string,
-	children: ParsedInlineElement, // TODO: Rename to parsed?
-}
-
-export type ParsedInlineElement =
-	null |
-	string |
-	EmphasisElement |
-	StrongElement |
-	StrongEmphasisElement
-
-
-
-
-
 // Describes contract for a parsed element.
 export interface IParsedElement {
 	id:     string,
@@ -112,46 +48,73 @@ export interface IParsedElement {
 // Describes contract for a parsed inline element.
 export interface IParsedInlineElement {
 	raw:    string,
-	parsed: NestedElement,
+	parsed: NestedInlineElement,
 }
 
+/*
+ * Elements
+ */
+
 // Describes all elements.
-export type ParsedElement2 =
-	ParagraphElement2
+export type ParsedElement =
+	HeaderElement |
+	ParagraphElement
 
 // Describes all nestable elements.
 export type NestedElement =
 	null |
 	string |
-	ParsedElement2 |
-	ParsedElement2[] |
-	ParsedInlineElement2 |
-	ParsedInlineElement2[]
+	ParsedElement |
+	ParsedElement[] |
+	ParsedInlineElement |
+	ParsedInlineElement[]
 
-export type ParagraphElement2 = {
+export type HeaderElement = {
+	tag:    string,
+	id:     string,
+	syntax: Syntax,
+	hash:   string,
+	raw:    string,
+	parsed: NestedElement,
+}
+
+export type ParagraphElement = {
 	id:     string,
 	raw:    string,
 	parsed: NestedElement,
 }
 
+/*
+ * Inline elements
+ */
+
 // Describes all inline elements.
-export type ParsedInlineElement2 =
-	EmphasisElement2 |
-	StrongElement2
+export type ParsedInlineElement =
+	EmphasisElement |
+	StrongElement |
+	StrongEmphasisElement
 
 // Describes all nestable inline elements.
 export type NestedInlineElement =
 	null |
 	string |
-	ParsedInlineElement2 |
-	ParsedInlineElement2[]
+	ParsedInlineElement |
+	ParsedInlineElement[]
 
-export type EmphasisElement2 = {
+export type EmphasisElement = {
+	syntax: Syntax,
 	raw:    string,
 	parsed: NestedInlineElement,
 }
 
-export type StrongElement2 = {
+export type StrongElement = {
+	syntax: Syntax,
+	raw:    string,
+	parsed: NestedInlineElement,
+}
+
+export type StrongEmphasisElement = {
+	syntax: Syntax,
 	raw:    string,
 	parsed: NestedInlineElement,
 }
