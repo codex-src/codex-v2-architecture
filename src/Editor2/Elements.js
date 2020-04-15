@@ -1,6 +1,6 @@
 import Markdown from "./Markdown"
 import React from "react"
-import TypeMap from "./TypeMap"
+import typeMap from "./typeMap"
 
 import {
 	// Node,
@@ -10,22 +10,21 @@ import {
 // Parses an array of parsed data structures to renderable
 // React components.
 function toReact(parsed) {
-	const recurse = toReact
-
 	if (parsed === null || typeof parsed === "string") {
 		return parsed
 	}
 	const components = []
 	for (const each of parsed) {
 		if (each === null || typeof each === "string") {
-			components.push(recurse(each))
+			components.push(toReact(each))
 			continue
 		}
 		const { type: T, ...props } = each
-		components.push(React.createElement(TypeMap[T], {
+		// NOTE: Uses children instead of parsed
+		components.push(React.createElement(typeMap[T], {
 			key: components.length,
 			...props,
-		}, recurse(props.parsed)))
+		}, toReact(props.parsed)))
 	}
 	return components
 }

@@ -1,4 +1,4 @@
-import TypeEnum from "./TypeEnum"
+import typeEnum from "./typeEnum"
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
@@ -28,7 +28,7 @@ function parse(unparsed) {
 			) {
 				const syntax = each.raw.slice(0, each.raw.indexOf(" ") + 1)
 				parsed.push({
-					type: TypeEnum.Header,
+					type: typeEnum.Header,
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
@@ -48,7 +48,7 @@ function parse(unparsed) {
 		// <Paragraph>
 		// const children = parseInnerGFM(each)
 		parsed.push({
-			type: TypeEnum.P,
+			type: typeEnum.P,
 			id: each.id,
 			// emojis: (
 			// 	children &&

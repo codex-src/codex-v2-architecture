@@ -1,13 +1,13 @@
-import TypeEnum from "./TypeEnum"
+import typeEnum from "./typeEnum"
 
 import {
 	Header,
 	P,
 } from "./Elements"
 
-const TypeMap = {
-	[TypeEnum.Header]: Header,
-	[TypeEnum.P]: P,
+const typeMap = {
+	[typeEnum.Header]: Header,
+	[typeEnum.P]: P,
 }
 
-export default TypeMap
+export default typeMap

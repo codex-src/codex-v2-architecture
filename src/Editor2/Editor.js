@@ -11,7 +11,7 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
-import TypeMap from "./TypeMap"
+import typeMap from "./typeMap"
 
 import "./Editor.css"
 
@@ -20,7 +20,7 @@ const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 const Document = ({ state, setState }) => (
 	<EditorContext.Provider value={[state, setState]}>
 		{state.data.map(({ type: T, ...each }) => (
-			React.createElement(TypeMap[T], {
+			React.createElement(typeMap[T], {
 				key: each.id,
 				...each,
 			})
@@ -56,6 +56,10 @@ const Editor = ({
 				if (mutations) {
 					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
 				}
+				if (!state.focused) {
+					// No-op
+					return
+				}
 				// Sync DOM cursors to the VDOM cursors:
 				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
 				if (syncedPos) {
@@ -68,7 +72,31 @@ const Editor = ({
 				setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 			})
 		}, [state, setState]),
-		[state.data],
+		[
+			state.data,
+			state.readOnly,
+		],
+	)
+
+	React.useEffect(
+		React.useCallback(() => {
+			const handler = e => {
+				if (e.keyCode !== keyCodes.P) {
+					// No-op
+					return
+				}
+				e.preventDefault()
+				setState(current => ({
+					...current,
+					readOnly: !current.readOnly,
+				}))
+			}
+			document.addEventListener("keydown", handler)
+			return () => {
+				document.removeEventListener("keydown", handler)
+			}
+		}, [state, setState]),
+		[],
 	)
 
 	// TODO: Register props e.g. readOnly

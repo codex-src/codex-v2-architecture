@@ -1,8 +1,8 @@
 import Enum from "Enum"
 
-const TypeEnum = new Enum(
+const typeEnum = new Enum(
 	"Header",
 	"P",
 )
 
-export default TypeEnum
+export default typeEnum
