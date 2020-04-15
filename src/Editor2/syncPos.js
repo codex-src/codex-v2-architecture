@@ -1,5 +1,5 @@
-import computePosRange from "./computePosRange"
 // import removeRange from "./removeRange"
+import computePosRange from "./computePosRange"
 
 // Computes a range data structure. Code based on
 // computePosRange.countOffset.

@@ -1,27 +1,9 @@
-// // @flow
-// import * as Types from "./__types"
 import parse from "./parser"
 import React from "react"
 import uuidv4 from "uuid/v4"
 import { newPos } from "./constructors"
 
-// // Not needed because of type definition for initialValue
-// type UnparsedType = Array<{
-// 	id: string,
-// 	raw: string,
-// }>
-
-// type EditorState = {
-// 	readOnly: boolean,
-// 	focused: boolean,
-// 	data: any, // TODO
-// 	pos1: PosType,
-// 	pos2: PosType,
-// 	extPosRange: Array<string>,
-// 	reactDOM: HTMLElement,
-// }
-
-function useEditor(initialValue/* : string */) /* : Array<Types.EditorState|Function> */ {
+function useEditor(initialValue) {
 	const unparsed = initialValue.split("\n").map(each => ({
 		id: uuidv4(),
 		raw: each,

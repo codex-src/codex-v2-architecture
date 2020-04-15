@@ -1,15 +1,7 @@
-// // @flow
 import React from "react"
 
-// type HOCProps = {|
-// 	id: string,
-// 	tag?: string,
-// 	style?: Object,
-// 	props?: Object,
-// |}
-
 // NOTE: Shadows browser API
-export const Node = ({ id, tag, style, ...props }/* : HOCProps */) => (
+export const Node = ({ id, tag, style, ...props }) => (
 	React.createElement(tag || "div", {
 		id,
 		"style": {
@@ -23,7 +15,7 @@ export const Node = ({ id, tag, style, ...props }/* : HOCProps */) => (
 	})
 )
 
-export const Root = ({ id, tag, style, ...props }/* : HOCProps */) => (
+export const Root = ({ id, tag, style, ...props }) => (
 	React.createElement(tag || "div", {
 		id,
 		"style": {

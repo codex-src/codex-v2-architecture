@@ -1,5 +1,3 @@
-// // @flow
-// import * as Types from "./__types"
 import typeEnum from "./typeEnum"
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
