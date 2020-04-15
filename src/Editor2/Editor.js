@@ -1,76 +1,43 @@
 import actions from "./actions"
+import attrs from "./attrs"
 import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
+import extendPosRange from "./extendPosRange"
 import keyCodes from "./keyCodes"
 import parse from "./parser"
+import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import TypeMap from "./TypeMap"
-import uuidv4 from "uuid/v4"
 
 import "./Editor.css"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
-// Creates an extended cursor ID (root ID) range.
-function extendPosRange(state, [pos1, pos2]) {
-	let x1 = state.data.findIndex(each => each.id === pos1.root.id)
-	x1 -= 2 // Decrement 2x
-	if (x1 < 0) {
-		x1 = 0
-	}
-	let x2 = state.data.findIndex(each => each.id === pos2.root.id)
-	x2 += 2 // Increment 2x
-	if (x2 >= state.data.length) {
-		x2 = state.data.length - 1
-	}
-	return [state.data[x1].id, state.data[x2].id]
-}
-
-// Queries data-root elements.
-function queryRoots(editorRoot, extendedPosRange) {
-	// Query the start root:
-	const root1 = document.getElementById(extendedPosRange[0])
-	if (!root1 || !editorRoot.contains(root1)) {
-		throw new Error("queryRoots: no such root1 or out of bounds")
-	}
-	// Query the end root:
-	let root2 = document.getElementById(extendedPosRange[1])
-	let root2AtEnd = false
-	// Guard enter pressed on root2:
-	const nextRoot = root2 && root2.nextElementSibling
-	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
-		nextRoot.id = uuidv4() // Correct the ID
-		root2 = nextRoot
-		root2AtEnd = true
-	// Guard backspaced pressed on root2:
-	} else if (!root2) {
-		root2 = editorRoot.children[editorRoot.children.length - 1]
-		root2AtEnd = true
-	}
-	if (!root2 || !editorRoot.contains(root2)) {
-		throw new Error("queryRoots: no such root2 or out of bounds")
-	}
-	return { roots: [root1, root2], root2AtEnd }
-}
-
-const Document = ({ data }) => (
-	data.map(({ type: T, ...props }) => (
-		React.createElement(TypeMap[T], {
-			key: props.id,
-			...props,
-		})
-	))
+const Document = ({ state, setState }) => (
+	<EditorContext.Provider value={[state, setState]}>
+		{state.data.map(({ type: T, ...each }) => (
+			React.createElement(TypeMap[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</EditorContext.Provider>
 )
 
 ;(() => {
 	document.body.classList.toggle("debug-css")
 })()
 
-const Editor = ({ id, tag, state, setState }) => {
+const Editor = ({
+	tag,
+	id,
+	state,
+	setState,
+}) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -79,39 +46,27 @@ const Editor = ({ id, tag, state, setState }) => {
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
-			const { Provider } = EditorContext
-			ReactDOM.render(
-				<Provider value={[state, setState]}>
-					<Document data={state.data} />
-				</Provider>,
-				state.reactDOM,
-				() => {
-					// Sync user-managed DOM to the React-managed DOM:
-					const mutations = syncTrees(state.reactDOM, ref.current)
-					if (!mounted.current) {
-						mounted.current = true
-						return
-					}
-					if (mutations) {
-						console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
-					}
-					// Sync DOM cursors to the VDOM cursors:
-					const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-					if (syncedPos) {
-						console.log("syncPos")
-					}
-					// Update extendedPosRange for edge-cases such as
-					// forward-backspace:
-					const [pos1, pos2] = computePosRange(ref.current)
-					const extendedPosRange = extendPosRange(state, [pos1, pos2])
-					setState(current => ({
-						...current,
-						pos1,
-						pos2,
-						extendedPosRange,
-					}))
-				},
-			)
+			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
+				// Sync user-managed DOM to the React-managed DOM:
+				const mutations = syncTrees(state.reactDOM, ref.current)
+				if (!mounted.current) {
+					mounted.current = true
+					return
+				}
+				if (mutations) {
+					console.log(`syncTrees: ${mutations} mutation${!mutations ? "" : "s"}`)
+				}
+				// Sync DOM cursors to the VDOM cursors:
+				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				if (syncedPos) {
+					console.log("syncPos")
+				}
+				// Update extendedPosRange for edge-cases such as
+				// forward-backspace:
+				const [pos1, pos2] = computePosRange(ref.current)
+				const extendedPosRange = extendPosRange(state, [pos1, pos2])
+				setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+			})
 		}, [state, setState]),
 		[state.data],
 	)
@@ -120,6 +75,7 @@ const Editor = ({ id, tag, state, setState }) => {
 	return (
 		<div>
 
+			{/* Editor */}
 			{React.createElement(
 				tag || "div",
 				{
@@ -136,11 +92,7 @@ const Editor = ({ id, tag, state, setState }) => {
 					className: "codex-editor",
 
 					style: {
-						// Imperative styles because of contenteditable:
-						whiteSpace: "pre-wrap",
-						outline: "none",
-						overflowWrap: "break-word",
-
+						...attrs.contenteditable,
 						caretColor: "black",
 					},
 
@@ -174,12 +126,7 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
 						const extendedPosRange = extendPosRange(state, [pos1, pos2])
-						setState(current => ({
-							...current,
-							pos1,
-							pos2,
-							extendedPosRange,
-						}))
+						setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 
 					onPointerDown: () => {
@@ -193,23 +140,19 @@ const Editor = ({ id, tag, state, setState }) => {
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
 						const extendedPosRange = extendPosRange(state, [pos1, pos2])
-						setState(current => ({
-							...current,
-							pos1,
-							pos2,
-							extendedPosRange,
-						}))
+						setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 					onPointerUp: () => {
 						pointerDownRef.current = false
 					},
 
 					onKeyDown: e => {
-						if (e.keyCode === keyCodes.Enter /* && e.shiftKey */) {
+						if (e.keyCode === keyCodes.Enter) {
 							e.preventDefault()
 							actions.enter(state, setState)
 							return
 						}
+						// TODO
 					},
 
 					// TODO: onCompositionEnd
@@ -240,8 +183,8 @@ const Editor = ({ id, tag, state, setState }) => {
 							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 							pos1,
 							pos2,
-							// NOTE: Do not extendPosRange here; defer
-							// to end of useLayoutEffect
+							// NOTE: Do not extendPosRange here; defer to
+							// useLayoutEffect
 						}))
 					},
 
@@ -250,6 +193,7 @@ const Editor = ({ id, tag, state, setState }) => {
 				},
 			)}
 
+			{/* Debugger */}
 			{DEBUG_MODE && (
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
 					{JSON.stringify(
