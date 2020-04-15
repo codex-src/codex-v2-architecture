@@ -1,3 +1,4 @@
+// @flow
 import Editor from "Editor2/Editor"
 import raw from "raw.macro"
 import React from "react"

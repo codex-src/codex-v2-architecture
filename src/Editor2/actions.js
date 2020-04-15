@@ -24,6 +24,8 @@ import uuidv4 from "uuid/v4"
 // }
 
 // Inserts an EOL character.
+//
+// TODO: Refactor to write?
 function enter(state, setState) {
 	const x1 = state.data.findIndex(each => each.id === state.pos1.root.id)
 	let x2 = x1
