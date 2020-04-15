@@ -15,6 +15,43 @@
 	line-height: 1.375;
 }
 
+/* TODO: Is there a better way to do this? */
+.codex-editor .text-lg .font-bold,
+.codex-editor .text-lg .font-semibold,
+.codex-editor .text-lg .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-xl .font-bold,
+.codex-editor .text-xl .font-semibold,
+.codex-editor .text-xl .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-2xl .font-bold,
+.codex-editor .text-2xl .font-semibold,
+.codex-editor .text-2xl .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-3xl .font-bold,
+.codex-editor .text-3xl .font-semibold,
+.codex-editor .text-3xl .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-4xl .font-bold,
+.codex-editor .text-4xl .font-semibold,
+.codex-editor .text-4xl .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-5xl .font-bold,
+.codex-editor .text-5xl .font-semibold,
+.codex-editor .text-5xl .font-medium {
+	font-weight: 650;
+}
+.codex-editor .text-6xl .font-bold,
+.codex-editor .text-6xl .font-semibold,
+.codex-editor .text-6xl .font-medium {
+	font-weight: 650;
+}
+
 /* .codex-editor .emoji { */
 /* 	vertical-align: -10%; */
 /* 	font-size: 120%; */
