@@ -11,7 +11,7 @@ import {
 	// safeURLRe,
 } from "./spec"
 
-// Registers a type for parseInline.
+// Registers a type for parseInlineElements.
 //
 // FIXME
 function registerType(type, syntax, opts = { recurse: true }) {
@@ -53,7 +53,7 @@ function registerType(type, syntax, opts = { recurse: true }) {
 			syntax,
 			children: !opts.recurse
 				? str.slice(index, index + offset)
-				: parseInline(str.slice(index, index + offset)),
+				: parseInlineElements(str.slice(index, index + offset)),
 		}
 		index += syntax.length + offset
 		return { data, x2: index }
@@ -82,36 +82,20 @@ function registerType(type, syntax, opts = { recurse: true }) {
 // 	return { parsed, index }
 // }
 
-
-// Registers a type for parseInline.
+// Parses a type.
 //
-// NOTE: Assumes start syntax was checked
+// NOTE: Does not match start syntax
 function parseType({
-	type,      // The parsed enum type
-	syntax,    // The syntax (end syntax) // TODO: Rename to endSyntax?
-	str,       // Argument string
-	index,     // Arugment index (number)
-	recursive, // Is recursive?  -- defaults to true
-	minOffset, // Minimum offset -- defaults to 1
+	type,   // The parsed enum type
+	syntax, // The syntax (end syntax) // TODO: Rename to endSyntax?
+	str,    // Argument string
+	index,  // Arugment index (number)
 }) {
-	const recurse = parseType
-
-	// Set default value for recursive:
-	if (recursive === undefined) {
-		recursive = true
-	}
-	// Set default value for minOffset:
-	if (minOffset === undefined) {
-		minOffset = 1
-	}
-
-	// if (!(index < str.length && str.slice(index, index + syntax.length) === syntax && str.length - index >= phrase.length)) {
-	// 	return null
-	// }
+	const shouldRecurse = type !== typeEnum.Code
 
 	// Prepare an escaped search regex:
-	let searchRe = syntax.split("").map(each => `\\${each}`).join("")
-	let searchReOffset = 0
+	let searchPattern = syntax.split("").map(each => `\\${each}`).join("")
+	let searchPatternOffset = 0
 	switch (syntax[0]) {
 	case "_":
 		// Underscores cannot be escaped and must be proceeded
@@ -119,35 +103,36 @@ function parseType({
 		if (index - 1 >= 0 && !(isASCIIWhitespace(str[index - 1]) || isASCIIPunctuation(str[index - 1]))) {
 			return null
 		}
-		searchRe = `[^\\\\]${searchRe}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
-		searchReOffset++
+		searchPattern = `[^\\\\]${searchPattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+		searchPatternOffset++
 		break
 	case "`":
 		// No-op
 		break
 	default:
 		// Etc. cannot be escaped:
-		searchRe = `[^\\\\]${searchRe}`
-		searchReOffset++
+		searchPattern = `[^\\\\]${searchPattern}`
+		searchPatternOffset++
 		break
 	}
-
-	// TODO
-	// (syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length])) ||           // Exempt <Code> and <A>
-	// (syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
-
-	// Guard: Most syntax cannot surround spaces:
-	const offset = str.slice(index + syntax.length).search(searchRe) + searchReOffset
-	if (offset < minOffset) {
+	// Match cannot be an empty string:
+	const offset = str.slice(index + syntax.length).search(searchPattern) + searchPatternOffset
+	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax
+		return null
+	// Match cannot be preceded or proceeded by a space (code
+	// exempt):
+	} else if (syntax[0] !== "`" && isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1])) {
 		return null
 	}
+	// Increment start syntax:
 	index += syntax.length
 	const parsed = {
 		type,
 		syntax,
-		children: !recursive ? str.slice(index, index + offset) : recurse(str.slice(index, index + offset)),
+		children: !shouldRecurse ? str.slice(index, index + offset) : parseInlineElements(str.slice(index, index + offset)),
 	}
-	index += syntax.length + offset
+	// Increment offset and end syntax:
+	index += offset + syntax.length
 	return { parsed, index }
 }
 
@@ -155,7 +140,7 @@ function parseType({
 // structure from a string.
 //
 // TODO: https://github.github.com/gfm/#delimiter-stack
-function parseInline(str) {
+function parseInlineElements(str) {
 	if (!str) {
 		return null
 	}
@@ -179,41 +164,52 @@ function parseInline(str) {
 		// 	// No-op
 		// 	break
 
-		// <StrongEm>
-		// <Strong>
-		// <Em>
+		// <StrongEm> OR <Strong> OR <Em>
 		case char === "*" || char === "_":
-			// ***Strong em***
+			// ***Strong emphasis*** OR ___Strong emphasis___
 			if (nchars >= "***x***".length && str.slice(index, index + 3) === char.repeat(3)) {
-				const parsed = registerType(typeEnum.StrongEmphasis, char.repeat(3))(str, index)
-				if (!parsed) {
+				const res = parseType({
+					type: typeEnum.StrongEmphasis,
+					syntax: char.repeat(3),
+					str,
+					index,
+				})
+				if (!res) {
 					// No-op
 					break
 				}
-				data.push(parsed.data)
-				index = parsed.x2 - 1
+				data.push(res.parsed)
+				index = res.index - 1
 				continue
-			// **Strong**
-			// __strong__
+			// **Strong** OR __Strong__
 			} else if (nchars >= "**x**".length && str.slice(index, index + 2) === char.repeat(2)) {
-				const parsed = registerType(typeEnum.Strong, char.repeat(2))(str, index)
-				if (!parsed) {
+				const res = parseType({
+					type: typeEnum.Strong,
+					syntax: char.repeat(2),
+					str,
+					index,
+				})
+				if (!res) {
 					// No-op
 					break
 				}
-				data.push(parsed.data)
-				index = parsed.x2 - 1
+				data.push(res.parsed)
+				index = res.index - 1
 				continue
-			// _Emphasis_
-			// *emphasis*
+			// _Emphasis_ OR *Emphasis*
 			} else if (nchars >= "*x*".length) {
-				const parsed = registerType(typeEnum.Emphasis, char)(str, index)
-				if (!parsed) {
+				const res = parseType({
+					type: typeEnum.Emphasis,
+					syntax: char,
+					str,
+					index,
+				})
+				if (!res) {
 					// No-op
 					break
 				}
-				data.push(parsed.data)
-				index = parsed.x2 - 1
+				data.push(res.parsed)
+				index = res.index - 1
 				continue
 			}
 			// No-op
@@ -248,14 +244,20 @@ function parseInline(str) {
 		// <Code>
 		case char === "`":
 			// `Code`
-			const res = parseType({ type: typeEnum.Code, syntax: "`", str, index, recursive: false })
-			if (res) {
-				data.push(res.parsed)
-				index = res.index - 1
-				continue
+			const res = parseType({
+				type: typeEnum.Code,
+				syntax: char,
+				str,
+				index,
+				recursive: false,
+			})
+			if (!res) {
+				// No-op
+				break
 			}
-			// No-op
-			break
+			data.push(res.parsed)
+			index = res.index - 1
+			continue
 
 			// // <A> (1 of 2)
 			// case char === "h":
@@ -362,7 +364,7 @@ function parseInline(str) {
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-function parse(unparsed) {
+function parse(unparsed) { // TODO: Rename to parseElements?
 	const parsed = []
 	for (let x = 0; x < unparsed.length; x++) {
 		const each = unparsed[x]
@@ -391,10 +393,10 @@ function parse(unparsed) {
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// hash: newHash(toInnerString(parseInline(each.raw.slice(syntax.length)))),
+					// hash: newHash(toInnerString(parseInlineElements(each.raw.slice(syntax.length)))),
 					hash: "TODO",
 					raw: each.raw,
-					children: parseInline(each.raw.slice(syntax.length)),
+					children: parseInlineElements(each.raw.slice(syntax.length)),
 				})
 				continue
 			}
@@ -404,7 +406,7 @@ function parse(unparsed) {
 			break
 		}
 		// <Paragraph>
-		const children = parseInline(each.raw)
+		const children = parseInlineElements(each.raw)
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
@@ -453,8 +455,8 @@ function parse(unparsed) {
 // 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 // 					id: uuidv4(),
 // 					syntax: [syntax],
-// 					hash: newHash(toInnerString(parseInline(each.slice(syntax.length)))),
-// 					children: parseInline(each.slice(syntax.length)),
+// 					hash: newHash(toInnerString(parseInlineElements(each.slice(syntax.length)))),
+// 					children: parseInlineElements(each.slice(syntax.length)),
 // 				})
 // 				continue
 // 			}
@@ -487,7 +489,7 @@ function parse(unparsed) {
 // 						type: BquoteParagraph,
 // 						id: uuidv4(),
 // 						syntax: [each.slice(0, 2)],
-// 						children: parseInline(each.slice(2)),
+// 						children: parseInlineElements(each.slice(2)),
 // 					})),
 // 				})
 // 				index = x2 - 1
@@ -565,7 +567,7 @@ function parse(unparsed) {
 // 			break
 // 		// <Image>
 // 		//
-// 		// TODO: Move to parseInline to support
+// 		// TODO: Move to parseInlineElements to support
 // 		// [![Image](href)](href) syntax?
 // 		case char === "!":
 // 			// ![Image](href)
@@ -616,7 +618,7 @@ function parse(unparsed) {
 // 			break
 // 		}
 // 		// <Paragraph>
-// 		const children = parseInline(each)
+// 		const children = parseInlineElements(each)
 // 		data.push({
 // 			type: Paragraph,
 // 			id: uuidv4(),
