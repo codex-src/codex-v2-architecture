@@ -8,6 +8,7 @@ import {
 import {
 	Code,
 	Emphasis,
+	Strikethrough,
 	Strong,
 	StrongEmphasis,
 } from "./InlineElements"
@@ -22,6 +23,7 @@ const typeMap = {
 	[typeEnum.Strong]: Strong,
 	[typeEnum.StrongEmphasis]: StrongEmphasis,
 	[typeEnum.Code]: Code,
+	[typeEnum.Strikethrough]: Strikethrough,
 }
 
 export default typeMap

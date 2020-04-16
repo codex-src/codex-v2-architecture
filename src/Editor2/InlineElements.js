@@ -51,15 +51,15 @@ export const Code = ({ syntax, children }) => (
 		</Markdown>
 	</span>
 )
-//
-// export const Strike = ({ syntax, children }) => (
-// 	<span {...attrs.strike}>
-// 		<Markdown syntax={syntax}>
-// 			{children}
-// 		</Markdown>
-// 	</span>
-// )
-//
+
+export const Strikethrough = ({ syntax, children }) => (
+	<span {...attrs.strike}>
+		<Markdown syntax={syntax}>
+			{children}
+		</Markdown>
+	</span>
+)
+
 // export const A = ({ syntax, href, children }) => (
 // 	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
 // 		<Markdown syntax={!children || syntax}>

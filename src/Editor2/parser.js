@@ -133,7 +133,7 @@ function parseType({
 	}
 	// Increment offset and end syntax:
 	index += offset + syntax.length
-	return { parsed, index }
+	return { parsed, x2: index }
 }
 
 // Parses a GitHub Flavored Markdown (GFM) inline data
@@ -179,7 +179,7 @@ function parseInlineElements(str) {
 					break
 				}
 				data.push(res.parsed)
-				index = res.index - 1
+				index = res.x2 - 1
 				continue
 			// **Strong** OR __Strong__
 			} else if (nchars >= "**x**".length && str.slice(index, index + 2) === char.repeat(2)) {
@@ -194,7 +194,7 @@ function parseInlineElements(str) {
 					break
 				}
 				data.push(res.parsed)
-				index = res.index - 1
+				index = res.x2 - 1
 				continue
 			// _Emphasis_ OR *Emphasis*
 			} else if (nchars >= "*x*".length) {
@@ -209,38 +209,46 @@ function parseInlineElements(str) {
 					break
 				}
 				data.push(res.parsed)
-				index = res.index - 1
+				index = res.x2 - 1
 				continue
 			}
 			// No-op
 			break
-
-			// // <Strike>
-			// case char === "~":
-			// 	// ~~Strike~~
-			// 	if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
-			// 		const parsed = registerType(Strike, "~~")(str, index)
-			// 		if (!parsed) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		data.push(parsed.data)
-			// 		index = parsed.x2 - 1
-			// 		continue
-			// 	// ~Strike~
-			// 	} else if (nchars >= "~x~".length) {
-			// 		const parsed = registerType(Strike, "~")(str, index)
-			// 		if (!parsed) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		data.push(parsed.data)
-			// 		index = parsed.x2 - 1
-			// 		continue
-			// 	}
-			// 	// No-op
-			// 	break
-
+		// <Strikethrough>
+		case char === "~":
+			// ~~Strikethrough~~
+			if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
+				const res = parseType({
+					type: typeEnum.Strikethrough,
+					syntax: char.repeat(2),
+					str,
+					index,
+				})
+				if (!res) {
+					// No-op
+					break
+				}
+				data.push(res.parsed)
+				index = res.x2 - 1
+				continue
+			// ~Strikethrough~
+			} else if (nchars >= "~x~".length) {
+				const res = parseType({
+					type: typeEnum.Strikethrough,
+					syntax: char,
+					str,
+					index,
+				})
+				if (!res) {
+					// No-op
+					break
+				}
+				data.push(res.parsed)
+				index = res.x2 - 1
+				continue
+			}
+			// No-op
+			break
 		// <Code>
 		case char === "`":
 			// `Code`
@@ -249,14 +257,13 @@ function parseInlineElements(str) {
 				syntax: char,
 				str,
 				index,
-				recursive: false,
 			})
 			if (!res) {
 				// No-op
 				break
 			}
 			data.push(res.parsed)
-			index = res.index - 1
+			index = res.x2 - 1
 			continue
 
 			// // <A> (1 of 2)

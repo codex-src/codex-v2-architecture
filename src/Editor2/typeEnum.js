@@ -10,6 +10,7 @@ const typeEnum = new Enum(
 	"Strong",
 	"StrongEmphasis",
 	"Code",
+	"Strikethrough",
 )
 
 export default typeEnum
