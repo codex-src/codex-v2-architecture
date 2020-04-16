@@ -56,10 +56,10 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</Root>
 ))
 
-export const Paragraph = ({ id, children }) => (
-	<Root id={id}>
+export const Paragraph = React.memo(({ id, emojis, children }) => (
+	<Root id={id} className={!emojis ? null : `emojis emojis-${children.length}`}>
 		{toReact(children) || (
 			<br />
 		)}
 	</Root>
-)
+))

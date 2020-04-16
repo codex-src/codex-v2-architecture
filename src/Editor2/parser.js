@@ -299,13 +299,14 @@ function parseInlineElements(str) {
 			// No-op
 			break
 		}
+		// Push:
 		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 			parsed.push(char)
 			continue
 		}
+		// Concatenate:
 		parsed[parsed.length - 1] += char
 	}
-	// Return a string or an array of objects:
 	if (parsed.length === 1 && typeof parsed[0] === "string") {
 		return parsed[0]
 	}
@@ -324,7 +325,7 @@ function parseElements(unparsed) {
 		switch (true) {
 		// <Header>
 		case char === "#":
-			// # H1 ... ###### H6
+			// # H1 … ###### H6
 			if (
 				(nchars >= 2 && each.raw.slice(0, 2) === "# ") ||
 				(nchars >= 3 && each.raw.slice(0, 3) === "## ") ||
@@ -356,11 +357,11 @@ function parseElements(unparsed) {
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
-			// emojis: (
-			// 	children &&
-			// 	children.every &&
-			// 	children.every(each => each.type === E)
-			// ),
+			emojis: (
+				children &&
+				children.every &&
+				children.every(each => each.type === typeEnum.Emoji)
+			),
 			raw: each.raw,
 			children,
 		})

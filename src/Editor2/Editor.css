@@ -54,13 +54,12 @@
 }
 
 .codex-editor .emoji {
-	margin-right: -0.125em; /* Experimental */
 	vertical-align: -10%;
 	font-size: 120%;
 	line-height: 1;
 }
 .codex-editor .emojis {
-	font-size: 208.33%; /* 208.33% * 120% = 250% */
+	font-size: 166.6667%; /* Resolves to 200% */
 }
 
 /* .codex-editor:not(.feature-read-only) [data-node] > span, */
