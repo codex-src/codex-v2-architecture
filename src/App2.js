@@ -63,7 +63,7 @@ const App = () => {
 
 				<Editor
 					id="main-editor"
-					style={{ fontSize: 17 }}
+					style={{ fontSize: 18 }}
 					state={state}
 					setState={setState}
 				/>

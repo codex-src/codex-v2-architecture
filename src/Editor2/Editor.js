@@ -15,7 +15,7 @@ import typeMap from "./typeMap"
 
 import "./Editor.css"
 
-const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
+const DEBUG_MODE = false && process.env.NODE_ENV !== "production"
 
 const Document = ({ state, setState }) => (
 	<EditorContext.Provider value={[state, setState]}>
