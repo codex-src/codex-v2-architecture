@@ -36,15 +36,16 @@ function trim(str) {
 const headerClassNames = {
 	h1: trim("font-medium   text-3xl leading-tight"),
 	h2: trim("font-medium   text-2xl leading-tight"),
-	h3: trim("font-semibold text-xl  leading-tight"),
-	h4: trim("font-semibold text-xl  leading-tight"),
-	h5: trim("font-semibold text-xl  leading-tight"),
-	h6: trim("font-semibold text-xl  leading-tight"),
+	h3: trim("font-medium   text-xl  leading-tight"),
+	h4: trim("font-semibold text-lg  leading-tight"),
+	h5: trim("font-semibold text-lg  leading-tight"),
+	h6: trim("font-semibold text-lg  leading-tight"),
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<Root id={id} className={headerClassNames[tag]}>
-		{/* NOTE: Use block because of contenteditable */}
+		{/* NOTE: Use className="block" because of
+		contenteditable */}
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(children) || (
