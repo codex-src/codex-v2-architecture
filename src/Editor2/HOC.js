@@ -10,7 +10,7 @@ export const Node = ({ id, tag, style, ...props }) => (
 			whiteSpace: "pre-wrap",
 			...style,
 		},
-		"data-node": true,
+		"data-codex-node": true,
 		...props,
 	})
 )
@@ -24,7 +24,7 @@ export const Root = ({ id, tag, style, ...props }) => (
 			whiteSpace: "pre-wrap",
 			...style,
 		},
-		"data-root": true,
+		"data-codex-root": true,
 		...props,
 	})
 )

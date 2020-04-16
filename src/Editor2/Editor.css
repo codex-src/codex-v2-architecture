@@ -62,8 +62,8 @@
 	font-size: 166.6667%; /* Resolves to 200% */
 }
 
-/* .codex-editor:not(.feature-read-only) [data-node] > span, */
-/* .codex-editor:not(.feature-read-only) [data-root] > span { */
+/* .codex-editor:not(.feature-read-only) [data-codex-node] > span, */
+/* .codex-editor:not(.feature-read-only) [data-codex-root] > span { */
 /* 	background-color: #2979ff0f; */
 /* } */
 /* */

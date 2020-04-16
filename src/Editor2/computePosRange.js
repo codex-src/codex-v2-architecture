@@ -13,7 +13,7 @@ function countOffset(element, node) {
 			}
 			offset += (each.nodeValue || "").length
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-node")) {
+			if (next && next.getAttribute("data-codex-node")) {
 				offset++
 			}
 		}
@@ -30,22 +30,21 @@ function computePos(editorRoot, { ...range }) {
 		throw new Error("computePos: no such node or out of bounds")
 	}
 	const pos = newPos()
-	// Iterate range.node to the deepest node:
+	// Iterate to the deepest node:
 	while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
 	}
-	// Compute pos.node.id; ascend to the nearest data-node or
-	// data-root element:
+	// Ascend to the nearest data-codex-node or
+	// data-codex-root element:
 	let node = range.node // eslint-disable-line prefer-destructuring
-	while (!(node.getAttribute && (node.getAttribute("data-node") || node.getAttribute("data-root")))) {
+	while (!(node.getAttribute && (node.getAttribute("data-codex-node") || node.getAttribute("data-codex-root")))) {
 		node = node.parentElement
 	}
 	pos.node.id = node.id
-	// Compute pos.root.id; ascend to the nearest data-root
-	// element:
+	// Ascend to the nearest data-codex-root element:
 	let root = node
-	while (!(root.getAttribute && root.getAttribute("data-root"))) {
+	while (!(root.getAttribute && root.getAttribute("data-codex-root"))) {
 		root = root.parentElement
 	}
 	pos.root.id = root.id

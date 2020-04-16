@@ -1,6 +1,6 @@
 import uuidv4 from "uuid/v4"
 
-// Queries data-root elements.
+// Queries data-codex-root elements.
 function queryRoots(editorRoot, extendedPosRange) {
 	const root1 = document.getElementById(extendedPosRange[0])
 	if (!root1 || !editorRoot.contains(root1)) {
@@ -10,7 +10,7 @@ function queryRoots(editorRoot, extendedPosRange) {
 	let root2AtEnd = false
 	// Guard enter pressed on root2:
 	const nextRoot = root2 && root2.nextElementSibling
-	if (nextRoot && nextRoot.getAttribute("data-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
+	if (nextRoot && nextRoot.getAttribute("data-codex-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
 		nextRoot.id = uuidv4() // Correct the ID
 		root2 = nextRoot
 		root2AtEnd = true

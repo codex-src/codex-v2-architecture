@@ -1,6 +1,6 @@
 import uuidv4 from "uuid/v4"
 
-// Reads a data-root element.
+// Reads a data-codex-root element.
 function readRoot(root) {
 	const unparsed = [
 		{
@@ -16,7 +16,7 @@ function readRoot(root) {
 		for (const each of on.childNodes) {
 			recurse(each)
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-node")) {
+			if (next && next.getAttribute("data-codex-node")) {
 				unparsed.push({
 					id: next.id,
 					raw: "",
@@ -28,7 +28,7 @@ function readRoot(root) {
 	return unparsed
 }
 
-// Reads a range of data-root elements.
+// Reads a range of data-codex-root elements.
 function readRoots(editorRoot, [startRoot, endRoot]) {
 	const unparsed = []
 	const seen = {}

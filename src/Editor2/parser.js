@@ -327,12 +327,12 @@ function parseElements(unparsed) {
 		case char === "#":
 			// # H1 … ###### H6
 			if (
-				(nchars >= 2 && each.raw.slice(0, 2) === "# ") ||
-				(nchars >= 3 && each.raw.slice(0, 3) === "## ") ||
-				(nchars >= 4 && each.raw.slice(0, 4) === "### ") ||
-				(nchars >= 5 && each.raw.slice(0, 5) === "#### ") ||
-				(nchars >= 6 && each.raw.slice(0, 6) === "##### ") ||
-				(nchars >= 7 && each.raw.slice(0, 7) === "###### ")
+				(nchars >= 2 && each.raw.slice(0, 2) === "# ") || // (nchars >= 2 && each.raw.startsWith("# ")) ||
+				(nchars >= 3 && each.raw.slice(0, 3) === "## ") || // (nchars >= 3 && each.raw.startsWith("## ")) ||
+				(nchars >= 4 && each.raw.slice(0, 4) === "### ") || // (nchars >= 4 && each.raw.startsWith("### ")) ||
+				(nchars >= 5 && each.raw.slice(0, 5) === "#### ") || // (nchars >= 5 && each.raw.startsWith("#### ")) ||
+				(nchars >= 6 && each.raw.slice(0, 6) === "##### ") || // (nchars >= 6 && each.raw.startsWith("##### ")) ||
+				(nchars >= 7 && each.raw.slice(0, 7) === "###### ") // (nchars >= 7 && each.raw.startsWith("###### "))
 			) {
 				const syntax = each.raw.slice(0, each.raw.indexOf(" ") + 1)
 				parsed.push({

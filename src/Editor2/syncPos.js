@@ -24,7 +24,7 @@ function computeRange(editorRoot, pos) {
 			}
 			pos.root.offset -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-node")) {
+			if (next && next.getAttribute("data-codex-node")) {
 				pos.root.offset--
 			}
 		}
