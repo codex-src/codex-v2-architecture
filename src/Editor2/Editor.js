@@ -56,15 +56,19 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 					mounted.current = true
 					return
 				}
-				if (mutations) {
-					const s = !mutations ? "" : "s"
-					console.log(`syncTrees: ${mutations} mutation${s}`)
-				}
+
+				// if (mutations) {
+				// 	const s = !mutations ? "" : "s"
+				// 	console.log(`syncTrees: ${mutations} mutation${s}`)
+				// }
+
 				// Sync DOM cursors to the VDOM cursors:
 				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-				if (syncedPos) {
-					console.log("syncPos")
-				}
+
+				// if (syncedPos) {
+				// 	console.log("syncPos")
+				// }
+
 				// Update extendedPosRange for edge-cases such as
 				// forward-backspace:
 				const [pos1, pos2] = computePosRange(ref.current)
