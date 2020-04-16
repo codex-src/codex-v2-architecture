@@ -11,14 +11,14 @@ import React from "react"
 // 		</Markdown>
 // 	</span>
 // )
-//
-// export const E = ({ description, children }) => (
-// 	<span className="emoji" aria-label={description} role="img">
-// 		<Markdown>
-// 			{children}
-// 		</Markdown>
-// 	</span>
-// )
+
+export const Emoji = ({ description, children }) => (
+	<span className="emoji" aria-label={description} role="img">
+		<Markdown>
+			{children}
+		</Markdown>
+	</span>
+)
 
 export const Emphasis = ({ syntax, children }) => (
 	<span className="italic">

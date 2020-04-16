@@ -53,20 +53,21 @@
 	font-weight: 650;
 }
 
+.codex-editor .emoji {
+	margin-right: -0.125em; /* Experimental */
+	vertical-align: -10%;
+	font-size: 120%;
+	line-height: 1;
+}
+.codex-editor .emojis {
+	font-size: 208.33%; /* 208.33% * 120% = 250% */
+}
+
 /* .codex-editor:not(.feature-read-only) [data-node] > span, */
 /* .codex-editor:not(.feature-read-only) [data-root] > span { */
 /* 	background-color: #2979ff0f; */
 /* } */
-
-/* .codex-editor .emoji { */
-/* 	vertical-align: -10%; */
-/* 	font-size: 120%; */
-/* 	line-height: 1; */
-/* } */
-/* .codex-editor .emojis { */
-/* 	font-size: 208.33%; */
-/* } */
-/*  */
+/* */
 /* .codex-editor.feature-read-only ul > li:not(.checked):before { */
 /* 	margin-right: 0.5em; */
 /* 	flex-shrink: 0; */

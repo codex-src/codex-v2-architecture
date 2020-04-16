@@ -6,6 +6,7 @@ const typeEnum = new Enum(
 	"Paragraph",
 
 	// Inline elements:
+	"Emoji",
 	"Emphasis",
 	"Strong",
 	"StrongEmphasis",

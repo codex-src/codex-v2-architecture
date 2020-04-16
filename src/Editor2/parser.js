@@ -1,4 +1,5 @@
 // import uuidv4 from "uuid/v4"
+import * as emojiTrie from "emoji-trie"
 import typeEnum from "./typeEnum"
 
 import {
@@ -69,8 +70,7 @@ function parseType({
 	const offset = str.slice(index + syntax.length).search(searchPattern) + searchPatternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax
 		return null
-	// Match cannot be preceded or proceeded by a space (code
-	// exempt):
+	// Match cannot be preceded or proceeded by a space:
 	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1]))) {
 		return null
 	}
@@ -285,21 +285,18 @@ function parseInlineElements(str) {
 			// 	break
 
 		default:
-
-			// // <E>
-			// //
-			// // eslint-disable-next-line no-case-declarations
-			// const e = emojiTrie.atStart(str.slice(index))
-			// if (e && e.status === "fully-qualified") {
-			// 	data.push({
-			// 		type: E,
-			// 		description: e.description,
-			// 		children: e.emoji,
-			// 	})
-			// 	index += e.emoji.length - 1
-			// 	continue
-			// }
-
+			// <Emoji>
+			const info = emojiTrie.atStart(str.slice(index))
+			if (info && info.status === "fully-qualified") {
+				parsed.push({
+					type: typeEnum.Emoji,
+					description: info.description,
+					children: info.emoji,
+				})
+				index += info.emoji.length - 1
+				continue
+			}
+			// No-op
 			break
 		}
 		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {

@@ -7,6 +7,7 @@ import {
 
 import {
 	Code,
+	Emoji,
 	Emphasis,
 	Strikethrough,
 	Strong,
@@ -19,6 +20,7 @@ const typeMap = {
 	[typeEnum.Paragraph]: Paragraph,
 
 	// Inline elements:
+	[typeEnum.Emoji]: Emoji,
 	[typeEnum.Emphasis]: Emphasis,
 	[typeEnum.Strong]: Strong,
 	[typeEnum.StrongEmphasis]: StrongEmphasis,
