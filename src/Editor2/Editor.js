@@ -104,10 +104,26 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 						...attrs.contenteditable,
 					},
 
-					onFocus: () => setState(current => ({ ...current, focused: true })),
-					onBlur:  () => setState(current => ({ ...current, focused: false })),
+					onFocus: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						setState(current => ({ ...current, focused: true }))
+					},
+					onBlur:  () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						setState(current => ({ ...current, focused: false }))
+					},
 
 					onSelect: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						// Guard out of bounds range:
 						const selection = document.getSelection()
 						if (!selection.rangeCount) {
@@ -138,9 +154,17 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 					},
 
 					onPointerDown: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						pointerDownRef.current = true
 					},
 					onPointerMove: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						// Editor must be focused and pointer must be down:
 						if (!state.focused || !pointerDownRef.current) {
 							pointerDownRef.current = false // Reset to be safe
@@ -151,10 +175,18 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 						setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 					onPointerUp: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						pointerDownRef.current = false
 					},
 
 					onKeyDown: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						if (e.keyCode === keyCodes.Enter) {
 							e.preventDefault()
 							actions.enter(state, setState)
@@ -165,6 +197,10 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 
 					// TODO: onCompositionEnd
 					onInput: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						// Force re-render when empty:
 						if (!ref.current.childNodes.length) {
 							setState(current => ({
