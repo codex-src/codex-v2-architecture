@@ -1,6 +1,7 @@
 import typeEnum from "./typeEnum"
 
 import {
+	Break,
 	Header,
 	Paragraph,
 } from "./Elements"
@@ -18,6 +19,7 @@ const typeMap = {
 	// Elements:
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
+	[typeEnum.Break]: Break,
 
 	// Inline elements:
 	[typeEnum.Emoji]: Emoji,

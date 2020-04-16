@@ -1,6 +1,7 @@
 import Markdown from "./Markdown"
 import React from "react"
 import typeMap from "./typeMap"
+import useEditorSetState from "./useEditorSetState"
 
 import {
 	// Node,
@@ -63,3 +64,18 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 		)}
 	</Root>
 ))
+
+export const Break = React.memo(({ id, syntax }) => {
+	const [state] = useEditorSetState()
+
+	const style = { verticalAlign: "15%" }
+	return (
+		<Root id={id}>
+			<Markdown syntax={syntax}>
+				{state.readOnly && (
+					<hr className="inline-block w-full" style={style} />
+				)}
+			</Markdown>
+		</Root>
+	)
+})

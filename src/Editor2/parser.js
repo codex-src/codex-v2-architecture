@@ -87,7 +87,7 @@ function parseType({
 }
 
 // TODO: https://github.github.com/gfm/#delimiter-stack
-function parseInlineElements(str) {
+function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	if (!str) {
 		return null
 	}
@@ -347,6 +347,22 @@ function parseElements(unparsed) {
 				})
 				continue
 			}
+			// No-op
+			break
+		// <Break>
+		case char === "-" || char === "*":
+			// --- OR ***
+			if (nchars === 3 && each.raw === char.repeat(3)) {
+				parsed.push({
+					type: typeEnum.Break,
+					id: each.id,
+					syntax: [char.repeat(3)],
+					raw: each.raw,
+					children: null,
+				})
+				continue
+			}
+			// No-op
 			break
 		default:
 			// No-op

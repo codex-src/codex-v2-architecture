@@ -4,6 +4,7 @@ const typeEnum = new Enum(
 	// Elements:
 	"Header",
 	"Paragraph",
+	"Break",
 
 	// Inline elements:
 	"Emoji",
