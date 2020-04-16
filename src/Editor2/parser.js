@@ -11,56 +11,6 @@ import {
 	// safeURLRe,
 } from "./spec"
 
-// Registers a type for parseInlineElements.
-//
-// FIXME
-function registerType(type, syntax, opts = { recurse: true }) {
-	// Escape syntax for regex:
-	let pattern = syntax.split("").map(each => `\\${each}`).join("")
-	let patternOffset = 0
-	if (syntax[0] === "_") {
-		// https://github.github.com/gfm/#example-369
-		pattern = `[^\\\\]${pattern}(\\s|[\\u0021-\\u002f\\u003a-\\u0040\\u005b-\\u0060\\u007b-\\u007e]|$)`
-		patternOffset++
-	} else if (syntax[0] === "`") {
-		// No-op
-		//
-		// https://github.github.com/gfm/#example-348
-	} else {
-		pattern = `[^\\\\]${pattern}`
-		patternOffset++
-	}
-	const parse = (str, index, { minOffset } = { minOffset: 1 }) => {
-		// Guard: Character before start underscore syntax must
-		// be whitespace or punctutation:
-		//
-		// https://github.github.com/gfm/#example-369
-		if (syntax[0] === "_" && index - 1 >= 0 && (!isASCIIWhitespace(str[index - 1]) && !isASCIIPunctuation(str[index - 1]))) {
-			return null
-		}
-		// Guard: Most syntax cannot surround spaces:
-		const offset = str.slice(index + syntax.length).search(pattern) + patternOffset
-		if (
-			offset < minOffset ||
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length])) ||           // Exempt <Code> and <A>
-			(syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
-		) {
-			return null
-		}
-		index += syntax.length
-		const data = {
-			type,
-			syntax,
-			children: !opts.recurse
-				? str.slice(index, index + offset)
-				: parseInlineElements(str.slice(index, index + offset)),
-		}
-		index += syntax.length + offset
-		return { data, x2: index }
-	}
-	return parse
-}
-
 // function parseCode(str, index) {
 // 	const syntax = "`"
 // 	const phrase = `${syntax}x${syntax}`
@@ -121,7 +71,7 @@ function parseType({
 		return null
 	// Match cannot be preceded or proceeded by a space (code
 	// exempt):
-	} else if (syntax[0] !== "`" && isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1])) {
+	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1]))) {
 		return null
 	}
 	// Increment start syntax:
@@ -136,15 +86,12 @@ function parseType({
 	return { parsed, x2: index }
 }
 
-// Parses a GitHub Flavored Markdown (GFM) inline data
-// structure from a string.
-//
 // TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInlineElements(str) {
 	if (!str) {
 		return null
 	}
-	const data = []
+	const parsed = []
 	for (let index = 0; index < str.length; index++) {
 		const char = str[index]
 		const nchars = str.length - index
@@ -178,7 +125,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				data.push(res.parsed)
+				parsed.push(res.parsed)
 				index = res.x2 - 1
 				continue
 			// **Strong** OR __Strong__
@@ -193,7 +140,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				data.push(res.parsed)
+				parsed.push(res.parsed)
 				index = res.x2 - 1
 				continue
 			// _Emphasis_ OR *Emphasis*
@@ -208,7 +155,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				data.push(res.parsed)
+				parsed.push(res.parsed)
 				index = res.x2 - 1
 				continue
 			}
@@ -228,7 +175,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				data.push(res.parsed)
+				parsed.push(res.parsed)
 				index = res.x2 - 1
 				continue
 			// ~Strikethrough~
@@ -243,7 +190,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				data.push(res.parsed)
+				parsed.push(res.parsed)
 				index = res.x2 - 1
 				continue
 			}
@@ -262,7 +209,7 @@ function parseInlineElements(str) {
 				// No-op
 				break
 			}
-			data.push(res.parsed)
+			parsed.push(res.parsed)
 			index = res.x2 - 1
 			continue
 
@@ -355,23 +302,23 @@ function parseInlineElements(str) {
 
 			break
 		}
-		if (!data.length || typeof data[data.length - 1] !== "string") {
-			data.push(char)
+		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
+			parsed.push(char)
 			continue
 		}
-		data[data.length - 1] += char
+		parsed[parsed.length - 1] += char
 	}
 	// Return a string or an array of objects:
-	if (data.length === 1 && typeof data[0] === "string") {
-		return data[0]
+	if (parsed.length === 1 && typeof parsed[0] === "string") {
+		return parsed[0]
 	}
-	return data
+	return parsed
 }
 
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-function parse(unparsed) { // TODO: Rename to parseElements?
+function parseElements(unparsed) {
 	const parsed = []
 	for (let x = 0; x < unparsed.length; x++) {
 		const each = unparsed[x]
@@ -380,12 +327,7 @@ function parse(unparsed) { // TODO: Rename to parseElements?
 		switch (true) {
 		// <Header>
 		case char === "#":
-			// # Header
-			// ## Subheader
-			// ### H3
-			// #### H4
-			// ##### H5
-			// ###### H6
+			// # H1 ... ###### H6
 			if (
 				(nchars >= 2 && each.raw.slice(0, 2) === "# ") ||
 				(nchars >= 3 && each.raw.slice(0, 3) === "## ") ||
@@ -640,4 +582,4 @@ function parse(unparsed) { // TODO: Rename to parseElements?
 // 	return data
 // }
 
-export default parse
+export default parseElements
