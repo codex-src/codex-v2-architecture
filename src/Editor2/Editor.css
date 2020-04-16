@@ -9,6 +9,9 @@
 .codex-editor * {
 	caret-color: #000;
 }
+.codex-editor ::selection {
+	background: #448aff3f;
+}
 
 .codex-editor .font-mono {
 	/* -moz-osx-font-smoothing: auto; */
@@ -65,11 +68,13 @@
 	font-size: 166.6667%; /* Resolves to 200% */
 }
 
+/* --md-blue-a200: #448aff; */
+/* --md-blue-a400: #2979ff; */
 /* .codex-editor:not(.feature-read-only) [data-codex-node] > span, */
 /* .codex-editor:not(.feature-read-only) [data-codex-root] > span { */
-/* 	background-color: #2979ff0f; */
+/* 	background-color: #448aff0f; */
 /* } */
-/* */
+
 /* .codex-editor.feature-read-only ul > li:not(.checked):before { */
 /* 	margin-right: 0.5em; */
 /* 	flex-shrink: 0; */
