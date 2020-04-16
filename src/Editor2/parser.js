@@ -4,6 +4,8 @@ import typeEnum from "./typeEnum"
 import {
 	// HTTP,
 	// HTTPS,
+	ASCIIPunctuationPattern,
+	ASCIIWhitespacePattern,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
 	// safeURLRe,
@@ -57,6 +59,96 @@ function registerType(type, syntax, opts = { recurse: true }) {
 		return { data, x2: index }
 	}
 	return parse
+}
+
+// function parseCode(str, index) {
+// 	const syntax = "`"
+// 	const phrase = `${syntax}x${syntax}`
+//
+// 	if (!(index < str.length && str.slice(index, index + syntax.length) === syntax && str.length - index >= phrase.length)) {
+// 		return null
+// 	}
+// 	const offset = str.slice(index + syntax.length).search(`\\${syntax}`)
+// 	if (offset <= 0) {
+// 		return null
+// 	}
+// 	index += syntax.length
+// 	const parsed = {
+// 		type: typeEnum.Code,
+// 		syntax,
+// 		children: str.slice(index, index + offset),
+// 	}
+// 	index += offset + syntax.length
+// 	return { parsed, index }
+// }
+
+
+// Registers a type for parseInline.
+//
+// NOTE: Assumes start syntax was checked
+function parseType({
+	type,      // The parsed enum type
+	syntax,    // The syntax (end syntax) // TODO: Rename to endSyntax?
+	str,       // Argument string
+	index,     // Arugment index (number)
+	recursive, // Is recursive?  -- defaults to true
+	minOffset, // Minimum offset -- defaults to 1
+}) {
+	const recurse = parseType
+
+	// Set default value for recursive:
+	if (recursive === undefined) {
+		recursive = true
+	}
+	// Set default value for minOffset:
+	if (minOffset === undefined) {
+		minOffset = 1
+	}
+
+	// if (!(index < str.length && str.slice(index, index + syntax.length) === syntax && str.length - index >= phrase.length)) {
+	// 	return null
+	// }
+
+	// Prepare an escaped search regex:
+	let searchRe = syntax.split("").map(each => `\\${each}`).join("")
+	let searchReOffset = 0
+	switch (syntax[0]) {
+	case "_":
+		// Underscores cannot be escaped and must be proceeded
+		// by a space or an ASCII punctuation character:
+		if (index - 1 >= 0 && !(isASCIIWhitespace(str[index - 1]) || isASCIIPunctuation(str[index - 1]))) {
+			return null
+		}
+		searchRe = `[^\\\\]${searchRe}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+		searchReOffset++
+		break
+	case "`":
+		// No-op
+		break
+	default:
+		// Etc. cannot be escaped:
+		searchRe = `[^\\\\]${searchRe}`
+		searchReOffset++
+		break
+	}
+
+	// TODO
+	// (syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length])) ||           // Exempt <Code> and <A>
+	// (syntax !== "`" && syntax !== "]" && syntax !== ")" && isASCIIWhitespace(str[index + syntax.length + offset - 1])) // Exempt <Code> and <A>
+
+	// Guard: Most syntax cannot surround spaces:
+	const offset = str.slice(index + syntax.length).search(searchRe) + searchReOffset
+	if (offset < minOffset) {
+		return null
+	}
+	index += syntax.length
+	const parsed = {
+		type,
+		syntax,
+		children: !recursive ? str.slice(index, index + offset) : recurse(str.slice(index, index + offset)),
+	}
+	index += syntax.length + offset
+	return { parsed, index }
 }
 
 // Parses a GitHub Flavored Markdown (GFM) inline data
@@ -127,128 +219,114 @@ function parseInline(str) {
 			// No-op
 			break
 
-		// // <Strike>
-		// case char === "~":
-		// 	// ~~Strike~~
-		// 	if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
-		// 		const parsed = registerType(Strike, "~~")(str, index)
-		// 		if (!parsed) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push(parsed.data)
-		// 		index = parsed.x2 - 1
-		// 		continue
-		// 	// ~Strike~
-		// 	} else if (nchars >= "~x~".length) {
-		// 		const parsed = registerType(Strike, "~")(str, index)
-		// 		if (!parsed) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push(parsed.data)
-		// 		index = parsed.x2 - 1
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
+			// // <Strike>
+			// case char === "~":
+			// 	// ~~Strike~~
+			// 	if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
+			// 		const parsed = registerType(Strike, "~~")(str, index)
+			// 		if (!parsed) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		data.push(parsed.data)
+			// 		index = parsed.x2 - 1
+			// 		continue
+			// 	// ~Strike~
+			// 	} else if (nchars >= "~x~".length) {
+			// 		const parsed = registerType(Strike, "~")(str, index)
+			// 		if (!parsed) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		data.push(parsed.data)
+			// 		index = parsed.x2 - 1
+			// 		continue
+			// 	}
+			// 	// No-op
+			// 	break
 
 		// <Code>
 		case char === "`":
-			// ```Code```
-			if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
-				const parsed = registerType(typeEnum.Code, "```", { recurse: false })(str, index)
-				if (!parsed) {
-					// No-op
-					break
-				}
-				data.push(parsed.data)
-				index = parsed.x2 - 1
-				continue
 			// `Code`
-			} else if (nchars >= "`x`".length) {
-				const parsed = registerType(typeEnum.Code, "`", { recurse: false })(str, index)
-				if (!parsed) {
-					// No-op
-					break
-				}
-				data.push(parsed.data)
-				index = parsed.x2 - 1
+			const res = parseType({ type: typeEnum.Code, syntax: "`", str, index, recursive: false })
+			if (res) {
+				data.push(res.parsed)
+				index = res.index - 1
 				continue
 			}
 			// No-op
 			break
 
-		// // <A> (1 of 2)
-		// case char === "h":
-		// 	// https://
-		// 	//
-		// 	// TODO: Eat "www."
-		// 	if (nchars >= HTTPS.length && str.slice(index, index + HTTPS.length) === HTTPS) {
-		// 		const matches = safeURLRe.exec(str.slice(index))
-		// 		let offset = 0
-		// 		if (matches) {
-		// 			offset = matches[0].length
-		// 		}
-		// 		data.push({
-		// 			type: A,
-		// 			syntax: [HTTPS],
-		// 			href: matches[0],
-		// 			children: matches[0].slice(HTTPS.length),
-		// 		})
-		// 		index += offset - 1
-		// 		continue
-		// 	// http://
-		// 	//
-		// 	// TODO: Eat "www."
-		// 	} else if (nchars >= HTTP.length && str.slice(index, index + HTTP.length) === HTTP) {
-		// 		const matches = safeURLRe.exec(str.slice(index))
-		// 		let offset = 0
-		// 		if (matches) {
-		// 			offset = matches[0].length
-		// 		}
-		// 		data.push({
-		// 			type: A,
-		// 			syntax: [HTTP],
-		// 			href: matches[0],
-		// 			children: matches[0].slice(HTTP.length),
-		// 		})
-		// 		index += offset - 1
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
-		// // <A> (2 of 2)
-		// case char === "[":
-		// 	// [A](href)
-		// 	if (nchars >= "[x](x)".length) {
-		// 		const lhs = registerType(null, "]")(str, index)
-		// 		if (!lhs) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		// Check ( syntax:
-		// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		const rhs = registerType(null, ")", { recurse: false })(str, lhs.x2)
-		// 		if (!rhs) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push({
-		// 			type: A,
-		// 			// syntax: ["[", "](…)"],
-		// 			syntax: ["[", `](${rhs.data.children})`],
-		// 			href: rhs.data.children.trim(),
-		// 			children: lhs.data.children,
-		// 		})
-		// 		index = rhs.x2 - 1
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
+			// // <A> (1 of 2)
+			// case char === "h":
+			// 	// https://
+			// 	//
+			// 	// TODO: Eat "www."
+			// 	if (nchars >= HTTPS.length && str.slice(index, index + HTTPS.length) === HTTPS) {
+			// 		const matches = safeURLRe.exec(str.slice(index))
+			// 		let offset = 0
+			// 		if (matches) {
+			// 			offset = matches[0].length
+			// 		}
+			// 		data.push({
+			// 			type: A,
+			// 			syntax: [HTTPS],
+			// 			href: matches[0],
+			// 			children: matches[0].slice(HTTPS.length),
+			// 		})
+			// 		index += offset - 1
+			// 		continue
+			// 	// http://
+			// 	//
+			// 	// TODO: Eat "www."
+			// 	} else if (nchars >= HTTP.length && str.slice(index, index + HTTP.length) === HTTP) {
+			// 		const matches = safeURLRe.exec(str.slice(index))
+			// 		let offset = 0
+			// 		if (matches) {
+			// 			offset = matches[0].length
+			// 		}
+			// 		data.push({
+			// 			type: A,
+			// 			syntax: [HTTP],
+			// 			href: matches[0],
+			// 			children: matches[0].slice(HTTP.length),
+			// 		})
+			// 		index += offset - 1
+			// 		continue
+			// 	}
+			// 	// No-op
+			// 	break
+			// // <A> (2 of 2)
+			// case char === "[":
+			// 	// [A](href)
+			// 	if (nchars >= "[x](x)".length) {
+			// 		const lhs = registerType(null, "]")(str, index)
+			// 		if (!lhs) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		// Check ( syntax:
+			// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		const rhs = registerType(null, ")", { recurse: false })(str, lhs.x2)
+			// 		if (!rhs) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		data.push({
+			// 			type: A,
+			// 			// syntax: ["[", "](…)"],
+			// 			syntax: ["[", `](${rhs.data.children})`],
+			// 			href: rhs.data.children.trim(),
+			// 			children: lhs.data.children,
+			// 		})
+			// 		index = rhs.x2 - 1
+			// 		continue
+			// 	}
+			// 	// No-op
+			// 	break
 
 		default:
 
