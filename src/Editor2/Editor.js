@@ -92,14 +92,12 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 						`codex-editor${
 							!className ? "" : ` ${className}`
 						}${
-							!state.readOnly ? "" : " feature-read-only" // Needed?
+							!state.readOnly ? "" : " feature-read-only"
 						}`,
 
 					style: {
 						...style, // Takes precedence
-
 						...attrs.contenteditable,
-						// caretColor: "black", // Move to CSS?
 					},
 
 					onFocus: () => setState(current => ({ ...current, focused: true })),
