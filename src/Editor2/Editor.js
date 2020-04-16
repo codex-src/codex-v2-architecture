@@ -78,28 +78,6 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 		],
 	)
 
-	// Binds read-only shortcut.
-	React.useEffect(
-		React.useCallback(() => {
-			const handler = e => {
-				if (e.keyCode !== keyCodes.P) {
-					// No-op
-					return
-				}
-				e.preventDefault()
-				setState(current => ({
-					...current,
-					readOnly: !state.readOnly,
-				}))
-			}
-			document.addEventListener("keydown", handler)
-			return () => {
-				document.removeEventListener("keydown", handler)
-			}
-		}, [state, setState]),
-		[state.readOnly],
-	)
-
 	return (
 		<div>
 

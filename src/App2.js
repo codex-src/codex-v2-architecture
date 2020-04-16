@@ -1,4 +1,5 @@
 import Editor from "Editor2/Editor"
+import keyCodes from "Editor2/keyCodes"
 import raw from "raw.macro"
 import React from "react"
 import useEditor from "Editor2/useEditor"
@@ -33,6 +34,28 @@ const App = () => {
 			clearTimeout(id)
 		}
 	}, [state.data])
+
+	// Binds read-only shortcut.
+	React.useEffect(
+		React.useCallback(() => {
+			const handler = e => {
+				if (!e.metaKey || e.keyCode !== keyCodes.P) {
+					// No-op
+					return
+				}
+				e.preventDefault()
+				setState(current => ({
+					...current,
+					readOnly: !state.readOnly,
+				}))
+			}
+			document.addEventListener("keydown", handler)
+			return () => {
+				document.removeEventListener("keydown", handler)
+			}
+		}, [state, setState]),
+		[state.readOnly],
+	)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
