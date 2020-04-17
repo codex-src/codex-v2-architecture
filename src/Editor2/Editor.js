@@ -236,13 +236,13 @@ const Editor = ({
 						const data = [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)]
 						const [pos1, pos2] = computePosRange(ref.current)
 
-						// Correct pos1 (from out of bounds):
+						// Correct pos1 (when out of bounds):
 						const p1 = data.findIndex(each => each.id === pos1.root.id)
 						if (p1 >= 0 && p1 + 1 < data.length && pos1.root.offset > data[p1].raw.length) {
 							pos1.root.id = data[p1 + 1].id
 							pos1.root.offset = pos1.node.offset
 						}
-						// Correct pos2 (from out of bounds):
+						// Correct pos2 (when out of bounds):
 						const p2 = data.findIndex(each => each.id === pos2.root.id)
 						if (p2 >= 0 && p2 + 1 < data.length && pos2.root.offset > data[p2].raw.length) {
 							pos2.root.id = data[p2 + 1].id
@@ -253,9 +253,7 @@ const Editor = ({
 							...current,
 							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 							pos1,
-							pos2: { ...pos1 },
-							// pos2,
-
+							pos2,
 							// NOTE: Do not extendPosRange here; defer to
 							// useLayoutEffect
 						}))
