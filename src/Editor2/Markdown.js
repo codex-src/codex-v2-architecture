@@ -25,24 +25,24 @@ const Syntax = props => {
 	if (!props.children || state.readOnly) {
 		return null
 	}
-	// NOTE: props.className does **not** concatenate
+	// NOTE: props.className does not concatenate
 	return <span className="text-md-blue-a400" {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const [s1, s2] = parseSyntax(syntax)
+	const [syntax1, syntax2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 
 			{/* LHS */}
 			<Syntax {...props}>
-				{s1}
+				{syntax1}
 			</Syntax>
 
 			{/* RHS */}
 			{props.children}
 			<Syntax {...props}>
-				{s2}
+				{syntax2}
 			</Syntax>
 
 		</React.Fragment>

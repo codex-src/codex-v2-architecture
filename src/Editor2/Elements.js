@@ -31,7 +31,7 @@ function toReact(children) {
 
 // Trims extraneous spaces.
 function trim(str) {
-	return str.replace(/ +/, " ") // Trims extra spaces
+	return str.replace(/ +/g, " ")
 }
 
 const headerClassNames = {

@@ -3,7 +3,7 @@
 	letter-spacing: -0.01em;
 	line-height: 1.5;
 }
-.codex-editor .font-mono { /* TODO: Rename to .monospace */
+.codex-editor .font-mono {
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
 	line-height: 1.375;
@@ -25,11 +25,6 @@
 .codex-editor:not(.feature-read-only) ::selection {
 	background-color: #448aff3f;
 }
-
-/* TODO */
-/* .codex-editor.feature-read-only .syntax { */
-/* 	display: none; */
-/* } */
 
 /* TODO: Is there a better way to do this? */
 .codex-editor .text-lg .font-bold,
