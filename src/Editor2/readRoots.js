@@ -2,42 +2,42 @@ import uuidv4 from "uuid/v4"
 
 // Reads a data-codex-root element.
 function readRoot(root) {
-	const unparsed = [{ id: root.id, raw: "" }]
+	const nodes = [{ id: root.id, data: "" }]
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
-			unparsed[unparsed.length - 1].raw += on.nodeValue
+			nodes[nodes.length - 1].data += on.nodeValue
 			return
 		}
 		for (const each of on.childNodes) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-codex-node")) {
-				unparsed.push({ id: next.id, raw: "" })
+				nodes.push({ id: next.id, data: "" })
 			}
 		}
 	}
 	recurse(root)
-	return unparsed
+	return nodes
 }
 
 // Reads a range of data-codex-root elements.
-function readRoots(editorRoot, [startRoot, endRoot]) {
-	const unparsed = []
+function readRoots(editorRoot, [root1, root2]) {
+	const nodes = []
 	const seen = {}
-	while (startRoot) {
+	while (root1) {
 		// Guard repeat IDs:
-		if (!startRoot.id || seen[startRoot.id]) {
-			startRoot.id = uuidv4()
+		if (!root1.id || seen[root1.id]) {
+			root1.id = uuidv4()
 		}
-		seen[startRoot.id] = true
-		unparsed.push(...readRoot(startRoot))
-		if (startRoot === endRoot) {
+		seen[root1.id] = true
+		nodes.push(...readRoot(root1))
+		if (root1 === root2) {
 			// No-op
 			break
 		}
-		startRoot = startRoot.nextElementSibling
+		root1 = root1.nextElementSibling
 	}
-	return unparsed
+	return nodes
 }
 
 export default readRoots

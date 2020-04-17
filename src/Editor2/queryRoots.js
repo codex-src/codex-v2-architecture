@@ -1,28 +1,36 @@
 import uuidv4 from "uuid/v4"
 
+// Ascends to the nearest data-codex-root element.
+function ascend(node) {
+	while (node && (!node.getAttribute || !node.getAttribute("data-codex-root"))) {
+		node = node.parentElement
+	}
+	return node
+}
+
 // Queries data-codex-root elements.
-function queryRoots(editorRoot, extendedPosRange) {
-	const root1 = document.getElementById(extendedPosRange[0])
-	if (!root1 || !editorRoot.contains(root1)) {
-		throw new Error("queryRoots: no such root1 or out of bounds")
+function queryRoots(editorRoot, [extPos1ID, extPos2ID]) {
+	const node1 = ascend(document.getElementById(extPos1ID))
+	if (!node1 || !editorRoot.contains(node1)) {
+		throw new Error("queryRoots: no such node1 or out of bounds")
 	}
-	let root2 = document.getElementById(extendedPosRange[1])
-	let root2AtEnd = false
-	// Guard enter pressed on root2:
-	const nextRoot = root2 && root2.nextElementSibling
-	if (nextRoot && nextRoot.getAttribute("data-codex-root") && (!nextRoot.id || nextRoot.id === root2.id)) {
-		nextRoot.id = uuidv4() // Correct the ID
-		root2 = nextRoot
-		root2AtEnd = true
-	// Guard backspaced pressed on root2:
-	} else if (!root2) {
-		root2 = editorRoot.children[editorRoot.children.length - 1]
-		root2AtEnd = true
+	let node2 = ascend(document.getElementById(extPos2ID))
+	let node2AtEnd = false
+	// Guard enter pressed on node2:
+	const next = node2 && node2.nextElementSibling
+	if (next && next.getAttribute("data-codex-root") && (!next.id || next.id === node2.id)) {
+		next.id = uuidv4() // Correct the ID
+		node2 = next
+		node2AtEnd = true
+	// Guard backspace or forward-backspace pressed on node2:
+	} else if (!node2) {
+		node2 = editorRoot.children[editorRoot.children.length - 1]
+		node2AtEnd = true
 	}
-	if (!root2 || !editorRoot.contains(root2)) {
-		throw new Error("queryRoots: no such root2 or out of bounds")
+	if (!node2 || !editorRoot.contains(node2)) {
+		throw new Error("queryRoots: no such node2 or out of bounds")
 	}
-	return { roots: [root1, root2], root2AtEnd }
+	return { roots: [node1, node2], atEnd: node2AtEnd }
 }
 
 export default queryRoots

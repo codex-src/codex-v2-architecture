@@ -18,7 +18,6 @@ function computePos(editorRoot, { ...range }) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
 	}
-	// Recurses on a node or element.
 	const recurse = on => {
 		if (on === range.node) {
 			Object.assign(pos, {

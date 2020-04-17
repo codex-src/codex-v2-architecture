@@ -2,20 +2,24 @@
 // import extendPosRange from "./extendPosRange"
 // import keyCodes from "./keyCodes"
 // import parse from "./parser"
-// import queryRoots from "./queryRoots"
-// import readRoots from "./readRoots"
 // import syncPos from "./syncPos"
 import attrs from "./attrs"
 import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
+import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
+import readRoots from "./readRoots"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 
 import "./Editor.css"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
+
+;(() => {
+	document.body.classList.toggle("debug-css")
+})()
 
 // TODO: Add React.memo?
 const ReactEditor = ({ state, dispatch }) => {
@@ -40,10 +44,6 @@ const ReactEditor = ({ state, dispatch }) => {
 // 	return ok
 // }
 
-// ;(() => {
-// 	document.body.classList.toggle("debug-css")
-// })()
-
 const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	const ref = React.useRef()
 
@@ -54,7 +54,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		dispatch.registerProps(readOnly)
 	}, [readOnly, dispatch])
 
-	// Renders to the DOM.
+	// Renders the VDOM to the DOM.
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
@@ -81,10 +81,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 				// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 			})
 		}, [state, dispatch]),
-		[
-			state.reactVDOM,
-			state.readOnly,
-		],
+		[state.readOnly, state.reactVDOM],
 	)
 
 	return (
@@ -154,10 +151,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							selection.addRange(range)
 						}
 						const [pos1, pos2] = computePosRange(ref.current)
-						console.log(pos1, pos2)
-						// const extendedPosRange = extendPosRange(state, [pos1, pos2])
 						dispatch.select(pos1, pos2)
-						// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 
 					onPointerDown: () => {
@@ -177,9 +171,8 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							pointerDownRef.current = false // Reset to be safe
 							return
 						}
-						// const [pos1, pos2] = computePosRange(ref.current)
-						// const extendedPosRange = extendPosRange(state, [pos1, pos2])
-						// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.select(pos1, pos2)
 					},
 					onPointerUp: () => {
 						if (state.readOnly) {
@@ -194,7 +187,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// TODO
+						// TODO: Enter, etc.
 					},
 
 					// TODO: onCompositionEnd
@@ -211,6 +204,15 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						// 	}))
 						// 	return
 						// }
+
+						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extendedPosRange)
+						const nodes = readRoots(ref.current, [root1, root2])
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.input(nodes, atEnd, [pos1, pos2])
+
+						// const [pos1, pos2] = computePosRange(ref.current)
+						// dispatch.input(nodes, atEnd, [pos1, pos2])
+
 						// const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extendedPosRange)
 						// const x1 = state.data.findIndex(each => each.id === root1.id)
 						// if (x1 === -1) {
@@ -253,7 +255,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 			)}
 
 			{DEBUG_MODE && (
-				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ tabSize: 2 }}>
+				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
 					{JSON.stringify(
 						{
 							// extendedPosRange: state.extendedPosRange,
