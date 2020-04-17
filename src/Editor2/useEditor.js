@@ -1,7 +1,5 @@
 import parse from "./parser"
-import React from "react"
 import useMethods from "use-methods"
-import uuidv4 from "uuid/v4"
 
 import {
 	newNodes,
@@ -18,7 +16,7 @@ function initialState(initialValue) {
 		pos1: newPos(),                          // Start cursor data structure
 		pos2: newPos(),                          // End cursor data structure
 		extendedPosRange: ["", ""],              // Extended node (ID) range
-		vdom: parse(nodes),                      // VDOM
+		reactVDOM: parse(nodes),                 // React VDOM
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return state

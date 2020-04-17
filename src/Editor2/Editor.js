@@ -1,15 +1,15 @@
 // import actions from "./actions"
 // import computePosRange from "./computePosRange"
 // import extendPosRange from "./extendPosRange"
+// import keyCodes from "./keyCodes"
+// import parse from "./parser"
+// import queryRoots from "./queryRoots"
+// import readRoots from "./readRoots"
 // import syncPos from "./syncPos"
 import attrs from "./attrs"
 import EditorContext from "./EditorContext"
-import keyCodes from "./keyCodes"
-import parse from "./parser"
-import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
-import readRoots from "./readRoots"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 
@@ -17,38 +17,34 @@ import "./Editor.css"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
-const ReactEditor = ({ state, dispatch }) => (
-	<EditorContext.Provider value={[state, dispatch]}>
-		{state.vdom.map(({ type: T, ...each }) => (
-			React.createElement(typeMap[T], {
-				key: each.id,
-				...each,
-			})
-		))}
-	</EditorContext.Provider>
-)
-
-function shouldRenderPos(state) {
-	const ok = (
-		state.focused &&
-		!state.readOnly
+// TODO: Add React.memo?
+const ReactEditor = ({ state, dispatch }) => {
+	const { Provider } = EditorContext
+	return (
+		<Provider value={[state, dispatch]}>
+			{state.reactVDOM.map(({ type: T, ...each }) => (
+				React.createElement(typeMap[T], {
+					key: each.id,
+					...each,
+				})
+			))}
+		</Provider>
 	)
-	return ok
 }
+
+// function shouldRenderPos(state) {
+// 	const ok = (
+// 		state.focused &&
+// 		!state.readOnly
+// 	)
+// 	return ok
+// }
 
 // ;(() => {
 // 	document.body.classList.toggle("debug-css")
 // })()
 
-const Editor = ({
-	tag,
-	id,
-	className,
-	style,
-	state,
-	dispatch,
-	readOnly,
-}) => {
+const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -86,7 +82,7 @@ const Editor = ({
 			})
 		}, [state, dispatch]),
 		[
-			state.vdom,
+			state.reactVDOM,
 			state.readOnly,
 		],
 	)
@@ -262,8 +258,8 @@ const Editor = ({
 							// id: state.data.map(each => each.id),
 
 							...state,
-							vdom: undefined,
-							reactDOM: undefined, // Obscure
+							reactVDOM: undefined,
+							reactDOM: undefined,
 						},
 						null,
 						"\t",
