@@ -15,7 +15,7 @@ import typeMap from "./typeMap"
 
 import "./Editor.css"
 
-const DEBUG_MODE = false && process.env.NODE_ENV !== "production"
+const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
 const Document = ({ state, setState }) => (
 	<EditorContext.Provider value={[state, setState]}>
@@ -40,10 +40,30 @@ function shouldRenderPos(state) {
 	return ok
 }
 
-const Editor = ({ tag, id, className, style, state, setState }) => {
+const Editor = ({
+	tag,
+	id,
+	className,
+	style,
+	state,
+	setState,
+	fontSmoothing,
+}) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
+
+	// Register features.
+	//
+	// TODO: Validate features?
+	React.useLayoutEffect(() => {
+		setState(current => ({
+			...current,
+			fontSmoothing,
+		}))
+	}, [
+		fontSmoothing,
+	])
 
 	// Renders to the DOM.
 	const mounted = React.useRef()
@@ -95,6 +115,8 @@ const Editor = ({ tag, id, className, style, state, setState }) => {
 					className:
 						`codex-editor${
 							!className ? "" : ` ${className}`
+						}${
+							!state.fontSmoothing ? "" : " feature-font-smoothing"
 						}${
 							!state.readOnly ? "" : " feature-read-only"
 						}`,

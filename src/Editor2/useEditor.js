@@ -10,6 +10,7 @@ function useEditor(initialValue) {
 	}))
 	const reactDOM = document.createElement("div")
 	const [state, setState] = React.useState(() => ({
+		fontSmoothing: false,       // Enable anti-aliasing?
 		readOnly: false,            // Is read-only?
 		focused: false,             // Is focused?
 		data: parse(unparsed),      // Document data

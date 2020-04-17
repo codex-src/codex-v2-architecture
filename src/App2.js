@@ -62,10 +62,12 @@ const App = () => {
 			<div className="px-6 w-full max-w-screen-md">
 
 				<Editor
+					tag="article"
 					id="main-editor"
 					style={{ fontSize: 18 }}
 					state={state}
 					setState={setState}
+					// fontSmoothing
 				/>
 
 			</div>

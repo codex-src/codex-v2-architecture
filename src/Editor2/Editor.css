@@ -4,7 +4,7 @@
 
 	font-family: "Inter var", sans-serif;
 	letter-spacing: -0.01em;
-	/* line-height: 1.625; */
+	line-height: 1.5;
 }
 .codex-editor * {
 	caret-color: #000;
@@ -14,13 +14,20 @@
 }
 
 .codex-editor .font-mono {
-	/* -moz-osx-font-smoothing: auto; */
-	/* -webkit-font-smoothing:  auto; */
-
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
 	line-height: 1.375;
 }
+
+.codex-editor.feature-font-smoothing {
+	-webkit-font-smoothing:  antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* TODO */
+/* .codex-editor.feature-read-only .syntax { */
+/* 	display: none; */
+/* } */
 
 /* TODO: Is there a better way to do this? */
 .codex-editor .text-lg .font-bold,
