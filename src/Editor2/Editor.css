@@ -1,4 +1,6 @@
 .codex-editor {
+	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
+
 	font-family: "Inter var", sans-serif;
 	letter-spacing: -0.01em;
 	/* line-height: 1.5; */
@@ -64,10 +66,18 @@
 
 /* --md-blue-a200: #448aff; */
 /* --md-blue-a400: #2979ff; */
-/* .codex-editor:not(.feature-read-only) [data-codex-node] > span, */
-/* .codex-editor:not(.feature-read-only) [data-codex-root] > span { */
-/* 	background-color: #448aff0f; */
-/* } */
+.codex-editor:not(.feature-read-only) [data-codex-node] > span:not(.font-mono),
+.codex-editor:not(.feature-read-only) [data-codex-root] > span:not(.font-mono) {
+	padding: 2.5px 0;
+	/* border-radius: 0.25em; */
+	transition-duration: 200ms;
+}
+.codex-editor:not(.feature-read-only) [data-codex-node] > span:not(.font-mono):hover,
+.codex-editor:not(.feature-read-only) [data-codex-root] > span:not(.font-mono):hover {
+	background-color: #448aff1f;
+	/* border-radius: 0.25em; */
+	transition-duration: 200ms;
+}
 
 /* .codex-editor.feature-read-only ul > li:not(.checked):before { */
 /* 	margin-right: 0.5em; */
