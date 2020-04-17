@@ -45,8 +45,6 @@ const headerClassNames = {
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<Root id={id} className={headerClassNames[tag]}>
-		{/* NOTE: Use className="block" because of
-		contenteditable */}
 		<a id={hash} className="block" href={`#${hash}`}>
 			<Markdown syntax={syntax}>
 				{toReact(children) || (
@@ -68,12 +66,11 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const [state] = useEditorSetState()
 
-	// FIXME
-	const style = state.readOnly && { paddingLeft: "calc(32 / 16 * 1em)" }
 	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
+	const style = state.readOnly && { paddingLeft: "calc(32 / 16 * 1em)" }
 	return (
 		<Node id={id} style={style}>
-			<Markdown className="text-md-blue-a400" syntax={syntax}>
+			<Markdown className="text-md-blue-a200" syntax={syntax}>
 				{toReact(children) || (
 					<br />
 				)}
