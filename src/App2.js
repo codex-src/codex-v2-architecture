@@ -68,7 +68,6 @@ const App = () => {
 					// style={{ fontSize: 18 }}
 					state={state}
 					setState={setState}
-					fontSmoothing
 					// readOnly
 				/>
 

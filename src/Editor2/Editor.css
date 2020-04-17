@@ -9,19 +9,9 @@
 	line-height: 1.375;
 }
 
-/* font-smoothing */
-.codex-editor:not(.feature-font-smoothing) {
-	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
-}
-.codex-editor.feature-font-smoothing {
-	-moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased;
-}
-
-/* caret-color */
 .codex-editor:not(.feature-read-only) * {
 	caret-color: #000;
 }
-/* ::selection background-color */
 .codex-editor:not(.feature-read-only) ::selection {
 	background-color: #448aff3f;
 }

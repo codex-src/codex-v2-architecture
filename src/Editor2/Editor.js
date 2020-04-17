@@ -47,7 +47,6 @@ const Editor = ({
 	style,
 	state,
 	setState,
-	fontSmoothing,
 	readOnly,
 }) => {
 	const ref = React.useRef()
@@ -58,10 +57,12 @@ const Editor = ({
 	React.useLayoutEffect(() => {
 		setState(current => ({
 			...current,
-			fontSmoothing,
 			readOnly,
 		}))
-	}, [fontSmoothing, readOnly])
+	}, [
+		readOnly,
+		setState,
+	])
 
 	// Renders to the DOM.
 	const mounted = React.useRef()
@@ -113,8 +114,6 @@ const Editor = ({
 					className:
 						`codex-editor${
 							!className ? "" : ` ${className}`
-						}${
-							!state.fontSmoothing ? "" : " feature-font-smoothing"
 						}${
 							!state.readOnly ? "" : " feature-read-only"
 						}`,
