@@ -88,7 +88,7 @@ export const Blockquote = React.memo(({ id, children }) => {
 	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
 	return (
 		<Root id={id} style={style}>
-			{children.map(({ type: T, children, ...each }) => (
+			{children.map(({ type: T, ...each }) => (
 				React.createElement(typeMap[T], {
 					key: each.id,
 					...each,

@@ -22,7 +22,8 @@ const initialValue = (() => {
 })()
 
 const App = () => {
-	const [state, setState] = useEditor(initialValue)
+	// const [state, setState] = useEditor(initialValue)
+	const [state, setState] = useEditor(`> Hello`)
 
 	// Write to localStorage:
 	React.useEffect(() => {

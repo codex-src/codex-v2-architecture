@@ -10,13 +10,7 @@ function useEditor(initialValue) {
 	}))
 	const reactDOM = document.createElement("div")
 	const [state, setState] = React.useState(() => ({
-		// Features:
-		fontSmoothing: false,
-		readOnly: false,
-		caretColor: "#000",
-		// selectionColor: "#000"
-
-		// State:
+		readOnly: false,            // Is read-only?
 		focused: false,             // Is focused?
 		data: parse(unparsed),      // Document data
 		pos1: newPos(),             // Start cursor data structure

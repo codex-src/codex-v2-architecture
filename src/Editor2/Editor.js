@@ -57,7 +57,7 @@ const Editor = ({
 	React.useLayoutEffect(() => {
 		setState(current => ({
 			...current,
-			readOnly,
+			readOnly: Boolean(readOnly),
 		}))
 	}, [
 		readOnly,
