@@ -7,6 +7,7 @@ const typeEnum = new Enum(
 	"Break",
 
 	// Inline elements:
+	"Escape",
 	"Emoji",
 	"Emphasis",
 	"Strong",

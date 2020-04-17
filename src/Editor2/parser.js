@@ -33,10 +33,10 @@ import {
 // 	return { parsed, index }
 // }
 
-// Parses a type.
+// Parses a GitHub Flavored Markdown (GFM) type.
 //
 // NOTE: Does not match start syntax
-function parseType({
+function parseGFMType({
 	type,   // The parsed enum type
 	syntax, // The syntax (end syntax) // TODO: Rename to endSyntax?
 	str,    // Argument string
@@ -96,26 +96,26 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		const char = str[index]
 		const nchars = str.length - index
 		switch (true) {
-
-		// // <Escape>
-		// case char === "\\":
-	 	// 	if (index + 1 < str.length && isASCIIPunctuation(str[index + 1])) {
-		// 		data.push({
-		// 			type: Escape,
-		// 			syntax: [char],
-		// 			children: str[index + 1],
-		// 		})
-		// 		index++
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
-
+		// <Escape>
+		case char === "\\":
+	 		if (index + 1 < str.length && isASCIIPunctuation(str[index + 1])) {
+				parsed.push({
+					type: typeEnum.Escape,
+					syntax: [char],
+					children: str[index + 1],
+				})
+				// Increment to the next character; the punctuation
+				// character is auto-incremented:
+				index++
+				continue
+			}
+			// No-op
+			break
 		// <StrongEm> OR <Strong> OR <Em>
 		case char === "*" || char === "_":
 			// ***Strong emphasis*** OR ___Strong emphasis___
 			if (nchars >= "***x***".length && str.slice(index, index + 3) === char.repeat(3)) {
-				const res = parseType({
+				const res = parseGFMType({
 					type: typeEnum.StrongEmphasis,
 					syntax: char.repeat(3),
 					str,
@@ -130,7 +130,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				continue
 			// **Strong** OR __Strong__
 			} else if (nchars >= "**x**".length && str.slice(index, index + 2) === char.repeat(2)) {
-				const res = parseType({
+				const res = parseGFMType({
 					type: typeEnum.Strong,
 					syntax: char.repeat(2),
 					str,
@@ -145,7 +145,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				continue
 			// _Emphasis_ OR *Emphasis*
 			} else if (nchars >= "*x*".length) {
-				const res = parseType({
+				const res = parseGFMType({
 					type: typeEnum.Emphasis,
 					syntax: char,
 					str,
@@ -165,7 +165,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		case char === "~":
 			// ~~Strikethrough~~
 			if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
-				const res = parseType({
+				const res = parseGFMType({
 					type: typeEnum.Strikethrough,
 					syntax: char.repeat(2),
 					str,
@@ -180,7 +180,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				continue
 			// ~Strikethrough~
 			} else if (nchars >= "~x~".length) {
-				const res = parseType({
+				const res = parseGFMType({
 					type: typeEnum.Strikethrough,
 					syntax: char,
 					str,
@@ -199,7 +199,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// <Code>
 		case char === "`":
 			// `Code`
-			const res = parseType({
+			const res = parseGFMType({
 				type: typeEnum.Code,
 				syntax: char,
 				str,

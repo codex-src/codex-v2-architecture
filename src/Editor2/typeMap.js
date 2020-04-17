@@ -10,6 +10,7 @@ import {
 	Code,
 	Emoji,
 	Emphasis,
+	Escape,
 	Strikethrough,
 	Strong,
 	StrongEmphasis,
@@ -22,6 +23,7 @@ const typeMap = {
 	[typeEnum.Break]: Break,
 
 	// Inline elements:
+	[typeEnum.Escape]: Escape,
 	[typeEnum.Emoji]: Emoji,
 	[typeEnum.Emphasis]: Emphasis,
 	[typeEnum.Strong]: Strong,

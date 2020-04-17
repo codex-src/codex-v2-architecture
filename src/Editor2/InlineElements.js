@@ -2,15 +2,13 @@ import attrs from "./attrs"
 import Markdown from "./Markdown"
 import React from "react"
 
-// TODO: Renamed children to parsed?
-
-// export const Escape = ({ syntax, children }) => (
-// 	<span>
-// 		<Markdown syntax={syntax}>
-// 			{children}
-// 		</Markdown>
-// 	</span>
-// )
+export const Escape = ({ syntax, children }) => (
+	// <span>
+	<Markdown syntax={syntax}>
+		{children}
+	</Markdown>
+	// </span>
+)
 
 export const Emoji = ({ description, children }) => (
 	<span className="emoji" aria-label={description} role="img">
