@@ -1,15 +1,15 @@
-import actions from "./actions"
+// import actions from "./actions"
+// import computePosRange from "./computePosRange"
+// import extendPosRange from "./extendPosRange"
+// import syncPos from "./syncPos"
 import attrs from "./attrs"
-import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
-import extendPosRange from "./extendPosRange"
 import keyCodes from "./keyCodes"
 import parse from "./parser"
 import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
-import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 
@@ -28,10 +28,6 @@ const Document = ({ state, setState }) => (
 	</EditorContext.Provider>
 )
 
-// ;(() => {
-// 	document.body.classList.toggle("debug-css")
-// })()
-
 function shouldRenderPos(state) {
 	const ok = (
 		state.focused &&
@@ -40,62 +36,60 @@ function shouldRenderPos(state) {
 	return ok
 }
 
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
+
 const Editor = ({
 	tag,
 	id,
 	className,
 	style,
 	state,
-	setState,
+	dispatch,
 	readOnly,
 }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
 
-	// Register features.
+	// Registers props.
 	React.useLayoutEffect(() => {
-		setState(current => ({
-			...current,
-			readOnly: Boolean(readOnly),
-		}))
-	}, [
-		readOnly,
-		setState,
-	])
+		dispatch.registerProps(readOnly)
+	}, [readOnly, dispatch])
 
-	// Renders to the DOM.
-	const mounted = React.useRef()
-	React.useLayoutEffect(
-		React.useCallback(() => {
-			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
-				// Sync user-managed DOM to the React-managed DOM:
-				const mutations = syncTrees(state.reactDOM, ref.current)
-				if (!mounted.current || !shouldRenderPos(state)) {
-					mounted.current = true
-					return
-				}
-				if (mutations) {
-					const s = !mutations ? "" : "s"
-					console.log(`syncTrees: ${mutations} mutation${s}`)
-				}
-				// Sync DOM cursors to the VDOM cursors:
-				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-				if (syncedPos) {
-					console.log("syncPos")
-				}
-				// Update extendedPosRange for edge-cases such as
-				// forward-backspace:
-				const [pos1, pos2] = computePosRange(ref.current)
-				const extendedPosRange = extendPosRange(state, [pos1, pos2])
-				setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
-			})
-		}, [state, setState]),
-		[
-			state.data,
-			state.readOnly,
-		],
-	)
+	// // Renders to the DOM.
+	// const mounted = React.useRef()
+	// React.useLayoutEffect(
+	// 	React.useCallback(() => {
+	// 		ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
+	// 			// Sync user-managed DOM to the React-managed DOM:
+	// 			const mutations = syncTrees(state.reactDOM, ref.current)
+	// 			if (!mounted.current) { // || !shouldRenderPos(state)) {
+	// 				mounted.current = true
+	// 				return
+	// 			}
+	// 			if (mutations) {
+	// 				const s = !mutations ? "" : "s"
+	// 				console.log(`syncTrees: ${mutations} mutation${s}`)
+	// 			}
+	// 			// // Sync DOM cursors to the VDOM cursors:
+	// 			// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+	// 			// if (syncedPos) {
+	// 			// 	console.log("syncPos")
+	// 			// }
+	// 			// // Update extendedPosRange for edge-cases such as
+	// 			// // forward-backspace:
+	// 			// const [pos1, pos2] = computePosRange(ref.current)
+	// 			// const extendedPosRange = extendPosRange(state, [pos1, pos2])
+	// 			// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+	// 		})
+	// 	}, [state, setState]),
+	// 	[
+	// 		state.data,
+	// 		state.readOnly,
+	// 	],
+	// )
 
 	return (
 		<div>
@@ -124,14 +118,14 @@ const Editor = ({
 							// No-op
 							return
 						}
-						setState(current => ({ ...current, focused: true }))
+						dispatch.focus()
 					},
 					onBlur:  () => {
 						if (state.readOnly) {
 							// No-op
 							return
 						}
-						setState(current => ({ ...current, focused: false }))
+						dispatch.blur()
 					},
 
 					onSelect: () => {
@@ -163,9 +157,9 @@ const Editor = ({
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
-						const [pos1, pos2] = computePosRange(ref.current)
-						const extendedPosRange = extendPosRange(state, [pos1, pos2])
-						setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+						// const [pos1, pos2] = computePosRange(ref.current)
+						// const extendedPosRange = extendPosRange(state, [pos1, pos2])
+						// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 
 					onPointerDown: () => {
@@ -185,9 +179,9 @@ const Editor = ({
 							pointerDownRef.current = false // Reset to be safe
 							return
 						}
-						const [pos1, pos2] = computePosRange(ref.current)
-						const extendedPosRange = extendPosRange(state, [pos1, pos2])
-						setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+						// const [pos1, pos2] = computePosRange(ref.current)
+						// const extendedPosRange = extendPosRange(state, [pos1, pos2])
+						// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 					onPointerUp: () => {
 						if (state.readOnly) {
@@ -202,11 +196,7 @@ const Editor = ({
 							// No-op
 							return
 						}
-						if (e.keyCode === keyCodes.Enter) {
-							e.preventDefault()
-							actions.enter(state, setState)
-							return
-						}
+						// TODO
 					},
 
 					// TODO: onCompositionEnd
@@ -215,48 +205,48 @@ const Editor = ({
 							// No-op
 							return
 						}
-						// Force re-render when empty:
-						if (!ref.current.childNodes.length) {
-							setState(current => ({
-								...current,
-								data: [...state.data],
-							}))
-							return
-						}
-						const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extendedPosRange)
-						const x1 = state.data.findIndex(each => each.id === root1.id)
-						if (x1 === -1) {
-							throw new Error("onInput: x1 out of bounds")
-						}
-						const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
-						if (x2 === -1) {
-							throw new Error("onInput: x2 out of bounds")
-						}
-						const unparsed = readRoots(ref.current, [root1, root2])
-						const data = [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)]
-						const [pos1, pos2] = computePosRange(ref.current)
-
-						// Correct pos1 (when out of bounds):
-						const p1 = data.findIndex(each => each.id === pos1.root.id)
-						if (p1 >= 0 && p1 + 1 < data.length && pos1.root.offset > data[p1].raw.length) {
-							pos1.root.id = data[p1 + 1].id
-							pos1.root.offset = pos1.node.offset
-						}
-						// Correct pos2 (when out of bounds):
-						const p2 = data.findIndex(each => each.id === pos2.root.id)
-						if (p2 >= 0 && p2 + 1 < data.length && pos2.root.offset > data[p2].raw.length) {
-							pos2.root.id = data[p2 + 1].id
-							pos2.root.offset = pos2.node.offset
-						}
-
-						setState(current => ({
-							...current,
-							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-							pos1,
-							pos2,
-							// NOTE: Do not extendPosRange here; defer to
-							// useLayoutEffect
-						}))
+						// // Force re-render when empty:
+						// if (!ref.current.childNodes.length) {
+						// 	setState(current => ({
+						// 		...current,
+						// 		data: [...state.data],
+						// 	}))
+						// 	return
+						// }
+						// const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extendedPosRange)
+						// const x1 = state.data.findIndex(each => each.id === root1.id)
+						// if (x1 === -1) {
+						// 	throw new Error("onInput: x1 out of bounds")
+						// }
+						// const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
+						// if (x2 === -1) {
+						// 	throw new Error("onInput: x2 out of bounds")
+						// }
+						// const unparsed = readRoots(ref.current, [root1, root2])
+						// const data = [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)]
+						// const [pos1, pos2] = computePosRange(ref.current)
+						//
+						// // // Correct pos1 (when out of bounds):
+						// // const p1 = data.findIndex(each => each.id === pos1.root.id)
+						// // if (p1 >= 0 && p1 + 1 < data.length && pos1.root.offset > data[p1].raw.length) {
+						// // 	pos1.root.id = data[p1 + 1].id
+						// // 	pos1.root.offset = pos1.node.offset
+						// // }
+						// // // Correct pos2 (when out of bounds):
+						// // const p2 = data.findIndex(each => each.id === pos2.root.id)
+						// // if (p2 >= 0 && p2 + 1 < data.length && pos2.root.offset > data[p2].raw.length) {
+						// // 	pos2.root.id = data[p2 + 1].id
+						// // 	pos2.root.offset = pos2.node.offset
+						// // }
+						//
+						// setState(current => ({
+						// 	...current,
+						// 	data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
+						// 	pos1,
+						// 	pos2,
+						// 	// NOTE: Do not extendPosRange here; defer to
+						// 	// useLayoutEffect
+						// }))
 					},
 
 					contentEditable: !state.readOnly,

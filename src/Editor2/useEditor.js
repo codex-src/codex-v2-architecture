@@ -1,24 +1,49 @@
 import parse from "./parser"
 import React from "react"
+import useMethods from "use-methods"
 import uuidv4 from "uuid/v4"
-import { newPos } from "./constructors"
+
+import {
+	newNodes,
+	newPos,
+} from "./constructors"
+
+function initialState(initialValue) {
+	const nodes = newNodes(initialValue)
+	const state = {
+		readOnly: false,                         // Is read-only?
+		focused: false,                          // Is focused?
+		data: initialValue,                      // Data (string)
+		nodes,                                   // Document nodes
+		pos1: newPos(),                          // Start cursor data structure
+		pos2: newPos(),                          // End cursor data structure
+		parsed: parse(nodes),                    // Parsed document nodes
+		extendedPosRange: ["", ""],              // Extended node (ID) range
+		reactDOM: document.createElement("div"), // React-managed DOM
+	}
+	return state
+}
+
+function methods(state) {
+	const dispatch = {
+		// Registers props.
+		registerProps(readOnly) {
+			state.readOnly = readOnly
+		},
+		// Focuses the editor.
+		focus() {
+			state.focused = true
+		},
+		// Blurs the editor.
+		blur() {
+			state.focused = false
+		},
+	}
+	return dispatch
+}
 
 function useEditor(initialValue) {
-	const unparsed = initialValue.split("\n").map(each => ({
-		id: uuidv4(),
-		raw: each,
-	}))
-	const reactDOM = document.createElement("div")
-	const [state, setState] = React.useState(() => ({
-		readOnly: false,            // Is read-only?
-		focused: false,             // Is focused?
-		data: parse(unparsed),      // Document data
-		pos1: newPos(),             // Start cursor data structure
-		pos2: newPos(),             // End cursor data structure
-		extendedPosRange: ["", ""], // Extended cursor ID (root ID) range
-		reactDOM,                   // The React-managed DOM
-	}))
-	return [state, setState]
+	return useMethods(methods, initialState, () => initialState(initialValue))
 }
 
 export default useEditor

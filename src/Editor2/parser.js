@@ -320,30 +320,30 @@ function parseElements(unparsed) {
 	const parsed = []
 	for (let index = 0; index < unparsed.length; index++) {
 		const each = unparsed[index]
-		const char = each.raw.charAt(0)
-		const nchars = each.raw.length
+		const char = each.data.charAt(0)
+		const nchars = each.data.length
 		switch (true) {
 		// <Header>
 		case char === "#":
 			// # H1 … ###### H6
 			if (
-				(nchars >= 2 && each.raw.slice(0, 2) === "# ") ||
-				(nchars >= 3 && each.raw.slice(0, 3) === "## ") ||
-				(nchars >= 4 && each.raw.slice(0, 4) === "### ") ||
-				(nchars >= 5 && each.raw.slice(0, 5) === "#### ") ||
-				(nchars >= 6 && each.raw.slice(0, 6) === "##### ") ||
-				(nchars >= 7 && each.raw.slice(0, 7) === "###### ")
+				(nchars >= 2 && each.data.slice(0, 2) === "# ") ||
+				(nchars >= 3 && each.data.slice(0, 3) === "## ") ||
+				(nchars >= 4 && each.data.slice(0, 4) === "### ") ||
+				(nchars >= 5 && each.data.slice(0, 5) === "#### ") ||
+				(nchars >= 6 && each.data.slice(0, 6) === "##### ") ||
+				(nchars >= 7 && each.data.slice(0, 7) === "###### ")
 			) {
-				const syntax = each.raw.slice(0, each.raw.indexOf(" ") + 1)
+				const syntax = each.data.slice(0, each.data.indexOf(" ") + 1)
 				parsed.push({
 					type: typeEnum.Header,
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// hash: newHash(toInnerString(parseInlineElements(each.raw.slice(syntax.length)))),
+					// hash: newHash(toInnerString(parseInlineElements(each.data.slice(syntax.length)))),
 					hash: "TODO",
-					raw: each.raw,
-					children: parseInlineElements(each.raw.slice(syntax.length)),
+					// raw: each.data,
+					children: parseInlineElements(each.data.slice(syntax.length)),
 				})
 				continue
 			}
@@ -354,8 +354,8 @@ function parseElements(unparsed) {
 		case char === ">":
 			// > Blockquote
 			if (
-				(nchars >= 2 && each.raw.slice(0, 2) === "> ") ||
-				(nchars === 1 && each.raw === ">")
+				(nchars >= 2 && each.data.slice(0, 2) === "> ") ||
+				(nchars === 1 && each.data === ">")
 			) {
 				const x1 = index
 				let x2 = x1
@@ -363,8 +363,8 @@ function parseElements(unparsed) {
 				// Iterate to end syntax:
 				while (x2 < unparsed.length) {
 					if (
-						(unparsed[x2].raw.length < 2 || unparsed[x2].raw.slice(0, 2) !== "> ") &&
-						(unparsed[x2].raw.length !== 1 || unparsed[x2].raw !== ">")
+						(unparsed[x2].data.length < 2 || unparsed[x2].data.slice(0, 2) !== "> ") &&
+						(unparsed[x2].data.length !== 1 || unparsed[x2].data !== ">")
 					) {
 						// No-op
 						break
@@ -376,14 +376,14 @@ function parseElements(unparsed) {
 					// <Blockquote>
 					type: typeEnum.Blockquote,
 					id: each.id,
-					raw: range.map(each => each.raw).join("\n"),
+					// raw: range.map(each => each.data).join("\n"),
 					children: range.map(each => ({
 						// <BlockquoteItem>
 						type: typeEnum.BlockquoteItem,
 						id: each.id,
-						syntax: [each.raw.slice(0, 2)],
-						raw: each.raw,
-						children: parseInlineElements(each.raw.slice(2)),
+						syntax: [each.data.slice(0, 2)],
+						// raw: each.data,
+						children: parseInlineElements(each.data.slice(2)),
 					})),
 				})
 				index = x2 - 1
@@ -395,12 +395,12 @@ function parseElements(unparsed) {
 		// <Break>
 		case char === "-" || char === "*":
 			// --- OR ***
-			if (nchars === 3 && each.raw === char.repeat(3)) {
+			if (nchars === 3 && each.data === char.repeat(3)) {
 				parsed.push({
 					type: typeEnum.Break,
 					id: each.id,
 					syntax: [char.repeat(3)],
-					raw: each.raw,
+					// raw: each.data,
 					children: null,
 				})
 				continue
@@ -412,7 +412,7 @@ function parseElements(unparsed) {
 			break
 		}
 		// <Paragraph>
-		const children = parseInlineElements(each.raw)
+		const children = parseInlineElements(each.data)
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
@@ -422,7 +422,7 @@ function parseElements(unparsed) {
 				children.reduce &&
 				children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
 			),
-			raw: each.raw,
+			// raw: each.data,
 			children,
 		})
 	}
