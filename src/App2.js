@@ -28,40 +28,41 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
 const App = () => {
-	const [state, dispatch] = useEditor(`> Hello\n>`)
+	// const [state, dispatch] = useEditor(`> Hello\n>`)
+	const [state, dispatch] = useEditor(initialValue)
 
-	// // Write to localStorage:
-	// React.useEffect(() => {
-	// 	const id = setTimeout(() => {
-	// 		const data = state.data.map(each => each.raw).join("\n")
-	// 		localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data }))
-	// 	}, 100)
-	// 	return () => {
-	// 		clearTimeout(id)
-	// 	}
-	// }, [state.data])
+	// Write to localStorage:
+	React.useEffect(
+		React.useCallback(() => {
+			const id = setTimeout(() => {
+				const { data } = state
+				localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data }))
+			}, 100)
+			return () => {
+				clearTimeout(id)
+			}
+		}, [state.data]),
+		[state.vdom],
+	)
 
-	// // Binds read-only shortcut.
-	// React.useEffect(
-	// 	React.useCallback(() => {
-	// 		const handler = e => {
-	// 			if (!e.metaKey || e.keyCode !== keyCodes.P) {
-	// 				// No-op
-	// 				return
-	// 			}
-	// 			e.preventDefault()
-	// 			setState(current => ({
-	// 				...current,
-	// 				readOnly: !state.readOnly,
-	// 			}))
-	// 		}
-	// 		document.addEventListener("keydown", handler)
-	// 		return () => {
-	// 			document.removeEventListener("keydown", handler)
-	// 		}
-	// 	}, [state, setState]),
-	// 	[state.readOnly],
-	// )
+	// Binds read-only shortcut (command-p).
+	React.useEffect(
+		React.useCallback(() => {
+			const handler = e => {
+				if (!e.metaKey || e.keyCode !== keyCodes.P) {
+					// No-op
+					return
+				}
+				e.preventDefault()
+				dispatch.toggleReadOnly()
+			}
+			document.addEventListener("keydown", handler)
+			return () => {
+				document.removeEventListener("keydown", handler)
+			}
+		}, [state, dispatch]),
+		[state.readOnly],
+	)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">

@@ -19,7 +19,7 @@ const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
 const ReactEditor = ({ state, dispatch }) => (
 	<EditorContext.Provider value={[state, dispatch]}>
-		{state.parsed.map(({ type: T, ...each }) => (
+		{state.vdom.map(({ type: T, ...each }) => (
 			React.createElement(typeMap[T], {
 				key: each.id,
 				...each,
@@ -86,7 +86,7 @@ const Editor = ({
 			})
 		}, [state, dispatch]),
 		[
-			state.parsed,
+			state.vdom,
 			state.readOnly,
 		],
 	)
@@ -262,6 +262,7 @@ const Editor = ({
 							// id: state.data.map(each => each.id),
 
 							...state,
+							vdom: undefined,
 							reactDOM: undefined, // Obscure
 						},
 						null,

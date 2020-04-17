@@ -18,7 +18,7 @@ function initialState(initialValue) {
 		pos1: newPos(),                          // Start cursor data structure
 		pos2: newPos(),                          // End cursor data structure
 		extendedPosRange: ["", ""],              // Extended node (ID) range
-		parsed: parse(nodes),                    // Parsed document nodes
+		vdom: parse(nodes),                      // VDOM
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return state
@@ -29,6 +29,10 @@ function methods(state) {
 		// Registers props.
 		registerProps(readOnly) {
 			state.readOnly = readOnly
+		},
+		// Toggles read-only mode.
+		toggleReadOnly() {
+			state.readOnly = !state.readOnly
 		},
 		// Focuses the editor.
 		focus() {
