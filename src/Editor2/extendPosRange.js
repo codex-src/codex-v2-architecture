@@ -1,16 +1,16 @@
-// Creates an extended cursor ID (root ID) range.
+// Creates an extended node ID range.
 function extendPosRange(state, [pos1, pos2]) {
-	let x1 = state.data.findIndex(each => each.id === pos1.root.id)
-	x1 -= 2
-	if (x1 < 0) {
-		x1 = 0
+	let y1 = pos1.y
+	y1 -= 2
+	if (y1 < 0) {
+		y1 = 0
 	}
-	let x2 = state.data.findIndex(each => each.id === pos2.root.id)
-	x2 += 2
-	if (x2 >= state.data.length) {
-		x2 = state.data.length - 1
+	let y2 = pos2.y
+	y2 += 2
+	if (y2 >= state.nodes.length) {
+		y2 = state.nodes.length - 1
 	}
-	return [state.data[x1].id, state.data[x2].id]
+	return [state.nodes[y1].id, state.nodes[y2].id]
 }
 
 export default extendPosRange

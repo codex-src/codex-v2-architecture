@@ -1,3 +1,4 @@
+import extendPosRange from "./extendPosRange"
 import parse from "./parser"
 import useMethods from "use-methods"
 
@@ -42,9 +43,8 @@ function methods(state) {
 		},
 		// Selects the editor.
 		select(pos1, pos2) {
-			state.pos1 = pos1
-			state.pos2 = pos2
-			// TODO: extendPosRange here?
+			const extendedPosRange = extendPosRange(state, [pos1, pos2])
+			Object.assign(state, { pos1, pos2, extendedPosRange })
 		}
 	}
 	return dispatch
