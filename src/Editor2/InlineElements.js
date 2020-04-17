@@ -3,11 +3,11 @@ import Markdown from "./Markdown"
 import React from "react"
 
 export const Escape = ({ syntax, children }) => (
-	// <span>
-	<Markdown syntax={syntax}>
-		{children}
-	</Markdown>
-	// </span>
+	<span>
+		<Markdown syntax={syntax}>
+			{children}
+		</Markdown>
+	</span>
 )
 
 export const Emoji = ({ description, children }) => (

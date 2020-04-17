@@ -64,8 +64,8 @@ const App = () => {
 				<Editor
 					tag="article"
 					id="main-editor"
-					className="text-lg"
-					// style={{ fontSize: 18 }}
+					// className="text-lg"
+					style={{ fontSize: 17 }}
 					state={state}
 					setState={setState}
 					// readOnly
