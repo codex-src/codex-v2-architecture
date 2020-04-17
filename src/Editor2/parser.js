@@ -375,8 +375,8 @@ function parseElements(unparsed) {
 			id: each.id,
 			emojis: (
 				children &&
-				children.every &&
-				children.every(each => each.type === typeEnum.Emoji)
+				children.reduce &&
+				children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
 			),
 			raw: each.raw,
 			children,
