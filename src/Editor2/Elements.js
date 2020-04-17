@@ -67,7 +67,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const [state] = useEditorSetState()
 
 	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
-	const style = state.readOnly && { paddingLeft: "calc(32 / 16 * 1em)" }
+	const style = state.readOnly && { paddingLeft: "calc(24 / 16 * 1em)" }
 	return (
 		<Node id={id} style={style}>
 			<Markdown className="text-md-blue-a200" syntax={syntax}>

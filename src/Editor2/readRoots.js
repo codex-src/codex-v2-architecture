@@ -2,12 +2,7 @@ import uuidv4 from "uuid/v4"
 
 // Reads a data-codex-root element.
 function readRoot(root) {
-	const unparsed = [
-		{
-			id: root.id,
-			raw: "",
-		},
-	]
+	const unparsed = [{ id: root.id, raw: "" }]
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
 			unparsed[unparsed.length - 1].raw += on.nodeValue
@@ -17,10 +12,7 @@ function readRoot(root) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && next.getAttribute("data-codex-node")) {
-				unparsed.push({
-					id: next.id,
-					raw: "",
-				})
+				unparsed.push({ id: next.id, raw: "" })
 			}
 		}
 	}

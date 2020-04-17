@@ -70,24 +70,20 @@ const Editor = ({
 		React.useCallback(() => {
 			ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
 				// Sync user-managed DOM to the React-managed DOM:
-				/* const mutations = */ syncTrees(state.reactDOM, ref.current)
+				const mutations = syncTrees(state.reactDOM, ref.current)
 				if (!mounted.current || !shouldRenderPos(state)) {
 					mounted.current = true
 					return
 				}
-
-				// if (mutations) {
-				// 	const s = !mutations ? "" : "s"
-				// 	console.log(`syncTrees: ${mutations} mutation${s}`)
-				// }
-
+				if (mutations) {
+					const s = !mutations ? "" : "s"
+					console.log(`syncTrees: ${mutations} mutation${s}`)
+				}
 				// Sync DOM cursors to the VDOM cursors:
-				/* const syncedPos = */ syncPos(ref.current, [state.pos1, state.pos2])
-
-				// if (syncedPos) {
-				// 	console.log("syncPos")
-				// }
-
+				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				if (syncedPos) {
+					console.log("syncPos")
+				}
 				// Update extendedPosRange for edge-cases such as
 				// forward-backspace:
 				const [pos1, pos2] = computePosRange(ref.current)
@@ -211,7 +207,6 @@ const Editor = ({
 							actions.enter(state, setState)
 							return
 						}
-						// TODO
 					},
 
 					// TODO: onCompositionEnd
@@ -238,12 +233,35 @@ const Editor = ({
 							throw new Error("onInput: x2 out of bounds")
 						}
 						const unparsed = readRoots(ref.current, [root1, root2])
+						const data = [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)]
 						const [pos1, pos2] = computePosRange(ref.current)
-						setState(current => ({ // FIXME: Use current
+
+						// Correct pos1 (from out of bounds):
+						const p1 = data.findIndex(each => each.id === pos1.root.id)
+						if (p1 !== -1 && pos1.root.offset > data[p1].raw.length) {
+							if (p1 + 1 >= data.length) {
+								throw new Error("onInput: cannot correct pos1; p1 + 1 is out of bounds")
+							}
+							pos1.root.id = data[p1 + 1].id
+							pos1.root.offset = pos1.node.offset
+						}
+						// Correct pos2 (from out of bounds):
+						const p2 = data.findIndex(each => each.id === pos2.root.id)
+						if (p2 !== -1 && pos2.root.offset > data[p2].raw.length) {
+							if (p2 + 1 >= data.length) {
+								throw new Error("onInput: cannot correct pos2; p2 + 1 is out of bounds")
+							}
+							pos2.root.id = data[p2 + 1].id
+							pos2.root.offset = pos2.node.offset
+						}
+
+						setState(current => ({
 							...current,
 							data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
 							pos1,
-							pos2,
+							pos2: { ...pos1 },
+							// pos2,
+
 							// NOTE: Do not extendPosRange here; defer to
 							// useLayoutEffect
 						}))
