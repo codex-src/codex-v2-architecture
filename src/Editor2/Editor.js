@@ -238,19 +238,13 @@ const Editor = ({
 
 						// Correct pos1 (from out of bounds):
 						const p1 = data.findIndex(each => each.id === pos1.root.id)
-						if (p1 !== -1 && pos1.root.offset > data[p1].raw.length) {
-							if (p1 + 1 >= data.length) {
-								throw new Error("onInput: cannot correct pos1; p1 + 1 is out of bounds")
-							}
+						if (p1 >= 0 && p1 + 1 < data.length && pos1.root.offset > data[p1].raw.length) {
 							pos1.root.id = data[p1 + 1].id
 							pos1.root.offset = pos1.node.offset
 						}
 						// Correct pos2 (from out of bounds):
 						const p2 = data.findIndex(each => each.id === pos2.root.id)
-						if (p2 !== -1 && pos2.root.offset > data[p2].raw.length) {
-							if (p2 + 1 >= data.length) {
-								throw new Error("onInput: cannot correct pos2; p2 + 1 is out of bounds")
-							}
+						if (p2 >= 0 && p2 + 1 < data.length && pos2.root.offset > data[p2].raw.length) {
 							pos2.root.id = data[p2 + 1].id
 							pos2.root.offset = pos2.node.offset
 						}
