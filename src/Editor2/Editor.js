@@ -48,22 +48,20 @@ const Editor = ({
 	state,
 	setState,
 	fontSmoothing,
+	readOnly,
 }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
 
 	// Register features.
-	//
-	// TODO: Validate features?
 	React.useLayoutEffect(() => {
 		setState(current => ({
 			...current,
 			fontSmoothing,
+			readOnly,
 		}))
-	}, [
-		fontSmoothing,
-	])
+	}, [fontSmoothing, readOnly])
 
 	// Renders to the DOM.
 	const mounted = React.useRef()

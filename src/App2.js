@@ -64,10 +64,12 @@ const App = () => {
 				<Editor
 					tag="article"
 					id="main-editor"
-					style={{ fontSize: 18 }}
+					className="text-lg"
+					// style={{ fontSize: 18 }}
 					state={state}
 					setState={setState}
-					// fontSmoothing
+					fontSmoothing
+					// readOnly
 				/>
 
 			</div>

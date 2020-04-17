@@ -1,27 +1,29 @@
 .codex-editor {
-	-moz-osx-font-smoothing: auto;
-	-webkit-font-smoothing:  auto;
-
 	font-family: "Inter var", sans-serif;
 	letter-spacing: -0.01em;
 	line-height: 1.5;
 }
-.codex-editor * {
-	caret-color: #000;
-}
-.codex-editor ::selection {
-	background: #448aff3f;
-}
-
-.codex-editor .font-mono {
+.codex-editor .font-mono { /* TODO: Rename to .monospace */
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0;
 	line-height: 1.375;
 }
 
+/* font-smoothing */
+.codex-editor:not(.feature-font-smoothing) {
+	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
+}
 .codex-editor.feature-font-smoothing {
-	-webkit-font-smoothing:  antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	-moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased;
+}
+
+/* caret-color */
+.codex-editor:not(.feature-read-only) * {
+	caret-color: #000;
+}
+/* ::selection background-color */
+.codex-editor:not(.feature-read-only) ::selection {
+	background-color: #448aff3f;
 }
 
 /* TODO */
