@@ -40,6 +40,12 @@ function methods(state) {
 		blur() {
 			state.focused = false
 		},
+		// Selects the editor.
+		select(pos1, pos2) {
+			state.pos1 = pos1
+			state.pos2 = pos2
+			// TODO: extendPosRange here?
+		}
 	}
 	return dispatch
 }

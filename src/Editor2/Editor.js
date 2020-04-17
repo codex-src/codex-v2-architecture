@@ -1,5 +1,4 @@
 // import actions from "./actions"
-// import computePosRange from "./computePosRange"
 // import extendPosRange from "./extendPosRange"
 // import keyCodes from "./keyCodes"
 // import parse from "./parser"
@@ -7,6 +6,7 @@
 // import readRoots from "./readRoots"
 // import syncPos from "./syncPos"
 import attrs from "./attrs"
+import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
 import React from "react"
 import ReactDOM from "react-dom"
@@ -153,8 +153,10 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
-						// const [pos1, pos2] = computePosRange(ref.current)
+						const [pos1, pos2] = computePosRange(ref.current)
+						console.log(pos1, pos2)
 						// const extendedPosRange = extendPosRange(state, [pos1, pos2])
+						dispatch.select(pos1, pos2)
 						// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
 					},
 
