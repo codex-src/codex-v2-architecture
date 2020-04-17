@@ -1,6 +1,8 @@
 import typeEnum from "./typeEnum"
 
 import {
+	Blockquote,
+	BlockquoteItem,
 	Break,
 	Header,
 	Paragraph,
@@ -20,6 +22,8 @@ const typeMap = {
 	// Elements:
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
+	[typeEnum.Blockquote]: Blockquote,
+	[typeEnum.BlockquoteItem]: BlockquoteItem,
 	[typeEnum.Break]: Break,
 
 	// Inline elements:

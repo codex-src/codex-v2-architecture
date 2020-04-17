@@ -1,6 +1,6 @@
-// import uuidv4 from "uuid/v4"
 import * as emojiTrie from "emoji-trie"
 import typeEnum from "./typeEnum"
+// import uuidv4 from "uuid/v4"
 
 import {
 	// HTTP,
@@ -286,14 +286,14 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 
 		default:
 			// <Emoji>
-			const info = emojiTrie.atStart(str.slice(index))
-			if (info && info.status === "fully-qualified") {
+			const e = emojiTrie.atStart(str.slice(index))
+			if (e && e.status === "fully-qualified") { // TODO: Add "component"?
 				parsed.push({
 					type: typeEnum.Emoji,
-					description: info.description,
-					children: info.emoji,
+					description: e.description,
+					children: e.emoji,
 				})
-				index += info.emoji.length - 1
+				index += e.emoji.length - 1
 				continue
 			}
 			// No-op
@@ -327,12 +327,12 @@ function parseElements(unparsed) {
 		case char === "#":
 			// # H1 … ###### H6
 			if (
-				(nchars >= 2 && each.raw.slice(0, 2) === "# ") || // (nchars >= 2 && each.raw.startsWith("# ")) ||
-				(nchars >= 3 && each.raw.slice(0, 3) === "## ") || // (nchars >= 3 && each.raw.startsWith("## ")) ||
-				(nchars >= 4 && each.raw.slice(0, 4) === "### ") || // (nchars >= 4 && each.raw.startsWith("### ")) ||
-				(nchars >= 5 && each.raw.slice(0, 5) === "#### ") || // (nchars >= 5 && each.raw.startsWith("#### ")) ||
+				(nchars >= 2 && each.raw.slice(0, 2) === "# ") ||     // (nchars >= 2 && each.raw.startsWith("# ")) ||
+				(nchars >= 3 && each.raw.slice(0, 3) === "## ") ||    // (nchars >= 3 && each.raw.startsWith("## ")) ||
+				(nchars >= 4 && each.raw.slice(0, 4) === "### ") ||   // (nchars >= 4 && each.raw.startsWith("### ")) ||
+				(nchars >= 5 && each.raw.slice(0, 5) === "#### ") ||  // (nchars >= 5 && each.raw.startsWith("#### ")) ||
 				(nchars >= 6 && each.raw.slice(0, 6) === "##### ") || // (nchars >= 6 && each.raw.startsWith("##### ")) ||
-				(nchars >= 7 && each.raw.slice(0, 7) === "###### ") // (nchars >= 7 && each.raw.startsWith("###### "))
+				(nchars >= 7 && each.raw.slice(0, 7) === "###### ")   // (nchars >= 7 && each.raw.startsWith("###### "))
 			) {
 				const syntax = each.raw.slice(0, each.raw.indexOf(" ") + 1)
 				parsed.push({
@@ -349,6 +349,46 @@ function parseElements(unparsed) {
 			}
 			// No-op
 			break
+
+		// // <Blockquote>
+		// case char === ">":
+		// 	// > Blockquote
+		// 	if (
+		// 		(nchars >= 2 && each.raw.slice(0, 2) === "> ") ||
+		// 		(nchars === 1 && each.raw === ">")
+		// 	) {
+		// 		const x1 = index
+		// 		let x2 = x1
+		// 		x2++
+		// 		// Iterate to end syntax:
+		// 		while (x2 < unparsed.length) {
+		// 			if (
+		// 				(unparsed[x2].raw.length < 2 || unparsed[x2].raw.slice(0, 2) !== "> ") &&
+		// 				(unparsed[x2].raw.length !== 1 || unparsed[x2].raw !== ">")
+		// 			) {
+		// 				// No-op
+		// 				break
+		// 			}
+		// 			x2++
+		// 		}
+		// 		parsed.push({
+		// 			type: typeEnum.Blockquote,
+		// 			id: each.id,
+		// 			// raw: ??
+		// 			children: unparsed.slice(x1, x2).map(each => ({
+		// 				type: typeEnum.BlockquoteP,
+		// 				id: id,
+		// 				syntax: [each.slice(0, 2)],
+		// 				// raw: ??
+		// 				children: parseInlineElements(each.slice(2)),
+		// 			})),
+		// 		})
+		// 		index = x2 - 1
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+
 		// <Break>
 		case char === "-" || char === "*":
 			// --- OR ***
@@ -373,6 +413,7 @@ function parseElements(unparsed) {
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
+			// The number of parsed emojis:
 			emojis: (
 				children &&
 				children.reduce &&

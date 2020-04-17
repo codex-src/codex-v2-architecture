@@ -4,7 +4,7 @@ import typeMap from "./typeMap"
 import useEditorSetState from "./useEditorSetState"
 
 import {
-	// Node,
+	Node,
 	Root,
 } from "./HOC"
 
@@ -64,6 +64,39 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 		)}
 	</Root>
 ))
+
+export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
+	const [state] = useEditorSetState()
+
+	// FIXME
+	const style = state.readOnly && { paddingLeft: "calc((14.734 + 8) / 16 * 1em)" }
+	return (
+		<Node id={id} className="text-gray-600" style={style}>
+			<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
+				{toReact(children) || (
+					<br />
+				)}
+			</Markdown>
+		</Node>
+	)
+})
+
+// NOTE: Compound component
+export const Blockquote = React.memo(({ id, children }) => {
+	const [state] = useEditorSetState()
+
+	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
+	return (
+		<Root id={id} style={style}>
+			{children.map(({ type: T, children, ...each }) => (
+				React.createElement(typeMap[T], {
+					key: each.id,
+					...each,
+				})
+			))}
+		</Root>
+	)
+})
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [state] = useEditorSetState()
