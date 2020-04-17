@@ -17,8 +17,8 @@ function initialState(initialValue) {
 		nodes,                                   // Document nodes
 		pos1: newPos(),                          // Start cursor data structure
 		pos2: newPos(),                          // End cursor data structure
-		parsed: parse(nodes),                    // Parsed document nodes
 		extendedPosRange: ["", ""],              // Extended node (ID) range
+		parsed: parse(nodes),                    // Parsed document nodes
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return state

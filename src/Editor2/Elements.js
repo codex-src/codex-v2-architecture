@@ -1,7 +1,7 @@
 import Markdown from "./Markdown"
 import React from "react"
 import typeMap from "./typeMap"
-import useEditorSetState from "./useEditorSetState"
+import useEditorState from "./useEditorState"
 
 import {
 	Node,
@@ -64,7 +64,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
-	const [state] = useEditorSetState()
+	const [state] = useEditorState()
 
 	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
 	const style = state.readOnly && { paddingLeft: "calc(24 / 16 * 1em)" }
@@ -81,7 +81,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 
 // NOTE: Compound component
 export const Blockquote = React.memo(({ id, children }) => {
-	const [state] = useEditorSetState()
+	const [state] = useEditorState()
 
 	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
 	return (
@@ -97,7 +97,7 @@ export const Blockquote = React.memo(({ id, children }) => {
 })
 
 export const Break = React.memo(({ id, syntax }) => {
-	const [state] = useEditorSetState()
+	const [state] = useEditorState()
 
 	const style = { verticalAlign: "15%" }
 	return (

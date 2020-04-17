@@ -17,9 +17,9 @@ import "./Editor.css"
 
 const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
 
-const Document = ({ state, setState }) => (
-	<EditorContext.Provider value={[state, setState]}>
-		{state.data.map(({ type: T, ...each }) => (
+const ReactEditor = ({ state, dispatch }) => (
+	<EditorContext.Provider value={[state, dispatch]}>
+		{state.parsed.map(({ type: T, ...each }) => (
 			React.createElement(typeMap[T], {
 				key: each.id,
 				...each,
@@ -58,38 +58,38 @@ const Editor = ({
 		dispatch.registerProps(readOnly)
 	}, [readOnly, dispatch])
 
-	// // Renders to the DOM.
-	// const mounted = React.useRef()
-	// React.useLayoutEffect(
-	// 	React.useCallback(() => {
-	// 		ReactDOM.render(<Document state={state} setState={setState} />, state.reactDOM, () => {
-	// 			// Sync user-managed DOM to the React-managed DOM:
-	// 			const mutations = syncTrees(state.reactDOM, ref.current)
-	// 			if (!mounted.current) { // || !shouldRenderPos(state)) {
-	// 				mounted.current = true
-	// 				return
-	// 			}
-	// 			if (mutations) {
-	// 				const s = !mutations ? "" : "s"
-	// 				console.log(`syncTrees: ${mutations} mutation${s}`)
-	// 			}
-	// 			// // Sync DOM cursors to the VDOM cursors:
-	// 			// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-	// 			// if (syncedPos) {
-	// 			// 	console.log("syncPos")
-	// 			// }
-	// 			// // Update extendedPosRange for edge-cases such as
-	// 			// // forward-backspace:
-	// 			// const [pos1, pos2] = computePosRange(ref.current)
-	// 			// const extendedPosRange = extendPosRange(state, [pos1, pos2])
-	// 			// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
-	// 		})
-	// 	}, [state, setState]),
-	// 	[
-	// 		state.data,
-	// 		state.readOnly,
-	// 	],
-	// )
+	// Renders to the DOM.
+	const mounted = React.useRef()
+	React.useLayoutEffect(
+		React.useCallback(() => {
+			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
+				// Sync user-managed DOM to the React-managed DOM:
+				const mutations = syncTrees(state.reactDOM, ref.current)
+				if (!mounted.current) { // || !shouldRenderPos(state)) {
+					mounted.current = true
+					return
+				}
+				if (mutations) {
+					const s = !mutations ? "" : "s"
+					console.log(`syncTrees: ${mutations} mutation${s}`)
+				}
+				// // Sync DOM cursors to the VDOM cursors:
+				// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				// if (syncedPos) {
+				// 	console.log("syncPos")
+				// }
+				// // Update extendedPosRange for edge-cases such as
+				// // forward-backspace:
+				// const [pos1, pos2] = computePosRange(ref.current)
+				// const extendedPosRange = extendPosRange(state, [pos1, pos2])
+				// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+			})
+		}, [state, dispatch]),
+		[
+			state.parsed,
+			state.readOnly,
+		],
+	)
 
 	return (
 		<div>

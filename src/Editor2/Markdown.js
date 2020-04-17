@@ -1,5 +1,5 @@
 import React from "react"
-import useEditorSetState from "./useEditorSetState"
+import useEditorState from "./useEditorState"
 
 // Parses syntax from a string or array of strings to an
 // array of strings.
@@ -21,7 +21,7 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, ...props }) => {
-	const [state] = useEditorSetState()
+	const [state] = useEditorState()
 	if (!props.children || state.readOnly) {
 		return null
 	}
