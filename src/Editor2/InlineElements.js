@@ -2,60 +2,64 @@ import attrs from "./attrs"
 import Markdown from "./Markdown"
 import React from "react"
 
+const Span = ({ className, ...props }) => (
+	<span className={!className ? "markdown" : `markdown ${className}`} {...props} />
+)
+
 export const Escape = ({ syntax, children }) => (
-	<span>
+	<Span>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const Emoji = ({ description, children }) => (
-	<span className="emoji" aria-label={description} role="img">
+	<Span className="emoji" aria-label={description} role="img">
 		<Markdown>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const Emphasis = ({ syntax, children }) => (
-	<span className="italic">
+	<Span className="italic">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const Strong = ({ syntax, children }) => (
-	<span className="font-semibold">
+	<Span className="font-semibold">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const StrongEmphasis = ({ syntax, children }) => (
-	<span className="font-semibold italic">
+	<Span className="font-semibold italic">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const Code = ({ syntax, children }) => (
-	<span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
+	<Span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
 		<Markdown className="text-red-600" syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<span {...attrs.strike}>
+	<Span {...attrs.strike}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</Span>
 )
 
 // export const A = ({ syntax, href, children }) => (

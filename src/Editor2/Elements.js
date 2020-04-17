@@ -69,7 +69,8 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const [state] = useEditorSetState()
 
 	// FIXME
-	const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
+	const style = state.readOnly && { paddingLeft: "calc(32 / 16 * 1em)" }
+	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
 	return (
 		<Node id={id} style={style}>
 			<Markdown className="text-md-blue-a400" syntax={syntax}>
@@ -85,7 +86,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 export const Blockquote = React.memo(({ id, children }) => {
 	const [state] = useEditorSetState()
 
-	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--gray-600)" }
+	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
 	return (
 		<Root id={id} style={style}>
 			{children.map(({ type: T, ...each }) => (
