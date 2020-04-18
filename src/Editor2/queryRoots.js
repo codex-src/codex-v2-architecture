@@ -9,6 +9,9 @@ function ascend(node) {
 }
 
 // Queries data-codex-root elements.
+//
+// NOTE: atEnd records whether the end node (root) changed
+// because of an enter or backspace event
 function queryRoots(editorRoot, [extPos1ID, extPos2ID]) {
 	const node1 = ascend(document.getElementById(extPos1ID))
 	if (!node1 || !editorRoot.contains(node1)) {
