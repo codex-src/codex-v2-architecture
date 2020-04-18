@@ -45,13 +45,16 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	}, [readOnly, dispatch])
 
 	// Renders to the DOM.
+	//
+	// TODO: When state.readOnly is managed by JS (vs. CSS),
+	// syncDOM needs to mutate the DOM
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				const mutations = syncDOM(state.reactDOM, ref.current)
-				if (!mounted.current) {
+				if (!mounted.current || state.readOnly || !state.focused) {
 					mounted.current = true
 					return
 				}
@@ -60,20 +63,14 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					console.log(`synced dom: ${mutations} mutation${s}`)
 				}
 				// Sync DOM cursors:
-				if (state.readOnly || !state.focused) {
-					// No-op
-					return
-				}
-				// Sync DOM cursors to the VDOM cursors:
 				const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
 				if (syncedPos) {
 					console.log("synced pos")
 				}
-				// // Update extendedPosRange for edge-cases such as
-				// // forward-backspace:
-				// const [pos1, pos2] = computePosRange(ref.current)
-				// const extendedPosRange = extendPosRange(state, [pos1, pos2])
-				// setState(current => ({ ...current, pos1, pos2, extendedPosRange }))
+				// Force select for edge-cases such as forward-
+				// backspace (pos does not change but the DOM does):
+				const [pos1, pos2] = computePosRange(ref.current)
+				dispatch.select(pos1, pos2)
 			})
 		}, [state, dispatch]),
 		[state.readOnly, state.reactVDOM],
