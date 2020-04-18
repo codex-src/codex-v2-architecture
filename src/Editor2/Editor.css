@@ -3,12 +3,10 @@
 
 	font-family: "Inter", sans-serif;
 	letter-spacing: -0.01em;
-	/* line-height: 1.5; */
 }
 .codex-editor .font-mono {
 	font-family: "iA Writer Mono var", monospace;
-	letter-spacing: 0;
-	/* line-height: 1.375; */
+	letter-spacing: 0; /* Needed because of .codex-editor */
 }
 
 .codex-editor:not(.feature-read-only) * {

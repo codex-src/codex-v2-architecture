@@ -67,9 +67,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const [state] = useEditorState()
 
 	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
-	const style = state.readOnly && { paddingLeft: "calc(24 / 16 * 1em)" }
+	// const style = state.readOnly && { paddingLeft: "calc(24 / 16 * 1em)" }
 	return (
-		<Node id={id} style={style}>
+		<Node id={id} /* style={style} */>
 			<Markdown className="text-md-blue-a200" syntax={syntax}>
 				{toReact(children) || (
 					<br />
@@ -83,9 +83,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 export const Blockquote = React.memo(({ id, children }) => {
 	const [state] = useEditorState()
 
-	const style = state.readOnly && { boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
+	const style = /* state.readOnly && */ { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
 	return (
-		<Root id={id} style={style}>
+		<Root id={id} className="py-4 px-8" style={style}>
 			{children.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
