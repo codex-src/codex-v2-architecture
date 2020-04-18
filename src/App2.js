@@ -125,18 +125,6 @@ const App = () => {
 		}
 	}, [state.data])
 
-	// {JSON.stringify(
-	// 	{
-	// 		renderMode, // Takes precedence
-	// 		...state,
-	// 		data:      undefined,
-	// 		reactVDOM: undefined,
-	// 		reactDOM:  undefined,
-	// 	},
-	// 	null,
-	// 	"\t",
-	// )}
-
 	React.useEffect(
 		React.useCallback(() => {
 			const id = setTimeout(() => {
@@ -144,7 +132,6 @@ const App = () => {
 					...current,
 					[renderModesEnum.JSON]: JSON.stringify(
 						{
-							renderMode: renderState.renderMode, // Takes precedence
 							...state,
 							data:      undefined,
 							reactVDOM: undefined,
