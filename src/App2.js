@@ -102,6 +102,10 @@ const App = () => {
 	// Binds read-only shortcut (command-p).
 	React.useEffect(
 		React.useCallback(() => {
+			// if (state.readOnly) {
+			// 	// No-op
+			// 	return
+			// }
 			const handler = e => {
 				if (!e.metaKey || e.keyCode !== keyCodes.P) {
 					// No-op
