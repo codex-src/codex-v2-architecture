@@ -187,8 +187,8 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							return
 						// Enter:
 						} else if (e.keyCode === keyCodes.Enter) {
-							// e.preventDefault() // FIXME?
-							// dispatch.enter()
+							e.preventDefault()
+							dispatch.enter()
 							return
 						}
 						// // Undo:
