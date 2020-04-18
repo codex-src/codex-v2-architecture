@@ -131,12 +131,12 @@ const App = () => {
 						<div className="h-6" />
 						<Transition
 							show={renderMode !== renderModesEnum.None}
-							enter="transition ease-out duration-100"
-							enterFrom="transform opacity-0 scale-95"
-							enterTo="transform opacity-100 scale-100"
-							leave="transition ease-in duration-75"
-							leaveFrom="transform opacity-100 scale-100"
-							leaveTo="transform opacity-0 scale-95"
+							enter="transition ease-out duration-300"
+							enterFrom="transform opacity-0 translate-x-64"
+							enterTo="transform opacity-100 translate-x-0"
+							leave="transition ease-in duration-300"
+							leaveFrom="transform opacity-100 translate-x-0"
+							leaveTo="transform opacity-0 translate-x-64"
 						>
 							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
