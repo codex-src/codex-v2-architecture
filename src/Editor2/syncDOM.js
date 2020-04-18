@@ -23,7 +23,7 @@ function removeRange() {
 // are not synced.
 //
 // TODO: Reduce mutations from 2 to 1 for the 90% case
-function syncTrees(src, dst) {
+function syncDOM(src, dst) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
@@ -78,4 +78,4 @@ function syncTrees(src, dst) {
 	return mutations
 }
 
-export default syncTrees
+export default syncDOM

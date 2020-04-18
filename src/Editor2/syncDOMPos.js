@@ -30,7 +30,7 @@ function computeRange(editorRoot, { pos }) {
 }
 
 // Synchronizes DOM cursors.
-function syncPos(editorRoot, [pos1, pos2]) {
+function syncDOMPos(editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
 	if (!selection.rangeCount) {
 		// No-op; defer to end
@@ -53,4 +53,4 @@ function syncPos(editorRoot, [pos1, pos2]) {
 	return true
 }
 
-export default syncPos
+export default syncDOMPos

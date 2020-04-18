@@ -7,8 +7,8 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
-import syncDOM from "./syncTrees"  // TODO: Rename
-import syncDOMPos from "./syncPos" // TODO: Rename
+import syncDOM from "./syncDOM"
+import syncDOMPos from "./syncDOMPos"
 import typeMap from "./typeMap"
 
 import "./Editor.css"
@@ -188,7 +188,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// Force re-render when empty:
+						// Force rerender when empty:
 						if (!ref.current.childNodes.length) {
 							dispatch.render()
 							return
