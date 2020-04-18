@@ -9,8 +9,9 @@ import "./stylesheets/tailwind-form-checkbox.css"
 import "./stylesheets/tailwind-codex-overrides.css"
 
 ReactDOM.render(
-	<React.StrictMode>
-		<App2 />
-	</React.StrictMode>,
+	// <React.StrictMode>
+	// 	<App2 />
+	// </React.StrictMode>,
+	<App2 />,
 	document.getElementById("root"),
 )

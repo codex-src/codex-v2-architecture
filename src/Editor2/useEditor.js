@@ -8,7 +8,7 @@ import {
 } from "./constructors"
 
 // Creates a new editor state.
-function newState(initialValue) {
+function newEditor(initialValue) {
 	const nodes = newNodes(initialValue)
 	const initialState = {
 		readOnly: false,                         // Is read-only?
@@ -53,7 +53,7 @@ const methods = state => ({
 })
 
 function useEditor(initialValue) {
-	return useMethods(methods, {}, () => newState(initialValue))
+	return useMethods(methods, {}, () => newEditor(initialValue))
 }
 
 export default useEditor
