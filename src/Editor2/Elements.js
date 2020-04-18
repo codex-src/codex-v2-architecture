@@ -37,10 +37,10 @@ function trim(str) {
 const headerClassNames = {
 	h1: trim("font-medium   text-3xl leading-tight"),
 	h2: trim("font-medium   text-2xl leading-tight"),
-	h3: trim("font-semibold text-xl  leading-tight"),
-	h4: trim("font-semibold text-xl  leading-tight"),
-	h5: trim("font-semibold text-xl  leading-tight"),
-	h6: trim("font-semibold text-xl  leading-tight"),
+	h3: trim("font-medium   text-xl  leading-tight"),
+	h4: trim("font-semibold text-lg  leading-tight"),
+	h5: trim("font-semibold text-lg  leading-tight"),
+	h6: trim("font-semibold text-lg  leading-tight"),
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
@@ -66,10 +66,8 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const [state] = useEditorState()
 
-	// const style = state.readOnly && { paddingLeft: "calc(19.203 / 16 * 1em)" }
-	// const style = state.readOnly && { paddingLeft: "calc(24 / 16 * 1em)" }
 	return (
-		<Node id={id} /* style={style} */>
+		<Node id={id}>
 			<Markdown className="text-md-blue-a200" syntax={syntax}>
 				{toReact(children) || (
 					<br />
@@ -83,7 +81,8 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 export const Blockquote = React.memo(({ id, children }) => {
 	const [state] = useEditorState()
 
-	const style = /* state.readOnly && */ { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
+	// NOTE: Uses md-blue-a200
+	const style = { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
 	return (
 		<Root id={id} className="py-4 px-8" style={style}>
 			{children.map(({ type: T, ...each }) => (
