@@ -7,8 +7,8 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
-import syncPos from "./syncPos"
-import syncTrees from "./syncTrees"
+import syncDOM from "./syncTrees"  // TODO: Rename
+import syncDOMPos from "./syncPos" // TODO: Rename
 import typeMap from "./typeMap"
 
 import "./Editor.css"
@@ -34,14 +34,6 @@ const ReactEditor = ({ state, dispatch }) => {
 	)
 }
 
-// function shouldRenderPos(state) {
-// 	const ok = (
-// 		state.focused &&
-// 		!state.readOnly
-// 	)
-// 	return ok
-// }
-
 const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	const ref = React.useRef()
 
@@ -52,25 +44,30 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		dispatch.registerProps(readOnly)
 	}, [readOnly, dispatch])
 
-	// Renders the VDOM to the DOM.
+	// Renders to the DOM.
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
-				// Sync user-managed DOM to the React-managed DOM:
-				const mutations = syncTrees(state.reactDOM, ref.current)
-				if (!mounted.current) { // || !shouldRenderPos(state)) {
+				// Sync DOM:
+				const mutations = syncDOM(state.reactDOM, ref.current)
+				if (!mounted.current) {
 					mounted.current = true
 					return
 				}
 				if (mutations) {
 					const s = !mutations ? "" : "s"
-					console.log(`syncTrees: ${mutations} mutation${s}`)
+					console.log(`synced dom: ${mutations} mutation${s}`)
+				}
+				// Sync DOM cursors:
+				if (state.readOnly || !state.focused) {
+					// No-op
+					return
 				}
 				// Sync DOM cursors to the VDOM cursors:
-				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
 				if (syncedPos) {
-					console.log("syncPos")
+					console.log("synced pos")
 				}
 				// // Update extendedPosRange for edge-cases such as
 				// // forward-backspace:

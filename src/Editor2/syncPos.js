@@ -1,7 +1,7 @@
 import computePosRange from "./computePosRange"
 import { newRange } from "./constructors"
 
-// Computes a range data strucutre.
+// Computes a range data strucutre (based on pos.pos).
 function computeRange(editorRoot, { pos }) {
 	const range = newRange()
 	const recurse = on => {
