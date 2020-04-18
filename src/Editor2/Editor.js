@@ -182,8 +182,8 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						}
 						// Tab:
 						if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
-							// e.preventDefault() // FIXME?
-							// dispatch.tab()
+							e.preventDefault()
+							dispatch.tab()
 							return
 						// Enter:
 						} else if (e.keyCode === keyCodes.Enter) {
