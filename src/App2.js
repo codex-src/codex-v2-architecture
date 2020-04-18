@@ -51,6 +51,7 @@ const Settings = ({ renderState, setRenderState }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderState({
 				...renderState,
+				show: true,
 				renderMode: renderModesEnum.JSON,
 			})}
 		>
@@ -60,6 +61,7 @@ const Settings = ({ renderState, setRenderState }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderState({
 				...renderState,
+				show: true,
 				renderMode: renderModesEnum.HTML,
 			})}
 		>
@@ -69,6 +71,7 @@ const Settings = ({ renderState, setRenderState }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderState({
 				...renderState,
+				show: true,
 				renderMode: renderModesEnum.HTML__BEM,
 			})}
 		>
@@ -78,6 +81,7 @@ const Settings = ({ renderState, setRenderState }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderState({
 				...renderState,
+				show: true,
 				renderMode: renderModesEnum.React_js,
 			})}
 		>
@@ -87,7 +91,7 @@ const Settings = ({ renderState, setRenderState }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderState({
 				...renderState,
-				renderMode: renderModesEnum.None,
+				show: false,
 			})}
 		>
 			Hide UI
@@ -102,7 +106,8 @@ const App = () => {
 	const [state, dispatch] = useEditor(data)
 
 	const [renderState, setRenderState] = React.useState(() => ({
-		renderMode: renderModesEnum.None,
+		show: false,
+		renderMode: renderModesEnum.JSON,
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
 		[renderModesEnum.HTML__BEM]: "",
@@ -160,24 +165,6 @@ const App = () => {
 		[state],
 	)
 
-	// // Parses a VDOM representation to other data types.
-	// //
-	// // TODO: Lazily parse
-	// function parseExportTypes(data) {
-	// 	const exportTypes = {
-	// 		// [RenderModes.GFM]
-	// 		// [RenderModes.Alpine_js]
-	// 		// [RenderModes.Angular_js]
-	// 		// [RenderModes.Svelte_js]
-	// 		// [RenderModes.Vue_js]
-	// 		[RenderModes.Text]:      toText(data),
-	// 		[RenderModes.HTML]:      toHTML(data),
-	// 		[RenderModes.HTML__BEM]: toHTML__BEM(data),
-	// 		[RenderModes.React_js]:  toReact_js(data),
-	// 	}
-	// 	return exportTypes
-	// }
-
 	// Binds read-only shortcut (command-p).
 	React.useEffect(
 		React.useCallback(() => {
@@ -213,7 +200,7 @@ const App = () => {
 						/>
 						<div className="h-6" />
 						<Transition
-							show={renderState.renderMode !== renderModesEnum.None}
+							show={renderState.show}
 							enter="transition ease-out duration-300"
 							enterFrom="transform opacity-0 translate-x-64"
 							enterTo="transform opacity-100 translate-x-0"
