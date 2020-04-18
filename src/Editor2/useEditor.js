@@ -68,10 +68,13 @@ const methods = state => ({
 		const nodes = newNodes(data)
 		const node1 = state.nodes[state.pos1.y]
 		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
-		// Concatenate the start node:
+		// Concatenate the end of the start node:
 		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
 		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
-		// Concatenate the end node:
+		// Concatenate the start of the end node:
+		//
+		// NOTE: The end node can be the start node or the end
+		// of the new nodes
 		let node = node1
 		if (nodes.length > 1) {
 			node = nodes[nodes.length - 1]
