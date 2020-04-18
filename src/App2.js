@@ -147,7 +147,11 @@ const App = () => {
 						},
 						null,
 						"\t",
-					)
+					),
+					[renderModesEnum.HTML]: cmap.toHTML(state.reactVDOM),
+					// [renderModesEnum.HTML]: cmap.toHTML(state.reactVDOM),
+					// [renderModesEnum.HTML__BEM]: cmap.toHTML__BEM(state.reactVDOM),
+					// [renderModesEnum.React_js]: cmap.toReact_js(state.reactVDOM),
 				}))
 				// console.log(state)
 				// console.log(cmap.toText(state.reactVDOM))
@@ -224,7 +228,22 @@ const App = () => {
 						>
 							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-									{renderState[renderModesEnum.JSON]}
+									{/* JSON */}
+									{renderState.renderMode === renderModesEnum.JSON && (
+										renderState[renderModesEnum.JSON]
+									)}
+									{/* HTML */}
+									{renderState.renderMode === renderModesEnum.HTML && (
+										renderState[renderModesEnum.HTML]
+									)}
+									{/* HTML__BEM */}
+									{renderState.renderMode === renderModesEnum.HTML__BEM && (
+										renderState[renderModesEnum.HTML__BEM]
+									)}
+									{/* React */}
+									{renderState.renderMode === renderModesEnum.React && (
+										renderState[renderModesEnum.React]
+									)}
 								</pre>
 							</div>
 						</Transition>
