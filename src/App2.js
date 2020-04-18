@@ -144,6 +144,7 @@ const App = () => {
 										{
 											renderMode, // Takes precedence
 											...state,
+											data:      undefined,
 											reactVDOM: undefined,
 											reactDOM:  undefined,
 										},
