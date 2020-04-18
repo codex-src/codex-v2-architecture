@@ -188,14 +188,11 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// // Force re-render when empty:
-						// if (!ref.current.childNodes.length) {
-						// 	setState(current => ({
-						// 		...current,
-						// 		data: [...state.data],
-						// 	}))
-						// 	return
-						// }
+						// Force re-render when empty:
+						if (!ref.current.childNodes.length) {
+							dispatch.render()
+							return
+						}
 						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extendedPosRange)
 						const nodes = readRoots(ref.current, [root1, root2])
 						const [pos1, pos2] = computePosRange(ref.current)
