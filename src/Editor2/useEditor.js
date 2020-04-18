@@ -16,7 +16,7 @@ function newEditorState(initialValue) {
 		nodes,                                   // Document nodes
 		pos1: newPos(),                          // Start cursor data structure
 		pos2: newPos(),                          // End cursor data structure
-		extendedPosRange: ["", ""],              // Extended node (ID) range
+		extPosRange: ["", ""],                   // Extended node (ID) range
 		reactVDOM: parse(nodes),                 // React VDOM
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
@@ -56,8 +56,8 @@ const methods = state => ({
 		if (y2 >= state.nodes.length) {
 			y2 = state.nodes.length - 1
 		}
-		const extendedPosRange = [state.nodes[y1].id, state.nodes[y2].id]
-		Object.assign(state, { pos1, pos2, extendedPosRange })
+		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
+		Object.assign(state, { pos1, pos2, extPosRange })
 	},
 	// Writes character data.
 	//

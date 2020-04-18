@@ -67,7 +67,13 @@ const Settings = ({ renderMode, setRenderMode }) => (
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 			onClick={e => setRenderMode(renderModesEnum.React_js)}
 		>
-			React (JSX)
+			React
+		</Button>
+		<Button
+			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+			onClick={e => setRenderMode(renderModesEnum.None)}
+		>
+			Hide UI
 		</Button>
 	</div>
 )
@@ -122,37 +128,28 @@ const App = () => {
 							setRenderMode={setRenderMode}
 						/>
 						<div className="h-6" />
-						<div className="px-3 py-2 w-full max-w-md bg-white rounded-lg shadow transition duration-75 pointer-events-auto">
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-							hello<br />
-						</div>
+						{renderMode !== renderModesEnum.None && (
+							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
+								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+									{JSON.stringify(
+										{
+											renderMode, // Takes precedence
+											...state,
+											reactVDOM: undefined,
+											reactDOM:  undefined,
+										},
+										null,
+										"\t",
+									)}
+								</pre>
+							</div>
+						)}
 					</div>
 				</div>
 
 				<Editor
 					style={{ fontSize: 17 }}
-					state={{ renderMode, ...state }}
+					state={state}
 					dispatch={dispatch}
 					// readOnly
 				/>
