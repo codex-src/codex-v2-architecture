@@ -9,11 +9,11 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
-import typeMap from "./typeMap"
+import typeEnumMap from "./typeEnumMap"
 
 import "./Editor.css"
 
-const DEBUG_MODE = true && process.env.NODE_ENV !== "production"
+const DEBUG_MODE = true // true && process.env.NODE_ENV !== "production"
 
 ;(() => {
 	document.body.classList.toggle("debug-css")
@@ -25,7 +25,7 @@ const ReactEditor = ({ state, dispatch }) => {
 	return (
 		<Provider value={[state, dispatch]}>
 			{state.reactVDOM.map(({ type: T, ...each }) => (
-				React.createElement(typeMap[T], {
+				React.createElement(typeEnumMap[T], {
 					key: each.id,
 					...each,
 				})

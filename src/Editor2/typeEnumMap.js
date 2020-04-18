@@ -18,7 +18,7 @@ import {
 	StrongEmphasis,
 } from "./InlineElements"
 
-const typeMap = {
+const typeEnumMap = {
 	// Elements:
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
@@ -36,4 +36,4 @@ const typeMap = {
 	[typeEnum.Strikethrough]: Strikethrough,
 }
 
-export default typeMap
+export default typeEnumMap

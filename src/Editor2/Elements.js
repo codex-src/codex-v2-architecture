@@ -1,6 +1,6 @@
 import Markdown from "./Markdown"
 import React from "react"
-import typeMap from "./typeMap"
+import typeEnumMap from "./typeEnumMap"
 import useEditorState from "./useEditorState"
 
 import {
@@ -21,7 +21,7 @@ function toReact(children) {
 			continue
 		}
 		const { type: T, ...props } = each
-		components.push(React.createElement(typeMap[T], {
+		components.push(React.createElement(typeEnumMap[T], {
 			key: components.length,
 			...props,
 		}, toReact(props.children)))
@@ -87,7 +87,7 @@ export const Blockquote = React.memo(({ id, children }) => {
 	return (
 		<Root id={id} style={style}>
 			{children.map(({ type: T, ...each }) => (
-				React.createElement(typeMap[T], {
+				React.createElement(typeEnumMap[T], {
 					key: each.id,
 					...each,
 				})
