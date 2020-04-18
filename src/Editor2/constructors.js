@@ -1,16 +1,25 @@
 import uuidv4 from "uuid/v4"
 
-// Creates a new cursor data structure.
+// Creates a new VDOM cursor data structure.
 export function newPos() {
 	const pos = {
-		x: 0,   // The x-axis offset
-		y: 0,   // The y-axis offset
-		pos: 0, // The absolute position (pos: position)
+		x: 0,
+		y: 0,
+		pos: 0,
 	}
 	return pos
 }
 
-// Creates a new document nodes data structure.
+// Creates a new DOM cursor data structure.
+export function newRange() {
+	const range = {
+		node: null,
+		offset: 0,
+	}
+	return range
+}
+
+// Creates a new nodes data structure.
 export function newNodes(str) {
 	const doc = str.split("\n").map(each => ({
 		id: uuidv4(),

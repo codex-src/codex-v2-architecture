@@ -1,46 +1,32 @@
 import computePosRange from "./computePosRange"
+import { newRange } from "./constructors"
 
-// Computes a range data structure. Code based on
-// computePosRange.countOffset.
-function computeRange(editorRoot, pos) {
-	// NOTE: Copy pos -- do not mutate reference
-	pos = { root: { ...pos.root } }
-
-	const root = document.getElementById(pos.root.id)
-	if (!root || !editorRoot.contains(root)) {
-		throw new Error("computeRange: no such root or out of bounds")
-	}
-	let node = null
-	let offset = 0
+// Computes a range data strucutre.
+function computeRange(editorRoot, { pos }) {
+	const range = newRange()
 	const recurse = on => {
-		if (pos.root.offset - (on.nodeValue || "").length <= 0) {
-			node = on
-			offset = pos.root.offset
+		if (pos - (on.nodeValue || "").length <= 0) {
+			Object.assign(range, {
+				node: on,
+				offset: pos,
+			})
 			return true
 		}
 		for (const each of on.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
-			pos.root.offset -= (each.nodeValue || "").length
+			pos -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-codex-node")) {
-				pos.root.offset--
+			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
+				pos--
 			}
 		}
 		return false
 	}
-	recurse(root)
-	return { node, offset }
-}
-
-// Compares two cursor data structures (compares root).
-function areEqual(pos1, pos2) {
-	const ok = (
-		pos1.root.id === pos2.root.id &&
-		pos1.root.offset === pos2.root.offset
-	)
-	return ok
+	recurse(editorRoot)
+	// TODO: Error on empty ranges?
+	return range
 }
 
 // Synchronizes DOM cursors.
@@ -50,20 +36,20 @@ function syncPos(editorRoot, [pos1, pos2]) {
 		// No-op; defer to end
 	} else {
 		const [domPos1, domPos2] = computePosRange(editorRoot)
-		if (areEqual(domPos1, pos1) && areEqual(domPos2, pos2)) {
+		if (domPos1.pos === pos1.pos && domPos2.pos === pos2.pos) {
 			return false
 		}
 	}
-	const range1 = computeRange(editorRoot, pos1)
-	let range2 = { ...range1 }
-	if (pos1.root.id !== pos2.root.id || pos1.root.offset !== pos2.root.offset) {
-		range2 = computeRange(editorRoot, pos2)
+	const r1 = computeRange(editorRoot, pos1)
+	let r2 = { ...r1 }
+	if (pos2.pos !== pos1.pos) {
+		r2 = computeRange(editorRoot, pos2)
 	}
-	const domRange = document.createRange()
-	domRange.setStart(range1.node, range1.offset)
-	domRange.setEnd(range2.node, range2.offset)
+	const range = document.createRange()
+	range.setStart(r1.node, r1.offset)
+	range.setEnd(r2.node, r2.offset)
 	selection.removeAllRanges()
-	selection.addRange(domRange)
+	selection.addRange(range)
 	return true
 }
 

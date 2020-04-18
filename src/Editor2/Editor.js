@@ -1,8 +1,5 @@
-// import actions from "./actions"
 // import extendPosRange from "./extendPosRange"
 // import keyCodes from "./keyCodes"
-// import parse from "./parser"
-// import syncPos from "./syncPos"
 import attrs from "./attrs"
 import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
@@ -10,6 +7,7 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
+import syncPos from "./syncPos"
 import syncTrees from "./syncTrees"
 import typeMap from "./typeMap"
 
@@ -69,11 +67,11 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					const s = !mutations ? "" : "s"
 					console.log(`syncTrees: ${mutations} mutation${s}`)
 				}
-				// // Sync DOM cursors to the VDOM cursors:
-				// const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
-				// if (syncedPos) {
-				// 	console.log("syncPos")
-				// }
+				// Sync DOM cursors to the VDOM cursors:
+				const syncedPos = syncPos(ref.current, [state.pos1, state.pos2])
+				if (syncedPos) {
+					console.log("syncPos")
+				}
 				// // Update extendedPosRange for edge-cases such as
 				// // forward-backspace:
 				// const [pos1, pos2] = computePosRange(ref.current)
