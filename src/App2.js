@@ -4,6 +4,7 @@ import Editor from "Editor2/Editor"
 import Enum from "Enum"
 import keyCodes from "Editor2/keyCodes"
 import React from "react"
+import Transition from "Transition"
 import useEditor from "Editor2/useEditor"
 
 import "./App.css"
@@ -128,7 +129,15 @@ const App = () => {
 							setRenderMode={setRenderMode}
 						/>
 						<div className="h-6" />
-						{renderMode !== renderModesEnum.None && (
+						<Transition
+							show={renderMode !== renderModesEnum.None}
+							enter="transition ease-out duration-100"
+							enterFrom="transform opacity-0 scale-95"
+							enterTo="transform opacity-100 scale-100"
+							leave="transition ease-in duration-75"
+							leaveFrom="transform opacity-100 scale-100"
+							leaveTo="transform opacity-0 scale-95"
+						>
 							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 									{JSON.stringify(
@@ -143,7 +152,7 @@ const App = () => {
 									)}
 								</pre>
 							</div>
-						)}
+						</Transition>
 					</div>
 				</div>
 
