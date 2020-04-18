@@ -29,7 +29,7 @@ const LOCALSTORAGE_KEY = "codex-app-v2.3"
 
 const App = () => {
 	// const [state, dispatch] = useEditor(data)
-	const [state, dispatch] = useEditor(`Hello **hello**\n\nHello __hello__\n\nHello \`hello\``)
+	const [state, dispatch] = useEditor(`> Hello\n`)
 
 	// Write to localStorage:
 	React.useEffect(

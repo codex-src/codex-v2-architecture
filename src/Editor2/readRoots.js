@@ -22,6 +22,7 @@ function readRoot(root) {
 
 // Reads a range of data-codex-root elements.
 function readRoots(editorRoot, [root1, root2]) {
+	// TODO: Reuse dedupeNodes?
 	const nodes = []
 	const seen = {}
 	while (root1) {

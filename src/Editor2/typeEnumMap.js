@@ -22,8 +22,8 @@ const typeEnumMap = {
 	// Elements:
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
-	[typeEnum.Blockquote]: Blockquote,
 	[typeEnum.BlockquoteItem]: BlockquoteItem,
+	[typeEnum.Blockquote]: Blockquote,
 	[typeEnum.Break]: Break,
 
 	// Inline elements:

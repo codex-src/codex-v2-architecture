@@ -46,7 +46,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 	// Renders to the DOM.
 	//
-	// TODO: When state.readOnly is managed by JS (vs. CSS),
+	// TODO: When state.readOnly is managed by JS (v. CSS),
 	// syncDOM needs to mutate the DOM
 	const mounted = React.useRef()
 	React.useLayoutEffect(
@@ -118,12 +118,12 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// Guard out of bounds range:
 						const selection = document.getSelection()
 						if (!selection.rangeCount) {
 							// No-op
 							return
 						}
+						// Guard out of bounds range:
 						const range = selection.getRangeAt(0)
 						if (range.startContainer === ref.current || range.endContainer === ref.current) {
 							// Iterate to the deepest start node:
@@ -186,6 +186,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 					// TODO: onCompositionEnd
 					onInput: () => {
+						// debugger
 						if (state.readOnly) {
 							// No-op
 							return
