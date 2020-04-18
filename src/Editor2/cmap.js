@@ -40,21 +40,17 @@ export function toInnerString(children, cmap = cmapText) {
 			str += toInnerString(each, cmap)
 			continue
 		}
-		const fn = cmap[each.type]
-		// TODO: Use str += cmap[each.type](each)
-		str += fn(each)
+		str += cmap[each.type](each)
 	}
 	return str
 }
 
 // Converts a VDOM representation to a string.
-function toString(vdom, cmap = cmapText) {
+function toString(reactVDOM, cmap = cmapText) {
 	let str = ""
-	for (const each of vdom) {
-		const fn = cmap[each.type]
-		// TODO: Use str += cmap[each.type](each)
-		str += fn(each)
-		if (each !== vdom[vdom.length - 1]) {
+	for (const each of reactVDOM) {
+		str += cmap[each.type](each)
+		if (each !== reactVDOM[reactVDOM.length - 1]) {
 			str += "\n"
 		}
 	}

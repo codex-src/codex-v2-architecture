@@ -1,4 +1,5 @@
 // import raw from "raw.macro"
+import * as cmap from "Editor2/cmap"
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Enum from "Enum"
@@ -44,60 +45,139 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
-const Settings = ({ renderMode, setRenderMode }) => (
+const Settings = ({ renderState, setRenderState }) => (
 	<div className="-m-1 flex flex-row pointer-events-auto">
 		<Button
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderMode(renderModesEnum.JSON)}
+			onClick={e => setRenderState({
+				...renderState,
+				renderMode: renderModesEnum.JSON,
+			})}
 		>
 			JSON
 		</Button>
 		<Button
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderMode(renderModesEnum.HTML)}
+			onClick={e => setRenderState({
+				...renderState,
+				renderMode: renderModesEnum.HTML,
+			})}
 		>
 			HTML
 		</Button>
 		<Button
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderMode(renderModesEnum.HTML__BEM)}
+			onClick={e => setRenderState({
+				...renderState,
+				renderMode: renderModesEnum.HTML__BEM,
+			})}
 		>
 			HTML__BEM
 		</Button>
 		<Button
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderMode(renderModesEnum.React_js)}
+			onClick={e => setRenderState({
+				...renderState,
+				renderMode: renderModesEnum.React_js,
+			})}
 		>
 			React
 		</Button>
 		<Button
 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderMode(renderModesEnum.None)}
+			onClick={e => setRenderState({
+				...renderState,
+				renderMode: renderModesEnum.None,
+			})}
 		>
 			Hide UI
 		</Button>
 	</div>
 )
 
+// const [renderMode, setRenderMode] = React.useState(renderModesEnum.None)
+
 const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
 	const [state, dispatch] = useEditor(data)
 
-	const [renderMode, setRenderMode] = React.useState(renderModesEnum.None)
+	const [renderState, setRenderState] = React.useState(() => ({
+		renderMode: renderModesEnum.None,
+		[renderModesEnum.JSON]: "",
+		[renderModesEnum.HTML]: "",
+		[renderModesEnum.HTML__BEM]: "",
+		[renderModesEnum.React]: "",
+	}))
 
 	// Write to localStorage:
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const json = JSON.stringify({ data: state.data })
+			localStorage.setItem(LOCALSTORAGE_KEY, json)
+		}, 100)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state.data])
+
+	// {JSON.stringify(
+	// 	{
+	// 		renderMode, // Takes precedence
+	// 		...state,
+	// 		data:      undefined,
+	// 		reactVDOM: undefined,
+	// 		reactDOM:  undefined,
+	// 	},
+	// 	null,
+	// 	"\t",
+	// )}
+
 	React.useEffect(
 		React.useCallback(() => {
 			const id = setTimeout(() => {
-				const json = JSON.stringify({ data: state.data })
-				localStorage.setItem(LOCALSTORAGE_KEY, json)
+				setRenderState(current => ({
+					...current,
+					[renderModesEnum.JSON]: JSON.stringify(
+						{
+							renderMode: renderState.renderMode, // Takes precedence
+							...state,
+							data:      undefined,
+							reactVDOM: undefined,
+							reactDOM:  undefined,
+						},
+						null,
+						"\t",
+					)
+				}))
+				// console.log(state)
+				// console.log(cmap.toText(state.reactVDOM))
+				// const json = JSON.stringify({ data: state.data })
+				// localStorage.setItem(LOCALSTORAGE_KEY, json)
 			}, 100)
 			return () => {
 				clearTimeout(id)
 			}
-		}, [state.data]),
-		[state.reactVDOM],
+		}, [state, renderState]),
+		[state],
 	)
+
+	// // Parses a VDOM representation to other data types.
+	// //
+	// // TODO: Lazily parse
+	// function parseExportTypes(data) {
+	// 	const exportTypes = {
+	// 		// [RenderModes.GFM]
+	// 		// [RenderModes.Alpine_js]
+	// 		// [RenderModes.Angular_js]
+	// 		// [RenderModes.Svelte_js]
+	// 		// [RenderModes.Vue_js]
+	// 		[RenderModes.Text]:      toText(data),
+	// 		[RenderModes.HTML]:      toHTML(data),
+	// 		[RenderModes.HTML__BEM]: toHTML__BEM(data),
+	// 		[RenderModes.React_js]:  toReact_js(data),
+	// 	}
+	// 	return exportTypes
+	// }
 
 	// Binds read-only shortcut (command-p).
 	React.useEffect(
@@ -129,12 +209,12 @@ const App = () => {
 				<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 					<div className="flex flex-col items-end">
 						<Settings
-							renderMode={renderMode}
-							setRenderMode={setRenderMode}
+							renderState={renderState}
+							setRenderState={setRenderState}
 						/>
 						<div className="h-6" />
 						<Transition
-							show={renderMode !== renderModesEnum.None}
+							show={renderState.renderMode !== renderModesEnum.None}
 							enter="transition ease-out duration-300"
 							enterFrom="transform opacity-0 translate-x-64"
 							enterTo="transform opacity-100 translate-x-0"
@@ -144,17 +224,7 @@ const App = () => {
 						>
 							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-									{JSON.stringify(
-										{
-											renderMode, // Takes precedence
-											...state,
-											data:      undefined,
-											reactVDOM: undefined,
-											reactDOM:  undefined,
-										},
-										null,
-										"\t",
-									)}
+									{renderState[renderModesEnum.JSON]}
 								</pre>
 							</div>
 						</Transition>
