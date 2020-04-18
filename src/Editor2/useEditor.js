@@ -27,7 +27,7 @@ function newEditor(initialValue) {
 const methods = state => ({
 	// Registers props.
 	registerProps(readOnly) {
-		state.readOnly = readOnly
+		state.readOnly = Boolean(readOnly) // Cast because readOnly is a prop
 	},
 	// Toggles read-only mode.
 	toggleReadOnly() {
