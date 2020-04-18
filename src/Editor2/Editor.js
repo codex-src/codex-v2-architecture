@@ -127,18 +127,20 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						const range = selection.getRangeAt(0)
 						if (range.startContainer === ref.current || range.endContainer === ref.current) {
 							// Iterate to the deepest start node:
-							let startNode = ref.current.childNodes[0]
-							while (startNode.childNodes.length) {
-								startNode = startNode.childNodes[0]
+							let node = ref.current.childNodes[0]
+							while (node.childNodes.length) {
+								node = node.childNodes[0]
 							}
-							// Iterate to the deepest end node:
-							let endNode = ref.current.childNodes[ref.current.childNodes.length - 1]
-							while (endNode.childNodes.length) {
-								endNode = endNode.childNodes[endNode.childNodes.length - 1]
-							}
+
+							// // Iterate to the deepest end node:
+							// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
+							// while (node2.childNodes.length) {
+							// 	node2 = node2.childNodes[node2.childNodes.length - 1]
+							// }
+
 							// Correct range:
-							range.setStart(startNode, 0)
-							range.setEnd(endNode, (endNode.nodeValue || "").length)
+							range.setStart(node, 0)
+							range.collapse()
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
@@ -208,12 +210,9 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 				<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
 					{JSON.stringify(
 						{
-							// extendedPosRange: state.extendedPosRange,
-							// id: state.data.map(each => each.id),
-
 							...state,
 							reactVDOM: undefined,
-							reactDOM: undefined,
+							reactDOM:  undefined,
 						},
 						null,
 						"\t",
