@@ -204,49 +204,10 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						// 	}))
 						// 	return
 						// }
-
 						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extendedPosRange)
 						const nodes = readRoots(ref.current, [root1, root2])
 						const [pos1, pos2] = computePosRange(ref.current)
 						dispatch.input(nodes, atEnd, [pos1, pos2])
-
-						// const [pos1, pos2] = computePosRange(ref.current)
-						// dispatch.input(nodes, atEnd, [pos1, pos2])
-
-						// const { roots: [root1, root2], root2AtEnd } = queryRoots(ref.current, state.extendedPosRange)
-						// const x1 = state.data.findIndex(each => each.id === root1.id)
-						// if (x1 === -1) {
-						// 	throw new Error("onInput: x1 out of bounds")
-						// }
-						// const x2 = !root2AtEnd ? state.data.findIndex(each => each.id === root2.id) : state.data.length - 1
-						// if (x2 === -1) {
-						// 	throw new Error("onInput: x2 out of bounds")
-						// }
-						// const unparsed = readRoots(ref.current, [root1, root2])
-						// const data = [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)]
-						// const [pos1, pos2] = computePosRange(ref.current)
-						//
-						// // // Correct pos1 (when out of bounds):
-						// // const p1 = data.findIndex(each => each.id === pos1.root.id)
-						// // if (p1 >= 0 && p1 + 1 < data.length && pos1.root.offset > data[p1].raw.length) {
-						// // 	pos1.root.id = data[p1 + 1].id
-						// // 	pos1.root.offset = pos1.node.offset
-						// // }
-						// // // Correct pos2 (when out of bounds):
-						// // const p2 = data.findIndex(each => each.id === pos2.root.id)
-						// // if (p2 >= 0 && p2 + 1 < data.length && pos2.root.offset > data[p2].raw.length) {
-						// // 	pos2.root.id = data[p2 + 1].id
-						// // 	pos2.root.offset = pos2.node.offset
-						// // }
-						//
-						// setState(current => ({
-						// 	...current,
-						// 	data: [...state.data.slice(0, x1), ...parse(unparsed), ...state.data.slice(x2 + 1)],
-						// 	pos1,
-						// 	pos2,
-						// 	// NOTE: Do not extendPosRange here; defer to
-						// 	// useLayoutEffect
-						// }))
 					},
 
 					contentEditable: !state.readOnly,

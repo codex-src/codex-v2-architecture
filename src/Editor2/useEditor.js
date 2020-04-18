@@ -48,58 +48,22 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
-
-		const k1 = nodes[0].id
-		const k2 = nodes[nodes.length - 1].id
-
-		const x1 = state.nodes.findIndex(each => each.id === k1)
-		if (x1 === -1) {
-			throw new Error("input: x1 out of bounds")
+		// Get the start offset:
+		const key1 = nodes[0].id
+		const offset1 = state.nodes.findIndex(each => each.id === key1)
+		if (offset1 === -1) {
+			throw new Error("input: offset1 out of bounds")
 		}
-		const x2 = !atEnd ? state.nodes.findIndex(each => each.id === k2) : state.nodes.length - 1
-		if (x2 === -1) {
-			throw new Error("input: x2 out of bounds")
+		// Get the end offset:
+		const key2 = nodes[nodes.length - 1].id
+		const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
+		if (offset2 === -1) {
+			throw new Error("input: offset2 out of bounds")
 		}
-
-		state.nodes.splice(x1, x2 - x1 + 1, ...nodes)
+		// Update nodes and pos and rerender:
+		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
 		Object.assign(state, { pos1, pos2 })
-
 		this.render()
-
-		// Object.assign(state, { data, pos1, pos2 })
-
-		// console.log(newNodes)
-
-		// const nodes = state.nodes.splice(index1, (index2 + 1) - index1, ...nodes)
-		// console.log(x1, x2)
-
-		// // Create a new action:
-		// this.registerAction(ActionTypes.INPUT)
-		// if (!state.history.index && !state.resetPos) {
-		// 	Object.assign(state.history.stack[0], {
-		// 		pos1: state.pos1,
-		// 		pos2: state.pos2,
-		// 	})
-		// 	state.resetPos = true
-		// }
-		// this.dropRedos()
-		// // Update body:
-		// const key1 = nodes[0].key
-		// const index1 = state.body.findIndex(each => each.key === key1)
-		// if (index1 === -1) {
-		// 	throw new Error("FIXME")
-		// }
-		// const key2 = nodes[nodes.length - 1].key
-		// const index2 = !atEnd ? state.body.findIndex(each => each.key === key2) : state.body.length - 1
-		// if (index2 === -1) {
-		// 	throw new Error("FIXME")
-		// }
-		// state.body.splice(index1, (index2 + 1) - index1, ...nodes)
-		// // Update data, pos1, and pos2:
-		// const data = state.body.map(each => each.data).join("\n")
-		// Object.assign(state, { data, pos1, pos2 })
-		// this.render()
-
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
