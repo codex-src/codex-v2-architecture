@@ -45,8 +45,8 @@ function parseGFMType({
 	const shouldRecurse = type !== typeEnum.Code
 
 	// Prepare an escaped search regex:
-	let searchPattern = syntax.split("").map(each => `\\${each}`).join("")
-	let searchPatternOffset = 0
+	let pattern = syntax.split("").map(each => `\\${each}`).join("")
+	let patternOffset = 0
 	switch (syntax[0]) {
 	case "_":
 		// Underscores cannot be escaped and must be proceeded
@@ -54,24 +54,28 @@ function parseGFMType({
 		if (index - 1 >= 0 && !(isASCIIWhitespace(str[index - 1]) || isASCIIPunctuation(str[index - 1]))) {
 			return null
 		}
-		searchPattern = `[^\\\\]${searchPattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
-		searchPatternOffset++
+		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+		patternOffset++
 		break
 	case "`":
 		// No-op
 		break
 	default:
 		// Etc. cannot be escaped:
-		searchPattern = `[^\\\\]${searchPattern}`
-		searchPatternOffset++
+		pattern = `[^\\\\]${pattern}`
+		patternOffset++
 		break
 	}
-	// Match cannot be an empty string:
-	const offset = str.slice(index + syntax.length).search(searchPattern) + searchPatternOffset
+	// Match cannot be empty:
+	const offset = str.slice(index + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax
 		return null
-	// Match cannot be preceded or proceeded by a space:
+	// Match cannot be preceded or proceeded by a space (does
+	// note affect code):
 	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1]))) {
+		return null
+	// Match cannot be redundant (e.g. ___, ***, and ~~~):
+	} else if (str[index + syntax.length] === syntax[0]) {
 		return null
 	}
 	// Increment start syntax:
@@ -95,6 +99,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	for (let index = 0; index < str.length; index++) {
 		const char = str[index]
 		const nchars = str.length - index
+		// TODO: Add fast path
 		switch (true) {
 		// <Escape>
 		case char === "\\":
@@ -322,6 +327,7 @@ function parseElements(unparsed) {
 		const each = unparsed[index]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
+		// TODO: Add fast path
 		switch (true) {
 		// <Header>
 		case char === "#":

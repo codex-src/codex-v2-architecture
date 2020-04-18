@@ -14,9 +14,9 @@ import "./Editor.css"
 
 const DEBUG_MODE = true // true && process.env.NODE_ENV !== "production"
 
-;(() => {
-	document.body.classList.toggle("debug-css")
-})()
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
 
 // TODO: Add React.memo?
 const ReactEditor = ({ state, dispatch }) => {
