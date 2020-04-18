@@ -1,8 +1,7 @@
-// import extendPosRange from "./extendPosRange"
-// import keyCodes from "./keyCodes"
 import attrs from "./attrs"
 import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
+import keyCodes from "./keyCodes"
 import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
@@ -181,7 +180,28 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// TODO: Enter, etc.
+						// Tab:
+						if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+							// e.preventDefault() // FIXME?
+							// dispatch.tab()
+							return
+						// Enter:
+						} else if (e.keyCode === keyCodes.Enter) {
+							// e.preventDefault() // FIXME?
+							// dispatch.enter()
+							return
+						}
+						// // Undo:
+						// } else if (detect.undo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.undo()
+						// 	return
+						// // Redo:
+						// } else if (detect.redo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.redo()
+						// 	return
+						// }
 					},
 
 					// TODO: onCompositionEnd

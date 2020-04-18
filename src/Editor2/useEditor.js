@@ -1,4 +1,3 @@
-import extendPosRange from "./extendPosRange"
 import parse from "./parser"
 import useMethods from "use-methods"
 
@@ -7,8 +6,8 @@ import {
 	newPos,
 } from "./constructors"
 
-// Creates a new editor state.
-function newEditor(initialValue) {
+// Prepares a new editor state (for useEditor).
+function newEditorState(initialValue) {
 	const nodes = newNodes(initialValue)
 	const initialState = {
 		readOnly: false,                         // Is read-only?
@@ -42,9 +41,47 @@ const methods = state => ({
 		state.focused = false
 	},
 	// Selects the editor.
+	//
+	// NOTE: Can use Math.max and Math.min instead
 	select(pos1, pos2) {
-		const extendedPosRange = extendPosRange(state, [pos1, pos2])
+		// Decrement a copy of pos1.y 2x:
+		let y1 = pos1.y
+		y1 -= 2
+		if (y1 < 0) {
+			y1 = 0
+		}
+		// Increment a copy of pos2.y 2x:
+		let y2 = pos2.y
+		y2 += 2
+		if (y2 >= state.nodes.length) {
+			y2 = state.nodes.length - 1
+		}
+		const extendedPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extendedPosRange })
+	},
+	// Writes character data.
+	//
+	// NOTE: write is inverse to input; write writes character
+	// data whereas input splices nodes (read from the DOM)
+	write(data) {
+		// Parse new nodes:
+		const nodes = newNodes(data)
+		const node1 = state.nodes[state.pos1.y]
+		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
+		// Concatenate the start node:
+		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
+		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
+		// Concatenate the end node:
+		let node = node1
+		if (nodes.length > 1) {
+			node = nodes[nodes.length - 1]
+		}
+		node.data += node2.data.slice(state.pos2.x)
+		// Update and rerender:
+		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
+		const pos2 = { ...pos1 }
+		Object.assign(state, { pos1, pos2 })
+		this.render()
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
@@ -60,10 +97,18 @@ const methods = state => ({
 		if (offset2 === -1) {
 			throw new Error("input: offset2 out of bounds")
 		}
-		// Update nodes and pos and rerender:
+		// Update and rerender:
 		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
 		Object.assign(state, { pos1, pos2 })
 		this.render()
+	},
+	// Inserts a tab character.
+	tab() {
+		this.write("\t")
+	},
+	// Inserts an EOL character.
+	enter() {
+		this.write("\n")
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
@@ -75,7 +120,7 @@ const methods = state => ({
 })
 
 function useEditor(initialValue) {
-	return useMethods(methods, {}, () => newEditor(initialValue))
+	return useMethods(methods, {}, () => newEditorState(initialValue))
 }
 
 export default useEditor
