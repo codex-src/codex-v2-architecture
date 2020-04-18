@@ -1,4 +1,4 @@
-import uuidv4 from "uuid/v4"
+import dedupeNodes from "./dedupeNodes"
 
 // Reads a data-codex-root element.
 function readRoot(root) {
@@ -21,16 +21,11 @@ function readRoot(root) {
 }
 
 // Reads a range of data-codex-root elements.
+//
+// NOTE: readRoots depends on queryRoots
 function readRoots(editorRoot, [root1, root2]) {
-	// TODO: Reuse dedupeNodes?
 	const nodes = []
-	const seen = {}
 	while (root1) {
-		// Guard repeat IDs:
-		if (!root1.id || seen[root1.id]) {
-			root1.id = uuidv4()
-		}
-		seen[root1.id] = true
 		nodes.push(...readRoot(root1))
 		if (root1 === root2) {
 			// No-op
@@ -38,7 +33,8 @@ function readRoots(editorRoot, [root1, root2]) {
 		}
 		root1 = root1.nextElementSibling
 	}
-	return nodes
+	const deduped = dedupeNodes(nodes)
+	return deduped
 }
 
 export default readRoots

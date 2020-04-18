@@ -1,7 +1,6 @@
 import extendPosRange from "./extendPosRange"
 import parse from "./parser"
 import useMethods from "use-methods"
-import uuidv4 from "uuid/v4"
 
 import {
 	newNodes,
@@ -23,18 +22,6 @@ function newEditor(initialValue) {
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return initialState
-}
-
-// Dedupes nodes e.g. repeat IDs.
-function dedupeNodes(nodes) {
-	const seen = {}
-	for (const each of nodes) {
-		if (!each.id || seen[each.id]) {
-			each.id = uuidv4()
-		}
-		seen[each.id] = true
-	}
-	return nodes
 }
 
 const methods = state => ({
@@ -61,10 +48,6 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
-		// NOTE: Dedupe node IDs because readRoots and queryRoot
-		// operate on roots not nodes e.g. dedupeNodes.
-		dedupeNodes(nodes)
-
 		// Get the start offset:
 		const key1 = nodes[0].id
 		const offset1 = state.nodes.findIndex(each => each.id === key1)
