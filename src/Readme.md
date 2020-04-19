@@ -2,11 +2,11 @@
 
 **Codex is a new WYSIWYG markdown editor for devs. 👩🏾‍💻👨🏼‍💻** As you type in the editor, your notes are synced to localStorage. You can always copy and paste your notes in and out of Codex and you’ll never loose formatting. ✨
 
-Codex is based on GitHub Flavored Markdown (GFM). That means you can use syntax characters like _italics_ and **bold** to format text, right in the browser!
+Codex is based on GitHub Flavored Markdown (GFM). That means you can use syntax characters like underscores `_` for _italics_ and asterisks `*` for **bold** to format text, right from your browser!
 
 Here’s a primer:
 
-You can use _italics_, **bold**, `code`, and ~strikethrough~. Alternate syntax is also supported: *italics*, __bold__, and ~~strikethrough~~ also work. Finally, you can use ***bold and italics*** or ___bold and italics__.
+You can use _italics_, **bold**, `code`, and ~strikethrough~. Alternate syntax is also supported: *italics*, __bold__, and ~~strikethrough~~ also work. Finally, you can use ***bold and italics*** or ___bold and italics___.
 
 > This is a blockquote
 >
