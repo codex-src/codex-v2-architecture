@@ -5,13 +5,15 @@ function newHashEpoch() {
 		// ALPHA / DIGIT / "-" / "." / "_" / "~"
 		//
 		// https://tools.ietf.org/html/rfc3986
-		const hash = str.toLowerCase()
-			// Convert spaces and dashes to one dash:
-			.replace(/(\s+|-+)/g, "-")
-			// Drop URL unsafe characters:
-			.replace(/[^\w\-\.\~]/g, "") // eslint-disable-line no-useless-escape
-			// Trim dashes:
-			.replace(/(^-+|-+$)/g, "")
+		//
+		// eslint-disable no-useless-escape
+		const hash = str
+			.toLowerCase()               // Lowercase
+			.replace(/(\s+|\-+)/g, "-")  // Convert spaces to dashes
+			.replace(/[^a-z0-9\-]/g, "") // Remove non-alphanumerics (strict)
+			.replace(/\-+/g, "-")        // Remove extraneous dashes (1 of 2)
+			.replace(/(^\-|\-$)/g, "")   // Remove extraneous dashes (2 of 2)
+		// eslint-enable no-useless-escape
 		const seen = hashes[hash]
 		if (!seen) {
 			hashes[hash] = 0
