@@ -137,27 +137,20 @@ const App = () => {
 	// Binds read-only shortcut (macOS).
 	//
 	// TODO: Make shortcut cross-platform.
-	React.useEffect(
-		React.useCallback(() => {
-			if (editorState.readOnly) {
+	React.useEffect(() => {
+		const handler = e => {
+			if (!e.metaKey || e.keyCode !== keyCodes.P) {
 				// No-op
 				return
 			}
-			const handler = e => {
-				if (!e.metaKey || e.keyCode !== keyCodes.P) {
-					// No-op
-					return
-				}
-				e.preventDefault()
-				editorDispatch.toggleReadOnly()
-			}
-			document.addEventListener("keydown", handler)
-			return () => {
-				document.removeEventListener("keydown", handler)
-			}
-		}, [editorState.readOnly, editorDispatch]),
-		[editorState.readOnly],
-	)
+			e.preventDefault()
+			editorDispatch.toggleReadOnly()
+		}
+		document.addEventListener("keydown", handler)
+		return () => {
+			document.removeEventListener("keydown", handler)
+		}
+	}, [editorDispatch])
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
