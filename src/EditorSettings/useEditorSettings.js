@@ -7,11 +7,20 @@ import {
 	toReact_js,
 } from "Editor2/cmap"
 
+// Maps render modes to an language extension.
+const extensionMap = {
+	[renderModesEnum.Readme]: "",
+	[renderModesEnum.JSON]: "json",
+	[renderModesEnum.HTML]: "html",
+	[renderModesEnum.HTML__BEM]: "html",
+	[renderModesEnum.React_js]: "jsx",
+}
+
 function initialState(defaultRenderer) {
 	const state = {
 		show: false,
 		renderMode: renderModesEnum[defaultRenderer],
-		extension: "",
+		extension: extensionMap[defaultRenderer],
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
 		[renderModesEnum.HTML__BEM]: "",
