@@ -45,20 +45,13 @@ I’m sure some of you will say that TypeScript makes you more productive, and i
 
 const Readme = () => {
 	const [state, dispatch] = useEditor(data)
-
-	return (
-		<Editor
-			style={{ fontSize: 15 }}
-			state={state}
-			dispatch={dispatch}
-		/>
-	)
+	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} />
 }
 
 const FixedEditorSettings = ({ state, dispatch }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 		<div className="flex flex-col items-end h-full">
-			<div className="-m-1 flex flex-row pointer-events-auto">
+			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showReadme}
