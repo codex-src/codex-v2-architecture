@@ -2,33 +2,18 @@
 import * as Hero from "react-heroicons"
 import Button from "Button"
 import Editor from "Editor2/Editor"
-import Enum from "Enum"
 import Highlighted from "Highlighted"
 import Icon from "Icon"
 import keyCodes from "Editor2/keyCodes"
 import React from "react"
 import Transition from "Transition"
 import useEditor from "Editor2/useEditor"
-import useMethods from "use-methods"
-
-import {
-	toHTML,
-	toHTML__BEM,
-	toReact_js,
-} from "./Editor2/cmap"
+import useEditorSettings from "EditorSettings/useEditorSettings"
 
 import "./App.css"
 
-const LOCALSTORAGE_KEY = "codex-app-v2.3"
-
-const renderModesEnum = new Enum(
-	"JSON",
-	"HTML",
-	"HTML__BEM",
-	"React_js",
-)
-
-// Read from localStorage:
+// const LOCALSTORAGE_KEY = "codex-app-v2.3"
+//
 // const data = (() => {
 // 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 // 	if (!cache) {
@@ -47,68 +32,7 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
-const initialState = {
-	show: false,
-	renderMode: renderModesEnum.JSON,
-	extension: "json",
-	// [renderModesEnum.JSON]: "",
-	// [renderModesEnum.HTML]: "",
-	// [renderModesEnum.HTML__BEM]: "",
-	// [renderModesEnum.React_js]: "",
-	...renderModesEnum.keys().reduce((acc, each) => {
-		acc[each] = ""
-		return acc
-	}, {}),
-}
-
-const methods = state => ({
-	update(editorState) {
-		Object.assign(state, {
-			JSON: JSON.stringify(
-				{
-					...editorState,
-					data:      undefined,
-					reactVDOM: undefined,
-					reactDOM:  undefined,
-				},
-				null,
-				"\t",
-			),
-			HTML:      toHTML(editorState.reactVDOM),
-			HTML__BEM: toHTML__BEM(editorState.reactVDOM),
-			React_js:  toReact_js(editorState.reactVDOM),
-		})
-	},
-	showJSON() {
-		state.show = true
-		state.renderMode = renderModesEnum.JSON
-		state.extension = "json"
-	},
-	showHTML() {
-		state.show = true
-		state.renderMode = renderModesEnum.HTML
-		state.extension = "html"
-	},
-	showHTML__BEM() {
-		state.show = true
-		state.renderMode = renderModesEnum.HTML__BEM
-		state.extension = "html"
-	},
-	showReact_js() {
-		state.show = true
-		state.renderMode = renderModesEnum.React_js
-		state.extension = "jsx"
-	},
-	toggleShow() {
-		state.show = !state.show
-	},
-})
-
-function useSettings() {
-	return useMethods(methods, initialState)
-}
-
-const FixedSettings = ({ state, dispatch }) => (
+const FixedEditorSettings = ({ state, dispatch }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 		<div className="flex flex-col items-end">
 			<div className="-m-1 flex flex-row pointer-events-auto">
@@ -137,6 +61,7 @@ const FixedSettings = ({ state, dispatch }) => (
 					React
 				</Button>
 				<Button
+					// NOTE: Uses rounded-full instead of rounded-lg
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-full shadow transition duration-75"
 					onClick={dispatch.toggleShow}
 				>
@@ -165,72 +90,72 @@ const FixedSettings = ({ state, dispatch }) => (
 )
 
 const App = () => {
-	// const [state, dispatch] = useEditor(`> Hello\n`)
-	const [state, dispatch] = useEditor(data)
+	const [editorState, editorDispatch] = useEditor(data)
+	const [editorSettings, editorSettingsDispatch] = useEditorSettings()
 
-	// TODO: Add "JSON" as an argument
-	const [renderState, renderDispatch] = useSettings()
+	// // Writes editorState.data to localStorage.
+	// React.useEffect(() => {
+	// 	const id = setTimeout(() => {
+	// 		const json = JSON.stringify({ data: editorState.data })
+	// 		localStorage.setItem(LOCALSTORAGE_KEY, json)
+	// 	}, 100)
+	// 	return () => {
+	// 		clearTimeout(id)
+	// 	}
+	// }, [editorState.data])
 
-	// Write to localStorage:
+	// Debounces editorSettingsDispatch.update by one frame.
 	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const json = JSON.stringify({ data: state.data })
-			localStorage.setItem(LOCALSTORAGE_KEY, json)
-		}, 100)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [state.data])
-
-	React.useEffect(() => {
-		if (!renderState.show) {
+		if (!editorSettings.show) {
 			// No-op
 			return
 		}
 		const id = setTimeout(() => {
-			renderDispatch.update(state)
+			editorSettingsDispatch.update(editorState)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [state, renderState, renderDispatch])
+	}, [editorState, editorSettings, editorSettingsDispatch])
 
-	// Binds read-only shortcut (command-p).
+	// Binds read-only shortcut (macOS).
+	//
+	// TODO: Make shortcut cross-platform.
 	React.useEffect(
 		React.useCallback(() => {
-			// if (state.readOnly) {
-			// 	// No-op
-			// 	return
-			// }
+			if (editorState.readOnly) {
+				// No-op
+				return
+			}
 			const handler = e => {
 				if (!e.metaKey || e.keyCode !== keyCodes.P) {
 					// No-op
 					return
 				}
 				e.preventDefault()
-				dispatch.toggleReadOnly()
+				editorDispatch.toggleReadOnly()
 			}
 			document.addEventListener("keydown", handler)
 			return () => {
 				document.removeEventListener("keydown", handler)
 			}
-		}, [dispatch]),
-		[state.readOnly],
+		}, [editorState.readOnly, editorDispatch]),
+		[editorState.readOnly],
 	)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
 
-				<FixedSettings
-					state={renderState}
-					dispatch={renderDispatch}
+				<FixedEditorSettings
+					state={editorSettings}
+					dispatch={editorSettingsDispatch}
 				/>
 
 				<Editor
 					style={{ fontSize: 17 }}
-					state={state}
-					dispatch={dispatch}
+					state={editorState}
+					dispatch={editorDispatch}
 					// readOnly
 				/>
 
