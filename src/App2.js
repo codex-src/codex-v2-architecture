@@ -55,7 +55,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showReadme}
 				>
-					Readme
+					Interative readme
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -85,7 +85,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleShow}
 				>
-					Toggle sidebar (esc){"\u00a0\u00a0"}
+					Sidebar (esc){"\u00a0\u00a0"}
 					<Icon className="-mt-px inline-block w-4 h-4" svg={!state.show ? ArrowLeftOutlineMd : XOutlineMd} />
 				</Button>
 			</div>
