@@ -39,6 +39,11 @@ const methods = state => ({
 			React_js:  toReact_js(editorState.reactVDOM),
 		})
 	},
+	showReadme() {
+		state.show = true
+		state.renderMode = renderModesEnum.Readme
+		state.extension = ""
+	},
 	showJSON() {
 		state.show = true
 		state.renderMode = renderModesEnum.JSON
