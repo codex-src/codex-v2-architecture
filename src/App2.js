@@ -1,12 +1,18 @@
 // import raw from "raw.macro"
-import * as cmap from "Editor2/cmap"
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Enum from "Enum"
 import keyCodes from "Editor2/keyCodes"
+import Prism from "./Prism"
 import React from "react"
 import Transition from "Transition"
 import useEditor from "Editor2/useEditor"
+
+import {
+	toHTML,
+	toHTML__BEM,
+	toReact_js,
+} from "./Editor2/cmap"
 
 import "./App.css"
 
@@ -45,6 +51,39 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
+// <div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={style}>
+// 	<span className="inline-block">
+// 		<div className="whitespace-pre font-mono text-sm leading-snug">
+// 			{html || (
+// 				children
+// 			)}
+// 		</div>
+// 	</span>
+// </div>
+
+const Highlighted = ({ extension, children }) => {
+	const [highlighted, setHighlighted] = React.useState(null)
+
+	React.useEffect(() => {
+		if (!extension) {
+			// No-op
+			return
+		}
+		const parser = Prism[extension]
+		if (!parser) {
+			// No-op
+			return
+		}
+		setHighlighted((
+			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
+				__html: window.Prism.highlight(children, parser, extension),
+			}} />
+		))
+	}, [extension, children])
+
+	return highlighted || children
+}
+
 const FixedSettings = ({ renderState, setRenderState }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 		<div className="flex flex-col items-end">
@@ -55,6 +94,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 						...renderState,
 						show: true,
 						renderMode: renderModesEnum.JSON,
+						extension: "json",
 					})}
 				>
 					JSON
@@ -65,6 +105,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 						...renderState,
 						show: true,
 						renderMode: renderModesEnum.HTML,
+						extension: "html",
 					})}
 				>
 					HTML
@@ -75,6 +116,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 						...renderState,
 						show: true,
 						renderMode: renderModesEnum.HTML__BEM,
+						extension: "html",
 					})}
 				>
 					HTML__BEM
@@ -85,6 +127,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 						...renderState,
 						show: true,
 						renderMode: renderModesEnum.React_js,
+						extension: "jsx",
 					})}
 				>
 					React
@@ -111,22 +154,9 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 			>
 				<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-						{/* JSON */}
-						{renderState.renderMode === renderModesEnum.JSON && (
-							renderState[renderModesEnum.JSON]
-						)}
-						{/* HTML */}
-						{renderState.renderMode === renderModesEnum.HTML && (
-							renderState[renderModesEnum.HTML]
-						)}
-						{/* HTML__BEM */}
-						{renderState.renderMode === renderModesEnum.HTML__BEM && (
-							renderState[renderModesEnum.HTML__BEM]
-						)}
-						{/* React_js */}
-						{renderState.renderMode === renderModesEnum.React_js && (
-							renderState[renderModesEnum.React_js]
-						)}
+						<Highlighted extension={renderState.extension}>
+							{renderState[renderState.renderMode]}
+						</Highlighted>
 					</pre>
 				</div>
 			</Transition>
@@ -176,9 +206,9 @@ const App = () => {
 						null,
 						"\t",
 					),
-					[renderModesEnum.HTML]:      cmap.toHTML(state.reactVDOM),
-					[renderModesEnum.HTML__BEM]: cmap.toHTML__BEM(state.reactVDOM),
-					[renderModesEnum.React_js]:  cmap.toReact_js(state.reactVDOM),
+					[renderModesEnum.HTML]:      toHTML(state.reactVDOM),
+					[renderModesEnum.HTML__BEM]: toHTML__BEM(state.reactVDOM),
+					[renderModesEnum.React_js]:  toReact_js(state.reactVDOM),
 				}))
 			}, 100)
 			return () => {
