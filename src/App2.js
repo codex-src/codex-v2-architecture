@@ -9,6 +9,7 @@ import keyCodes from "Editor2/keyCodes"
 import React from "react"
 import Transition from "Transition"
 import useEditor from "Editor2/useEditor"
+import useMethods from "use-methods"
 
 import {
 	toHTML,
@@ -50,102 +51,100 @@ const initialState = {
 	show: false,
 	renderMode: renderModesEnum.JSON,
 	extension: "json",
-	// ...renderModesEnum.keys().reduce((acc, each) => {
-	// 	acc[each] = ""
-	// 	return acc
-	// }, {}),
-	[renderModesEnum.JSON]: "",
-	[renderModesEnum.HTML]: "",
-	[renderModesEnum.HTML__BEM]: "",
-	[renderModesEnum.React_js]: "",
+	// [renderModesEnum.JSON]: "",
+	// [renderModesEnum.HTML]: "",
+	// [renderModesEnum.HTML__BEM]: "",
+	// [renderModesEnum.React_js]: "",
+	...renderModesEnum.keys().reduce((acc, each) => {
+		acc[each] = ""
+		return acc
+	}, {}),
 }
 
 const methods = state => ({
-	toggleShow() {
-		state.show = !state.show
+	update(editorState) {
+		Object.assign(state, {
+			JSON: JSON.stringify(
+				{
+					...editorState,
+					data:      undefined,
+					reactVDOM: undefined,
+					reactDOM:  undefined,
+				},
+				null,
+				"\t",
+			),
+			HTML:      toHTML(editorState.reactVDOM),
+			HTML__BEM: toHTML__BEM(editorState.reactVDOM),
+			React_js:  toReact_js(editorState.reactVDOM),
+		})
 	},
-	setJSON() {
+	showJSON() {
 		state.show = true
 		state.renderMode = renderModesEnum.JSON
 		state.extension = "json"
 	},
-	setHTML() {
+	showHTML() {
 		state.show = true
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
-	setHTML__BEM() {
+	showHTML__BEM() {
 		state.show = true
 		state.renderMode = renderModesEnum.HTML__BEM
 		state.extension = "html"
 	},
-	setReact_js() {
+	showReact_js() {
 		state.show = true
 		state.renderMode = renderModesEnum.React_js
 		state.extension = "jsx"
 	},
+	toggleShow() {
+		state.show = !state.show
+	},
 })
 
-const FixedSettings = ({ renderState, setRenderState }) => (
+function useSettings() {
+	return useMethods(methods, initialState)
+}
+
+const FixedSettings = ({ state, dispatch }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 		<div className="flex flex-col items-end">
 			<div className="-m-1 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={e => setRenderState({
-						...renderState,
-						show: true,
-						renderMode: renderModesEnum.JSON,
-						extension: "json",
-					})}
+					onClick={dispatch.showJSON}
 				>
 					JSON
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={e => setRenderState({
-						...renderState,
-						show: true,
-						renderMode: renderModesEnum.HTML,
-						extension: "html",
-					})}
+					onClick={dispatch.showHTML}
 				>
 					HTML
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={e => setRenderState({
-						...renderState,
-						show: true,
-						renderMode: renderModesEnum.HTML__BEM,
-						extension: "html",
-					})}
+					onClick={dispatch.showHTML__BEM}
 				>
 					HTML (BEM classes)
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={e => setRenderState({
-						...renderState,
-						show: true,
-						renderMode: renderModesEnum.React_js,
-						extension: "jsx",
-					})}
+					onClick={dispatch.showReact_js}
 				>
 					React
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-full shadow transition duration-75"
-					onClick={e => setRenderState({
-						...renderState,
-						show: !renderState.show,
-					})}
+					onClick={dispatch.toggleShow}
 				>
-					<Icon className="w-4 h-4" svg={!renderState.show ? Hero.ArrowLeftOutlineMd : Hero.XOutlineMd} />
+					<Icon className="w-4 h-4" svg={!state.show ? Hero.ArrowLeftOutlineMd : Hero.XOutlineMd} />
 				</Button>
 			</div>
 			<Transition
-				show={renderState.show}
+				show={state.show}
 				enter="transition ease-out duration-300"
 				enterFrom="transform opacity-0 translate-x-64"
 				enterTo="transform opacity-100 translate-x-0"
@@ -155,8 +154,8 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 			>
 				<div className="my-6 p-6 relative w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-						<Highlighted extension={renderState.extension}>
-							{renderState[renderState.renderMode]}
+						<Highlighted extension={state.extension}>
+							{state[state.renderMode]}
 						</Highlighted>
 					</pre>
 				</div>
@@ -169,15 +168,8 @@ const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
 	const [state, dispatch] = useEditor(data)
 
-	// const [renderState, renderDispatch] = useSettings() // TODO: Add "JSON" as an argument
-	const [renderState, setRenderState] = React.useState(() => ({
-		show: false,
-		renderMode: renderModesEnum.JSON,
-		...renderModesEnum.keys().reduce((acc, each) => {
-			acc[each] = ""
-			return acc
-		}, {}),
-	}))
+	// TODO: Add "JSON" as an argument
+	const [renderState, renderDispatch] = useSettings()
 
 	// Write to localStorage:
 	React.useEffect(() => {
@@ -196,27 +188,12 @@ const App = () => {
 			return
 		}
 		const id = setTimeout(() => {
-			setRenderState(current => ({
-				...current,
-				[renderModesEnum.JSON]: JSON.stringify(
-					{
-						...state,
-						data:      undefined,
-						reactVDOM: undefined,
-						reactDOM:  undefined,
-					},
-					null,
-					"\t",
-				),
-				[renderModesEnum.HTML]:      toHTML(state.reactVDOM),
-				[renderModesEnum.HTML__BEM]: toHTML__BEM(state.reactVDOM),
-				[renderModesEnum.React_js]:  toReact_js(state.reactVDOM),
-			}))
+			renderDispatch.update(state)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [state, renderState])
+	}, [state, renderState, renderDispatch])
 
 	// Binds read-only shortcut (command-p).
 	React.useEffect(
@@ -246,8 +223,8 @@ const App = () => {
 			<div className="px-6 w-full max-w-screen-md">
 
 				<FixedSettings
-					renderState={renderState}
-					setRenderState={setRenderState}
+					state={renderState}
+					dispatch={renderDispatch}
 				/>
 
 				<Editor
