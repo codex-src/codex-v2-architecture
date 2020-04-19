@@ -93,7 +93,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 				leaveFrom="transform opacity-100 translate-x-0"
 				leaveTo="transform opacity-0 translate-x-64"
 			>
-				<div className="my-6 p-6 relative w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
+				<div className="my-6 p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 						<Highlighted extension={state.extension}>
 							{state[state.renderMode]}
