@@ -100,7 +100,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	for (let index = 0; index < str.length; index++) {
 		const char = str[index]
 		const nchars = str.length - index
-		// TODO: Add fast path
+		// TODO: Add fast path for plain text?
 		switch (true) {
 		// <Escape>
 		case char === "\\":
@@ -330,7 +330,7 @@ function parseElements(unparsed) {
 		const each = unparsed[index]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
-		// TODO: Add fast path
+		// TODO: Add fast path for plain text?
 		switch (true) {
 		// <Header>
 		case char === "#":

@@ -54,6 +54,12 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 			<div className="-m-1 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					// onClick={dispatch.showJSON}
+				>
+					Readme
+				</Button>
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showJSON}
 				>
 					JSON
@@ -68,7 +74,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showHTML__BEM}
 				>
-					HTML (BEM classes)
+					HTML (BEM)
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
