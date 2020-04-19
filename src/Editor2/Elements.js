@@ -43,17 +43,28 @@ const headerClassNames = {
 	h6: trim("font-semibold text-lg  leading-tight"),
 }
 
-export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root id={id} className={headerClassNames[tag]}>
-		<a id={hash} className="block" href={`#${hash}`}>
-			<Markdown syntax={syntax}>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</a>
-	</Root>
-))
+// Conditionally wraps a React component.
+const IfWrapper = ({ cond, wrap: Wrapper, children }) => {
+	if (!cond) {
+		return children
+	}
+	return <Wrapper>{children}</Wrapper>
+}
+
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
+	const [state] = useEditorState()
+	return (
+		<Root id={id} className={headerClassNames[tag]}>
+			<IfWrapper cond={state.readOnly} wrap={({ children }) => <a id={hash} href={`#${hash}`}>{children}</a>}>
+				<Markdown syntax={syntax}>
+					{toReact(children) || (
+						<br />
+					)}
+				</Markdown>
+			</IfWrapper>
+		</Root>
+	)
+})
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
 	<Root id={id} className={!emojis ? null : `emojis emojis-${emojis}`}>
