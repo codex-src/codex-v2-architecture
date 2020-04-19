@@ -1,6 +1,7 @@
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Highlighted from "Highlighted"
+import Icon from "Icon"
 import raw from "raw.macro"
 import React from "react"
 import renderModesEnum from "EditorSettings/renderModesEnum"
@@ -10,16 +11,16 @@ import useEditorSettings from "EditorSettings/useEditorSettings"
 
 import "./App.css"
 
-// const ArrowLeftOutlineMd = React.forwardRef((props, ref) => (
-// 	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
-// 		<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-// 	</svg>
-// ))
-// const XOutlineMd = React.forwardRef((props, ref) => (
-// 	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
-// 		<path d="M6 18L18 6M6 6l12 12" />
-// 	</svg>
-// ))
+const ArrowLeftOutlineMd = React.forwardRef((props, ref) => (
+	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
+		<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+	</svg>
+))
+const XOutlineMd = React.forwardRef((props, ref) => (
+	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
+		<path d="M6 18L18 6M6 6l12 12" />
+	</svg>
+))
 
 // const LOCALSTORAGE_KEY = "codex-app-v2.3"
 //
@@ -78,20 +79,14 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showReact_js}
 				>
-					React
+					React (JSX)
 				</Button>
-				{/* <Button */}
-				{/* 	// NOTE: Uses rounded-full instead of rounded-lg */}
-				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-full shadow transition duration-75" */}
-				{/* 	onClick={dispatch.toggleShow} */}
-				{/* > */}
-				{/* 	<Icon className="w-4 h-4" svg={!state.show ? ArrowLeftOutlineMd : XOutlineMd} /> */}
-				{/* </Button> */}
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleShow}
 				>
-					{!state.show ? "Open" : "Close"} (esc)
+					Toggle sidebar{"\u00a0\u00a0"}
+					<Icon className="-mt-px inline-block w-4 h-4" svg={!state.show ? ArrowLeftOutlineMd : XOutlineMd} />
 				</Button>
 			</div>
 			<Transition
