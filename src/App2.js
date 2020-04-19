@@ -86,13 +86,13 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showJSON}
 	 			>
-	 				Show JSON
+	 				JSON
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showHTML}
 	 			>
-	 				Show HTML
+	 				HTML
 	 			</Button>
 	 			{/* <Button */}
 	 			{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
@@ -104,14 +104,14 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showReact_js}
 	 			>
-	 				Show React
+	 				React
 	 			</Button>
-	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-	 				onClick={dispatch.toggleSidebar}
-	 			>
-	 				Toggle sidebar (esc)
-	 			</Button>
+	 			{/* <Button */}
+	 			{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
+	 			{/* 	onClick={dispatch.toggleSidebar} */}
+	 			{/* > */}
+	 			{/* 	Toggle sidebar (esc) */}
+	 			{/* </Button> */}
 			</div>
 
 		</div>

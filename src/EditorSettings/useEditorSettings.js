@@ -50,27 +50,47 @@ const methods = state => ({
 		})
 	},
 	showReadme() {
-		state.showSidebar = true
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.Readme) {
+			state.showSidebar = false
+		}
 		state.renderMode = renderModesEnum.Readme
 		state.extension = ""
 	},
 	showJSON() {
-		state.showSidebar = true
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.JSON) {
+			state.showSidebar = false
+		}
 		state.renderMode = renderModesEnum.JSON
 		state.extension = "json"
 	},
 	showHTML() {
-		state.showSidebar = true
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.HTML) {
+			state.showSidebar = false
+		}
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
 	showHTML__BEM() {
-		state.showSidebar = true
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.HTML__BEM) {
+			state.showSidebar = false
+		}
 		state.renderMode = renderModesEnum.HTML__BEM
 		state.extension = "html"
 	},
 	showReact_js() {
-		state.showSidebar = true
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.React_js) {
+			state.showSidebar = false
+		}
 		state.renderMode = renderModesEnum.React_js
 		state.extension = "jsx"
 	},
@@ -80,9 +100,9 @@ const methods = state => ({
 	toggleCSSDebugger() {
 		state.showCSSDebugger = !state.showCSSDebugger
 	},
-	toggleSidebar() {
-		state.showSidebar = !state.showSidebar
-	},
+	// toggleSidebar() {
+	// 	state.showSidebar = !state.showSidebar
+	// },
 })
 
 function useEditorSettings(defaultRenderer) {
