@@ -1,9 +1,9 @@
-// import raw from "raw.macro"
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Highlighted from "Highlighted"
 import Icon from "Icon"
 import keyCodes from "Editor2/keyCodes"
+import raw from "raw.macro"
 import React from "react"
 import renderModesEnum from "EditorSettings/renderModesEnum"
 import Transition from "Transition"
@@ -43,8 +43,8 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
-const Readme = () => {
-	const [state, dispatch] = useEditor(data)
+const ReadmeEditor = () => {
+	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} />
 }
 
@@ -58,12 +58,12 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 				>
 					Readme
 				</Button>
-				<Button
-					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={dispatch.showJSON}
-				>
-					JSON
-				</Button>
+				{/* <Button */}
+				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
+				{/* 	onClick={dispatch.showJSON} */}
+				{/* > */}
+				{/* 	JSON */}
+				{/* </Button> */}
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showHTML}
@@ -80,7 +80,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.showReact_js}
 				>
-					React
+					React (JSX)
 				</Button>
 				<Button
 					// NOTE: Uses rounded-full instead of rounded-lg
@@ -101,7 +101,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 			>
 				<div className="my-6 p-6 w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 					{state.renderMode === renderModesEnum.Readme ? (
-						<Readme />
+						<ReadmeEditor />
 					) : (
 						<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 							<Highlighted extension={state.extension}>
