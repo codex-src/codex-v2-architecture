@@ -50,7 +50,7 @@ I’m sure some of you will say that TypeScript makes you more productive, and i
 
 const FixedEditorSettings = ({ state, dispatch }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
-		<div className="flex flex-col items-end">
+		<div className="flex flex-col items-end h-full">
 			<div className="-m-1 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -93,7 +93,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 				leaveFrom="transform opacity-100 translate-x-0"
 				leaveTo="transform opacity-0 translate-x-64"
 			>
-				<div className="my-6 p-6 relative w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
+				<div className="my-6 p-6 relative w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 						<Highlighted extension={state.extension}>
 							{state[state.renderMode]}
