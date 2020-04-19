@@ -12,8 +12,6 @@ import typeEnumMap from "./typeEnumMap"
 
 import "./Editor.css"
 
-// const DEBUG_MODE = true // true && process.env.NODE_ENV !== "production"
-//
 // ;(() => {
 // 	document.body.classList.toggle("debug-css")
 // })()
@@ -204,7 +202,6 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 				// TODO: onCompositionEnd
 				onInput: () => {
-					// debugger
 					if (state.readOnly) {
 						// No-op
 						return
@@ -220,25 +217,53 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				},
 
+				onCut: e => {
+					if (state.readOnly) {
+						// No-op
+						return
+					}
+					e.preventDefault()
+					if (state.pos1.pos === state.pos2.pos) {
+						// No-op
+						return
+					}
+					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", data)
+					dispatch.cut()
+				},
+				onCopy: e => {
+					if (state.readOnly) {
+						// No-op
+						return
+					}
+					e.preventDefault()
+					if (state.pos1.pos === state.pos2.pos) {
+						// No-op
+						return
+					}
+					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", data)
+					dispatch.copy()
+				},
+				onPaste: e => {
+					if (state.readOnly) {
+						// No-op
+						return
+					}
+					e.preventDefault()
+					const data = e.clipboardData.getData("text/plain")
+					if (!data) {
+						// No-op
+						return
+					}
+					dispatch.paste(data)
+				},
+
 				contentEditable: !state.readOnly,
 				suppressContentEditableWarning: !state.readOnly,
 			},
 		)
 	)
 }
-
-// {DEBUG_MODE && (
-// 	<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
-// 		{JSON.stringify(
-// 			{
-// 				...state,
-// 				reactVDOM: undefined,
-// 				reactDOM:  undefined,
-// 			},
-// 			null,
-// 			"\t",
-// 		)}
-// 	</div>
-// )}
 
 export default Editor

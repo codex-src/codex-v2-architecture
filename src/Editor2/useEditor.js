@@ -113,6 +113,20 @@ const methods = state => ({
 	enter() {
 		this.write("\n")
 	},
+	// Cuts character data.
+	cut() {
+		this.write("")
+	},
+	// Copies character data.
+	copy() {
+		// No-op
+	},
+	// Pastes character data.
+	//
+	// NOTE: Pasting HTML is not yet supported
+	paste(data) {
+		this.write(data)
+	},
 	// Rerenders the string and VDOM representations.
 	render() {
 		Object.assign(state, {
