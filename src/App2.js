@@ -46,6 +46,46 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
+const initialState = {
+	show: false,
+	renderMode: renderModesEnum.JSON,
+	extension: "json",
+	// ...renderModesEnum.keys().reduce((acc, each) => {
+	// 	acc[each] = ""
+	// 	return acc
+	// }, {}),
+	[renderModesEnum.JSON]: "",
+	[renderModesEnum.HTML]: "",
+	[renderModesEnum.HTML__BEM]: "",
+	[renderModesEnum.React_js]: "",
+}
+
+const methods = state => ({
+	toggleShow() {
+		state.show = !state.show
+	},
+	setJSON() {
+		state.show = true
+		state.renderMode = renderModesEnum.JSON
+		state.extension = "json"
+	},
+	setHTML() {
+		state.show = true
+		state.renderMode = renderModesEnum.HTML
+		state.extension = "html"
+	},
+	setHTML__BEM() {
+		state.show = true
+		state.renderMode = renderModesEnum.HTML__BEM
+		state.extension = "html"
+	},
+	setReact_js() {
+		state.show = true
+		state.renderMode = renderModesEnum.React_js
+		state.extension = "jsx"
+	},
+})
+
 const FixedSettings = ({ renderState, setRenderState }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
 		<div className="flex flex-col items-end">
@@ -81,7 +121,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 						extension: "html",
 					})}
 				>
-					HTML__BEM
+					HTML (BEM classes)
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -125,15 +165,11 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 	</div>
 )
 
-// ;(() => {
-// 	document.body.classList.toggle("debug-css")
-// })()
-
 const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
 	const [state, dispatch] = useEditor(data)
 
-	// TODO: Extract to reducer?
+	// const [renderState, renderDispatch] = useSettings() // TODO: Add "JSON" as an argument
 	const [renderState, setRenderState] = React.useState(() => ({
 		show: false,
 		renderMode: renderModesEnum.JSON,
