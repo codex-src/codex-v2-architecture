@@ -123,7 +123,7 @@ const methods = state => ({
 	},
 	// Pastes character data.
 	//
-	// NOTE: Pasting HTML is not yet supported
+	// TODO: Add pasteFromHTML handler
 	paste(data) {
 		this.write(data)
 	},

@@ -35,6 +35,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
+	const dedupedCompositionEnd = React.useRef()
 
 	// Registers props.
 	React.useLayoutEffect(() => {
@@ -200,15 +201,33 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					// }
 				},
 
-				// TODO: onCompositionEnd
+				onCompositionEnd: e => {
+					if (state.readOnly) {
+						// No-op
+						return
+					}
+					// https://github.com/w3c/uievents/issues/202#issue-316461024
+					dedupedCompositionEnd.current = true
+					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
+					const nodes = readRoots(ref.current, [root1, root2])
+					const [pos1, pos2] = computePosRange(ref.current)
+					dispatch.input(nodes, atEnd, [pos1, pos2])
+				},
 				onInput: () => {
 					if (state.readOnly) {
 						// No-op
 						return
 					}
 					// Force rerender when empty:
-					if (!ref.current.childNodes.length) {
+					if (!ref.current.childNodes.length) { // Takes precedence?
 						dispatch.render()
+						return
+					}
+					// Dedupe "compositionend" event (not tested):
+					//
+					// https://github.com/w3c/uievents/issues/202#issue-316461024
+					if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
+						dedupedCompositionEnd.current = false
 						return
 					}
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
