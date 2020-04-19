@@ -64,7 +64,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Toggle read-only mode: {"" + state.showReadOnly}
+					Toggle read-only: {"" + state.showReadOnly}
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -110,7 +110,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.toggleSidebar}
 	 			>
-	 				Sidebar (esc)
+	 				Toggle sidebar (esc)
 	 			</Button>
 			</div>
 
