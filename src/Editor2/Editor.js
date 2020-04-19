@@ -213,7 +213,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					const [pos1, pos2] = computePosRange(ref.current)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				},
-				onInput: () => {
+				onInput: e => {
 					if (state.readOnly) {
 						// No-op
 						return
