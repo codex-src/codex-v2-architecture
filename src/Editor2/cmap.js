@@ -137,8 +137,11 @@ function toString(reactVDOM, cmap = cmapText) {
 	//	/* eslint-enable no-multi-spaces */
 })()
 
+export function toInnerText(children) {
+	return toInnerString(children)
+}
 export function toText(reactVDOM) {
-	return toString(reactVDOM, cmapText)
+	return toString(reactVDOM)
 }
 export function toHTML(reactVDOM) {
 	return toString(reactVDOM, cmapHTML)

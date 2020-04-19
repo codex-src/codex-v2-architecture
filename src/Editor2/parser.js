@@ -1,6 +1,7 @@
 import * as emojiTrie from "emoji-trie"
+import newHashEpoch from "./newHashEpoch"
 import typeEnum from "./typeEnum"
-// import uuidv4 from "uuid/v4"
+import { toInnerText } from "./cmap"
 
 import {
 	// HTTP,
@@ -322,6 +323,8 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
 function parseElements(unparsed) {
+	const newHash = newHashEpoch()
+
 	const parsed = []
 	for (let index = 0; index < unparsed.length; index++) {
 		const each = unparsed[index]
@@ -346,9 +349,7 @@ function parseElements(unparsed) {
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// hash: newHash(toInnerString(parseInlineElements(each.data.slice(syntax.length)))),
-					hash: "TODO",
-					// raw: each.data,
+					hash: newHash(toInnerText(parseInlineElements(each.data.slice(syntax.length)))),
 					children: parseInlineElements(each.data.slice(syntax.length)),
 				})
 				continue
