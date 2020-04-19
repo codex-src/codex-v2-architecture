@@ -62,15 +62,15 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					// onClick={dispatch.showReadme}
+					onClick={dispatch.toggleReadOnlyMode}
 				>
-					Toggle read-only mode (⌘-p)
+					Toggle read-only mode: {"" + state.showReadOnlyMode}
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					// onClick={dispatch.showReadme}
+					onClick={dispatch.toggleCSSDebugger}
 				>
-					Toggle CSS debugger
+					Toggle CSS debugger: {"" + state.showCSSDebugger}
 				</Button>
 			</div>
 
@@ -108,7 +108,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-	 				onClick={dispatch.toggleShow}
+	 				onClick={dispatch.toggleSidebar}
 	 			>
 	 				Sidebar (esc)
 	 			</Button>
@@ -119,7 +119,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 		{/* Sidebar */}
 		<div className="flex-shrink-0 h-6" />
 		<Transition
-			show={state.show}
+			show={state.showSidebar}
 			enter="transition ease-out duration-300"
 			enterFrom="transform opacity-0 translate-x-64"
 			enterTo="transform opacity-100 translate-x-0"
@@ -148,33 +148,33 @@ const keyCodeP = 80
 
 const App = () => {
 	// TODO: Can we use props.children instead of useEditor?
-	const [editorState, editorDispatch] = useEditor(data)
+	const [editor, editorDispatch] = useEditor(data)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
-	// // Writes editorState.data to localStorage.
+	// // Writes editor.data to localStorage.
 	// React.useEffect(() => {
 	// 	const id = setTimeout(() => {
-	// 		const json = JSON.stringify({ data: editorState.data })
+	// 		const json = JSON.stringify({ data: editor.data })
 	// 		localStorage.setItem(LOCALSTORAGE_KEY, json)
 	// 	}, 100)
 	// 	return () => {
 	// 		clearTimeout(id)
 	// 	}
-	// }, [editorState.data])
+	// }, [editor.data])
 
 	// Debounces editorSettingsDispatch.update by one frame.
 	React.useEffect(() => {
-		if (!editorSettings.show) {
+		if (!editorSettings.showSidebar) {
 			// No-op
 			return
 		}
 		const id = setTimeout(() => {
-			editorSettingsDispatch.update(editorState)
+			editorSettingsDispatch.update(editor)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editorState, editorSettings, editorSettingsDispatch])
+	}, [editor, editorSettings, editorSettingsDispatch])
 
 	// Binds read-only shortcut (macOS).
 	//
@@ -202,7 +202,7 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			editorSettingsDispatch.toggleShow()
+			editorSettingsDispatch.toggleSidebar()
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
@@ -220,10 +220,11 @@ const App = () => {
 				/>
 
 				<Editor
+					className={editorSettings.showCSSDebugger && "debug-css"}
 					style={{ fontSize: 17 }}
-					state={editorState}
+					state={editor}
 					dispatch={editorDispatch}
-					// readOnly
+					readOnly={editorSettings.showReadOnlyMode}
 				/>
 
 			</div>

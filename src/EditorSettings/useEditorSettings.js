@@ -18,7 +18,9 @@ const extensionMap = {
 
 function initialState(defaultRenderer) {
 	const state = {
-		show: false,
+		showReadOnlyMode: false,
+		showCSSDebugger: false,
+		showSidebar: false,
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: extensionMap[defaultRenderer],
 		[renderModesEnum.JSON]: "",
@@ -48,32 +50,38 @@ const methods = state => ({
 		})
 	},
 	showReadme() {
-		state.show = true
+		state.showSidebar = true
 		state.renderMode = renderModesEnum.Readme
 		state.extension = ""
 	},
 	showJSON() {
-		state.show = true
+		state.showSidebar = true
 		state.renderMode = renderModesEnum.JSON
 		state.extension = "json"
 	},
 	showHTML() {
-		state.show = true
+		state.showSidebar = true
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
 	showHTML__BEM() {
-		state.show = true
+		state.showSidebar = true
 		state.renderMode = renderModesEnum.HTML__BEM
 		state.extension = "html"
 	},
 	showReact_js() {
-		state.show = true
+		state.showSidebar = true
 		state.renderMode = renderModesEnum.React_js
 		state.extension = "jsx"
 	},
-	toggleShow() {
-		state.show = !state.show
+	toggleReadOnlyMode() {
+		state.showReadOnlyMode = !state.showReadOnlyMode
+	},
+	toggleCSSDebugger() {
+		state.showCSSDebugger = !state.showCSSDebugger
+	},
+	toggleSidebar() {
+		state.showSidebar = !state.showSidebar
 	},
 })
 
