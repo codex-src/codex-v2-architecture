@@ -1,8 +1,10 @@
 // import raw from "raw.macro"
+import * as Hero from "react-heroicons"
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Enum from "Enum"
 import Highlighted from "Highlighted"
+import Icon from "Icon"
 import keyCodes from "Editor2/keyCodes"
 import React from "react"
 import Transition from "Transition"
@@ -93,16 +95,15 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 					React
 				</Button>
 				<Button
-					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-full shadow transition duration-75"
 					onClick={e => setRenderState({
 						...renderState,
-						show: false,
+						show: !renderState.show,
 					})}
 				>
-					Hide UI
+					<Icon className="w-4 h-4" svg={!renderState.show ? Hero.ArrowLeftOutlineMd : Hero.XOutlineMd} />
 				</Button>
 			</div>
-			<div className="h-6" />
 			<Transition
 				show={renderState.show}
 				enter="transition ease-out duration-300"
@@ -112,7 +113,7 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 				leaveFrom="transform opacity-100 translate-x-0"
 				leaveTo="transform opacity-0 translate-x-64"
 			>
-				<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
+				<div className="my-6 p-6 relative w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 						<Highlighted extension={renderState.extension}>
 							{renderState[renderState.renderMode]}
@@ -123,6 +124,10 @@ const FixedSettings = ({ renderState, setRenderState }) => (
 		</div>
 	</div>
 )
+
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
 
 const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
@@ -139,18 +144,15 @@ const App = () => {
 	}))
 
 	// Write to localStorage:
-	React.useEffect(
-		React.useCallback(() => {
-			const id = setTimeout(() => {
-				const { data } = state
-				localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data }))
-			}, 100)
-			return () => {
-				clearTimeout(id)
-			}
-		}, [state]),
-		[state.data],
-	)
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const json = JSON.stringify({ data: state.data })
+			localStorage.setItem(LOCALSTORAGE_KEY, json)
+		}, 100)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state.data])
 
 	React.useEffect(() => {
 		if (!renderState.show) {
