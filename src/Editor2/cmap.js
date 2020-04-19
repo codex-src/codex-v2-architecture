@@ -97,6 +97,7 @@ function toString(reactVDOM, cmap = cmapText) {
 	// cmapHTML[typeEnum.Image]            = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML[typeEnum.Break]               = data => "<hr>"
 
+	// TODO: Rename blockquote__p to blockquote__item?
 	cmapHTML__BEM[typeEnum.Escape]         = data => data.children
 	cmapHTML__BEM[typeEnum.Emoji]          = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML__BEM)}</span>`
 	cmapHTML__BEM[typeEnum.Emphasis]       = data => `<em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em>`
