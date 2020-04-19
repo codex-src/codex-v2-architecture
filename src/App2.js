@@ -118,7 +118,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 const App = () => {
 	// TODO: Can we use props.children instead of useEditor?
 	const [editorState, editorDispatch] = useEditor(data)
-	const [editorSettings, editorSettingsDispatch] = useEditorSettings()
+	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	// // Writes editorState.data to localStorage.
 	// React.useEffect(() => {

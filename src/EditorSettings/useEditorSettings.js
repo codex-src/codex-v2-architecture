@@ -7,18 +7,17 @@ import {
 	toReact_js,
 } from "Editor2/cmap"
 
-const initialState = {
-	show: false,
-	renderMode: renderModesEnum.JSON,
-	extension: "json",
-	// [renderModesEnum.JSON]: "",
-	// [renderModesEnum.HTML]: "",
-	// [renderModesEnum.HTML__BEM]: "",
-	// [renderModesEnum.React_js]: "",
-	...renderModesEnum.keys().reduce((acc, each) => {
-		acc[each] = ""
-		return acc
-	}, {}),
+function initialState(defaultRenderer) {
+	const state = {
+		show: false,
+		renderMode: renderModesEnum[defaultRenderer],
+		extension: "",
+		[renderModesEnum.JSON]: "",
+		[renderModesEnum.HTML]: "",
+		[renderModesEnum.HTML__BEM]: "",
+		[renderModesEnum.React_js]: "",
+	}
+	return state
 }
 
 const methods = state => ({
@@ -69,8 +68,8 @@ const methods = state => ({
 	},
 })
 
-function useEditorSettings() {
-	return useMethods(methods, initialState)
+function useEditorSettings(defaultRenderer) {
+	return useMethods(methods, {}, () => initialState(defaultRenderer))
 }
 
 export default useEditorSettings
