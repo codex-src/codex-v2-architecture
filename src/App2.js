@@ -62,9 +62,9 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={dispatch.toggleReadOnlyMode}
+					onClick={dispatch.toggleReadOnly}
 				>
-					Toggle read-only mode: {"" + state.showReadOnlyMode}
+					Toggle read-only mode: {"" + state.showReadOnly}
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
@@ -187,12 +187,13 @@ const App = () => {
 			}
 			e.preventDefault()
 			editorDispatch.toggleReadOnly()
+			editorSettingsDispatch.toggleReadOnly()
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [editorDispatch])
+	}, [editorDispatch, editorSettingsDispatch])
 
 	// Binds sidebar shortcut.
 	React.useEffect(() => {
@@ -224,7 +225,7 @@ const App = () => {
 					style={{ fontSize: 17 }}
 					state={editor}
 					dispatch={editorDispatch}
-					readOnly={editorSettings.showReadOnlyMode}
+					readOnly={editorSettings.showReadOnly}
 				/>
 
 			</div>

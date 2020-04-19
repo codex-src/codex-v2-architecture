@@ -18,7 +18,7 @@ const extensionMap = {
 
 function initialState(defaultRenderer) {
 	const state = {
-		showReadOnlyMode: false,
+		showReadOnly: false,
 		showCSSDebugger: false,
 		showSidebar: false,
 		renderMode: renderModesEnum[defaultRenderer],
@@ -74,8 +74,8 @@ const methods = state => ({
 		state.renderMode = renderModesEnum.React_js
 		state.extension = "jsx"
 	},
-	toggleReadOnlyMode() {
-		state.showReadOnlyMode = !state.showReadOnlyMode
+	toggleReadOnly() {
+		state.showReadOnly = !state.showReadOnly
 	},
 	toggleCSSDebugger() {
 		state.showCSSDebugger = !state.showCSSDebugger
