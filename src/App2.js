@@ -45,61 +45,94 @@ What I’m trying to say is that TypeScript is a _very steep bet_. But something
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
-const Settings = ({ renderState, setRenderState }) => (
-	<div className="-m-1 flex flex-row pointer-events-auto">
-		<Button
-			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderState({
-				...renderState,
-				show: true,
-				renderMode: renderModesEnum.JSON,
-			})}
-		>
-			JSON
-		</Button>
-		<Button
-			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderState({
-				...renderState,
-				show: true,
-				renderMode: renderModesEnum.HTML,
-			})}
-		>
-			HTML
-		</Button>
-		<Button
-			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderState({
-				...renderState,
-				show: true,
-				renderMode: renderModesEnum.HTML__BEM,
-			})}
-		>
-			HTML__BEM
-		</Button>
-		<Button
-			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderState({
-				...renderState,
-				show: true,
-				renderMode: renderModesEnum.React_js,
-			})}
-		>
-			React
-		</Button>
-		<Button
-			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-			onClick={e => setRenderState({
-				...renderState,
-				show: false,
-			})}
-		>
-			Hide UI
-		</Button>
+const FixedSettings = ({ renderState, setRenderState }) => (
+	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
+		<div className="flex flex-col items-end">
+			<div className="-m-1 flex flex-row pointer-events-auto">
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					onClick={e => setRenderState({
+						...renderState,
+						show: true,
+						renderMode: renderModesEnum.JSON,
+					})}
+				>
+					JSON
+				</Button>
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					onClick={e => setRenderState({
+						...renderState,
+						show: true,
+						renderMode: renderModesEnum.HTML,
+					})}
+				>
+					HTML
+				</Button>
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					onClick={e => setRenderState({
+						...renderState,
+						show: true,
+						renderMode: renderModesEnum.HTML__BEM,
+					})}
+				>
+					HTML__BEM
+				</Button>
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					onClick={e => setRenderState({
+						...renderState,
+						show: true,
+						renderMode: renderModesEnum.React_js,
+					})}
+				>
+					React
+				</Button>
+				<Button
+					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+					onClick={e => setRenderState({
+						...renderState,
+						show: false,
+					})}
+				>
+					Hide UI
+				</Button>
+			</div>
+			<div className="h-6" />
+			<Transition
+				show={renderState.show}
+				enter="transition ease-out duration-300"
+				enterFrom="transform opacity-0 translate-x-64"
+				enterTo="transform opacity-100 translate-x-0"
+				leave="transition ease-in duration-300"
+				leaveFrom="transform opacity-100 translate-x-0"
+				leaveTo="transform opacity-0 translate-x-64"
+			>
+				<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
+					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+						{/* JSON */}
+						{renderState.renderMode === renderModesEnum.JSON && (
+							renderState[renderModesEnum.JSON]
+						)}
+						{/* HTML */}
+						{renderState.renderMode === renderModesEnum.HTML && (
+							renderState[renderModesEnum.HTML]
+						)}
+						{/* HTML__BEM */}
+						{renderState.renderMode === renderModesEnum.HTML__BEM && (
+							renderState[renderModesEnum.HTML__BEM]
+						)}
+						{/* React_js */}
+						{renderState.renderMode === renderModesEnum.React_js && (
+							renderState[renderModesEnum.React_js]
+						)}
+					</pre>
+				</div>
+			</Transition>
+		</div>
 	</div>
 )
-
-// const [renderMode, setRenderMode] = React.useState(renderModesEnum.None)
 
 const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
@@ -115,15 +148,18 @@ const App = () => {
 	}))
 
 	// Write to localStorage:
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const json = JSON.stringify({ data: state.data })
-			localStorage.setItem(LOCALSTORAGE_KEY, json)
-		}, 100)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [state.data])
+	React.useEffect(
+		React.useCallback(() => {
+			const id = setTimeout(() => {
+				const { data } = state
+				localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ data }))
+			}, 100)
+			return () => {
+				clearTimeout(id)
+			}
+		}, [state]),
+		[state.data],
+	)
 
 	React.useEffect(
 		React.useCallback(() => {
@@ -148,8 +184,8 @@ const App = () => {
 			return () => {
 				clearTimeout(id)
 			}
-		}, [state, renderState]),
-		[state],
+		}, [state]),
+		[state.data],
 	)
 
 	// Binds read-only shortcut (command-p).
@@ -179,45 +215,10 @@ const App = () => {
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
 
-				<div className="p-3 fixed inset-0 z-30 pointer-events-none">
-					<div className="flex flex-col items-end">
-						<Settings
-							renderState={renderState}
-							setRenderState={setRenderState}
-						/>
-						<div className="h-6" />
-						<Transition
-							show={renderState.show}
-							enter="transition ease-out duration-300"
-							enterFrom="transform opacity-0 translate-x-64"
-							enterTo="transform opacity-100 translate-x-0"
-							leave="transition ease-in duration-300"
-							leaveFrom="transform opacity-100 translate-x-0"
-							leaveTo="transform opacity-0 translate-x-64"
-						>
-							<div className="p-6 w-full max-w-lg h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto" style={{ maxHeight: "36em" }}>
-								<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-									{/* JSON */}
-									{renderState.renderMode === renderModesEnum.JSON && (
-										renderState[renderModesEnum.JSON]
-									)}
-									{/* HTML */}
-									{renderState.renderMode === renderModesEnum.HTML && (
-										renderState[renderModesEnum.HTML]
-									)}
-									{/* HTML__BEM */}
-									{renderState.renderMode === renderModesEnum.HTML__BEM && (
-										renderState[renderModesEnum.HTML__BEM]
-									)}
-									{/* React_js */}
-									{renderState.renderMode === renderModesEnum.React_js && (
-										renderState[renderModesEnum.React_js]
-									)}
-								</pre>
-							</div>
-						</Transition>
-					</div>
-				</div>
+				<FixedSettings
+					renderState={renderState}
+					setRenderState={setRenderState}
+				/>
 
 				<Editor
 					style={{ fontSize: 17 }}
@@ -230,93 +231,5 @@ const App = () => {
 		</div>
 	)
 }
-
-// import Button from "./Button"
-// import React from "react"
-// import RenderModes from "./Editor/RenderModes"
-//
-// const Settings = ({ state, setState, ...props }) => (
-// 	<div className="flex flex-col items-end">
-//
-// 		{/* Top */}
-// 		<div className="-m-1 flex flex-row">
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={e => setState({
-// 					...state,
-// 					renderMode: RenderModes.Text,
-// 				})}
-// 			>
-// 				Plain text
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={e => setState({
-// 					...state,
-// 					renderMode: RenderModes.GFM,
-// 				})}
-// 			>
-// 				Markdown
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={e => setState({
-// 					...state,
-// 					renderMode: RenderModes.HTML,
-// 				})}
-// 			>
-// 				HTML
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={e => setState({
-// 					...state,
-// 					renderMode: RenderModes.HTML__BEM,
-// 				})}
-// 			>
-// 				HTML and BEM classes
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={e => setState({
-// 					...state,
-// 					renderMode: RenderModes.React_js,
-// 				})}
-// 			>
-// 				React (JSX)
-// 			</Button>
-// 		</div>
-//
-// 		{/* Bottom */}
-// 		<div className="h-2" />
-// 		<div className="-m-1 flex flex-row">
-// 			{state.renderMode === RenderModes.GFM && (
-// 				<React.Fragment>
-// 					<Button
-// 						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 						onClick={e => setState({
-// 							...state,
-// 							readOnly: !state.readOnly,
-// 						})}
-// 					>
-// 						Toggle readOnly: {String(state.readOnly)}
-// 					</Button>
-// 					<Button
-// 						className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 						onClick={e => setState({
-// 							...state,
-// 							debugCSS: !state.debugCSS,
-// 						})}
-// 					>
-// 						Toggle debugCSS: {String(state.debugCSS)}
-// 					</Button>
-// 				</React.Fragment>
-// 			)}
-// 		</div>
-//
-// 	</div>
-// )
-//
-// export default Settings
 
 export default App
