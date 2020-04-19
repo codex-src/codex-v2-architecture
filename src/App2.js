@@ -80,19 +80,19 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showReadme}
 	 			>
-	 				Readme
+	 				Interactive readme
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showJSON}
 	 			>
-	 				JSON
+	 				Show JSON
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showHTML}
 	 			>
-	 				HTML
+	 				Show HTML
 	 			</Button>
 	 			{/* <Button */}
 	 			{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
@@ -104,7 +104,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showReact_js}
 	 			>
-	 				React
+	 				Show React
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
