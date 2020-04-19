@@ -2,8 +2,8 @@
 import Button from "Button"
 import Editor from "Editor2/Editor"
 import Enum from "Enum"
+import Highlighted from "Highlighted"
 import keyCodes from "Editor2/keyCodes"
-import Prism from "./Prism"
 import React from "react"
 import Transition from "Transition"
 import useEditor from "Editor2/useEditor"
@@ -19,17 +19,10 @@ import "./App.css"
 const LOCALSTORAGE_KEY = "codex-app-v2.3"
 
 const renderModesEnum = new Enum(
-	"None",
-	// "Text",
-	// "GFM",
 	"JSON",
 	"HTML",
 	"HTML__BEM",
-	// "Alpine_js",
-	// "Angular_js",
 	"React_js",
-	// "Svelte_js",
-	// "Vue_js",
 )
 
 // Read from localStorage:
@@ -50,39 +43,6 @@ const data = `I seriously agree with this article. I find TypeScript to be a kin
 What I’m trying to say is that TypeScript is a _very steep bet_. But something about this is unsettling — Go is not dynamic, and I find writing Go to be easier than TypeScript, so what gives? I actually think the crux of the problem is that TypeScript is trying to fix JavaScript. _But what if JavaScript doesn’t need fixing?_ Then TypeScript actually doesn’t pay for itself. I say all of this as a cautionary tale for developers. I’ve been turned on and off multiple times by TypeScript. Ultimately, I think that some languages introduce so much complexity up front that if you try to wrangle them in later, you’re optimizing for the wrong problem.
 
 I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
-
-// <div className="px-6 py-4 bg-white rounded-lg shadow-hero-lg overflow-x-scroll scrolling-touch" style={style}>
-// 	<span className="inline-block">
-// 		<div className="whitespace-pre font-mono text-sm leading-snug">
-// 			{html || (
-// 				children
-// 			)}
-// 		</div>
-// 	</span>
-// </div>
-
-const Highlighted = ({ extension, children }) => {
-	const [highlighted, setHighlighted] = React.useState(null)
-
-	React.useEffect(() => {
-		if (!extension) {
-			// No-op
-			return
-		}
-		const parser = Prism[extension]
-		if (!parser) {
-			// No-op
-			return
-		}
-		setHighlighted((
-			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(children, parser, extension),
-			}} />
-		))
-	}, [extension, children])
-
-	return highlighted || children
-}
 
 const FixedSettings = ({ renderState, setRenderState }) => (
 	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
@@ -168,13 +128,14 @@ const App = () => {
 	// const [state, dispatch] = useEditor(`> Hello\n`)
 	const [state, dispatch] = useEditor(data)
 
+	// TODO: Extract to reducer?
 	const [renderState, setRenderState] = React.useState(() => ({
 		show: false,
 		renderMode: renderModesEnum.JSON,
-		[renderModesEnum.JSON]: "",
-		[renderModesEnum.HTML]: "",
-		[renderModesEnum.HTML__BEM]: "",
-		[renderModesEnum.React]: "",
+		...renderModesEnum.keys().reduce((acc, each) => {
+			acc[each] = ""
+			return acc
+		}, {}),
 	}))
 
 	// Write to localStorage:
@@ -191,32 +152,33 @@ const App = () => {
 		[state.data],
 	)
 
-	React.useEffect(
-		React.useCallback(() => {
-			const id = setTimeout(() => {
-				setRenderState(current => ({
-					...current,
-					[renderModesEnum.JSON]: JSON.stringify(
-						{
-							...state,
-							data:      undefined,
-							reactVDOM: undefined,
-							reactDOM:  undefined,
-						},
-						null,
-						"\t",
-					),
-					[renderModesEnum.HTML]:      toHTML(state.reactVDOM),
-					[renderModesEnum.HTML__BEM]: toHTML__BEM(state.reactVDOM),
-					[renderModesEnum.React_js]:  toReact_js(state.reactVDOM),
-				}))
-			}, 100)
-			return () => {
-				clearTimeout(id)
-			}
-		}, [state]),
-		[state.data],
-	)
+	React.useEffect(() => {
+		if (!renderState.show) {
+			// No-op
+			return
+		}
+		const id = setTimeout(() => {
+			setRenderState(current => ({
+				...current,
+				[renderModesEnum.JSON]: JSON.stringify(
+					{
+						...state,
+						data:      undefined,
+						reactVDOM: undefined,
+						reactDOM:  undefined,
+					},
+					null,
+					"\t",
+				),
+				[renderModesEnum.HTML]:      toHTML(state.reactVDOM),
+				[renderModesEnum.HTML__BEM]: toHTML__BEM(state.reactVDOM),
+				[renderModesEnum.React_js]:  toReact_js(state.reactVDOM),
+			}))
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [state, renderState])
 
 	// Binds read-only shortcut (command-p).
 	React.useEffect(

@@ -1,9 +1,9 @@
 // Maps user-perceived language extensions to Prism
 // languages.
-const Prism = {}
+const PrismExtensions = {}
 
 document.addEventListener("DOMContentLoaded", e => {
-	Object.assign(Prism, {
+	const extensions = {
 		bash:       window.Prism.languages.bash,
 		c:          window.Prism.languages.c,
 		cpp:        window.Prism.languages.cpp,
@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", e => {
 		xml:        window.Prism.languages.xml,
 		yaml:       window.Prism.languages.yaml,
 		yml:        window.Prism.languages.yml,
-	})
+	}
+	Object.assign(PrismExtensions, extensions)
 })
 
-export default Prism
+export default PrismExtensions
