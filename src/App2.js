@@ -10,9 +10,9 @@ import useEditorSettings from "EditorSettings/useEditorSettings"
 
 import "./App.css"
 
-;(() => {
-	document.body.classList.toggle("debug-css")
-})()
+// ;(() => {
+// 	document.body.classList.toggle("debug-css")
+// })()
 
 // const ArrowLeftOutlineMd = React.forwardRef((props, ref) => (
 // 	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
@@ -51,96 +51,12 @@ const ReadmeEditor = () => {
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} />
 }
 
-// <div className="flex flex-row justify-between h-full">
-// 	<div>
-// 		<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				// onClick={dispatch.showReadme}
-// 			>
-// 				Toggle read-only mode (⌘-p)
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				// onClick={dispatch.showReadme}
-// 			>
-// 				Toggle CSS debugger
-// 			</Button>
-// 		</div>
-// 	</div>
-// 	{/* NOTE: Uses an extra <div> for the sidebar */}
-// 	<div className="flex flex-col items-end h-full">
-// 		<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-//
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={dispatch.showReadme}
-// 			>
-// 				Readme
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={dispatch.showJSON}
-// 			>
-// 				JSON
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={dispatch.showHTML}
-// 			>
-// 				HTML
-// 			</Button>
-// 			{/* <Button */}
-// 			{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-// 			{/* 	onClick={dispatch.showHTML__BEM} */}
-// 			{/* > */}
-// 			{/* 	HTML (BEM) */}
-// 			{/* </Button> */}
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={dispatch.showReact_js}
-// 			>
-// 				React
-// 			</Button>
-// 			<Button
-// 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-// 				onClick={dispatch.toggleShow}
-// 			>
-// 				Sidebar (esc)
-// 				{/* {"\u00a0\u00a0"} */}
-// 				{/* <Icon className="-mt-px inline-block w-4 h-4" svg={!state.show ? ArrowLeftOutlineMd : XOutlineMd} /> */}
-// 			</Button>
-//
-// 		</div>
-//
-// 		<Transition
-// 			show={state.show}
-// 			enter="transition ease-out duration-300"
-// 			enterFrom="transform opacity-0 translate-x-64"
-// 			enterTo="transform opacity-100 translate-x-0"
-// 			leave="transition ease-in duration-300"
-// 			leaveFrom="transform opacity-100 translate-x-0"
-// 			leaveTo="transform opacity-0 translate-x-64"
-// 		>
-// 			<div className="my-6 p-6 w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-// 				{state.renderMode === renderModesEnum.Readme ? (
-// 					<ReadmeEditor />
-// 				) : (
-// 					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-// 						<Highlighted extension={state.extension}>
-// 							{state[state.renderMode]}
-// 						</Highlighted>
-// 					</pre>
-// 				)}
-// 			</div>
-// 		</Transition>
-//
-// 	</div>
-// </div>
-
 const FixedEditorSettings = ({ state, dispatch }) => (
-	<div className="p-3 fixed inset-0 z-30 pointer-events-none">
-		<div className="flex flex-row justify-between">
+	// NOTE: Usese flex flex-col to make the sidebar  work
+	<div className="p-3 pb-6 fixed inset-0 flex flex-col z-30 pointer-events-none">
+
+		{/* Buttons */}
+		<div className="flex-shrink-0 flex flex-row justify-between w-full">
 
 			{/* LHS */}
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
@@ -200,96 +116,30 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 
 		</div>
 
-		{/* NOTE: items-start is needed for h-full to work */}
-		<div className="flex flex-row justify-end items-start h-full">
+		{/* Sidebar */}
+		<div className="flex-shrink-0 h-6" />
+		<Transition
+			show={state.show}
+			enter="transition ease-out duration-300"
+			enterFrom="transform opacity-0 translate-x-64"
+			enterTo="transform opacity-100 translate-x-0"
+			leave="transition ease-in duration-300"
+			leaveFrom="transform opacity-100 translate-x-0"
+			leaveTo="transform opacity-0 translate-x-64"
+		>
+			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
+				{state.renderMode === renderModesEnum.Readme ? (
+					<ReadmeEditor />
+				) : (
+					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+						<Highlighted extension={state.extension}>
+							{state[state.renderMode]}
+						</Highlighted>
+					</pre>
+				)}
+			</div>
+		</Transition>
 
-			{/* Siderbar */}
-			<Transition
-				show={state.show}
-				enter="transition ease-out duration-300"
-				enterFrom="transform opacity-0 translate-x-64"
-				enterTo="transform opacity-100 translate-x-0"
-				leave="transition ease-in duration-300"
-				leaveFrom="transform opacity-100 translate-x-0"
-				leaveTo="transform opacity-0 translate-x-64"
-			>
-				<div className="my-6 p-6 w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-					{state.renderMode === renderModesEnum.Readme ? (
-						<ReadmeEditor />
-					) : (
-						<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-							<Highlighted extension={state.extension}>
-								{state[state.renderMode]}
-							</Highlighted>
-						</pre>
-					)}
-				</div>
-			</Transition>
-
-		</div>
-
-		{/* <div className="flex flex-col items-end h-full"> */}
-		{/* 	<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto"> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.showReadme} */}
-		{/* 		> */}
-		{/* 			Interative readme */}
-		{/* 		</Button> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.showJSON} */}
-		{/* 		> */}
-		{/* 			JSON */}
-		{/* 		</Button> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.showHTML} */}
-		{/* 		> */}
-		{/* 			HTML */}
-		{/* 		</Button> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.showHTML__BEM} */}
-		{/* 		> */}
-		{/* 			HTML (BEM) */}
-		{/* 		</Button> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.showReact_js} */}
-		{/* 		> */}
-		{/* 			React */}
-		{/* 		</Button> */}
-		{/* 		<Button */}
-		{/* 			className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-		{/* 			onClick={dispatch.toggleShow} */}
-		{/* 		> */}
-		{/* 			Sidebar (esc){"\u00a0\u00a0"} */}
-		{/* 			<Icon className="-mt-px inline-block w-4 h-4" svg={!state.show ? ArrowLeftOutlineMd : XOutlineMd} /> */}
-		{/* 		</Button> */}
-		{/* 	</div> */}
-		{/* 	<Transition */}
-		{/* 		show={state.show} */}
-		{/* 		enter="transition ease-out duration-300" */}
-		{/* 		enterFrom="transform opacity-0 translate-x-64" */}
-		{/* 		enterTo="transform opacity-100 translate-x-0" */}
-		{/* 		leave="transition ease-in duration-300" */}
-		{/* 		leaveFrom="transform opacity-100 translate-x-0" */}
-		{/* 		leaveTo="transform opacity-0 translate-x-64" */}
-		{/* 	> */}
-		{/* 		<div className="my-6 p-6 w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto"> */}
-		{/* 			{state.renderMode === renderModesEnum.Readme ? ( */}
-		{/* 				<ReadmeEditor /> */}
-		{/* 			) : ( */}
-		{/* 				<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}> */}
-		{/* 					<Highlighted extension={state.extension}> */}
-		{/* 						{state[state.renderMode]} */}
-		{/* 					</Highlighted> */}
-		{/* 				</pre> */}
-		{/* 			)} */}
-		{/* 		</div> */}
-		{/* 	</Transition> */}
-		{/* </div> */}
 	</div>
 )
 
