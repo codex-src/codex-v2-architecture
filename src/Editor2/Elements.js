@@ -51,11 +51,18 @@ const IfWrapper = ({ cond, wrap: Wrapper, children }) => {
 	return <Wrapper>{children}</Wrapper>
 }
 
+const HeaderAnchor = ({ hash, children }) => (
+	// NOTE: className="block" is preferred
+	<a id={hash} className="block" href={`#${hash}`}>
+		{children}
+	</a>
+)
+
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 	const [state] = useEditorState()
 	return (
 		<Root id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={state.readOnly} wrap={({ children }) => <a id={hash} href={`#${hash}`}>{children}</a>}>
+			<IfWrapper cond={state.readOnly} wrap={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 				<Markdown syntax={syntax}>
 					{toReact(children) || (
 						<br />
