@@ -38,13 +38,13 @@ const headerClassNames = {
 	h1: trim("font-medium   text-3xl leading-tight"),
 	h2: trim("font-medium   text-2xl leading-tight"),
 	h3: trim("font-medium   text-xl  leading-tight"),
-	h4: trim("font-semibold text-lg  leading-tight"),
-	h5: trim("font-semibold text-lg  leading-tight"),
-	h6: trim("font-semibold text-lg  leading-tight"),
+	h4: trim("font-semibold text-lg  leading-snug"),
+	h5: trim("font-semibold text-lg  leading-snug"),
+	h6: trim("font-semibold text-lg  leading-snug"),
 }
 
 // Conditionally wraps a React component.
-const IfWrapper = ({ cond, wrap: Wrapper, children }) => {
+const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 	if (!cond) {
 		return children
 	}
@@ -52,7 +52,7 @@ const IfWrapper = ({ cond, wrap: Wrapper, children }) => {
 }
 
 const HeaderAnchor = ({ hash, children }) => (
-	// NOTE: className="block" is preferred
+	// NOTE: Use block to make <a> width: 100%
 	<a id={hash} className="block" href={`#${hash}`}>
 		{children}
 	</a>
@@ -62,7 +62,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 	const [state] = useEditorState()
 	return (
 		<Root id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={state.readOnly} wrap={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+			<IfWrapper cond={state.readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 				<Markdown syntax={syntax}>
 					{toReact(children) || (
 						<br />
@@ -92,16 +92,19 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 // NOTE: Compound component
-export const Blockquote = React.memo(({ id, children }) => (
-	<Root id={id} className="py-4 px-8" style={{ backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }}>
-		{children.map(({ type: T, ...each }) => (
-			React.createElement(typeEnumMap[T], {
-				key: each.id,
-				...each,
-			})
-		))}
-	</Root>
-))
+export const Blockquote = React.memo(({ id, children }) => {
+	const style = { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
+	return (
+		<Root id={id} className="py-4 px-8" style={style}>
+			{children.map(({ type: T, ...each }) => (
+				React.createElement(typeEnumMap[T], {
+					key: each.id,
+					...each,
+				})
+			))}
+		</Root>
+	)
+})
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [state] = useEditorState()
