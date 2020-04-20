@@ -441,7 +441,7 @@ function parseElements(nodes) {
 					type: typeEnum.CodeBlock,
 					id: nodes[x1].id,
 					syntax: [nodes[x1].data, nodes[x2 - 1].data],
-					extension: nodes[x1].data.split(".").slice(-1)[0].toLowerCase(),
+					extension: nodes[x1].data.slice(3).split(".").slice(-1)[0].toLowerCase(),
 					children: nodes.slice(x1, x2),
 				})
 				index = x2 - 1

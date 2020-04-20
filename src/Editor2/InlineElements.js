@@ -48,11 +48,11 @@ export const StrongEmphasis = ({ syntax, children }) => (
 )
 
 export const Code = ({ syntax, children }) => {
-	const [state] = useEditorState()
+	const [{ readOnly }] = useEditorState()
 	return (
 		<Span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
 			<Markdown className="text-red-600" syntax={syntax}>
-				{!state.readOnly ? (
+				{!readOnly ? (
 					children
 				) : (
 					children.trim()

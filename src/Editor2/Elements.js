@@ -1,6 +1,7 @@
 import attrs from "./attrs"
 import Highlighted from "Highlighted"
 import Markdown from "./Markdown"
+import PrismExtensions from "PrismExtensions"
 import React from "react"
 import typeEnumMap from "./typeEnumMap"
 import useEditorState from "./useEditorState"
@@ -56,17 +57,14 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 }
 
 const HeaderAnchor = ({ hash, children }) => (
-	// NOTE: Use block to make <a> width: 100%
-	<a id={hash} className="block" href={`#${hash}`}>
-		{children}
-	</a>
+	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
 )
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
-	const [state] = useEditorState()
+	const [{ readOnly }] = useEditorState()
 	return (
 		<Root id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={state.readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+			<IfWrapper cond={readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 				<Markdown syntax={syntax}>
 					{toReact(children) || (
 						<br />
@@ -110,9 +108,50 @@ export const Blockquote = React.memo(({ id, children }) => {
 	)
 })
 
+// import PrismExtensions from "PrismExtensions"
+// import React from "react"
+//
+// // Performs syntax highlighting.
+// const Highlighted = React.memo(({ extension, children }) => {
+// 	const [highlighted, setHighlighted] = React.useState(null)
+// 	React.useEffect(() => {
+// 		if (!extension) {
+// 			// No-op
+// 			return
+// 		}
+// 		const parser = PrismExtensions[extension]
+// 		if (!parser) {
+// 			// No-op
+// 			return
+// 		}
+// 		setHighlighted((
+// 			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
+// 				__html: window.Prism.highlight(children, parser, extension),
+// 			}} />
+// 		))
+// 	}, [extension, children])
+// 	return highlighted || children
+// })
+
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
-	const [state] = useEditorState()
+	const [{ readOnly }] = useEditorState()
+
+	// const [$nodes, $setNodes] = React.useState(nodes.slice(1, -1))
+	//
+	// React.useLayoutEffect(() => {
+	// 	if (!extension) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	const parser = PrismExtensions[extension]
+	// 	if (!parser) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	const data = window.Prism.highlight(nodes.slice(1, -1).map(each => each.data).join("\n"), parser, extension)
+	// 	$setNodes(data.split("\n").map((each, x) => ({ id: nodes[x + 1].id, data: each })))
+	// }, [extension, nodes])
 
 	const style = { whiteSpace: "pre" }
 	return (
@@ -120,21 +159,19 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 			<span className="inline-block">
 				<Node id={nodes[0].id} className="py-px leading-none text-md-blue-a400" style={style}>
 					<Markdown syntax={[syntax[0]]}>
-						{state.readOnly && (
+						{readOnly && (
 							<br />
 						)}
 					</Markdown>
 				</Node>
 				{nodes.slice(1, -1).map(each => (
-					<Node key={each.id} id={each.id} style={style}>
-						{each.data || (
-							<br />
-						)}
-					</Node>
+					<Node key={each.id} id={each.id} style={style} dangerouslySetInnerHTML={{
+						__html: each.data || "<br>",
+					}} />
 				))}
 				<Node id={nodes[nodes.length - 1].id} className="py-px leading-none text-md-blue-a400" style={style}>
 					<Markdown syntax={[syntax[1]]}>
-						{state.readOnly && (
+						{readOnly && (
 							<br />
 						)}
 					</Markdown>
@@ -145,13 +182,13 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 })
 
 export const Break = React.memo(({ id, syntax }) => {
-	const [state] = useEditorState()
+	const [{ readOnly }] = useEditorState()
 
 	const style = { verticalAlign: "15%" }
 	return (
 		<Root id={id}>
 			<Markdown syntax={syntax}>
-				{state.readOnly && (
+				{readOnly && (
 					<hr className="inline-block w-full" style={style} />
 				)}
 			</Markdown>
