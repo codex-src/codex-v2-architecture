@@ -100,9 +100,9 @@ const methods = state => ({
 	toggleCSSDebugger() {
 		state.showCSSDebugger = !state.showCSSDebugger
 	},
-	// toggleSidebar() {
-	// 	state.showSidebar = !state.showSidebar
-	// },
+	toggleSidebar() {
+		state.showSidebar = !state.showSidebar
+	},
 })
 
 function useEditorSettings(defaultRenderer) {

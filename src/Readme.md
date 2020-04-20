@@ -1,4 +1,6 @@
-## Interactive readme
+## Readme
+
+**You can edit this readme at anytime**, but only your note will persist changes.
 
 **Codex is a new WYSIWYG markdown editor for devs. 👩🏾‍💻👨🏼‍💻** As you type in the editor, your notes are synced to localStorage. You can always copy and paste your notes in and out of Codex and you’ll never loose formatting. ✨
 
@@ -30,4 +32,4 @@ Finally, you can add section breaks using either syntax:
 
 ***
 
-Have fun! **You can edit this readme at anytime**, but only your note will persist changes.
+Have fun!

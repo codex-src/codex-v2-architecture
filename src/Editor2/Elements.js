@@ -95,7 +95,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 export const Blockquote = React.memo(({ id, children }) => {
 	const style = { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
 	return (
-		<Root id={id} className="py-4 px-8 leading-relaxed" style={style}>
+		<Root id={id} className="py-4 px-8" style={style}>
 			{children.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,

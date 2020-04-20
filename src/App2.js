@@ -14,18 +14,6 @@ import "./App.css"
 // 	document.body.classList.toggle("debug-css")
 // })()
 
-// const ArrowLeftOutlineMd = React.forwardRef((props, ref) => (
-// 	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
-// 		<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-// 	</svg>
-// ))
-//
-// const XOutlineMd = React.forwardRef((props, ref) => (
-// 	<svg ref={ref} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" {...props}>
-// 		<path d="M6 18L18 6M6 6l12 12" />
-// 	</svg>
-// ))
-
 // const LOCALSTORAGE_KEY = "codex-app-v2.3"
 //
 // const data = (() => {
@@ -64,13 +52,13 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Toggle read-only: {"" + state.showReadOnly}
+					Toggle read-only: {`${state.showReadOnly}`}
 				</Button>
 				<Button
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleCSSDebugger}
 				>
-					Toggle CSS debugger: {"" + state.showCSSDebugger}
+					Toggle CSS debugger: {`${state.showCSSDebugger}`}
 				</Button>
 			</div>
 
@@ -80,7 +68,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showReadme}
 	 			>
-	 				Interactive readme
+	 				Readme
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
