@@ -154,7 +154,7 @@ const methods = state => ({
 			return
 		}
 		const { data, nodes, pos1, pos2 } = state
-		state.history.stack.push({ data, nodes: nodes.map(each => ({ ...each })), pos1: { ...pos1 }, pos2: { ...pos2 } })
+		state.history.stack.push({ data, nodes, pos1: { ...pos1 }, pos2: { ...pos2 } })
 		state.history.index++
 	},
 

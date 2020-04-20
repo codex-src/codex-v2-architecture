@@ -10,6 +10,11 @@ import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
 
+import {
+	detectRedo,
+	detectUndo,
+} from "./detect"
+
 import "./Editor.css"
 
 // ;(() => {
@@ -74,7 +79,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		[state.readOnly, state.reactVDOM],
 	)
 
-	// Stores the next undo (debounced 250ms).
+	// Stores the next undo (debounced 500ms).
 	React.useEffect(
 		React.useCallback(() => {
 			if (state.readOnly) {
@@ -83,7 +88,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 			}
 			const id = setTimeout(() => {
 				dispatch.storeUndo()
-			}, 250)
+			}, 500)
 			return () => {
 				clearTimeout(id)
 			}
@@ -202,23 +207,24 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							e.preventDefault()
 							dispatch.tab()
 							return
-						// Enter:
+						// Enter (EOL):
 						} else if (e.keyCode === keyCodes.Enter) {
 							e.preventDefault()
 							dispatch.enter()
 							return
+						// Undo:
+						} else if (detectUndo(e)) {
+							e.preventDefault()
+							// dispatch.undo()
+							console.log("undo")
+							return
+						// Redo:
+						} else if (detectRedo(e)) {
+							e.preventDefault()
+							// dispatch.redo()
+							console.log("redo")
+							return
 						}
-						// // Undo:
-						// } else if (detect.undo(e)) {
-						// 	e.preventDefault()
-						// 	dispatch.undo()
-						// 	return
-						// // Redo:
-						// } else if (detect.redo(e)) {
-						// 	e.preventDefault()
-						// 	dispatch.redo()
-						// 	return
-						// }
 					},
 
 					onCompositionEnd: e => {
@@ -311,7 +317,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						data: undefined,
 						nodes: each.nodes.map(each => ({
 							...each,
-							data: !each.data ? "" : each.data.slice(0, 60 - 1) + "…",
+							data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`,
 						})),
 						pos1: undefined,
 						pos2: undefined,
