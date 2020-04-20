@@ -1,3 +1,4 @@
+// import escape from "lodash/escape"
 import attrs from "./attrs"
 import Highlighted from "Highlighted"
 import Markdown from "./Markdown"
@@ -108,54 +109,25 @@ export const Blockquote = React.memo(({ id, children }) => {
 	)
 })
 
-// import PrismExtensions from "PrismExtensions"
-// import React from "react"
-//
-// // Performs syntax highlighting.
-// const Highlighted = React.memo(({ extension, children }) => {
-// 	const [highlighted, setHighlighted] = React.useState(null)
-// 	React.useEffect(() => {
-// 		if (!extension) {
-// 			// No-op
-// 			return
-// 		}
-// 		const parser = PrismExtensions[extension]
-// 		if (!parser) {
-// 			// No-op
-// 			return
-// 		}
-// 		setHighlighted((
-// 			<div className={extension && `language-${extension}`} dangerouslySetInnerHTML={{
-// 				__html: window.Prism.highlight(children, parser, extension),
-// 			}} />
-// 		))
-// 	}, [extension, children])
-// 	return highlighted || children
-// })
-
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
-	// const [$nodes, $setNodes] = React.useState(nodes)
-
-	const $nodes = React.useMemo(() => nodes, [nodes])
-
-	// React.useLayoutEffect(() => {
-	// 	if (!extension) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const parser = PrismExtensions[extension]
-	// 	if (!parser) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const data = window.Prism.highlight(nodes.slice(1, -1).map(each => each.data).join("\n"), parser, extension)
-	// 	$setNodes(data.split("\n").map((each, x) => ({ id: nodes.slice(1, -1)[x].id, data: each })))
-	// }, [extension, nodes])
-
-	console.log(nodes, $nodes)
+	// NOTE: Use useMemo not useState; state needs to be
+	// updated eagerly
+	const $nodes = React.useMemo(() => {
+		if (!extension) {
+			return null
+		}
+		const parser = PrismExtensions[extension]
+		if (!parser) {
+			return null
+		}
+		// TODO: Move syntax highlighting to parser?
+		const data = nodes.slice(1, -1).map(each => each.data).join("\n")
+		const html = window.Prism.highlight(data, parser, extension)
+		return [nodes[0], ...html.split("\n").map((each, x) => ({ id: nodes[x + 1].id, data: each })), nodes[nodes.length - 1]]
+	}, [extension, nodes])
 
 	const style = { whiteSpace: "pre" }
 	return (
@@ -168,11 +140,25 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 						)}
 					</Markdown>
 				</Node>
-				{$nodes.slice(1, -1).map(each => (
-					<Node key={each.id} id={each.id} style={style} dangerouslySetInnerHTML={{
-						__html: each.data || "<br>",
-					}} />
-				))}
+				{!$nodes ? (
+					nodes.slice(1, -1).map(each => (
+						<Node key={each.id} id={each.id} style={style}>
+							{each.data || (
+								<br />
+							)}
+						</Node>
+					))
+				) : (
+					$nodes.slice(1, -1).map(each => (
+						<Node key={each.id} id={each.id} style={style}>
+							<span dangerouslySetInnerHTML={{
+								__html: each.data || (
+									"<br>"
+								)
+							}} />
+						</Node>
+					))
+				)}
 				<Node id={nodes[nodes.length - 1].id} className="py-px leading-none text-md-blue-a400" style={style}>
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
