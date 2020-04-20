@@ -62,7 +62,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					return
 				}
 				if (mutations) {
-					const s = !mutations ? "" : "s"
+					const s = mutations === 1 ? "" : "s"
 					console.log(`synced dom: ${mutations} mutation${s}`)
 				}
 				// Sync DOM cursors:
