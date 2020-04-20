@@ -11,13 +11,18 @@ function isMetaOrCtrlKey(e) {
 	return e.ctrlKey && !e.metaKey
 }
 
-// // Detects whether a key down event matches a key code.
-// export function keyCode(e, keyCode, { shiftKey } = { shiftKey: false }) {
+// NOTE: DO NOT USE -- DOES NOT WORK AS EXPECTED
+//
+// // Matches a key code event.
+// //
+// // NOTE: shiftKey, altKey, and metaOrCtrlKey do not
+// // passthrough
+// function matchKeyCode(e, keyCode, { shiftKey, altKey, metaOrCtrlKey }) {
 // 	const ok = (
-// 		e.shiftKey === shiftKey &&
-// 		!e.altKey &&
-// 		isMetaOrCtrlKey(e) &&
-// 		e.keyCode === keyCode // XOR
+// 		e.shiftKey === Boolean(shiftKey) &&
+// 		e.altKey === Boolean(altKey) &&
+// 		isMetaOrCtrlKey(e) === Boolean(metaOrCtrlKey) &&
+// 		e.keycode === keyCode
 // 	)
 // 	return ok
 // }
@@ -35,11 +40,17 @@ export function detectUndo(e) {
 
 // Detects whether a key down event is redo.
 export function detectRedo(e) {
-	const ok = (
+	const opt1 = (
 		e.shiftKey &&
 		!e.altKey &&
 		isMetaOrCtrlKey(e) &&
-		(e.keyCode === keyCodes.Z || e.keyCode === keyCodes.Y)
+		e.keyCode === keyCodes.Z
 	)
-	return ok
+	const opt2 = (
+		!e.shiftKey &&
+		!e.altKey &&
+		isMetaOrCtrlKey(e) &&
+		e.keyCode === keyCodes.Y
+	)
+	return opt1 || opt2
 }
