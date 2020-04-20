@@ -1,6 +1,7 @@
 import attrs from "./attrs"
 import Markdown from "./Markdown"
 import React from "react"
+import useEditorState from "./useEditorState"
 
 const Span = ({ className, ...props }) => (
 	<span className={!className ? "markdown" : `markdown ${className}`} {...props} />
@@ -46,13 +47,20 @@ export const StrongEmphasis = ({ syntax, children }) => (
 	</Span>
 )
 
-export const Code = ({ syntax, children }) => (
-	<Span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
-		<Markdown className="text-red-600" syntax={syntax}>
-			{children}
-		</Markdown>
-	</Span>
-)
+export const Code = ({ syntax, children }) => {
+	const [state] = useEditorState()
+	return (
+		<Span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
+			<Markdown className="text-red-600" syntax={syntax}>
+				{!state.readOnly ? (
+					children
+				) : (
+					children.trim()
+				)}
+			</Markdown>
+		</Span>
+	)
+}
 
 export const Strikethrough = ({ syntax, children }) => (
 	<Span {...attrs.strike}>
