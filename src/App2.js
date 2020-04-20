@@ -68,7 +68,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 	 				onClick={dispatch.showReadme}
 	 			>
-	 				Readme
+	 				Readme (esc)
 	 			</Button>
 	 			<Button
 	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
