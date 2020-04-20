@@ -143,7 +143,6 @@ const App = () => {
 		}
 	}, [editor, editorSettings, editorSettingsDispatch])
 
-
 	// Writes editor.data to localStorage (debounced 100ms).
 	React.useEffect(() => {
 		const id = setTimeout(() => {
@@ -200,6 +199,7 @@ const App = () => {
 					dispatch={editorSettingsDispatch}
 				/>
 
+				{/* TODO: Implement <DocumentTitle> pattern */}
 				<Editor
 					className={editorSettings.showCSSDebugger && "debug-css"}
 					style={{ fontSize: 17 }}

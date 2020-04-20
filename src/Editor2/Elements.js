@@ -44,6 +44,8 @@ const headerClassNames = {
 }
 
 // Conditionally wraps a React component.
+//
+// TODO: Extract component and change API to props?
 const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 	if (!cond) {
 		return children
