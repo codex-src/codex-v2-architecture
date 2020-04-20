@@ -92,213 +92,238 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	)
 
 	return (
-		React.createElement(
-			tag || "div",
-			{
-				ref,
+		<div>
 
-				id,
+			{/* Editor */}
+			{React.createElement(
+				tag || "div",
+				{
+					ref,
 
-				className:
-					`codex-editor${
-						!className ? "" : ` ${className}`
-					}${
-						!state.readOnly ? "" : " feature-read-only"
-					}`,
+					id,
 
-				style: {
-					...style, // Takes precedence
-					...attrs.contenteditable,
-				},
+					className:
+						`codex-editor${
+							!className ? "" : ` ${className}`
+						}${
+							!state.readOnly ? "" : " feature-read-only"
+						}`,
 
-				onFocus: () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					dispatch.focus()
-				},
-				onBlur:  () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					dispatch.blur()
-				},
+					style: {
+						...style, // Takes precedence
+						...attrs.contenteditable,
+					},
 
-				onSelect: () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					const selection = document.getSelection()
-					if (!selection.rangeCount) {
-						// No-op
-						return
-					}
-					// Guard out of bounds range:
-					const range = selection.getRangeAt(0)
-					if (range.startContainer === ref.current || range.endContainer === ref.current) {
-						// Iterate to the deepest start node:
-						let node = ref.current.childNodes[0]
-						while (node.childNodes.length) {
-							node = node.childNodes[0]
+					onFocus: () => {
+						if (state.readOnly) {
+							// No-op
+							return
 						}
+						dispatch.focus()
+					},
+					onBlur:  () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						dispatch.blur()
+					},
 
-						// // Iterate to the deepest end node:
-						// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
-						// while (node2.childNodes.length) {
-						// 	node2 = node2.childNodes[node2.childNodes.length - 1]
+					onSelect: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						const selection = document.getSelection()
+						if (!selection.rangeCount) {
+							// No-op
+							return
+						}
+						// Guard out of bounds range:
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current || range.endContainer === ref.current) {
+							// Iterate to the deepest start node:
+							let node = ref.current.childNodes[0]
+							while (node.childNodes.length) {
+								node = node.childNodes[0]
+							}
+
+							// // Iterate to the deepest end node:
+							// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
+							// while (node2.childNodes.length) {
+							// 	node2 = node2.childNodes[node2.childNodes.length - 1]
+							// }
+
+							// Correct range:
+							range.setStart(node, 0)
+							range.collapse()
+							selection.removeAllRanges()
+							selection.addRange(range)
+						}
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.select(pos1, pos2)
+					},
+
+					onPointerDown: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						pointerDownRef.current = true
+					},
+					onPointerMove: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						// Editor must be focused and pointer must be down:
+						if (!state.focused || !pointerDownRef.current) {
+							pointerDownRef.current = false // Reset to be safe
+							return
+						}
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.select(pos1, pos2)
+					},
+					onPointerUp: () => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						pointerDownRef.current = false
+					},
+
+					onKeyDown: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						// Tab:
+						if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+							e.preventDefault()
+							dispatch.tab()
+							return
+						// Enter:
+						} else if (e.keyCode === keyCodes.Enter) {
+							e.preventDefault()
+							dispatch.enter()
+							return
+						}
+						// // Undo:
+						// } else if (detect.undo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.undo()
+						// 	return
+						// // Redo:
+						// } else if (detect.redo(e)) {
+						// 	e.preventDefault()
+						// 	dispatch.redo()
+						// 	return
 						// }
+					},
 
-						// Correct range:
-						range.setStart(node, 0)
-						range.collapse()
-						selection.removeAllRanges()
-						selection.addRange(range)
-					}
-					const [pos1, pos2] = computePosRange(ref.current)
-					dispatch.select(pos1, pos2)
-				},
+					onCompositionEnd: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						// https://github.com/w3c/uievents/issues/202#issue-316461024
+						dedupedCompositionEnd.current = true
+						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
+						const nodes = readRoots(ref.current, [root1, root2])
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.input(nodes, atEnd, [pos1, pos2])
+					},
+					onInput: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						// Force rerender when empty:
+						if (!ref.current.childNodes.length) { // Takes precedence?
+							dispatch.render()
+							return
+						}
+						// Dedupe "compositionend" event (not tested):
+						//
+						// https://github.com/w3c/uievents/issues/202#issue-316461024
+						if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
+							dedupedCompositionEnd.current = false
+							return
+						}
+						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
+						const nodes = readRoots(ref.current, [root1, root2])
+						const [pos1, pos2] = computePosRange(ref.current)
+						dispatch.input(nodes, atEnd, [pos1, pos2])
+					},
 
-				onPointerDown: () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					pointerDownRef.current = true
-				},
-				onPointerMove: () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					// Editor must be focused and pointer must be down:
-					if (!state.focused || !pointerDownRef.current) {
-						pointerDownRef.current = false // Reset to be safe
-						return
-					}
-					const [pos1, pos2] = computePosRange(ref.current)
-					dispatch.select(pos1, pos2)
-				},
-				onPointerUp: () => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					pointerDownRef.current = false
-				},
-
-				onKeyDown: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					// Tab:
-					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+					onCut: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						e.preventDefault()
-						dispatch.tab()
-						return
-					// Enter:
-					} else if (e.keyCode === keyCodes.Enter) {
+						if (state.pos1.pos === state.pos2.pos) {
+							// No-op
+							return
+						}
+						const data = state.data.slice(state.pos1.pos, state.pos2.pos)
+						e.clipboardData.setData("text/plain", data)
+						dispatch.cut()
+					},
+					onCopy: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
 						e.preventDefault()
-						dispatch.enter()
-						return
-					}
-					// // Undo:
-					// } else if (detect.undo(e)) {
-					// 	e.preventDefault()
-					// 	dispatch.undo()
-					// 	return
-					// // Redo:
-					// } else if (detect.redo(e)) {
-					// 	e.preventDefault()
-					// 	dispatch.redo()
-					// 	return
-					// }
-				},
+						if (state.pos1.pos === state.pos2.pos) {
+							// No-op
+							return
+						}
+						const data = state.data.slice(state.pos1.pos, state.pos2.pos)
+						e.clipboardData.setData("text/plain", data)
+						dispatch.copy()
+					},
+					onPaste: e => {
+						if (state.readOnly) {
+							// No-op
+							return
+						}
+						e.preventDefault()
+						const data = e.clipboardData.getData("text/plain")
+						if (!data) {
+							// No-op
+							return
+						}
+						dispatch.paste(data)
+					},
 
-				onCompositionEnd: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					// https://github.com/w3c/uievents/issues/202#issue-316461024
-					dedupedCompositionEnd.current = true
-					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
-					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(ref.current)
-					dispatch.input(nodes, atEnd, [pos1, pos2])
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
 				},
-				onInput: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					// Force rerender when empty:
-					if (!ref.current.childNodes.length) { // Takes precedence?
-						dispatch.render()
-						return
-					}
-					// Dedupe "compositionend" event (not tested):
-					//
-					// https://github.com/w3c/uievents/issues/202#issue-316461024
-					if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
-						dedupedCompositionEnd.current = false
-						return
-					}
-					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
-					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(ref.current)
-					dispatch.input(nodes, atEnd, [pos1, pos2])
-				},
+			)}
 
-				onCut: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					e.preventDefault()
-					if (state.pos1.pos === state.pos2.pos) {
-						// No-op
-						return
-					}
-					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", data)
-					dispatch.cut()
-				},
-				onCopy: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					e.preventDefault()
-					if (state.pos1.pos === state.pos2.pos) {
-						// No-op
-						return
-					}
-					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", data)
-					dispatch.copy()
-				},
-				onPaste: e => {
-					if (state.readOnly) {
-						// No-op
-						return
-					}
-					e.preventDefault()
-					const data = e.clipboardData.getData("text/plain")
-					if (!data) {
-						// No-op
-						return
-					}
-					dispatch.paste(data)
-				},
+			{/* Debugger */}
+			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
+				{JSON.stringify(
+					// {
+					// 	...state,
+					// 	reactDOM: undefined,
+					// },
+					state.history,
+					(key, value) => {
+						if (key === "data" && value === state.data) {
+							return undefined
+						} else if (key === "data") {
+							return value.slice(0, 60) + "…"
+						}
+						return value
+					},
+					"\t",
+				)}
+			</div>
 
-				contentEditable: !state.readOnly,
-				suppressContentEditableWarning: !state.readOnly,
-			},
-		)
+		</div>
 	)
 }
 
