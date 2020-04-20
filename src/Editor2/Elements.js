@@ -137,8 +137,10 @@ export const Blockquote = React.memo(({ id, children }) => {
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
-	// const [$nodes, $setNodes] = React.useState(nodes.slice(1, -1))
-	//
+	// const [$nodes, $setNodes] = React.useState(nodes)
+
+	const $nodes = React.useMemo(() => nodes, [nodes])
+
 	// React.useLayoutEffect(() => {
 	// 	if (!extension) {
 	// 		// No-op
@@ -150,8 +152,10 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	// 		return
 	// 	}
 	// 	const data = window.Prism.highlight(nodes.slice(1, -1).map(each => each.data).join("\n"), parser, extension)
-	// 	$setNodes(data.split("\n").map((each, x) => ({ id: nodes[x + 1].id, data: each })))
+	// 	$setNodes(data.split("\n").map((each, x) => ({ id: nodes.slice(1, -1)[x].id, data: each })))
 	// }, [extension, nodes])
+
+	console.log(nodes, $nodes)
 
 	const style = { whiteSpace: "pre" }
 	return (
@@ -164,7 +168,7 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 						)}
 					</Markdown>
 				</Node>
-				{nodes.slice(1, -1).map(each => (
+				{$nodes.slice(1, -1).map(each => (
 					<Node key={each.id} id={each.id} style={style} dangerouslySetInnerHTML={{
 						__html: each.data || "<br>",
 					}} />
