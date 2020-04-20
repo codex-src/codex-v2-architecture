@@ -158,54 +158,38 @@ const methods = state => ({
 		state.history.index++
 	},
 
-	// // Stores the next undo state.
-	// storeUndo() {
-	// 	const undo = state.history.stack[state.history.index]
-	// 	if (undo.data.length === state.data.length && undo.data === state.data) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const { data, body, pos1, pos2 } = state
-	// 	state.history.stack.push({ data, body: body.map(each => ({ ...each })), pos1: { ...pos1 }, pos2: { ...pos2 } })
-	// 	state.history.index++
-	// },
+	// Undos once:
+	undo() {
+		// if (state.history.index === 1 && state.resetPos) {
+		// 	state.resetPos = false
+		// }
+
+		// Guard bounds error:
+		if (state.history.index) {
+			state.history.index--
+		}
+		const undo = state.history.stack[state.history.index]
+		Object.assign(state, undo)
+		// TOOD: render does not need to compute state.data
+		this.render()
+	},
+	// Redos once:
+	redo() {
+		// Guard bounds error:
+		if (state.history.index + 1 === state.history.stack.length) {
+			// No-op
+			return
+		}
+		state.history.index++
+		const redo = state.history.stack[state.history.index]
+		Object.assign(state, redo)
+		// TOOD: render does not need to compute state.data
+		this.render()
+	},
+
 	// // Drops future undo states.
 	// dropRedos() {
 	// 	state.history.stack.splice(state.history.index + 1)
-	// },
-	// // (Self-explanatory)
-	// undo() {
-	// 	if (state.props.readOnly) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	this.registerAction(ActionTypes.UNDO)
-	// 	if (state.history.index === 1 && state.resetPos) {
-	// 		state.resetPos = false
-	// 	}
-	// 	// Guard decrement:
-	// 	if (state.history.index) {
-	// 		state.history.index--
-	// 	}
-	// 	const undo = state.history.stack[state.history.index]
-	// 	Object.assign(state, undo)
-	// 	this.render()
-	// },
-	// // (Self-explanatory)
-	// redo() {
-	// 	if (state.props.readOnly) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	this.registerAction(ActionTypes.REDO)
-	// 	if (state.history.index + 1 === state.history.stack.length) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	state.history.index++
-	// 	const redo = state.history.stack[state.history.index]
-	// 	Object.assign(state, redo)
-	// 	this.render()
 	// },
 
 	// Rerenders the string and VDOM representations.

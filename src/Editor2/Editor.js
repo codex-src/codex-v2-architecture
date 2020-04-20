@@ -215,14 +215,12 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						// Undo:
 						} else if (detectUndo(e)) {
 							e.preventDefault()
-							// dispatch.undo()
-							console.log("undo")
+							dispatch.undo()
 							return
 						// Redo:
 						} else if (detectRedo(e)) {
 							e.preventDefault()
-							// dispatch.redo()
-							console.log("redo")
+							dispatch.redo()
 							return
 						}
 					},
