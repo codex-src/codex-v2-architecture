@@ -79,7 +79,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		[state.readOnly, state.reactVDOM],
 	)
 
-	// Stores the next undo (debounced 500ms).
+	// Stores the next undo (debounced 250ms).
 	React.useEffect(
 		React.useCallback(() => {
 			if (state.readOnly) {
@@ -88,7 +88,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 			}
 			const id = setTimeout(() => {
 				dispatch.storeUndo()
-			}, 500)
+			}, 250)
 			return () => {
 				clearTimeout(id)
 			}
@@ -308,22 +308,22 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 			)}
 
 			{/* Debugger */}
-			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
-				{JSON.stringify(
-					state.history.stack.map(each => ({
-						...each,
-						data: undefined,
-						nodes: each.nodes.map(each => ({
-							...each,
-							data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`,
-						})),
-						pos1: undefined,
-						pos2: undefined,
-					})),
-					null,
-					"\t",
-				)}
-			</div>
+			{/* <div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}> */}
+			{/* 	{JSON.stringify( */}
+			{/* 		state.history.stack.map(each => ({ */}
+			{/* 			...each, */}
+			{/* 			data: undefined, */}
+			{/* 			nodes: each.nodes.map(each => ({ */}
+			{/* 				...each, */}
+			{/* 				data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`, */}
+			{/* 			})), */}
+			{/* 			pos1: undefined, */}
+			{/* 			pos2: undefined, */}
+			{/* 		})), */}
+			{/* 		null, */}
+			{/* 		"\t", */}
+			{/* 	)} */}
+			{/* </div> */}
 
 		</div>
 	)

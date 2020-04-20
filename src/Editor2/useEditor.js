@@ -82,6 +82,8 @@ const methods = state => ({
 	// NOTE: write is inverse to input; write writes character
 	// data whereas input splices nodes (read from the DOM)
 	write(data) {
+		this.dropRedos() // TODO: Guard !data?
+
 		// Parse new nodes:
 		const nodes = newNodes(data)
 		const node1 = state.nodes[state.pos1.y]
@@ -106,6 +108,8 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
+		this.dropRedos()
+
 		// Get the start offset:
 		const key1 = nodes[0].id
 		const offset1 = state.nodes.findIndex(each => each.id === key1)
@@ -145,7 +149,6 @@ const methods = state => ({
 	paste(data) {
 		this.write(data)
 	},
-
 	// Stores the next undo state.
 	storeUndo() {
 		const undo = state.history.stack[state.history.index]
@@ -157,13 +160,12 @@ const methods = state => ({
 		state.history.stack.push({ data, nodes, pos1: { ...pos1 }, pos2: { ...pos2 } })
 		state.history.index++
 	},
-
+	// Drops redo states.
+	dropRedos() {
+		state.history.stack.splice(state.history.index + 1)
+	},
 	// Undos once:
 	undo() {
-		// if (state.history.index === 1 && state.resetPos) {
-		// 	state.resetPos = false
-		// }
-
 		// Guard bounds error:
 		if (state.history.index) {
 			state.history.index--
@@ -186,12 +188,6 @@ const methods = state => ({
 		// TOOD: render does not need to compute state.data
 		this.render()
 	},
-
-	// // Drops future undo states.
-	// dropRedos() {
-	// 	state.history.stack.splice(state.history.index + 1)
-	// },
-
 	// Rerenders the string and VDOM representations.
 	render() {
 		Object.assign(state, {
