@@ -7,17 +7,31 @@ import {
 } from "./constructors"
 
 // Prepares a new editor state (for useEditor).
-function newEditorState(initialValue) {
-	const nodes = newNodes(initialValue)
+function newEditorState(data) {
+	const nodes = newNodes(data)
+	const pos1 = newPos()
+	const pos2 = newPos()
 	const initialState = {
 		readOnly: false,                         // Is read-only?
 		focused: false,                          // Is focused?
-		data: initialValue,                      // Data (string)
+		data,                                    // Data data (string)
 		nodes,                                   // Document nodes
-		pos1: newPos(),                          // Start cursor data structure
-		pos2: newPos(),                          // End cursor data structure
+		pos1,                                    // Start cursor data structure
+		pos2,                                    // End cursor data structure
 		extPosRange: ["", ""],                   // Extended node (ID) range
-		reactVDOM: parse(nodes),                 // React VDOM
+		history: {                               // History object
+			stack: [                               // History state stack
+				{                                    // ...
+					data,                              // ...
+					nodes,                             // ...
+					pos1: { ...pos1 },                 // ...
+					pos2: { ...pos1 },                 // ...
+				},                                   // ...
+			],                                     // ...
+			index: 0,                              // History state stack index
+		},                                       // ...
+		// resetPos: false,                      // TODO: Did reset the cursors?
+		reactVDOM: parse(nodes),                 // React VDOM -- does not use React elements
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return initialState
@@ -44,18 +58,22 @@ const methods = state => ({
 	//
 	// NOTE: Can use Math.max and Math.min instead
 	select(pos1, pos2) {
-		// Decrement a copy of pos1.y 2x:
-		let y1 = pos1.y
-		y1 -= 2
-		if (y1 < 0) {
-			y1 = 0
-		}
-		// Increment a copy of pos2.y 2x:
-		let y2 = pos2.y
-		y2 += 2
-		if (y2 >= state.nodes.length) {
-			y2 = state.nodes.length - 1
-		}
+
+		// // Decrement a copy of pos1.y by 2:
+		// let y1 = pos1.y
+		// y1 -= 2
+		// if (y1 < 0) {
+		// 	y1 = 0
+		// }
+		// // Increment a copy of pos2.y by 2:
+		// let y2 = pos2.y
+		// y2 += 2
+		// if (y2 >= state.nodes.length) {
+		// 	y2 = state.nodes.length - 1
+		// }
+
+		const y1 = Math.max(pos1.y - 2, 0)
+		const y2 = Math.min(pos2.y + 2, state.nodes.length - 1)
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
@@ -127,6 +145,69 @@ const methods = state => ({
 	paste(data) {
 		this.write(data)
 	},
+
+	// Stores the next undo state.
+	storeUndo() {
+		const undo = state.history.stack[state.history.index]
+		if (undo.data.length === state.data.length && undo.data === state.data) {
+			// No-op
+			return
+		}
+		const { data, nodes, pos1, pos2 } = state
+		state.history.stack.push({ data, nodes: nodes.map(each => ({ ...each })), pos1: { ...pos1 }, pos2: { ...pos2 } })
+		state.history.index++
+	},
+
+	// // Stores the next undo state.
+	// storeUndo() {
+	// 	const undo = state.history.stack[state.history.index]
+	// 	if (undo.data.length === state.data.length && undo.data === state.data) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	const { data, body, pos1, pos2 } = state
+	// 	state.history.stack.push({ data, body: body.map(each => ({ ...each })), pos1: { ...pos1 }, pos2: { ...pos2 } })
+	// 	state.history.index++
+	// },
+	// // Drops future undo states.
+	// dropRedos() {
+	// 	state.history.stack.splice(state.history.index + 1)
+	// },
+	// // (Self-explanatory)
+	// undo() {
+	// 	if (state.props.readOnly) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	this.registerAction(ActionTypes.UNDO)
+	// 	if (state.history.index === 1 && state.resetPos) {
+	// 		state.resetPos = false
+	// 	}
+	// 	// Guard decrement:
+	// 	if (state.history.index) {
+	// 		state.history.index--
+	// 	}
+	// 	const undo = state.history.stack[state.history.index]
+	// 	Object.assign(state, undo)
+	// 	this.render()
+	// },
+	// // (Self-explanatory)
+	// redo() {
+	// 	if (state.props.readOnly) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	this.registerAction(ActionTypes.REDO)
+	// 	if (state.history.index + 1 === state.history.stack.length) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	state.history.index++
+	// 	const redo = state.history.stack[state.history.index]
+	// 	Object.assign(state, redo)
+	// 	this.render()
+	// },
+
 	// Rerenders the string and VDOM representations.
 	render() {
 		Object.assign(state, {

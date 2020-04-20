@@ -38,6 +38,7 @@ const methods = state => ({
 				{
 					...editorState,
 					data:      undefined,
+					history:   undefined,
 					reactVDOM: undefined,
 					reactDOM:  undefined,
 				},

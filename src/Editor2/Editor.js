@@ -74,6 +74,23 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		[state.readOnly, state.reactVDOM],
 	)
 
+	// Stores the next undo (debounced 250ms).
+	React.useEffect(
+		React.useCallback(() => {
+			if (state.readOnly) {
+				// No-op
+				return
+			}
+			const id = setTimeout(() => {
+				dispatch.storeUndo()
+			}, 250)
+			return () => {
+				clearTimeout(id)
+			}
+		}, [state, dispatch]),
+		[state.readOnly, state.reactVDOM],
+	)
+
 	return (
 		React.createElement(
 			tag || "div",
