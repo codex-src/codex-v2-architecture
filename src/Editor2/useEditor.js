@@ -82,6 +82,8 @@ const methods = state => ({
 	// Writes character data.
 	write(data) {
 		// Correct pos before first change event:
+		//
+		// TODO: Extract to changeEvent?
 		if (!state.history.index && !state.history.correctedPos) {
 			Object.assign(state.history.stack[0], {
 				pos1: state.pos1,
@@ -116,6 +118,8 @@ const methods = state => ({
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
 		// Correct pos before first change event:
+		//
+		// TODO: Extract to changeEvent?
 		if (!state.history.index && !state.history.correctedPos) {
 			Object.assign(state.history.stack[0], {
 				pos1: state.pos1,
