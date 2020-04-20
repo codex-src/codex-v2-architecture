@@ -182,13 +182,12 @@ const methods = state => ({
 	},
 	// Undos once:
 	undo() {
-		// Reset correctedPos before committing the first or
-		// second-to-first undo:
+		// Reset correctedPos on the first or the second-to-
+		// first undo:
 		if (state.history.index <= 1 && state.history.correctedPos) {
 			state.history.correctedPos = false
 		}
-
-		// Guard bounds error:
+		// Bounds check:
 		if (state.history.index) {
 			state.history.index--
 		}
@@ -199,7 +198,7 @@ const methods = state => ({
 	},
 	// Redos once:
 	redo() {
-		// Guard bounds error:
+		// Bounds check:
 		if (state.history.index + 1 === state.history.stack.length) {
 			// No-op
 			return
