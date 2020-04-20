@@ -126,7 +126,7 @@ const keyCodeP = 80
 
 const App = () => {
 	// TODO: Can we use props.children instead of useEditor?
-	const [editor, editorDispatch] = useEditor(`Hello, world!\n\n\`\`\`go\npackage main\n\nimport "fmt"\n\nfunc main() {\n	fmt.Println("Hello, world!")\n}\n\`\`\`\n\nHello, world!\n`)
+	const [editor, editorDispatch] = useEditor("Hello, world!\n\n```\n```\n\nHello, world!\n") // `Hello, world!\n\n\`\`\`go\npackage main\n\nimport "fmt"\n\nfunc main() {\n	fmt.Println("Hello, world!")\n}\n\`\`\`\n\nHello, world!\n`)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	// Debounces renderers by one frame.
