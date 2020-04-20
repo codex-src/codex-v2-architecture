@@ -4,7 +4,6 @@ import React from "react"
 // Performs syntax highlighting.
 const Highlighted = React.memo(({ extension, children }) => {
 	const [highlighted, setHighlighted] = React.useState(null)
-
 	React.useEffect(() => {
 		if (!extension) {
 			// No-op
@@ -21,7 +20,6 @@ const Highlighted = React.memo(({ extension, children }) => {
 			}} />
 		))
 	}, [extension, children])
-
 	return highlighted || children
 })
 

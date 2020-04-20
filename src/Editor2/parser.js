@@ -420,14 +420,27 @@ function parseElements(nodes) {
 					break
 				}
 				x2++ // Iterate once past end
-				const info = each.data.slice(3)
+
+				// const infoString = each.data.slice(3)
+				// console.log({
+				// 	type: typeEnum.CodeBlock,
+				// 	id: each.id,
+				// 	syntax: [nodes[x1].data, nodes[x2 - 1].data],
+				// 	infoString,
+				// 	extension: infoString.split(".").slice(-1)[0].toLowerCase(),
+				// 	children: x1 + 1 === x2 - 1 ? "" : nodes.slice(x1 + 1, x2 - 1).map(each => each.data).join("\n"),
+				// })
+
+				// const infoString = each.data.slice(3)
 				parsed.push({
 					type: typeEnum.CodeBlock,
 					id: each.id,
 					syntax: [nodes[x1].data, nodes[x2 - 1].data],
-					info,
-					extension: info.split(".").slice(-1)[0].toLowerCase(),
-					children: x1 + 1 === x2 - 1 ? "" : `${nodes.slice(x1 + 1, x2 - 1).map(each => each.data).join("\n")}\n`,
+					// infoString,
+					// extension: infoString.split(".").slice(-1)[0].toLowerCase(),
+					extension: nodes[x1].data.split(".").slice(-1)[0].toLowerCase(),
+					children: nodes.slice(x1, x2),
+					// children: x1 + 1 === x2 - 1 ? "" : `${nodes.slice(x1 + 1, x2 - 1).map(each => each.data).join("\n")}\n`,
 				})
 				index = x2 - 1
 				continue

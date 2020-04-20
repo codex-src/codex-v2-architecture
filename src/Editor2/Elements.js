@@ -122,13 +122,13 @@ export const Blockquote = React.memo(({ id, children }) => {
 // // .slice(1),              // Trim start paragraph
 
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, info, extension, children }) => {
+export const CodeBlock = React.memo(({ id, syntax, extension, children }) => {
 	const [state] = useEditorState()
 	return (
 		<Root id={id} className="-mx-6 px-6 bg-white shadow-hero rounded" {...attrs.code}>
 			<div className="break-words font-mono text-sm leading-snug">
 				{/* TODO: Add ID? */}
-				<Node className="py-px leading-none text-md-blue-a400">
+				<Node id={children[0].id} className="py-px leading-none text-md-blue-a400">
 					<Markdown syntax={[syntax[0]]}>
 						{state.readOnly && (
 							<br />
@@ -136,13 +136,15 @@ export const CodeBlock = React.memo(({ id, syntax, info, extension, children }) 
 					</Markdown>
 				</Node>
 				{/* TODO: Add ID? */}
-				<Node>
-					<Highlighted extension={extension}>
-						{children}
-					</Highlighted>
-				</Node>
+				{children.slice(1, -1).map(each => (
+					<Node key={each.id} id={each.id}>
+						{each.data || (
+							<br />
+						)}
+					</Node>
+				))}
 				{/* TODO: Add ID? */}
-				<Node className="py-px leading-none text-md-blue-a400">
+				<Node id={children[children.length - 1].id} className="py-px leading-none text-md-blue-a400">
 					<Markdown syntax={[syntax[1]]}>
 						{state.readOnly && (
 							<br />
