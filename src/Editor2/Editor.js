@@ -139,7 +139,11 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							// No-op
 							return
 						}
-						// Guard out of bounds range:
+						// Bounds check:
+						//
+						// FIXME: Causes a bug when the editor is
+						// selected and user transitions back and forth
+						// between read-write and read-only mode
 						const range = selection.getRangeAt(0)
 						if (range.startContainer === ref.current || range.endContainer === ref.current) {
 							// Iterate to the deepest start node:
