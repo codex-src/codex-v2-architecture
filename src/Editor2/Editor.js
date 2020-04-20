@@ -306,19 +306,17 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 			{/* Debugger */}
 			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
 				{JSON.stringify(
-					// {
-					// 	...state,
-					// 	reactDOM: undefined,
-					// },
-					state.history,
-					(key, value) => {
-						if (key === "data" && value === state.data) {
-							return undefined
-						} else if (key === "data") {
-							return value.slice(0, 60) + "…"
-						}
-						return value
-					},
+					state.history.stack.map(each => ({
+						...each,
+						data: undefined,
+						nodes: each.nodes.map(each => ({
+							...each,
+							data: !each.data ? "" : each.data.slice(0, 60 - 1) + "…",
+						})),
+						pos1: undefined,
+						pos2: undefined,
+					})),
+					null,
 					"\t",
 				)}
 			</div>
