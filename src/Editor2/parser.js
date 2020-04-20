@@ -204,22 +204,22 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 		// <Code>
 		case char === "`":
-			// ```Code```
-			if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
-				const res = parseGFMType({
-					type: typeEnum.Code,
-					syntax: "```",
-					str,
-					index,
-				})
-				if (!res) {
-					// No-op
-					break
-				}
-				parsed.push(res.parsed)
-				index = res.x2 - 1
-				continue
-			} else if (nchars >= `x`.length) {
+			// // ```Code```
+			// if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
+			// 	const res = parseGFMType({
+			// 		type: typeEnum.Code,
+			// 		syntax: "```",
+			// 		str,
+			// 		index,
+			// 	})
+			// 	if (!res) {
+			// 		// No-op
+			// 		break
+			// 	}
+			// 	parsed.push(res.parsed)
+			// 	index = res.x2 - 1
+			// 	continue
+			if (nchars >= `x`.length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
 					syntax: "`",
