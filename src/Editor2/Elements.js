@@ -111,37 +111,35 @@ export const Blockquote = React.memo(({ id, children }) => {
 })
 
 // NOTE: Compound component
-export const CodeBlock = React.memo(({ id, syntax, extension, children }) => {
+export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [state] = useEditorState()
+
 	const style = { whiteSpace: "pre" }
 	return (
-		<Root id={id} className="-mx-6 bg-white shadow-hero rounded" {...attrs.code}>
-			<div className="px-6 whitespace-pre font-mono text-sm leading-snug overflow-x-scroll scrolling-touch">
-				{/* Use inline-block to conserve padding-right */}
-				<span className="inline-block">
-					<Node id={children[0].id} className="py-px leading-none text-md-blue-a400" style={style}>
-						<Markdown syntax={[syntax[0]]}>
-							{state.readOnly && (
-								<br />
-							)}
-						</Markdown>
+		<Root id={id} className="-mx-6 px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
+			<span className="inline-block">
+				<Node id={nodes[0].id} className="py-px leading-none text-md-blue-a400" style={style}>
+					<Markdown syntax={[syntax[0]]}>
+						{state.readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Node>
+				{nodes.slice(1, -1).map(each => (
+					<Node key={each.id} id={each.id} style={style}>
+						{each.data || (
+							<br />
+						)}
 					</Node>
-					{children.slice(1, -1).map(each => (
-						<Node key={each.id} id={each.id} style={style}>
-							{each.data || (
-								<br />
-							)}
-						</Node>
-					))}
-					<Node id={children[children.length - 1].id} className="py-px leading-none text-md-blue-a400" style={style}>
-						<Markdown syntax={[syntax[1]]}>
-							{state.readOnly && (
-								<br />
-							)}
-						</Markdown>
-					</Node>
-				</span>
-			</div>
+				))}
+				<Node id={nodes[nodes.length - 1].id} className="py-px leading-none text-md-blue-a400" style={style}>
+					<Markdown syntax={[syntax[1]]}>
+						{state.readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Node>
+			</span>
 		</Root>
 	)
 })
