@@ -18,8 +18,10 @@ function newEditorState(data) {
 		nodes,                                   // Document nodes
 		pos1,                                    // Start cursor data structure
 		pos2,                                    // End cursor data structure
+		// TODO: Rename to extendedNodeIDs?
 		extPosRange: ["", ""],                   // Extended node (ID) range
 		history: {                               // History object
+			correctedPos: false,                   // Corrected pos before first change event?
 			stack: [                               // History state stack
 				{                                    // ...
 					data,                              // ...
@@ -78,11 +80,16 @@ const methods = state => ({
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
 	// Writes character data.
-	//
-	// NOTE: write is inverse to input; write writes character
-	// data whereas input splices nodes (read from the DOM)
 	write(data) {
-		this.dropRedos() // TODO: Guard !data?
+		// Correct pos before first change event:
+		if (!state.history.index && !state.history.correctedPos) {
+			Object.assign(state.history.stack[0], {
+				pos1: state.pos1,
+				pos2: state.pos2,
+			})
+			state.history.correctedPos = true
+		}
+		this.dropRedos()
 
 		// Parse new nodes:
 		const nodes = newNodes(data)
@@ -108,6 +115,14 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
+		// Correct pos before first change event:
+		if (!state.history.index && !state.history.correctedPos) {
+			Object.assign(state.history.stack[0], {
+				pos1: state.pos1,
+				pos2: state.pos2,
+			})
+			state.history.correctedPos = true
+		}
 		this.dropRedos()
 
 		// Get the start offset:
@@ -157,6 +172,7 @@ const methods = state => ({
 			return
 		}
 		const { data, nodes, pos1, pos2 } = state
+		// NOTE: Copy pos1 and pos2 because of correctedPos
 		state.history.stack.push({ data, nodes, pos1: { ...pos1 }, pos2: { ...pos2 } })
 		state.history.index++
 	},
@@ -166,6 +182,12 @@ const methods = state => ({
 	},
 	// Undos once:
 	undo() {
+		// Reset correctedPos before committing the first or
+		// second-to-first undo:
+		if (state.history.index <= 1 && state.history.correctedPos) {
+			state.history.correctedPos = false
+		}
+
 		// Guard bounds error:
 		if (state.history.index) {
 			state.history.index--
