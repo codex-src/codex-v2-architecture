@@ -79,6 +79,17 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 		[state.readOnly, state.reactVDOM],
 	)
 
+	// Rerenders on DOMContentLoaded for syntax highlighting.
+	React.useEffect(() => {
+		const handler = () => {
+			dispatch.render()
+		}
+		document.addEventListener("DOMContentLoaded", handler)
+		return () => {
+			document.removeEventListener("DOMContentLoaded", handler)
+		}
+	}, [dispatch])
+
 	// Stores the next undo (debounced 250ms).
 	React.useEffect(
 		React.useCallback(() => {

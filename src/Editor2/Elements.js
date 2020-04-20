@@ -1,6 +1,4 @@
-// import escape from "lodash/escape"
 import attrs from "./attrs"
-import Highlighted from "Highlighted"
 import Markdown from "./Markdown"
 import PrismExtensions from "PrismExtensions"
 import React from "react"
@@ -141,6 +139,7 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 					</Markdown>
 				</Node>
 				{!$nodes ? (
+					// Text:
 					nodes.slice(1, -1).map(each => (
 						<Node key={each.id} id={each.id} style={style}>
 							{each.data || (
@@ -149,12 +148,13 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 						</Node>
 					))
 				) : (
+					// HTML:
 					$nodes.slice(1, -1).map(each => (
 						<Node key={each.id} id={each.id} style={style}>
 							<span dangerouslySetInnerHTML={{
 								__html: each.data || (
 									"<br>"
-								)
+								),
 							}} />
 						</Node>
 					))

@@ -18,9 +18,9 @@ document.addEventListener("DOMContentLoaded", e => {
 		htm:        window.Prism.languages.html,
 		html:       window.Prism.languages.html,
 		http:       window.Prism.languages.http,
-		js:         window.Prism.languages.jsx,
+		js:         window.Prism.languages.jsx, // Uses jsx
 		json:       window.Prism.languages.json,
-		jsx:        window.Prism.languages.jsx, // Uses jsx
+		jsx:        window.Prism.languages.jsx,
 		kotlin:     window.Prism.languages.kotlin,
 		php:        window.Prism.languages.php,
 		py:         window.Prism.languages.py,
