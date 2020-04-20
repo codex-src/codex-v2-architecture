@@ -4,7 +4,7 @@ import keyCodes from "./keyCodes"
 // meta (command: ⌘) or control key.
 //
 // https://css-tricks.com/snippets/javascript/test-mac-pc-javascript
-function isMetaOrCtrlKey(e) {
+export function isMetaOrCtrlKey(e) {
 	if (navigator.userAgent.includes("Mac OS X")) {
 		return !e.ctrlKey && e.metaKey
 	}

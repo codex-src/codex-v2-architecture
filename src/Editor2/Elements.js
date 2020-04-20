@@ -114,7 +114,7 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
 	const $nodes = React.useMemo(() => {
-		if (!extension) {
+		if (!extension || nodes.length === 2) {
 			return null
 		}
 		const parser = PrismExtensions[extension]
@@ -129,9 +129,9 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 
 	const style = { whiteSpace: "pre" }
 	return (
-		<Root id={id} className="-mx-6 px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
+		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
 			<span className="inline-block">
-				<Node id={nodes[0].id} className="py-px leading-none text-md-blue-a400" style={style}>
+				<Node id={nodes[0].id} className="leading-none" style={style}>
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
 							<br />
@@ -153,13 +153,13 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 						<Node key={each.id} id={each.id} style={style}>
 							<span dangerouslySetInnerHTML={{
 								__html: each.data || (
-									"<br>"
+									"<br />"
 								),
 							}} />
 						</Node>
 					))
 				)}
-				<Node id={nodes[nodes.length - 1].id} className="py-px leading-none text-md-blue-a400" style={style}>
+				<Node id={nodes[nodes.length - 1].id} className="leading-none" style={style}>
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
 							<br />
