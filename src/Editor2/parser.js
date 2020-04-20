@@ -322,12 +322,12 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-function parseElements(unparsed) {
+function parseElements(nodes) {
 	const newHash = newHashEpoch()
 
 	const parsed = []
-	for (let index = 0; index < unparsed.length; index++) {
-		const each = unparsed[index]
+	for (let index = 0; index < nodes.length; index++) {
+		const each = nodes[index]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
 		// TODO: Add fast path for plain text?
@@ -356,7 +356,6 @@ function parseElements(unparsed) {
 			}
 			// No-op
 			break
-
 		// <Blockquote>
 		case char === ">":
 			// > Blockquote
@@ -368,30 +367,67 @@ function parseElements(unparsed) {
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
-				while (x2 < unparsed.length) {
+				while (x2 < nodes.length) {
 					if (
-						(unparsed[x2].data.length < 2 || unparsed[x2].data.slice(0, 2) !== "> ") &&
-						(unparsed[x2].data.length !== 1 || unparsed[x2].data !== ">")
+						(nodes[x2].data.length < 2 || nodes[x2].data.slice(0, 2) !== "> ") &&
+						(nodes[x2].data.length !== 1 || nodes[x2].data !== ">")
 					) {
 						// No-op
 						break
 					}
 					x2++
 				}
-				const range = unparsed.slice(x1, x2)
+				const range = nodes.slice(x1, x2)
 				parsed.push({
 					// <Blockquote>
 					type: typeEnum.Blockquote,
 					id: each.id,
-					// raw: range.map(each => each.data).join("\n"),
 					children: range.map(each => ({
 						// <BlockquoteItem>
 						type: typeEnum.BlockquoteItem,
 						id: each.id,
 						syntax: [each.data.slice(0, 2)],
-						// raw: each.data,
 						children: parseInlineElements(each.data.slice(2)),
 					})),
+				})
+				index = x2 - 1
+				continue
+			}
+			// No-op
+			break
+
+		// <CodeBlock>
+		case char === "`":
+			if (
+				nchars >= 3 &&
+				each.data.slice(0, 3) === "```" &&
+				each.data.slice(3).indexOf("`") === -1 && // Negate backticks
+				index + 1 < nodes.length
+			) {
+				const x1 = index
+				let x2 = x1
+				x2++
+				// Iterate to end syntax:
+				while (x2 < nodes.length) {
+					if (nodes[x2].data.length === 3 && nodes[x2].data === "```") {
+						// No-op
+						break
+					}
+					x2++
+				}
+				if (x2 === nodes.length) { // Unterminated
+					index = x1
+					break
+				}
+				x2++ // Iterate once past end
+				const info = each.data.slice(3)
+				parsed.push({
+					type: typeEnum.CodeBlock,
+					id: each.id,
+					syntax: [nodes[x1].data, nodes[x2 - 1].data],
+					info,
+					extension: info.split(".").slice(-1)[0].toLowerCase(),
+					children: x1 + 1 === x2 - 1 ? "" : `${nodes.slice(x1 + 1, x2 - 1).map(each => each.data).join("\n")}\n`,
 				})
 				index = x2 - 1
 				continue

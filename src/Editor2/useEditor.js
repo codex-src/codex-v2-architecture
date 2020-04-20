@@ -57,25 +57,23 @@ const methods = state => ({
 		state.focused = false
 	},
 	// Selects the editor.
-	//
-	// NOTE: Can use Math.max and Math.min instead
 	select(pos1, pos2) {
 
-		// // Decrement a copy of pos1.y by 2:
-		// let y1 = pos1.y
-		// y1 -= 2
-		// if (y1 < 0) {
-		// 	y1 = 0
-		// }
-		// // Increment a copy of pos2.y by 2:
-		// let y2 = pos2.y
-		// y2 += 2
-		// if (y2 >= state.nodes.length) {
-		// 	y2 = state.nodes.length - 1
-		// }
+		// const y1 = Math.max(pos1.y - 2, 0)
+		// const y2 = Math.min(pos2.y + 2, state.nodes.length - 1)
+		// const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
+		// Object.assign(state, { pos1, pos2, extPosRange })
 
-		const y1 = Math.max(pos1.y - 2, 0)
-		const y2 = Math.min(pos2.y + 2, state.nodes.length - 1)
+		// Decrement by 2:
+		let y1 = pos1.y - 2
+		if (y1 < 0) {
+			y1 = 0
+		}
+		// Increment by 2:
+		let y2 = pos2.y + 2
+		if (y2 >= state.nodes.length) {
+			y2 = state.nodes.length - 1
+		}
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},

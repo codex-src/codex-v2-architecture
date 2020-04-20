@@ -1,3 +1,5 @@
+import attrs from "./attrs"
+import Highlighted from "Highlighted"
 import Markdown from "./Markdown"
 import React from "react"
 import typeEnumMap from "./typeEnumMap"
@@ -104,6 +106,50 @@ export const Blockquote = React.memo(({ id, children }) => {
 					...each,
 				})
 			))}
+		</Root>
+	)
+})
+
+// type: CodeBlock,
+// id: uuidv4(),
+// syntax: [body[x1], body[x2 - 1]],
+// info,
+// extension: info.split(".").slice(-1)[0].toLowerCase(),
+// children: x1 + 1 === x2 - 1
+// 	? ""
+// 	: `${body.slice(x1 + 1, x2 - 1).join("\n")}\n`,
+// // .slice(each.length, -3) // Trim syntax
+// // .slice(1),              // Trim start paragraph
+
+// NOTE: Compound component
+export const CodeBlock = React.memo(({ id, syntax, info, extension, children }) => {
+	const [state] = useEditorState()
+	return (
+		<Root id={id} className="-mx-6 px-6 bg-white shadow-hero rounded" {...attrs.code}>
+			<div className="break-words font-mono text-sm leading-snug">
+				{/* TODO: Add ID? */}
+				<Node className="py-px leading-none text-md-blue-a400">
+					<Markdown syntax={[syntax[0]]}>
+						{state.readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Node>
+				{/* TODO: Add ID? */}
+				<Node>
+					<Highlighted extension={extension}>
+						{children}
+					</Highlighted>
+				</Node>
+				{/* TODO: Add ID? */}
+				<Node className="py-px leading-none text-md-blue-a400">
+					<Markdown syntax={[syntax[1]]}>
+						{state.readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Node>
+			</div>
 		</Root>
 	)
 })

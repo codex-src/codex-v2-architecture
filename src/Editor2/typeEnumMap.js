@@ -4,6 +4,7 @@ import {
 	Blockquote,
 	BlockquoteItem,
 	Break,
+	CodeBlock,
 	Header,
 	Paragraph,
 } from "./Elements"
@@ -24,6 +25,7 @@ const typeEnumMap = {
 	[typeEnum.Paragraph]: Paragraph,
 	[typeEnum.BlockquoteItem]: BlockquoteItem,
 	[typeEnum.Blockquote]: Blockquote,
+	[typeEnum.CodeBlock]: CodeBlock,
 	[typeEnum.Break]: Break,
 
 	// Inline elements:

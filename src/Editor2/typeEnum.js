@@ -6,6 +6,7 @@ const typeEnum = new Enum(
 	"Paragraph",
 	"Blockquote",
 	"BlockquoteItem",
+	"CodeBlock",
 	"Break",
 
 	// Inline elements:
