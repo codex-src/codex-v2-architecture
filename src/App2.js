@@ -228,11 +228,11 @@ const App = () => {
 			case "h4":
 			case "h5":
 			case "h6":
-				let nth = toc.length - 1
-				if (nth === -1) {
-					nth = 0
+				if (!toc.length || !toc[toc.length - 1].subheaders) {
+					// No-op
+					break
 				}
-				toc[nth].subheaders.push(each)
+				toc[toc.length - 1].subheaders.push(each)
 				break
 			default:
 				// No-op
@@ -262,7 +262,7 @@ const App = () => {
 						{(toc => (
 							toc.length > 0 && (
 								<React.Fragment>
-									<div className="py-1 flex flex-row items-center transform scale-90 origin-left">
+									<div className="pt-1 pb-3 flex flex-row items-center transform scale-90 origin-left">
 										{/* <svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg> */}
 										<svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
 										<p className="font-medium text-xs tracking-widest text-gray-600">
