@@ -118,7 +118,11 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 					id,
 
-					className: `codex-editor${!className ? "" : ` ${className}`}${!state.readOnly ? "" : " feature-read-only"}`,
+					className: `codex-editor${
+						!className ? "" : ` ${className}`
+					}${
+						!state.readOnly ? "" : " feature-read-only"
+					} subpixel-antialiased`,
 
 					style: {
 						...style, // Takes precedence

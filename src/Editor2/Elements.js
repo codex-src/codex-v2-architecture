@@ -62,7 +62,6 @@ const HeaderAnchor = ({ hash, children }) => (
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 	const [{ readOnly }] = useEditorState()
-	// const readOnly = false
 	return (
 		<Root id={id} className={headerClassNames[tag]}>
 			<IfWrapper cond={readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
@@ -116,7 +115,6 @@ export const Pre = props => (
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
-	// const readOnly = false
 
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
@@ -137,7 +135,8 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	}, [extension, nodes])
 
 	return (
-		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
+		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
+			{/* NOTE: inline-block is needed for overflow-x-scroll */}
 			<span className="inline-block">
 				<Pre id={nodes[0].id} className="leading-none">
 					<Markdown syntax={[syntax[0]]}>
@@ -147,7 +146,7 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 					</Markdown>
 				</Pre>
 				{$nodes.map(each => (
-					<Pre key={each.id} id={each.id}>
+					<Pre key={each.id} id={each.id} className="leading-snug">
 						<span dangerouslySetInnerHTML={{
 							__html: each.data || (
 								"<br />"
@@ -169,7 +168,6 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
-	// const readOnly = false
 
 	const style = { verticalAlign: "15%" }
 	return (

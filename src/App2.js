@@ -79,11 +79,14 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 				{state.renderMode === renderModesEnum.Readme ? (
 					<ReadmeEditor />
 				) : (
-					<pre className="whitespace-pre-wrap font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-						<Highlighted extension={state.extension}>
-							{state[state.renderMode]}
-						</Highlighted>
-					</pre>
+					/* NOTE: inline-block is needed for overflow-x-scroll */
+					<span className="inline-block">
+						<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+							<Highlighted extension={state.extension}>
+								{state[state.renderMode]}
+							</Highlighted>
+						</pre>
+					</span>
 				)}
 			</div>
 		</Transition>
