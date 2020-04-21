@@ -98,13 +98,20 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	}
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
+		// Fast path:
+		//
+		// FIXME: <Emoji>
+		if (!isASCIIPunctuation(str[x])) {
+			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
+				parsed.push(str[x])
+				continue
+			}
+			parsed[parsed.length - 1] += str[x]
+			continue
+		}
 		const char = str[x]
 		const nchars = str.length - x
 		switch (true) {
-		// Fast pass:
-		case !isASCIIPunctuation(char):
-			// No-op
-			break
 		// <Escape>
 		case char === "\\":
 	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
@@ -328,13 +335,12 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 		}
-		// Push:
 		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 			parsed.push(char)
 			continue
 		}
-		// Concatenate:
 		parsed[parsed.length - 1] += char
+		// continue
 	}
 	if (parsed.length === 1 && typeof parsed[0] === "string") {
 		return parsed[0]
@@ -350,14 +356,28 @@ function parseElements(nodes) {
 
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
+		// Fast path:
+		//
+		// FIXME: <Emoji>
+		if (nodes[x].data.length && !isASCIIPunctuation(nodes[x].data[0])) {
+			const children = parseInlineElements(nodes[x].data)
+			parsed.push({
+				type: typeEnum.Paragraph,
+				id: nodes[x].id,
+				// // The number of parsed emojis:
+				// emojis: (
+				// 	children &&
+				// 	children.reduce &&
+				// 	children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+				// ),
+				children,
+			})
+			continue
+		}
 		const each = nodes[x]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
 		switch (true) {
-		// Fast pass:
-		case !isASCIIPunctuation(char):
-			// No-op
-			break
 		// <Header>
 		case char === "#":
 			// # H1 … ###### H6
@@ -465,7 +485,6 @@ function parseElements(nodes) {
 					type: typeEnum.Break,
 					id: each.id,
 					syntax: [char.repeat(3)],
-					// raw: each.data,
 					children: null,
 				})
 				continue
@@ -476,20 +495,19 @@ function parseElements(nodes) {
 			// No-op
 			break
 		}
-		// <Paragraph>
 		const children = parseInlineElements(each.data)
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
-			// The number of parsed emojis:
-			emojis: (
-				children &&
-				children.reduce &&
-				children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
-			),
-			// raw: each.data,
+			// // The number of parsed emojis:
+			// emojis: (
+			// 	children &&
+			// 	children.reduce &&
+			// 	children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+			// ),
 			children,
 		})
+		// continue
 	}
 	return parsed
 }
