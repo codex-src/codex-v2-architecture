@@ -46,9 +46,7 @@ const headerClassNames = {
 	h6: trim("font-semibold text-xl  leading-snug"),
 }
 
-// Conditionally wraps a React component.
-//
-// TODO: Extract component and change API to props?
+// Conditionally wraps a React element.
 const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 	if (!cond) {
 		return children
@@ -93,7 +91,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</Node>
 ))
 
-// NOTE: Compound component
+// NOTE: Compound React element
 export const Blockquote = React.memo(({ id, children }) => {
 	const style = { backgroundColor: "#2979ff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
 	return (
@@ -112,7 +110,7 @@ export const Pre = props => (
 	<Node style={{ whiteSpace: "pre" }} {...props} />
 )
 
-// NOTE: Compound component
+// NOTE: Compound React element
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
