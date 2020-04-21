@@ -171,14 +171,17 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 							while (node1.childNodes.length) {
 								node1 = node1.childNodes[0]
 							}
-							// Iterate to the deepest end node:
-							let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
-							while (node2.childNodes.length) {
-								node2 = node2.childNodes[node2.childNodes.length - 1]
-							}
+
+							// // Iterate to the deepest end node:
+							// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
+							// while (node2.childNodes.length) {
+							// 	node2 = node2.childNodes[node2.childNodes.length - 1]
+							// }
+
 							// Correct range:
 							range.setStart(node1, 0)
-							range.setEnd(node2, (node2.nodeValue || "").length)
+							// range.setEnd(node2, (node2.nodeValue || "").length)
+							range.collapse()
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}

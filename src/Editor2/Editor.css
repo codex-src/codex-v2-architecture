@@ -1,8 +1,8 @@
 .codex-editor {
 	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
 
-	/* font-family: "Inter", sans-serif; */
-	/* letter-spacing: -0.01em; */
+	font-family: "Inter", sans-serif;
+	letter-spacing: -0.01em;
 }
 .codex-editor .font-mono {
 	font-family: "iA Writer Mono var", monospace;

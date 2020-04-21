@@ -7,6 +7,7 @@ import useEditorState from "./useEditorState"
 
 import {
 	Node,
+	Pre,
 	Root,
 } from "./HOC"
 
@@ -127,45 +128,44 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 		return [nodes[0], ...html.split("\n").map((each, x) => ({ id: nodes[x + 1].id, data: each })), nodes[nodes.length - 1]]
 	}, [extension, nodes])
 
-	const style = { whiteSpace: "pre" }
 	return (
 		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
 			<span className="inline-block">
-				<Node id={nodes[0].id} className="leading-none" style={style}>
+				<Pre id={nodes[0].id} className="leading-none">
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</Node>
+				</Pre>
 				{!$nodes ? (
 					// Text:
 					nodes.slice(1, -1).map(each => (
-						<Node key={each.id} id={each.id} style={style}>
+						<Pre key={each.id} id={each.id}>
 							{each.data || (
 								<br />
 							)}
-						</Node>
+						</Pre>
 					))
 				) : (
 					// HTML:
 					$nodes.slice(1, -1).map(each => (
-						<Node key={each.id} id={each.id} style={style}>
+						<Pre key={each.id} id={each.id}>
 							<span dangerouslySetInnerHTML={{
 								__html: each.data || (
 									"<br />"
 								),
 							}} />
-						</Node>
+						</Pre>
 					))
 				)}
-				<Node id={nodes[nodes.length - 1].id} className="leading-none" style={style}>
+				<Pre id={nodes[nodes.length - 1].id} className="leading-none">
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</Node>
+				</Pre>
 			</span>
 		</Root>
 	)

@@ -65,12 +65,12 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 			{/* > */}
 	 			{/* 	HTML (BEM) */}
 	 			{/* </Button> */}
-	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-	 				onClick={dispatch.showReact_js}
-	 			>
-	 				React
-	 			</Button>
+	 			{/* <Button */}
+	 			{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
+	 			{/* 	onClick={dispatch.showReact_js} */}
+	 			{/* > */}
+	 			{/* 	React */}
+	 			{/* </Button> */}
 			</div>
 
 		</div>

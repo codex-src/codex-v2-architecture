@@ -15,6 +15,18 @@ export const Node = ({ id, tag, style, ...props }) => (
 	})
 )
 
+export const Pre = ({ id, tag, style, ...props }) => (
+	React.createElement(tag || "div", {
+		id,
+		"style": {
+			whiteSpace: "pre",
+			...style,
+		},
+		"data-codex-node": true,
+		...props,
+	})
+)
+
 export const Root = ({ id, tag, style, ...props }) => (
 	React.createElement(tag || "div", {
 		id,
