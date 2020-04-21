@@ -114,11 +114,8 @@ html {
 	/* letter-spacing: -0.01em; */
 
 	font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+	scroll-behavior: smooth;
 }
-
-/*html {*/
-/*	scroll-behavior: smooth;*/
-/*}*/
 
 .grid-toc {
 	position: sticky;

@@ -258,39 +258,46 @@ const App = () => {
 				<div className="py-32 grid-toc-editor">
 
 					{/* TODO: Add two-way binding? */}
-					{/* FIXME: Code blocks overflow natural boundary */}
 					<div className="pb-12 grid-toc overflow-x-hidden">
 						{(toc => (
 							toc.length > 0 && (
-								// <ul className="-my-1">
-								<ul>
-									{toc.map(({ hash, children, subheaders }) => (
-										<li key={hash}>
-											<a href={`#${hash}`}>
-												<h1 className="py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
-													{toInnerText(children) || (
-														"Untitled"
-													)}
-												</h1>
-											</a>
-											{subheaders.length > 0 && (
-												<ul>
-													{subheaders.map(({ hash, children }) => (
-														<li key={hash}>
-															<a href={`#${hash}`}>
-																<h2 className="pl-4 py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
-																	{toInnerText(children) || (
-																		"Untitled"
-																	)}
-																</h2>
-															</a>
-														</li>
-													))}
-												</ul>
-											)}
-										</li>
-									))}
-								</ul>
+								<React.Fragment>
+									<div className="py-1 flex flex-row items-center transform scale-90 origin-left">
+										{/* <svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg> */}
+										<svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+										<p className="font-medium text-xs tracking-widest text-gray-600">
+											CONTENTS
+										</p>
+									</div>
+									<ul>
+										{toc.map(({ hash, children, subheaders }) => (
+											<li key={hash}>
+												<a href={`#${hash}`}>
+													<h1 className="py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+														{toInnerText(children) || (
+															"Untitled"
+														)}
+													</h1>
+												</a>
+												{subheaders.length > 0 && (
+													<ul>
+														{subheaders.map(({ hash, children }) => (
+															<li key={hash}>
+																<a href={`#${hash}`}>
+																	<h2 className="pl-4 py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+																		{toInnerText(children) || (
+																			"Untitled"
+																		)}
+																	</h2>
+																</a>
+															</li>
+														))}
+													</ul>
+												)}
+											</li>
+										))}
+									</ul>
+								</React.Fragment>
 							)
 						))(parseToC(editor.reactVDOM))}
 					</div>
