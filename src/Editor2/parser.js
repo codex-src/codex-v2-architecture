@@ -101,8 +101,13 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		const char = str[index]
 		const nchars = str.length - index
 		switch (true) {
-		// Fast pass -- break:
-		case char === " " || (char >= "a" && char <= "z") || (char >= "A" && char <= "Z"): // FIXME: Lowercase takes precedence
+		// Fast pass:
+		case (
+			// TODO: Change to inverse ASCII punctuation?
+			(char >= "a" && char <= "z") ||
+			(char === " ") ||
+			(char >= "A" && char <= "Z")
+		):
 			// No-op
 			break
 		// <Escape>
@@ -352,7 +357,7 @@ function parseElements(nodes) {
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
 		switch (true) {
-		// Fast pass -- break:
+		// Fast pass:
 		case !char || (char >= "A" && char <= "Z") || (char >= "a" && char <= "z"): // Uppercase takes precedence
 			// No-op
 			break
