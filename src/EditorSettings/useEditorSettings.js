@@ -48,7 +48,7 @@ const RUNES_PER_SECOND = 6 / 250 * 60
 function parseMetadata(text) {
 	const runes = [...text].length
 	const metadata = {
-		title: text.split("\n", 1),
+		title: text.split("\n", 1)[0],
 		runes,
 		words: text.split(/\s+/).filter(Boolean).length,
 		durationSeconds: Math.ceil(runes / RUNES_PER_SECOND),
