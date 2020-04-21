@@ -117,6 +117,11 @@ const data = (() => {
 	return json.data
 })()
 
+// Shorthand.
+function commas(n) {
+	return n.toLocaleString("en")
+}
+
 const App = () => {
 	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
@@ -223,14 +228,14 @@ const App = () => {
 										if (!editor.focused) {
 											return "No selection"
 										}
-										return `Line ${editor.pos1.y + 1}, column ${editor.pos1.x + 1}`
+										return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
 									})()
 								) : (
 									((chars, lines) => {
 										if (!editor.focused) {
 											return "No selection"
 										}
-										return `Selected ${lines < 2 ? "" : `${lines} lines, `}${chars} character${chars === 1 ? "" : "s"}`
+										return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
 									})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
 								)}
 							</p>
@@ -240,7 +245,7 @@ const App = () => {
 						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
 							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 								{((words, minutes) => (
-									`${words.toLocaleString("en")} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${minutes} minute read`}`
+									`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
 								))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
 							</p>
 						</div>
