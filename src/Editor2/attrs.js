@@ -27,11 +27,11 @@ const attrs = {
 			fontFeatureSettings: "'tnum'",
 		},
 	},
-	contenteditable: {
-		whiteSpace: "pre-wrap",
-		outline: "none",
-		overflowWrap: "break-word",
-	},
+	// contenteditable: {
+	// 	whiteSpace: "pre-wrap",
+	// 	outline: "none",
+	// 	overflowWrap: "break-word",
+	// },
 }
 
 export default attrs

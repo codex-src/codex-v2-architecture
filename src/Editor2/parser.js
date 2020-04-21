@@ -370,12 +370,14 @@ function parseElements(nodes) {
 				(nchars >= 7 && each.data.slice(0, 7) === "###### ")
 			) {
 				const syntax = each.data.slice(0, each.data.indexOf(" ") + 1)
+				// const text = toInnerText(parseInlineElements(each.data.slice(syntax.length)))
 				parsed.push({
 					type: typeEnum.Header,
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// TODO: Add text?
+					// text,
+					// hash: newHash(text),
 					hash: newHash(toInnerText(parseInlineElements(each.data.slice(syntax.length)))),
 					children: parseInlineElements(each.data.slice(syntax.length)),
 				})

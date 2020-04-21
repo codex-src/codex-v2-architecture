@@ -105,10 +105,10 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	)
 
 	return (
-		<div>
+		// <div>
 
-			{/* Editor */}
-			{React.createElement(
+			/* Editor */
+			React.createElement(
 				tag || "div",
 				{
 					ref,
@@ -123,7 +123,11 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 					style: {
 						...style, // Takes precedence
-						...attrs.contenteditable,
+						whiteSpace: "pre-wrap",
+						outline: "none",
+						// TODO: overflow-wrap does not work as expected
+						// overflowWrap: "break-word",
+						wordBreak: "break-word",
 					},
 
 					onFocus: () => {
@@ -326,27 +330,27 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 					contentEditable: !state.readOnly,
 					suppressContentEditableWarning: !state.readOnly,
 				},
-			)}
+			)
 
-			{/* Debugger */}
-			{/* <div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}> */}
-			{/* 	{JSON.stringify( */}
-			{/* 		state.history.stack.map(each => ({ */}
-			{/* 			...each, */}
-			{/* 			data: undefined, */}
-			{/* 			nodes: each.nodes.map(each => ({ */}
-			{/* 				...each, */}
-			{/* 				data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`, */}
-			{/* 			})), */}
-			{/* 			pos1: undefined, */}
-			{/* 			pos2: undefined, */}
-			{/* 		})), */}
-			{/* 		null, */}
-			{/* 		"\t", */}
-			{/* 	)} */}
-			{/* </div> */}
+		// {/* Debugger */}
+		// {/* <div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}> */}
+		// {/* 	{JSON.stringify( */}
+		// {/* 		state.history.stack.map(each => ({ */}
+		// {/* 			...each, */}
+		// {/* 			data: undefined, */}
+		// {/* 			nodes: each.nodes.map(each => ({ */}
+		// {/* 				...each, */}
+		// {/* 				data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`, */}
+		// {/* 			})), */}
+		// {/* 			pos1: undefined, */}
+		// {/* 			pos2: undefined, */}
+		// {/* 		})), */}
+		// {/* 		null, */}
+		// {/* 		"\t", */}
+		// {/* 	)} */}
+		// {/* </div> */}
 
-		</div>
+		// </div>
 	)
 }
 

@@ -116,6 +116,54 @@ html {
 	font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
+/*html {*/
+/*	scroll-behavior: smooth;*/
+/*}*/
+
+.grid-toc {
+	position: sticky;
+	top: 128px;
+}
+
+.grid-toc-editor {
+	display: grid;
+	grid-template-areas:
+		". . toc . editor . . . ."
+		". . .   . editor . . . .";
+
+	grid-template-columns:
+		1fr
+			24px
+				192px
+			64px
+				minmax(640px, 720px)
+			24px
+		2fr;
+}
+.grid-toc {
+	grid-area: toc;
+}
+.grid-editor {
+	grid-area: editor;
+}
+
+/* 944 === 24 + 192 + 64 + 640 + 24 */
+@media (max-width: 944px) {
+	.grid-toc {
+		position: static;
+	}
+	.grid-toc-editor {
+		grid-template-areas:
+			". toc    ."
+			". editor .";
+
+		grid-template-columns:
+			24px
+				1fr
+			24px;
+	}
+}
+
 .pb-2\/1 {
 	padding-bottom: 200%;
 }

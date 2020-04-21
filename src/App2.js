@@ -124,6 +124,8 @@ function commas(n) {
 	return n.toLocaleString("en")
 }
 
+// TODO: <DocumentTitle> should be instant; use toText on a
+// subset of editor.reactVDOM
 const App = () => {
 	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
@@ -198,116 +200,156 @@ const App = () => {
 		}
 	}, [editorSettingsDispatch])
 
+	// // Parse a table of contents.
+	// const parseToC = reactVDOM => {
+	// 	const toc = []
+	// 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
+	// 	for (const each of headers) {
+	// 		if (each.tag === "h1") {
+	// 			toc.push({ ...each, subheaders: [] })
+	// 		} else if (toc.length) {
+	// 			toc[toc.length - 1].subheaders.push(each)
+	// 		}
+	// 	}
+	// 	return toc
+	// }
+
 	// Parse a table of contents.
 	const parseToC = reactVDOM => {
 		const toc = []
 		const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
 		for (const each of headers) {
-			if (each.tag === "h1") {
+			switch (each.tag) {
+			case "h1":
+			case "h2":
 				toc.push({ ...each, subheaders: [] })
-			} else if (toc.length) {
-				toc[toc.length - 1].subheaders.push(each)
+				break
+			case "h3":
+			case "h4":
+			case "h5":
+			case "h6":
+				let nth = toc.length - 1
+				if (nth === -1) {
+					nth = 0
+				}
+				toc[nth].subheaders.push(each)
+				break
+			default:
+				// No-op
+				break
 			}
 		}
+		// console.log(toc)
 		return toc
+		// console.log(reactVDOM.filter(each => each.type === typeEnum.Header))
 	}
 
 	return (
-		<div className="py-32 flex flex-row justify-center">
-			<div className="px-6 w-full max-w-screen-md">
+		// <div className="py-32 flex flex-row justify-center">
+			// <div className="px-6 w-full max-w-screen-md">
+		<React.Fragment>
 
-				{/* Settings */}
-				<FixedEditorSettings
-					state={editorSettings}
-					dispatch={editorSettingsDispatch}
-				/>
+				<div className="py-32 grid-toc-editor">
 
-				{/* onClick={newHashClickHandler(hash)} */}
-				<div>
-					{(toc => (
-						toc.length > 0 && (
-							<ul>
-								{toc.map(({ hash, children, subheaders }) => (
-									<li key={hash}>
-										<a href={`#${hash}`}>
-											<h1>
-												{toInnerText(children) || (
-													"Untitled"
-												)}
-											</h1>
-										</a>
-										{subheaders.length > 0 && (
-											<ul>
-												{subheaders.map(({ hash, children }) => (
-													<li key={hash}>
-														<a href={`#${hash}`}>
-															<h2>
-																{toInnerText(children) || (
-																	"Untitled"
-																)}
-															</h2>
-														</a>
-													</li>
-												))}
-											</ul>
-										)}
-									</li>
-								))}
-							</ul>
-						)
-					))(parseToC(editor.reactVDOM))}
+					{/* TODO: Add two-way binding? */}
+					{/* FIXME: Code blocks overflow natural boundary */}
+					<div className="pb-12 grid-toc">
+						{(toc => (
+							toc.length > 0 && (
+								// <ul className="-my-1">
+								<ul>
+									{toc.map(({ hash, children, subheaders }) => (
+										<li key={hash}>
+											<a href={`#${hash}`}>
+												<h1 className="py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+													{toInnerText(children) || (
+														"Untitled"
+													)}
+												</h1>
+											</a>
+											{subheaders.length > 0 && (
+												<ul>
+													{subheaders.map(({ hash, children }) => (
+														<li key={hash}>
+															<a href={`#${hash}`}>
+																<h2 className="pl-4 py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+																	{toInnerText(children) || (
+																		"Untitled"
+																	)}
+																</h2>
+															</a>
+														</li>
+													))}
+												</ul>
+											)}
+										</li>
+									))}
+								</ul>
+							)
+						))(parseToC(editor.reactVDOM))}
+					</div>
+
+					{/* Editor */}
+					<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+						<Editor
+							// className={editorSettings.debugCSS && "debug-css"}
+							className="grid-editor"
+							style={{ fontSize: 17 }}
+							state={editor}
+							dispatch={editorDispatch}
+							readOnly={editorSettings.readOnly}
+						/>
+					</DocumentTitle>
+
 				</div>
 
-				{/* Editor */}
-				<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
-					<Editor
-						// className={editorSettings.debugCSS && "debug-css"}
-						style={{ fontSize: 17 }}
-						state={editor}
-						dispatch={editorDispatch}
-						readOnly={editorSettings.readOnly}
-					/>
-				</DocumentTitle>
+		</React.Fragment>
 
-				{!editor.readOnly && (
-					<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-
-						{/* LHS */}
-						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-								{editor.pos1.pos === editor.pos2.pos ? (
-									(() => {
-										if (!editor.focused) {
-											return "No selection"
-										}
-										return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
-									})()
-								) : (
-									((chars, lines) => {
-										if (!editor.focused) {
-											return "No selection"
-										}
-										return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
-									})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
-								)}
-							</p>
-						</div>
-
-						{/* RHS */}
-						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-								{((words, minutes) => (
-									`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
-								))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
-							</p>
-						</div>
-
-					</div>
-				)}
-
-			</div>
-		</div>
+			// </div>
+		// </div>
 	)
 }
 
 export default App
+
+// {/* Settings */}
+// <FixedEditorSettings
+// 	state={editorSettings}
+// 	dispatch={editorSettingsDispatch}
+// />
+
+// {!editor.readOnly && (
+// 	<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+//
+// 		{/* LHS */}
+// 		<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+// 			<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+// 				{editor.pos1.pos === editor.pos2.pos ? (
+// 					(() => {
+// 						if (!editor.focused) {
+// 							return "No selection"
+// 						}
+// 						return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
+// 					})()
+// 				) : (
+// 					((chars, lines) => {
+// 						if (!editor.focused) {
+// 							return "No selection"
+// 						}
+// 						return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
+// 					})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+// 				)}
+// 			</p>
+// 		</div>
+//
+// 		{/* RHS */}
+// 		<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+// 			<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+// 				{((words, minutes) => (
+// 					`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
+// 				))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
+// 			</p>
+// 		</div>
+//
+// 	</div>
+// )}

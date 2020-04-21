@@ -58,17 +58,18 @@ const HeaderAnchor = ({ hash, children }) => (
 	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
 )
 
+// FIXME: ToC depends on <HeaderAnchor>
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		<Root id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+			{/* <IfWrapper cond={readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}> */}
 				<Markdown syntax={syntax}>
 					{toReact(children) || (
 						<br />
 					)}
 				</Markdown>
-			</IfWrapper>
+			{/* </IfWrapper> */}
 		</Root>
 	)
 })
