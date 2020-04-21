@@ -2,9 +2,9 @@ import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
 
 import {
+	// toHTML__BEM,
+	// toReact_js,
 	toHTML,
-	toHTML__BEM,
-	toReact_js,
 	toText,
 } from "Editor2/cmap"
 

@@ -19,7 +19,7 @@ const ReadmeEditor = () => {
 
 const FixedEditorSettings = ({ state, dispatch }) => (
 	// NOTE: Usese flex flex-col for the sidebar
-	<div className="p-3 pb-6 fixed inset-0 flex flex-col z-30 pointer-events-none">
+	<div className="p-3 fixed inset-0 flex flex-col z-40 pointer-events-none" style={{ paddingBottom: 58 /* Maps to status bars */ }}>
 
 		{/* Buttons */}
 		<div className="flex-shrink-0 flex flex-row justify-between w-full">
