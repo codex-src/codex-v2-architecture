@@ -10,6 +10,7 @@ import typeEnum from "Editor2/typeEnum"
 import useEditor from "Editor2/useEditor"
 import useEditorSettings from "EditorSettings/useEditorSettings"
 import { isMetaOrCtrlKey } from "Editor2/detect"
+import { toInnerText } from "Editor2/cmap"
 
 import "./App.css"
 
@@ -208,42 +209,8 @@ const App = () => {
 				toc[toc.length - 1].subheaders.push(each)
 			}
 		}
-		console.log(toc)
-		// console.log(reactVDOM.filter(each => each.type === typeEnum.Header))
+		return toc
 	}
-
-	// <aside>
-	// 	{props.table.length > 0 && ( // `> 0` is needed.
-	// 		// Lift `font-size` and `line-height`.
-	// 		<ul className="fs:1 lh:1.3" style={{ "--fs-mod": props.activeFont !== "fs-mod:S ff:Roboto-Mono" ? null : 0.9 }}>
-	// 			{props.table.map(({ hash, h1, h2s }, index) => (
-	// 				<li key={index}>
-	// 					<a href={`#${hash}`} onClick={newHashClickHandler(hash)}>
-	// 						<h1 className="p-y:*0.1 fs:1 lh:1.3 fw:700" style={{ color: h1Color(hash) }}>
-	// 							{h1 || "Untitled"}
-	// 						</h1>
-	// 					</a>
-	// 					{h2s.length > 0 && (
-	// 						<ul className="p-b:*0.4">
-	// 							{h2s.map(({ hash, h2 }, index) => (
-	// 								<li key={index} onClick={newHashClickHandler(hash)}>
-	// 									<a href={`#${hash}`}>
-	// 										<h2 className="p-y:*0.1 fw:500" style={{ color: h2Color(hash) }}>
-	// 											{h2 || "Untitled"}
-	// 										</h2>
-	// 									</a>
-	// 								</li>
-	// 							))}
-	// 						</ul>
-	// 					)}
-	// 				</li>
-	// 			))}
-	// 		</ul>
-	// 	)}
-	// </aside>
-
-	// console.log(parseToC(editor.reactVDOM))
-	parseToC(editor.reactVDOM)
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
@@ -254,6 +221,42 @@ const App = () => {
 					state={editorSettings}
 					dispatch={editorSettingsDispatch}
 				/>
+
+				{/* onClick={newHashClickHandler(hash)} */}
+				<div>
+					{(toc => (
+						toc.length > 0 && (
+							<ul>
+								{toc.map(({ hash, children, subheaders }) => (
+									<li key={hash}>
+										<a href={`#${hash}`}>
+											<h1>
+												{toInnerText(children) || (
+													"Untitled"
+												)}
+											</h1>
+										</a>
+										{subheaders.length > 0 && (
+											<ul>
+												{subheaders.map(({ hash, children }) => (
+													<li key={hash}>
+														<a href={`#${hash}`}>
+															<h2>
+																{toInnerText(children) || (
+																	"Untitled"
+																)}
+															</h2>
+														</a>
+													</li>
+												))}
+											</ul>
+										)}
+									</li>
+								))}
+							</ul>
+						)
+					))(parseToC(editor.reactVDOM))}
+				</div>
 
 				{/* Editor */}
 				<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
