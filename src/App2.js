@@ -129,84 +129,84 @@ const App = () => {
 	// TODO: Can we use props.children instead of useEditor?
 	// const [editor, editorDispatch] = useEditor(`Hello, world!\n\n\`\`\`js\nexport const BlockquoteItem = React.memo(({ id, syntax, children }) => (\n	<Node id={id}>\n		<Markdown className="text-md-blue-a200" syntax={syntax}>\n			{toReact(children) || (\n				<br />\n			)}\n		</Markdown>\n	</Node>\n))\n\`\`\`\n\nHello, world!\n`)
 	const [editor, editorDispatch] = useEditor(data)
-	// const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
+	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
-	// // Debounces renderers by one frame.
-	// React.useEffect(() => {
-	// 	if (!editorSettings.showSidebar) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const id = setTimeout(() => {
-	// 		editorSettingsDispatch.update(editor)
-	// 	}, 16.67)
-	// 	return () => {
-	// 		clearTimeout(id)
-	// 	}
-	// }, [editor, editorSettings, editorSettingsDispatch])
+	// Debounces renderers by one frame.
+	React.useEffect(() => {
+		if (!editorSettings.showSidebar) {
+			// No-op
+			return
+		}
+		const id = setTimeout(() => {
+			editorSettingsDispatch.update(editor)
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [editor, editorSettings, editorSettingsDispatch])
 
-	// // Writes editor.data to localStorage (debounced 100ms).
-	// React.useEffect(() => {
-	// 	const id = setTimeout(() => {
-	// 		const json = JSON.stringify({ data: editor.data })
-	// 		localStorage.setItem(LOCALSTORAGE_KEY, json)
-	// 	}, 100)
-	// 	return () => {
-	// 		clearTimeout(id)
-	// 	}
-	// // TODO: Can use [editor.reactVDOM] instead
-	// }, [editor.data])
+	// Writes editor.data to localStorage (debounced 100ms).
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const json = JSON.stringify({ data: editor.data })
+			localStorage.setItem(LOCALSTORAGE_KEY, json)
+		}, 100)
+		return () => {
+			clearTimeout(id)
+		}
+	// TODO: Can use [editor.reactVDOM] instead
+	}, [editor.data])
 
-	// // Binds read-only shortcut (macOS).
-	// React.useEffect(() => {
-	// 	const handler = e => {
-	// 		// TODO: Refactor?
-	// 		if (!(!e.shiftKey && !e.altKey && isMetaOrCtrlKey(e) && e.keyCode === keyCodeP)) {
-	// 			// No-op
-	// 			return
-	// 		}
-	// 		e.preventDefault()
-	// 		editorDispatch.toggleReadOnly()
-	// 		editorSettingsDispatch.toggleReadOnly()
-	// 	}
-	// 	document.addEventListener("keydown", handler)
-	// 	return () => {
-	// 		document.removeEventListener("keydown", handler)
-	// 	}
-	// }, [editorDispatch, editorSettingsDispatch])
+	// Binds read-only shortcut (macOS).
+	React.useEffect(() => {
+		const handler = e => {
+			// TODO: Refactor?
+			if (!(!e.shiftKey && !e.altKey && isMetaOrCtrlKey(e) && e.keyCode === keyCodeP)) {
+				// No-op
+				return
+			}
+			e.preventDefault()
+			editorDispatch.toggleReadOnly()
+			editorSettingsDispatch.toggleReadOnly()
+		}
+		document.addEventListener("keydown", handler)
+		return () => {
+			document.removeEventListener("keydown", handler)
+		}
+	}, [editorDispatch, editorSettingsDispatch])
 
-	// // Binds sidebar shortcut.
-	// React.useEffect(() => {
-	// 	const handler = e => {
-	// 		if (e.keyCode !== keyCodeEsc) {
-	// 			// No-op
-	// 			return
-	// 		}
-	// 		e.preventDefault()
-	// 		editorSettingsDispatch.toggleSidebar()
-	// 	}
-	// 	document.addEventListener("keydown", handler)
-	// 	return () => {
-	// 		document.removeEventListener("keydown", handler)
-	// 	}
-	// }, [editorSettingsDispatch])
+	// Binds sidebar shortcut.
+	React.useEffect(() => {
+		const handler = e => {
+			if (e.keyCode !== keyCodeEsc) {
+				// No-op
+				return
+			}
+			e.preventDefault()
+			editorSettingsDispatch.toggleSidebar()
+		}
+		document.addEventListener("keydown", handler)
+		return () => {
+			document.removeEventListener("keydown", handler)
+		}
+	}, [editorSettingsDispatch])
 
 	return (
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
 
-				{/* <FixedEditorSettings */}
-				{/* 	state={editorSettings} */}
-				{/* 	dispatch={editorSettingsDispatch} */}
-				{/* /> */}
+				<FixedEditorSettings
+					state={editorSettings}
+					dispatch={editorSettingsDispatch}
+				/>
 
 				{/* TODO: Implement <DocumentTitle> pattern */}
 				<Editor
-					// className={editorSettings.showCSSDebugger && "debug-css"}
+					className={editorSettings.showCSSDebugger && "debug-css"}
 					style={{ fontSize: 17 }}
 					state={editor}
 					dispatch={editorDispatch}
-					// readOnly={editorSettings.showReadOnly}
+					readOnly={editorSettings.showReadOnly}
 				/>
 
 			</div>

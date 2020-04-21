@@ -54,41 +54,26 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
-
-			// let t = Date.now()
-
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
-				// console.log(`render=${Date.now() - t}`)
-				// t = Date.now()
-
 				// Sync DOM:
 				const mutations = syncDOM(state.reactDOM, ref.current)
 				if (!mounted.current || state.readOnly || !state.focused) {
 					mounted.current = true
 					return
 				}
-
-				// if (mutations) {
-				// 	const s = mutations === 1 ? "" : "s"
-				// 	console.log(`synced dom: ${mutations} mutation${s}`)
-				// }
-
-				// console.log(`syncDOM=${Date.now() - t}`)
-				// t = Date.now()
-
+				if (mutations) {
+					const s = mutations === 1 ? "" : "s"
+					console.log(`synced dom: ${mutations} mutation${s}`)
+				}
 				// Sync DOM cursors:
 				const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
-
-				// if (syncedPos) {
-				// 	console.log("synced pos")
-				// }
-
+				if (syncedPos) {
+					console.log("synced pos")
+				}
 				// Force select for edge-cases such as forward-
 				// backspace (pos does not change but the DOM does):
 				const [pos1, pos2] = computePosRange(ref.current)
 				dispatch.select(pos1, pos2)
-
-				// console.log(`syncPos=${Date.now() - t}`)
 			})
 		}, [state, dispatch]),
 		[state.readOnly, state.reactVDOM],
@@ -273,8 +258,6 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						dispatch.input(nodes, atEnd, [pos1, pos2])
 					},
 					onInput: e => {
-						// const t = Date.now()
-
 						if (state.readOnly) {
 							// No-op
 							return
@@ -295,8 +278,6 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						const nodes = readRoots(ref.current, [root1, root2])
 						const [pos1, pos2] = computePosRange(ref.current)
 						dispatch.input(nodes, atEnd, [pos1, pos2])
-
-						// console.log(`onInput=${Date.now() - t}`)
 					},
 
 					onCut: e => {

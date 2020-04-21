@@ -3,15 +3,6 @@ export const HTTPS = "https://"
 export const HTTP  = "http://"
 /* eslint-enable no-multi-spaces */
 
-// Returns whether a character is an ASCII character.
-export function isASCII(char) {
-	const ok = (
-		char >= "\u0000" &&
-		char <= "\u00ff"
-	)
-	return ok
-}
-
 // Matches a URL terminated by an alphanumeric (word) or
 // forward-slash character.
 //

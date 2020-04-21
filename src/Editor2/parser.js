@@ -8,7 +8,6 @@ import {
 	// HTTPS,
 	ASCIIPunctuationPattern,
 	ASCIIWhitespacePattern,
-	isASCII,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
 	// safeURLRe,
