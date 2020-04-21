@@ -1,4 +1,3 @@
-import attrs from "./attrs"
 import computePosRange from "./computePosRange"
 import EditorContext from "./EditorContext"
 import keyCodes from "./keyCodes"

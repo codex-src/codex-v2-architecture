@@ -249,11 +249,17 @@ const App = () => {
 			// <div className="px-6 w-full max-w-screen-md">
 		<React.Fragment>
 
+				{/* Settings */}
+				<FixedEditorSettings
+					state={editorSettings}
+					dispatch={editorSettingsDispatch}
+				/>
+
 				<div className="py-32 grid-toc-editor">
 
 					{/* TODO: Add two-way binding? */}
 					{/* FIXME: Code blocks overflow natural boundary */}
-					<div className="pb-12 grid-toc">
+					<div className="pb-12 grid-toc overflow-x-hidden">
 						{(toc => (
 							toc.length > 0 && (
 								// <ul className="-my-1">
@@ -289,17 +295,58 @@ const App = () => {
 						))(parseToC(editor.reactVDOM))}
 					</div>
 
-					{/* Editor */}
-					<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
-						<Editor
-							// className={editorSettings.debugCSS && "debug-css"}
-							className="grid-editor"
-							style={{ fontSize: 17 }}
-							state={editor}
-							dispatch={editorDispatch}
-							readOnly={editorSettings.readOnly}
-						/>
-					</DocumentTitle>
+					{/* Editor section */}
+					<div className="grid-editor">
+
+						{/* Editor */}
+						<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+							<Editor
+								// className={editorSettings.debugCSS && "debug-css"}
+								className="grid-editor"
+								style={{ fontSize: 17 }}
+								state={editor}
+								dispatch={editorDispatch}
+								readOnly={editorSettings.readOnly}
+							/>
+						</DocumentTitle>
+
+						{/* Status bars */}
+						{!editor.readOnly && (
+							<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+
+								{/* LHS */}
+								<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+									<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+										{editor.pos1.pos === editor.pos2.pos ? (
+											(() => {
+												if (!editor.focused) {
+													return "No selection"
+												}
+												return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
+											})()
+										) : (
+											((chars, lines) => {
+												if (!editor.focused) {
+													return "No selection"
+												}
+												return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
+											})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+										)}
+									</p>
+								</div>
+
+								{/* RHS */}
+								<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+									<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+										{((words, minutes) => (
+											`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
+										))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
+									</p>
+								</div>
+							</div>
+						)}
+
+					</div>
 
 				</div>
 
@@ -311,45 +358,3 @@ const App = () => {
 }
 
 export default App
-
-// {/* Settings */}
-// <FixedEditorSettings
-// 	state={editorSettings}
-// 	dispatch={editorSettingsDispatch}
-// />
-
-// {!editor.readOnly && (
-// 	<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-//
-// 		{/* LHS */}
-// 		<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-// 			<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-// 				{editor.pos1.pos === editor.pos2.pos ? (
-// 					(() => {
-// 						if (!editor.focused) {
-// 							return "No selection"
-// 						}
-// 						return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
-// 					})()
-// 				) : (
-// 					((chars, lines) => {
-// 						if (!editor.focused) {
-// 							return "No selection"
-// 						}
-// 						return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
-// 					})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
-// 				)}
-// 			</p>
-// 		</div>
-//
-// 		{/* RHS */}
-// 		<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-// 			<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-// 				{((words, minutes) => (
-// 					`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
-// 				))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
-// 			</p>
-// 		</div>
-//
-// 	</div>
-// )}
