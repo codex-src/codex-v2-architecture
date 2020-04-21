@@ -30,13 +30,13 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Toggle read-only: {`${state.showReadOnly}`}
+					Toggle preview mode ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-p)
 				</Button>
 				{/* <Button */}
 				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
 				{/* 	onClick={dispatch.toggleCSSDebugger} */}
 				{/* > */}
-				{/* 	Toggle CSS debugger: {`${state.showCSSDebugger}`} */}
+				{/* 	Toggle CSS debugger: {`${state.debugCSS}`} */}
 				{/* </Button> */}
 			</div>
 
@@ -77,7 +77,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 		>
 			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 				{state.renderMode === renderModesEnum.Readme ? (
-					<ReadmeEditor readOnly={state.showReadOnly} />
+					<ReadmeEditor readOnly={state.readOnly} />
 				) : (
 					/* NOTE: inline-block is needed for overflow-x-scroll */
 					<span className="inline-block">
@@ -204,11 +204,11 @@ const App = () => {
 				{/* Editor */}
 				<DocumentTitle title={editorSettings.metadata.title || "Untitled" /* Use "Loading"? */}>
 					<Editor
-						className={editorSettings.showCSSDebugger && "debug-css"}
+						// className={editorSettings.debugCSS && "debug-css"}
 						style={{ fontSize: 17 }}
 						state={editor}
 						dispatch={editorDispatch}
-						readOnly={editorSettings.showReadOnly}
+						readOnly={editorSettings.readOnly}
 					/>
 				</DocumentTitle>
 

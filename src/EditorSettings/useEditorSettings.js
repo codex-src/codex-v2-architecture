@@ -26,8 +26,8 @@ function initialState(defaultRenderer) {
 			words: 0,
 			minutes: 0,
 		},
-		showReadOnly: false,
-		showCSSDebugger: false,
+		readOnly: false,
+		// debugCSS: false,
 		showSidebar: false,
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: extensionMap[defaultRenderer],
@@ -130,11 +130,11 @@ const methods = state => ({
 		state.extension = "jsx"
 	},
 	toggleReadOnly() {
-		state.showReadOnly = !state.showReadOnly
+		state.readOnly = !state.readOnly
 	},
-	toggleCSSDebugger() {
-		state.showCSSDebugger = !state.showCSSDebugger
-	},
+	// toggleCSSDebugger() {
+	// 	state.debugCSS = !state.debugCSS
+	// },
 	toggleSidebar() {
 		state.showSidebar = !state.showSidebar
 	},
