@@ -58,8 +58,10 @@
 	font-size: 120%;
 	line-height: 1;
 }
-.codex-editor .emojis {
-	font-size: 166.6667%; /* Resolves to 200%; use 4x precision because of Chrome */
+.codex-editor .emojis.emojis-1,
+.codex-editor .emojis.emojis-2,
+.codex-editor .emojis.emojis-3 {
+	font-size: 208.3333%; /* Resolves to 250%; use 4x precision because of Chrome */
 }
 
 /* .codex-editor:not(.feature-read-only) .markdown:not( .font-mono) { */

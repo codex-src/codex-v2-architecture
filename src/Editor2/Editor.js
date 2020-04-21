@@ -152,26 +152,33 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 						}
 						// Bounds check:
 						//
-						// FIXME: Causes a bug when the editor is
-						// selected and user transitions back and forth
-						// between read-write and read-only mode
+						// FIXME: Selects the entire editor when a user
+						// backspaces (not a synthetic backspace) the
+						// start of the second-to-first line
+						//
+						// Hello, world!
+						// <cursor><backspace>Hello, world!
+						//
+						// ->
+						//
+						// <cursor>Hello, world!<cursor>
+						//
+						// https://github.com/codex-src/codex-v2-architecture/commit/e975c1541b7354409879fca64ffd3ec9575edc9d
 						const range = selection.getRangeAt(0)
 						if (range.startContainer === ref.current || range.endContainer === ref.current) {
 							// Iterate to the deepest start node:
-							let node = ref.current.childNodes[0]
-							while (node.childNodes.length) {
-								node = node.childNodes[0]
+							let node1 = ref.current.childNodes[0]
+							while (node1.childNodes.length) {
+								node1 = node1.childNodes[0]
 							}
-
-							// // Iterate to the deepest end node:
-							// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
-							// while (node2.childNodes.length) {
-							// 	node2 = node2.childNodes[node2.childNodes.length - 1]
-							// }
-
+							// Iterate to the deepest end node:
+							let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
+							while (node2.childNodes.length) {
+								node2 = node2.childNodes[node2.childNodes.length - 1]
+							}
 							// Correct range:
-							range.setStart(node, 0)
-							range.collapse()
+							range.setStart(node1, 0)
+							range.setEnd(node2, (node2.nodeValue || "").length)
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
