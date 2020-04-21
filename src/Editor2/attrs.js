@@ -11,7 +11,7 @@ const attrs = {
 		style: {
 			"--red-100": "var(--gray-100)",
 			"--red-600": "currentColor",
-			"--md-blue-a200": "currentColor",
+			"--md-blue-a400": "currentColor",
 			"textDecoration": "line-through",
 			"color": "var(--gray-500)",
 		},

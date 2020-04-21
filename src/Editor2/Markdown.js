@@ -27,7 +27,7 @@ const Syntax = ({ className, ...props }) => {
 		return null
 	}
 	// NOTE: className does not concatenate
-	return <span className={!className ? "text-md-blue-a200" : className} {...props} />
+	return <span className={!className ? "text-md-blue-a400" : className} {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {

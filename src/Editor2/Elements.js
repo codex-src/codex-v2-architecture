@@ -86,7 +86,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id}>
-		<Markdown className="text-md-blue-a200" syntax={syntax}>
+		<Markdown className="text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -96,7 +96,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 
 // NOTE: Compound component
 export const Blockquote = React.memo(({ id, children }) => {
-	const style = { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a200)" }
+	// NOTE: #448aff0f (md-blue-a200) is preferable to
+	// #2979ff0f (md-blue-a400)
+	const style = { backgroundColor: "#448aff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
 	return (
 		<Root id={id} className="py-4 px-8" style={style}>
 			{children.map(({ type: T, ...each }) => (
