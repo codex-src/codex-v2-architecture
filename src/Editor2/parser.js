@@ -8,6 +8,7 @@ import {
 	// HTTPS,
 	ASCIIPunctuationPattern,
 	ASCIIWhitespacePattern,
+	isASCII,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
 	// safeURLRe,
@@ -69,10 +70,9 @@ function parseGFMType({
 	}
 	// Match cannot be empty:
 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
-	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax
+	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
 		return null
-	// Match cannot be preceded or proceeded by a space (does
-	// note affect code):
+	// Match cannot be preceded or proceeded by a space (sans code):
 	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1]))) {
 		return null
 	// Match cannot be redundant (e.g. ___, ***, and ~~~):
@@ -101,7 +101,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// Fast path:
 		//
 		// FIXME: <Emoji>
-		if (!isASCIIPunctuation(str[x])) {
+		if (!isASCIIPunctuation(str[x]) && isASCII(str[x])) {
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
 				continue
@@ -109,6 +109,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			parsed[parsed.length - 1] += str[x]
 			continue
 		}
+		// Allocate convenience variables:
 		const char = str[x]
 		const nchars = str.length - x
 		switch (true) {
@@ -214,21 +215,6 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 		// <Code>
 		case char === "`":
-			// // ```Code```
-			// if (nchars >= "```x```".length && str.slice(x, x + 3) === "```") {
-			// 	const res = parseGFMType({
-			// 		type: typeEnum.Code,
-			// 		syntax: "```",
-			// 		str,
-			// 		x,
-			// 	})
-			// 	if (!res) {
-			// 		// No-op
-			// 		break
-			// 	}
-			// 	parsed.push(res.parsed)
-			// 	x = res.x2 - 1
-			// 	continue
 			if (nchars >= `x`.length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
@@ -319,19 +305,17 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 	break
 
 		default:
-
-			// // <Emoji>
-			// const e = emojiTrie.atStart(str.slice(x))
-			// if (e && e.status === "fully-qualified") { // TODO: Add "component"?
-			// 	parsed.push({
-			// 		type: typeEnum.Emoji,
-			// 		description: e.description,
-			// 		children: e.emoji,
-			// 	})
-			// 	x += e.emoji.length - 1
-			// 	continue
-			// }
-
+			// <Emoji>
+			const emojiInfo = emojiTrie.atStart(str.slice(x))
+			if (emojiInfo && emojiInfo.status === "fully-qualified") { // TODO: Add "component"?
+				parsed.push({
+					type: typeEnum.Emoji,
+					description: emojiInfo.description,
+					children: emojiInfo.emoji,
+				})
+				x += emojiInfo.emoji.length - 1
+				continue
+			}
 			// No-op
 			break
 		}
@@ -364,16 +348,17 @@ function parseElements(nodes) {
 			parsed.push({
 				type: typeEnum.Paragraph,
 				id: nodes[x].id,
-				// // The number of parsed emojis:
-				// emojis: (
-				// 	children &&
-				// 	children.reduce &&
-				// 	children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
-				// ),
+				// The number of emojis:
+				emojis: (
+					children &&
+					children.reduce &&
+					children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+				),
 				children,
 			})
 			continue
 		}
+		// Allocate convenience variables:
 		const each = nodes[x]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
@@ -499,12 +484,12 @@ function parseElements(nodes) {
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
-			// // The number of parsed emojis:
-			// emojis: (
-			// 	children &&
-			// 	children.reduce &&
-			// 	children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
-			// ),
+			// The number of emojis:
+			emojis: (
+				children &&
+				children.reduce &&
+				children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+			),
 			children,
 		})
 		// continue
