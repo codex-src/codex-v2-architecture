@@ -110,8 +110,10 @@ html {
 }
 
 html {
-	font-family: "Inter", sans-serif;
-	letter-spacing: -0.01em;
+	/* font-family: "Inter", sans-serif; */
+	/* letter-spacing: -0.01em; */
+
+	font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
 .pb-2\/1 {

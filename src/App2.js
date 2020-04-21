@@ -32,12 +32,12 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 				>
 					Toggle read-only: {`${state.showReadOnly}`}
 				</Button>
-				<Button
-					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={dispatch.toggleCSSDebugger}
-				>
-					Toggle CSS debugger: {`${state.showCSSDebugger}`}
-				</Button>
+				{/* <Button */}
+				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
+				{/* 	onClick={dispatch.toggleCSSDebugger} */}
+				{/* > */}
+				{/* 	Toggle CSS debugger: {`${state.showCSSDebugger}`} */}
+				{/* </Button> */}
 			</div>
 
 			{/* RHS */}
@@ -228,8 +228,9 @@ const App = () => {
 										if (!editor.focused) {
 											return "No selection"
 										}
-										return `Selected ${!lines ? "" : `${lines} line${lines === 1 ? "" : "s"}, `}${chars} character${chars === 1 ? "" : "s"}`
-									})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y)
+										// return `Selected ${!lines ? "" : `${lines} line${lines === 1 ? "" : "s"}, `}${chars} character${chars === 1 ? "" : "s"}`
+										return `Selected ${lines < 2 ? "" : `${lines} lines, `}${chars} character${chars === 1 ? "" : "s"}`
+									})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
 								)}
 							</p>
 						</div>

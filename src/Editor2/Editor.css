@@ -1,6 +1,8 @@
 .codex-editor {
 	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
 
+	/* font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; */
+
 	/* font-family: "Inter", sans-serif; */
 	/* letter-spacing: -0.01em; */
 }
