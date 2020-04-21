@@ -133,8 +133,6 @@ const App = () => {
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	// Debounces renderers by one frame.
-	//
-	// FIXME: Prevent recursion?
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			editorSettingsDispatch.shallowUpdate(editor)
@@ -147,7 +145,12 @@ const App = () => {
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor, editorSettings, editorSettingsDispatch])
+	}, [
+		// Logically sorted:
+		editor,
+		editorSettings.showSidebar,
+		editorSettingsDispatch,
+	])
 
 	// Writes editor.data to localStorage (debounced 100ms).
 	React.useEffect(() => {
@@ -158,10 +161,9 @@ const App = () => {
 		return () => {
 			clearTimeout(id)
 		}
-	// TODO: Can use [editor.reactVDOM] instead
 	}, [editor.data])
 
-	// Binds read-only shortcut (macOS).
+	// Binds read-only shortcut.
 	React.useEffect(() => {
 		const handler = e => {
 			// TODO: Refactor?
@@ -177,7 +179,11 @@ const App = () => {
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [editorDispatch, editorSettingsDispatch])
+	}, [
+		// Logically sorted:
+		editorDispatch,
+		editorSettingsDispatch,
+	])
 
 	// Binds sidebar shortcut.
 	React.useEffect(() => {
