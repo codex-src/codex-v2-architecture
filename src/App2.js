@@ -1,4 +1,5 @@
 import Button from "Button"
+import DocumentTitle from "DocumentTitle"
 import Editor from "Editor2/Editor"
 import Highlighted from "Highlighted"
 import raw from "raw.macro"
@@ -132,12 +133,15 @@ const App = () => {
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	// Debounces renderers by one frame.
+	//
+	// FIXME: Prevent recursion?
 	React.useEffect(() => {
-		if (!editorSettings.showSidebar) {
-			// No-op
-			return
-		}
 		const id = setTimeout(() => {
+			editorSettingsDispatch.shallowUpdate(editor)
+			if (!editorSettings.showSidebar) {
+				// No-op
+				return
+			}
 			editorSettingsDispatch.update(editor)
 		}, 16.67)
 		return () => {
@@ -195,19 +199,22 @@ const App = () => {
 		<div className="py-32 flex flex-row justify-center">
 			<div className="px-6 w-full max-w-screen-md">
 
+				{/* Settings */}
 				<FixedEditorSettings
 					state={editorSettings}
 					dispatch={editorSettingsDispatch}
 				/>
 
-				{/* TODO: Implement <DocumentTitle> pattern */}
-				<Editor
-					className={editorSettings.showCSSDebugger && "debug-css"}
-					style={{ fontSize: 17 }}
-					state={editor}
-					dispatch={editorDispatch}
-					readOnly={editorSettings.showReadOnly}
-				/>
+				{/* Editor */}
+				<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+					<Editor
+						className={editorSettings.showCSSDebugger && "debug-css"}
+						style={{ fontSize: 17 }}
+						state={editor}
+						dispatch={editorDispatch}
+						readOnly={editorSettings.showReadOnly}
+					/>
+				</DocumentTitle>
 
 			</div>
 		</div>
