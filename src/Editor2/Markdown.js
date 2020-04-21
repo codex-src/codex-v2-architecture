@@ -21,8 +21,9 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, ...props }) => {
-	const [state] = useEditorState()
-	if (!props.children || state.readOnly) {
+	const [{ readOnly }] = useEditorState()
+	// const readOnly = false
+	if (!props.children || readOnly) {
 		return null
 	}
 	// NOTE: className does not concatenate
