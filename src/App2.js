@@ -30,7 +30,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Toggle preview mode ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-p)
+					Preview mode: {!state.readOnly ? "off" : "on"} ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-p)
 				</Button>
 				{/* <Button */}
 				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
@@ -213,7 +213,7 @@ const App = () => {
 				</DocumentTitle>
 
 				{!editor.readOnly && (
-					<div className="p-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+					<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 
 						{/* LHS */}
 						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">

@@ -146,6 +146,7 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 					</Markdown>
 				</Pre>
 				{$nodes.map(each => (
+					// TODO: Add support for read-only line numbers
 					<Pre key={each.id} id={each.id} className="leading-snug">
 						<span dangerouslySetInnerHTML={{
 							__html: each.data || (
