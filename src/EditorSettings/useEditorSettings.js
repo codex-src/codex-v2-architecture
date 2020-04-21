@@ -21,10 +21,10 @@ const extensionMap = {
 function initialState(defaultRenderer) {
 	const state = {
 		metadata: {
-			title: "", // : text.split("\n", 1),
-			runes: 0, // ,
-			words: 0, // : text.split(/\s+/).filter(Boolean).length,
-			durationSeconds: 0, // : Math.ceil(runes / runesPerSecond),
+			title: "",
+			runes: 0,
+			words: 0,
+			minutes: 0,
 		},
 		showReadOnly: false,
 		showCSSDebugger: false,
@@ -40,9 +40,8 @@ function initialState(defaultRenderer) {
 	return state
 }
 
-// Estimates runes per second; 6 runes per word, 250 words
-// per minute, and 60 seconds per minute.
-const RUNES_PER_SECOND = 6 / 250 * 60
+const CHARACTERS_PER_WORD =   4.7 // eslint-disable-line no-multi-spaces
+const WORDS_PER_MINUTE    = 300.0 // eslint-disable-line no-multi-spaces
 
 // Parses metadata from a text-representation of an editor.
 function parseMetadata(text) {
@@ -51,7 +50,7 @@ function parseMetadata(text) {
 		title: text.split("\n", 1)[0],
 		runes,
 		words: text.split(/\s+/).filter(Boolean).length,
-		durationSeconds: Math.ceil(runes / RUNES_PER_SECOND),
+		minutes: Math.round(runes / CHARACTERS_PER_WORD / WORDS_PER_MINUTE),
 	}
 	return metadata
 }

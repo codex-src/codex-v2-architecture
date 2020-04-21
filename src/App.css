@@ -1,4 +1,4 @@
-:root {
+html {
 	--black:        #000000;
 	--blue-100:     #ebf8ff;
 	--blue-200:     #bee3f8;
@@ -109,6 +109,11 @@
 	--md-gray-900:  #212121;
 }
 
+html {
+	font-family: "Inter", sans-serif;
+	letter-spacing: -0.01em;
+}
+
 .pb-2\/1 {
 	padding-bottom: 200%;
 }
@@ -168,17 +173,32 @@
 .text-md-blue-a700 {
 	color: var(--md-blue-a700);
 }
+
 .text-red-100 {
 	color: var(--red-100);
 }
 .text-red-600 {
 	color: var(--red-600);
 }
+
+.bg-md-blue-a100 {
+	background-color: var(--md-blue-a100);
+}
+.bg-md-blue-a200 {
+	background-color: var(--md-blue-a200);
+}
+.bg-md-blue-a400 {
+	background-color: var(--md-blue-a400);
+}
+.bg-md-blue-a700 {
+	background-color: var(--md-blue-a700);
+}
+
 .bg-red-100 {
-	background: var(--red-100);
+	background-color: var(--red-100);
 }
 .bg-red-600 {
-	background: var(--red-600);
+	background-color: var(--red-600);
 }
 
 .shadow-hero-sm {

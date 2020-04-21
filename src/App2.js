@@ -18,7 +18,7 @@ const ReadmeEditor = () => {
 }
 
 const FixedEditorSettings = ({ state, dispatch }) => (
-	// NOTE: Usese flex flex-col to make the sidebar  work
+	// NOTE: Usese flex flex-col for the sidebar
 	<div className="p-3 pb-6 fixed inset-0 flex flex-col z-30 pointer-events-none">
 
 		{/* Buttons */}
@@ -212,7 +212,7 @@ const App = () => {
 				/>
 
 				{/* Editor */}
-				<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+				<DocumentTitle title={editorSettings.metadata.title || "Untitled" /* Use "Loading"? */}>
 					<Editor
 						className={editorSettings.showCSSDebugger && "debug-css"}
 						style={{ fontSize: 17 }}
@@ -221,6 +221,52 @@ const App = () => {
 						readOnly={editorSettings.showReadOnly}
 					/>
 				</DocumentTitle>
+
+				{/* const { line, column, selected: { lines, characters } } = status */}
+				{/* if (characters.count) { */}
+				{/* 	if (lines.count < 2) { */}
+				{/* 		return `${toCount(characters)} selected` */}
+				{/* 	} */}
+				{/* 	return `${toCount(lines)}, ${toCount(characters)} selected` */}
+				{/* } */}
+				{/* return `Line ${toComma(line)}, column ${toComma(column)}` */}
+
+				{!editor.readOnly && (
+					<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+
+						{/* LHS */}
+						<div className="px-3 py-1 bg-white rounded-full border pointer-events-auto">
+							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+								{editor.pos1.pos === editor.pos2.pos ? (
+									(() => {
+										if (!editor.focused) {
+											return "No selection"
+										}
+										return `Line ${editor.pos1.y + 1}, column ${editor.pos1.x + 1}`
+									})()
+								) : (
+									((chars, lines) => {
+										if (!editor.focused) {
+											return "No selection"
+										}
+										return `Selected ${!lines ? "" : `${lines} line${lines === 1 ? "" : "s"}, `}${chars} character${chars === 1 ? "" : "s"}`
+									})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y)
+								)}
+							</p>
+						</div>
+
+						{/* RHS */}
+						<div className="px-3 py-1 bg-white rounded-full border pointer-events-auto">
+							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+								{((words, minutes) => (
+									// `, est. ${minutes} minute${minutes === 1 ? "" : "s"}`
+									`${words.toLocaleString("en")} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${minutes} minute read`}`
+								))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
+							</p>
+						</div>
+
+					</div>
+				)}
 
 			</div>
 		</div>
