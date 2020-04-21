@@ -235,7 +235,7 @@ const App = () => {
 					<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 
 						{/* LHS */}
-						<div className="px-3 py-1 bg-white rounded-full border pointer-events-auto">
+						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
 							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 								{editor.pos1.pos === editor.pos2.pos ? (
 									(() => {
@@ -256,7 +256,7 @@ const App = () => {
 						</div>
 
 						{/* RHS */}
-						<div className="px-3 py-1 bg-white rounded-full border pointer-events-auto">
+						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
 							<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 								{((words, minutes) => (
 									// `, est. ${minutes} minute${minutes === 1 ? "" : "s"}`
