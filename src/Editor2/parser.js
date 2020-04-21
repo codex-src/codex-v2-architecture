@@ -13,25 +13,25 @@ import {
 	// safeURLRe,
 } from "./spec"
 
-// function parseCode(str, index) {
+// function parseCode(str, x) {
 // 	const syntax = "`"
 // 	const phrase = `${syntax}x${syntax}`
 //
-// 	if (!(index < str.length && str.slice(index, index + syntax.length) === syntax && str.length - index >= phrase.length)) {
+// 	if (!(x < str.length && str.slice(x, x + syntax.length) === syntax && str.length - x >= phrase.length)) {
 // 		return null
 // 	}
-// 	const offset = str.slice(index + syntax.length).search(`\\${syntax}`)
+// 	const offset = str.slice(x + syntax.length).search(`\\${syntax}`)
 // 	if (offset <= 0) {
 // 		return null
 // 	}
-// 	index += syntax.length
+// 	x += syntax.length
 // 	const parsed = {
 // 		type: typeEnum.Code,
 // 		syntax,
-// 		children: str.slice(index, index + offset),
+// 		children: str.slice(x, x + offset),
 // 	}
-// 	index += offset + syntax.length
-// 	return { parsed, index }
+// 	x += offset + syntax.length
+// 	return { parsed, x }
 // }
 
 // Parses a GitHub Flavored Markdown (GFM) type.
@@ -41,7 +41,7 @@ function parseGFMType({
 	type,   // The parsed enum type
 	syntax, // The syntax (end syntax) // TODO: Rename to endSyntax?
 	str,    // Argument string
-	index,  // Arugment index (number)
+	x,  // Arugment x (number)
 }) {
 	const shouldRecurse = type !== typeEnum.Code
 
@@ -52,7 +52,7 @@ function parseGFMType({
 	case "_":
 		// Underscores cannot be escaped and must be proceeded
 		// by a space or an ASCII punctuation character:
-		if (index - 1 >= 0 && !(isASCIIWhitespace(str[index - 1]) || isASCIIPunctuation(str[index - 1]))) {
+		if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) {
 			return null
 		}
 		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
@@ -68,27 +68,27 @@ function parseGFMType({
 		break
 	}
 	// Match cannot be empty:
-	const offset = str.slice(index + syntax.length).search(pattern) + patternOffset
+	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax
 		return null
 	// Match cannot be preceded or proceeded by a space (does
 	// note affect code):
-	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[index + syntax.length]) || isASCIIWhitespace(str[index + syntax.length + offset - 1]))) {
+	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1]))) {
 		return null
 	// Match cannot be redundant (e.g. ___, ***, and ~~~):
-	} else if (str[index + syntax.length] === syntax[0]) {
+	} else if (str[x + syntax.length] === syntax[0]) {
 		return null
 	}
 	// Increment start syntax:
-	index += syntax.length
+	x += syntax.length
 	const parsed = {
 		type,
 		syntax,
-		children: !shouldRecurse ? str.slice(index, index + offset) : parseInlineElements(str.slice(index, index + offset)),
+		children: !shouldRecurse ? str.slice(x, x + offset) : parseInlineElements(str.slice(x, x + offset)),
 	}
 	// Increment offset and end syntax:
-	index += offset + syntax.length
-	return { parsed, x2: index }
+	x += offset + syntax.length
+	return { parsed, x2: x }
 }
 
 // TODO: https://github.github.com/gfm/#delimiter-stack
@@ -97,30 +97,25 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		return null
 	}
 	const parsed = []
-	for (let index = 0; index < str.length; index++) {
-		const char = str[index]
-		const nchars = str.length - index
+	for (let x = 0; x < str.length; x++) {
+		const char = str[x]
+		const nchars = str.length - x
 		switch (true) {
 		// Fast pass:
-		case (
-			// TODO: Change to inverse ASCII punctuation?
-			(char >= "a" && char <= "z") ||
-			(char === " ") ||
-			(char >= "A" && char <= "Z")
-		):
+		case !isASCIIPunctuation(char):
 			// No-op
 			break
 		// <Escape>
 		case char === "\\":
-	 		if (index + 1 < str.length && isASCIIPunctuation(str[index + 1])) {
+	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
 				parsed.push({
 					type: typeEnum.Escape,
 					syntax: [char],
-					children: str[index + 1],
+					children: str[x + 1],
 				})
 				// Increment to the next character; the punctuation
 				// character is auto-incremented:
-				index++
+				x++
 				continue
 			}
 			// No-op
@@ -128,34 +123,34 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// <StrongEm> OR <Strong> OR <Em>
 		case char === "*" || char === "_":
 			// ***Strong emphasis*** OR ___Strong emphasis___
-			if (nchars >= "***x***".length && str.slice(index, index + 3) === char.repeat(3)) {
+			if (nchars >= "***x***".length && str.slice(x, x + 3) === char.repeat(3)) {
 				const res = parseGFMType({
 					type: typeEnum.StrongEmphasis,
 					syntax: char.repeat(3),
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			// **Strong** OR __Strong__
-			} else if (nchars >= "**x**".length && str.slice(index, index + 2) === char.repeat(2)) {
+			} else if (nchars >= "**x**".length && str.slice(x, x + 2) === char.repeat(2)) {
 				const res = parseGFMType({
 					type: typeEnum.Strong,
 					syntax: char.repeat(2),
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			// _Emphasis_ OR *Emphasis*
 			} else if (nchars >= "*x*".length) {
@@ -163,14 +158,14 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 					type: typeEnum.Emphasis,
 					syntax: char,
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -178,19 +173,19 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// <Strikethrough>
 		case char === "~":
 			// ~~Strikethrough~~
-			if (nchars >= "~~x~~".length && str.slice(index, index + 2) === "~~") {
+			if (nchars >= "~~x~~".length && str.slice(x, x + 2) === "~~") {
 				const res = parseGFMType({
 					type: typeEnum.Strikethrough,
 					syntax: char.repeat(2),
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			// ~Strikethrough~
 			} else if (nchars >= "~x~".length) {
@@ -198,14 +193,14 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 					type: typeEnum.Strikethrough,
 					syntax: char,
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -213,33 +208,33 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// <Code>
 		case char === "`":
 			// // ```Code```
-			// if (nchars >= "```x```".length && str.slice(index, index + 3) === "```") {
+			// if (nchars >= "```x```".length && str.slice(x, x + 3) === "```") {
 			// 	const res = parseGFMType({
 			// 		type: typeEnum.Code,
 			// 		syntax: "```",
 			// 		str,
-			// 		index,
+			// 		x,
 			// 	})
 			// 	if (!res) {
 			// 		// No-op
 			// 		break
 			// 	}
 			// 	parsed.push(res.parsed)
-			// 	index = res.x2 - 1
+			// 	x = res.x2 - 1
 			// 	continue
 			if (nchars >= `x`.length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
 					syntax: "`",
 					str,
-					index,
+					x,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				parsed.push(res.parsed)
-				index = res.x2 - 1
+				x = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -250,8 +245,8 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 	// https://
 			// 	//
 			// 	// TODO: Eat "www."
-			// 	if (nchars >= HTTPS.length && str.slice(index, index + HTTPS.length) === HTTPS) {
-			// 		const matches = safeURLRe.exec(str.slice(index))
+			// 	if (nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) {
+			// 		const matches = safeURLRe.exec(str.slice(x))
 			// 		let offset = 0
 			// 		if (matches) {
 			// 			offset = matches[0].length
@@ -262,13 +257,13 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 			href: matches[0],
 			// 			children: matches[0].slice(HTTPS.length),
 			// 		})
-			// 		index += offset - 1
+			// 		x += offset - 1
 			// 		continue
 			// 	// http://
 			// 	//
 			// 	// TODO: Eat "www."
-			// 	} else if (nchars >= HTTP.length && str.slice(index, index + HTTP.length) === HTTP) {
-			// 		const matches = safeURLRe.exec(str.slice(index))
+			// 	} else if (nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP) {
+			// 		const matches = safeURLRe.exec(str.slice(x))
 			// 		let offset = 0
 			// 		if (matches) {
 			// 			offset = matches[0].length
@@ -279,7 +274,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 			href: matches[0],
 			// 			children: matches[0].slice(HTTP.length),
 			// 		})
-			// 		index += offset - 1
+			// 		x += offset - 1
 			// 		continue
 			// 	}
 			// 	// No-op
@@ -288,7 +283,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// case char === "[":
 			// 	// [A](href)
 			// 	if (nchars >= "[x](x)".length) {
-			// 		const lhs = registerType(null, "]")(str, index)
+			// 		const lhs = registerType(null, "]")(str, x)
 			// 		if (!lhs) {
 			// 			// No-op
 			// 			break
@@ -310,24 +305,26 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 			href: rhs.data.children.trim(),
 			// 			children: lhs.data.children,
 			// 		})
-			// 		index = rhs.x2 - 1
+			// 		x = rhs.x2 - 1
 			// 		continue
 			// 	}
 			// 	// No-op
 			// 	break
 
 		default:
-			// <Emoji>
-			const e = emojiTrie.atStart(str.slice(index))
-			if (e && e.status === "fully-qualified") { // TODO: Add "component"?
-				parsed.push({
-					type: typeEnum.Emoji,
-					description: e.description,
-					children: e.emoji,
-				})
-				index += e.emoji.length - 1
-				continue
-			}
+
+			// // <Emoji>
+			// const e = emojiTrie.atStart(str.slice(x))
+			// if (e && e.status === "fully-qualified") { // TODO: Add "component"?
+			// 	parsed.push({
+			// 		type: typeEnum.Emoji,
+			// 		description: e.description,
+			// 		children: e.emoji,
+			// 	})
+			// 	x += e.emoji.length - 1
+			// 	continue
+			// }
+
 			// No-op
 			break
 		}
@@ -352,13 +349,13 @@ function parseElements(nodes) {
 	const newHash = newHashEpoch()
 
 	const parsed = []
-	for (let index = 0; index < nodes.length; index++) {
-		const each = nodes[index]
+	for (let x = 0; x < nodes.length; x++) {
+		const each = nodes[x]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
 		switch (true) {
 		// Fast pass:
-		case !char || (char >= "A" && char <= "Z") || (char >= "a" && char <= "z"): // Uppercase takes precedence
+		case !isASCIIPunctuation(char):
 			// No-op
 			break
 		// <Header>
@@ -392,7 +389,7 @@ function parseElements(nodes) {
 				(nchars >= 2 && each.data.slice(0, 2) === "> ") ||
 				(nchars === 1 && each.data === ">")
 			) {
-				const x1 = index
+				const x1 = x
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
@@ -413,12 +410,12 @@ function parseElements(nodes) {
 					children: nodes.slice(x1, x2).map((_, offset) => ({
 						// <BlockquoteItem>
 						type: typeEnum.BlockquoteItem,
-						id: nodes[index + offset].id,
-						syntax: [nodes[index + offset].data.slice(0, 2)],
-						children: parseInlineElements(nodes[index + offset].data.slice(2)),
+						id: nodes[x + offset].id,
+						syntax: [nodes[x + offset].data.slice(0, 2)],
+						children: parseInlineElements(nodes[x + offset].data.slice(2)),
 					})),
 				})
-				index = x2 - 1
+				x = x2 - 1
 				continue
 			}
 			// No-op
@@ -429,9 +426,9 @@ function parseElements(nodes) {
 				nchars >= 3 &&
 				each.data.slice(0, 3) === "```" &&
 				each.data.slice(3).indexOf("`") === -1 && // Negate backticks
-				index + 1 < nodes.length
+				x + 1 < nodes.length
 			) {
-				const x1 = index
+				const x1 = x
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
@@ -443,7 +440,7 @@ function parseElements(nodes) {
 					x2++
 				}
 				if (x2 === nodes.length) { // Unterminated
-					index = x1
+					x = x1
 					break
 				}
 				x2++ // Iterate once past end
@@ -455,7 +452,7 @@ function parseElements(nodes) {
 					extension: nodes[x1].data.slice(3).split(".").slice(-1)[0].toLowerCase(),
 					children: nodes.slice(x1, x2),
 				})
-				index = x2 - 1
+				x = x2 - 1
 				continue
 			}
 			// No-op
@@ -503,8 +500,8 @@ function parseElements(nodes) {
 //
 // 	const data = []
 // 	const body = str.split("\n")
-// 	for (let index = 0; index < body.length; index++) {
-// 		const each = body[index]
+// 	for (let x = 0; x < body.length; x++) {
+// 		const each = body[x]
 // 		const char = each.charAt(0)
 // 		const nchars = each.length
 // 		switch (true) {
@@ -543,7 +540,7 @@ function parseElements(nodes) {
 // 				(nchars >= 2 && each.slice(0, 2) === "> ") ||
 // 				(nchars === 1 && each === ">")
 // 			) {
-// 				const x1 = index
+// 				const x1 = x
 // 				let x2 = x1
 // 				x2++
 // 				// Iterate to end syntax:
@@ -567,7 +564,7 @@ function parseElements(nodes) {
 // 						children: parseInlineElements(each.slice(2)),
 // 					})),
 // 				})
-// 				index = x2 - 1
+// 				x = x2 - 1
 // 				continue
 // 			}
 // 			break
@@ -580,9 +577,9 @@ function parseElements(nodes) {
 // 				nchars >= 3 &&
 // 				each.slice(0, 3) === "```" &&
 // 				each.slice(3).indexOf("`") === -1 && // Negate backticks
-// 				index + 1 < body.length
+// 				x + 1 < body.length
 // 			) {
-// 				const x1 = index
+// 				const x1 = x
 // 				let x2 = x1
 // 				x2++
 // 				// Iterate to end syntax:
@@ -594,7 +591,7 @@ function parseElements(nodes) {
 // 					x2++
 // 				}
 // 				if (x2 === body.length) { // Unterminated
-// 					index = x1
+// 					x = x1
 // 					break
 // 				}
 // 				x2++ // Iterate once past end
@@ -611,7 +608,7 @@ function parseElements(nodes) {
 // 					// .slice(each.length, -3) // Trim syntax
 // 					// .slice(1),              // Trim start paragraph
 // 				})
-// 				index = x2 - 1
+// 				x = x2 - 1
 // 				continue
 // 			}
 // 			break
@@ -623,7 +620,7 @@ function parseElements(nodes) {
 // 			// - List
 // 			// 1. List
 // 			if (nchars >= "- ".length && AnyListRe.test(each)) {
-// 				const x1 = index
+// 				const x1 = x
 // 				let x2 = x1
 // 				x2++
 // 				// Iterate to end syntax:
@@ -636,7 +633,7 @@ function parseElements(nodes) {
 // 				}
 // 				const range = body.slice(x1, x2)
 // 				data.push(parseList(range))
-// 				index = x2 - 1
+// 				x = x2 - 1
 // 				continue
 // 			}
 // 			break
