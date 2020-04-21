@@ -79,9 +79,9 @@ const methods = state => ({
 				null,
 				"\t",
 			),
-			[renderModesEnum.HTML]:      toHTML(editorState.reactVDOM),
-			[renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
-			[renderModesEnum.React_js]:  toReact_js(editorState.reactVDOM),
+			[renderModesEnum.HTML]:         toHTML(editorState.reactVDOM),
+			// [renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
+			// [renderModesEnum.React_js]:  toReact_js(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
