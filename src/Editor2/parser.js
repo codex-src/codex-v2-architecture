@@ -99,9 +99,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
 		// Fast path:
-		//
-		// FIXME: <Emoji>
-		if (!isASCIIPunctuation(str[x]) && isASCII(str[x])) {
+		if (!isASCIIPunctuation(str[x]) && str[x] <= "\u00ff") { // Use "\u00ff" to guard BMP range, etc.
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
 				continue
@@ -341,8 +339,6 @@ function parseElements(nodes) {
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast path:
-		//
-		// FIXME: <Emoji>
 		if (nodes[x].data.length && !isASCIIPunctuation(nodes[x].data[0])) {
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
