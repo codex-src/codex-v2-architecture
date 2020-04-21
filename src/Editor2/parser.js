@@ -100,8 +100,11 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	for (let index = 0; index < str.length; index++) {
 		const char = str[index]
 		const nchars = str.length - index
-		// TODO: Add fast path for plain text?
 		switch (true) {
+		// Fast pass -- break:
+		case char === " " || (char >= "a" && char <= "z") || (char >= "A" && char <= "Z"): // FIXME: Lowercase takes precedence
+			// No-op
+			break
 		// <Escape>
 		case char === "\\":
 	 		if (index + 1 < str.length && isASCIIPunctuation(str[index + 1])) {
@@ -348,8 +351,11 @@ function parseElements(nodes) {
 		const each = nodes[index]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
-		// TODO: Add fast path for plain text?
 		switch (true) {
+		// Fast pass -- break:
+		case !char || (char >= "A" && char <= "Z") || (char >= "a" && char <= "z"): // Uppercase takes precedence
+			// No-op
+			break
 		// <Header>
 		case char === "#":
 			// # H1 … ###### H6
