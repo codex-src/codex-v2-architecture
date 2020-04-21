@@ -21,7 +21,7 @@ const extensionMap = {
 function initialState(defaultRenderer) {
 	const state = {
 		metadata: {
-			title: "",
+			title: "Loading…", // Do not use "" reverts to "Untitled"
 			runes: 0,
 			words: 0,
 			minutes: 0,

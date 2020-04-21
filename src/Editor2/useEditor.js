@@ -13,6 +13,7 @@ function newEditorState(data) {
 	const pos2 = newPos()
 	const initialState = {
 		readOnly: false,                         // Is read-only?
+		// mounted: false,                       // Is mounted?
 		focused: false,                          // Is focused?
 		data,                                    // Data data (string)
 		nodes,                                   // Document nodes
@@ -48,6 +49,12 @@ const methods = state => ({
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},
+
+	// // Records that the editor is mounted.
+	// setMounted() {
+	// 	state.mounted = true
+	// },
+
 	// Focuses the editor.
 	focus() {
 		state.focused = true

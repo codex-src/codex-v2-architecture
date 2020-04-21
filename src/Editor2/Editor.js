@@ -48,9 +48,6 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 	}, [readOnly, dispatch])
 
 	// Renders to the DOM.
-	//
-	// TODO: When state.readOnly is managed by JS (v. CSS),
-	// syncDOM needs to mutate the DOM
 	const mounted = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
