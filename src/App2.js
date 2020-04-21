@@ -12,9 +12,9 @@ import { isMetaOrCtrlKey } from "Editor2/detect"
 
 import "./App.css"
 
-const ReadmeEditor = () => {
+const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
-	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} />
+	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
 const FixedEditorSettings = ({ state, dispatch }) => (
@@ -77,7 +77,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 		>
 			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 				{state.renderMode === renderModesEnum.Readme ? (
-					<ReadmeEditor />
+					<ReadmeEditor readOnly={state.showReadOnly} />
 				) : (
 					/* NOTE: inline-block is needed for overflow-x-scroll */
 					<span className="inline-block">
@@ -118,8 +118,7 @@ const data = (() => {
 })()
 
 const App = () => {
-	// TODO: Can we use props.children instead of useEditor?
-	// const [editor, editorDispatch] = useEditor(`Hello, world!\n\n\`\`\`js\nexport const BlockquoteItem = React.memo(({ id, syntax, children }) => (\n	<Node id={id}>\n		<Markdown className="text-md-blue-a200" syntax={syntax}>\n			{toReact(children) || (\n				<br />\n			)}\n		</Markdown>\n	</Node>\n))\n\`\`\`\n\nHello, world!\n`)
+	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
