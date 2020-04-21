@@ -222,17 +222,8 @@ const App = () => {
 					/>
 				</DocumentTitle>
 
-				{/* const { line, column, selected: { lines, characters } } = status */}
-				{/* if (characters.count) { */}
-				{/* 	if (lines.count < 2) { */}
-				{/* 		return `${toCount(characters)} selected` */}
-				{/* 	} */}
-				{/* 	return `${toCount(lines)}, ${toCount(characters)} selected` */}
-				{/* } */}
-				{/* return `Line ${toComma(line)}, column ${toComma(column)}` */}
-
 				{!editor.readOnly && (
-					<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+					<div className="p-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 
 						{/* LHS */}
 						<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
