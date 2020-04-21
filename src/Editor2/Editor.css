@@ -18,41 +18,40 @@
 /* 	background-color: #448aff3f; */
 /* } */
 
-/* TODO: Is there a better way to do this? */
-.codex-editor .text-lg .font-bold,
+.codex-editor .text-lg .font-medium,
 .codex-editor .text-lg .font-semibold,
-.codex-editor .text-lg .font-medium {
-	font-weight: 650;
+.codex-editor .text-lg .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-xl .font-bold,
+.codex-editor .text-xl .font-medium,
 .codex-editor .text-xl .font-semibold,
-.codex-editor .text-xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-xl .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-2xl .font-bold,
+.codex-editor .text-2xl .font-medium,
 .codex-editor .text-2xl .font-semibold,
-.codex-editor .text-2xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-2xl .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-3xl .font-bold,
+.codex-editor .text-3xl .font-medium,
 .codex-editor .text-3xl .font-semibold,
-.codex-editor .text-3xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-3xl .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-4xl .font-bold,
+.codex-editor .text-4xl .font-medium,
 .codex-editor .text-4xl .font-semibold,
-.codex-editor .text-4xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-4xl .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-5xl .font-bold,
+.codex-editor .text-5xl .font-medium,
 .codex-editor .text-5xl .font-semibold,
-.codex-editor .text-5xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-5xl .font-bold {
+	font-weight: 700;
 }
-.codex-editor .text-6xl .font-bold,
+.codex-editor .text-6xl .font-medium,
 .codex-editor .text-6xl .font-semibold,
-.codex-editor .text-6xl .font-medium {
-	font-weight: 650;
+.codex-editor .text-6xl .font-bold {
+	font-weight: 700;
 }
 
 .codex-editor .emoji {

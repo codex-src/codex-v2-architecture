@@ -38,12 +38,12 @@ function trim(str) {
 }
 
 const headerClassNames = {
-	h1: trim("font-medium   text-3xl leading-tight"),
-	h2: trim("font-medium   text-2xl leading-tight"),
-	h3: trim("font-medium   text-xl  leading-tight"),
-	h4: trim("font-semibold text-lg  leading-snug"),
-	h5: trim("font-semibold text-lg  leading-snug"),
-	h6: trim("font-semibold text-lg  leading-snug"),
+	h1: trim("font-medium   text-4xl leading-tight antialiased"),
+	h2: trim("font-medium   text-3xl leading-tight antialiased"),
+	h3: trim("font-medium   text-2xl leading-tight antialiased"),
+	h4: trim("font-semibold text-xl  leading-snug"),
+	h5: trim("font-semibold text-xl  leading-snug"),
+	h6: trim("font-semibold text-xl  leading-snug"),
 }
 
 // Conditionally wraps a React component.
