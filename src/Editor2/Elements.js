@@ -1,4 +1,5 @@
 import attrs from "./attrs"
+import escape from "lodash/escape"
 import Markdown from "./Markdown"
 import PrismExtensions from "PrismExtensions"
 import React from "react"
@@ -7,7 +8,6 @@ import useEditorState from "./useEditorState"
 
 import {
 	Node,
-	Pre,
 	Root,
 } from "./HOC"
 
@@ -108,6 +108,10 @@ export const Blockquote = React.memo(({ id, children }) => {
 	)
 })
 
+export const Pre = props => (
+	<Node style={{ whiteSpace: "pre" }} {...props} />
+)
+
 // NOTE: Compound component
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
@@ -115,17 +119,19 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
 	const $nodes = React.useMemo(() => {
+		const range = nodes.slice(1, -1)
 		if (!extension || nodes.length === 2) {
-			return null
+			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
 		const parser = PrismExtensions[extension]
 		if (!parser) {
-			return null
+			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
-		// TODO: Move syntax highlighting to parser?
-		const data = nodes.slice(1, -1).map(each => each.data).join("\n")
-		const html = window.Prism.highlight(data, parser, extension)
-		return [nodes[0], ...html.split("\n").map((each, x) => ({ id: nodes[x + 1].id, data: each })), nodes[nodes.length - 1]]
+		// TODO: Move to parser? Moving syntax highlighting to
+		// parser (possibly) breaks cmap
+		const data = range.map(each => each.data).join("\n")
+		const __html = window.Prism.highlight(data, parser, extension)
+		return __html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
 	}, [extension, nodes])
 
 	return (
@@ -138,27 +144,15 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 						)}
 					</Markdown>
 				</Pre>
-				{!$nodes ? (
-					// Text:
-					nodes.slice(1, -1).map(each => (
-						<Pre key={each.id} id={each.id}>
-							{each.data || (
-								<br />
-							)}
-						</Pre>
-					))
-				) : (
-					// HTML:
-					$nodes.slice(1, -1).map(each => (
-						<Pre key={each.id} id={each.id}>
-							<span dangerouslySetInnerHTML={{
-								__html: each.data || (
-									"<br />"
-								),
-							}} />
-						</Pre>
-					))
-				)}
+				{$nodes.map(each => (
+					<Pre key={each.id} id={each.id}>
+						<span dangerouslySetInnerHTML={{
+							__html: each.data || (
+								"<br />"
+							),
+						}} />
+					</Pre>
+				))}
 				<Pre id={nodes[nodes.length - 1].id} className="leading-none">
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
