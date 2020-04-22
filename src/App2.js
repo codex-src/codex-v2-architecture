@@ -109,13 +109,14 @@ const data = (() => {
 	return json.data
 })()
 
-// TODO: Change behavior for ### H3
-function parseContents(reactVDOM) {
+// NOTE: h1 and h2 elements are considered primary headers;
+// h3 through h6 are considered secondary headers
+function computeContents(reactVDOM) {
 	const contents = []
 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
-	for (const { tag, id, hash, children } of headers) {
+	for (const { tag, id, hash, children } of headers.slice(1)) {
 		switch (tag) {
-		// case "h1":
+		case "h1":
 		case "h2":
 			contents.push({
 				id,
@@ -129,8 +130,12 @@ function parseContents(reactVDOM) {
 		case "h5":
 		case "h6":
 			if (!contents.length || !contents[contents.length - 1].nested) {
-				// No-op
-				break
+				contents.push({
+					id: "no-op",
+					hash: "",
+					nested: [],
+					children: "",
+				})
 			}
 			contents[contents.length - 1].nested.push({
 				id,
@@ -220,11 +225,11 @@ const App = () => {
 		}
 	}, [editor])
 
-	const [contents, setContents] = React.useState(() => parseContents(editor.reactVDOM))
+	const [contents, setContents] = React.useState(() => computeContents(editor.reactVDOM))
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			const contents = parseContents(editor.reactVDOM)
+			const contents = computeContents(editor.reactVDOM)
 			setContents(contents)
 		}, 16.67)
 		return () => {
@@ -364,13 +369,15 @@ const App = () => {
 					<ul>
 						{contents.map(({ id, hash, nested, children }) => (
 							<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-								<a href={`#${hash}`}>
-									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-										{children || (
-											"Untitled"
-										)}
-									</h1>
-								</a>
+								{id !== "no-op" && (
+									<a href={`#${hash}`}>
+										<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+											{children || (
+												 "Untitled"
+											)}
+										</h1>
+									</a>
+								)}
 								<ul>
 									{nested.map(({ id, hash, children }) => (
 										<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
