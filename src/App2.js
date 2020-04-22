@@ -150,14 +150,14 @@ function parseContents(reactVDOM) {
 function computeStatusLHS(editor) {
 	const lhs = ((chars, lines) => {
 		if (editor.pos1.pos === editor.pos2.pos) {
-			if (!editor.focused) {
-				return "No selection"
-			}
+			// if (!editor.focused) {
+			// 	return "" // "No selection"
+			// }
 			return `Line ${format(editor.pos1.y + 1)}, column ${format(editor.pos1.x + 1)}`
 		} else {
-			if (!editor.focused) {
-				return "No selection"
-			}
+			// if (!editor.focused) {
+			// 	return "" // "No selection"
+			// }
 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
 		}
 	})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
@@ -409,7 +409,8 @@ const App = () => {
 					{/* TODO: Add fade-in effect */}
 					{!editor.readOnly && (
 						<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-							<p className="font-medium text-xs" style={{ fontFeatureSettings: "'tnum'" }}>
+							{/* NOTE: Matches settings aesthetic */}
+							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0%" : "100%" }}>
 								{statusLHS}
 							</p>
 							<p className="font-medium text-xs" style={{ fontFeatureSettings: "'tnum'" }}>
