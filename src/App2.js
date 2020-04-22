@@ -32,14 +32,9 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 
 			{/* LHS */}
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-
 				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
 					<p className="font-medium text-xs text-gray-600">
-						{saveStatus <= 1 ? (
-							"Saving…"
-						) : (
-							"Saved"
-						)}
+						Saving
 					</p>
 					<svg
 						className="ml-2 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
@@ -261,7 +256,7 @@ const App = () => {
 				ids.push(setTimeout(() => {
 					setSaveStatus(3)
 				}, 1e3))
-			}, 2e3))
+			}, 1e3 - 100))
 		}, 100))
 		return () => {
 			ids.slice().reverse().map(each => clearTimeout(each))
