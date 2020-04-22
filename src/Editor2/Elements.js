@@ -172,12 +172,12 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
 
-	const style = { verticalAlign: "15%" }
+	const style = { verticalAlign: "12.5%" }
 	return (
 		<Root id={id}>
 			<Markdown syntax={syntax}>
 				{readOnly && (
-					<hr className="inline-block w-full border-t-2" style={style} />
+					<hr className="inline-block w-full border-t-2 border-b-2" style={style} />
 				)}
 			</Markdown>
 		</Root>
