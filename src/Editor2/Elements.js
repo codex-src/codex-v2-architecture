@@ -190,7 +190,7 @@ export const Break = React.memo(({ id, syntax }) => {
 		<Root id={id}>
 			<Markdown syntax={syntax}>
 				{readOnly && (
-					<hr className="inline-block w-full" style={style} />
+					<hr className="inline-block w-full border-t-2" style={style} />
 				)}
 			</Markdown>
 		</Root>

@@ -314,7 +314,7 @@ const App = () => {
 						<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 
 							{/* LHS */}
-							<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 									{editor.pos1.pos === editor.pos2.pos ? (
 										(() => {
@@ -335,7 +335,7 @@ const App = () => {
 							</div>
 
 							{/* RHS */}
-							<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 									{((words, minutes) => (
 										`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`

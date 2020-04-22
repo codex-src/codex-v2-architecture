@@ -119,9 +119,14 @@ html {
 
 .grid-contents {
 	position: sticky;
-	top: 128px;
+	top: 128px; /* 128px === py-32 */
 }
 
+/* +--------------+ */
+/* || a ||       || */
+/* ||---||   b   || */
+/* |     |       || */
+/* +--------------+ */
 .grid-contents-editor {
 	display: grid;
 	grid-template-areas:
@@ -137,8 +142,12 @@ html {
 	grid-area: editor;
 }
 
-/* 944px === px-6 + 192px + 64px + 640px + px-6 */
-@media (max-width: 944px) {
+/* +-----+ */
+/* || a || */
+/* ||---|| */
+/* || b || */
+/* +-----+ */
+@media (max-width: 944px) { /* 944px === px-6 + 192px + 64px + 640px + px-6 */
 	.grid-contents {
 		position: static;
 	}
