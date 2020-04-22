@@ -10,7 +10,11 @@ import typeEnum from "Editor2/typeEnum"
 import useEditor from "Editor2/useEditor"
 import useEditorSettings from "EditorSettings/useEditorSettings"
 import { isMetaOrCtrlKey } from "Editor2/detect"
-import { toInnerText } from "Editor2/cmap"
+
+import {
+	toInnerText,
+	toText,
+} from "Editor2/cmap"
 
 import "./App.css"
 
@@ -194,17 +198,27 @@ function format(n) {
 	return n.toLocaleString("en")
 }
 
-// TODO: <DocumentTitle> should be instant; use toText on a
-// subset of editor.reactVDOM
 const App = () => {
 	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
+	const [title, setTitle] = React.useState(() => "")
 	const [contents, setContents] = React.useState(() => parseContents(editor.reactVDOM))
 	const [status, setStatus] = React.useState(() => ["", ""])
 
-	// Debounces contents.
+	// Sets title (debounced).
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const title = toText(editor.reactVDOM.slice(0, 1)).split("\n", 1)[0]
+			setTitle(title)
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [editor.reactVDOM])
+
+	// Sets contents (debounced).
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			const contents = parseContents(editor.reactVDOM)
@@ -215,15 +229,10 @@ const App = () => {
 		}
 	}, [editor.reactVDOM])
 
-	// Debounces status.
+	// Sets status.
 	React.useEffect(() => {
-		// const id = setTimeout(() => {
 		const status = parseStatus(editor, editorSettings.metadata)
 		setStatus(status)
-		// }, 16.67)
-		// return () => {
-		// 	clearTimeout(id)
-		// }
 	}, [editor, editorSettings.metadata])
 
 	// Debounces renderers.
@@ -322,7 +331,7 @@ const App = () => {
 							<path d="M4 6h16M4 12h16M4 18h7"></path>
 						</svg>
 						<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-							{(editorSettings.metadata.title || "Untitled").toUpperCase()}
+							{(title.trim() || "Untitled").toUpperCase()}
 						</p>
 					</div>
 					<div className="h-2" />
@@ -358,7 +367,7 @@ const App = () => {
 				<div className="grid-editor">
 
 					{/* Editor */}
-					<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+					<DocumentTitle title={title || "Untitled"}>
 						{/* TODO: Add React.forwardRef */}
 						<Editor
 							className="grid-editor"
