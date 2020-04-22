@@ -123,32 +123,34 @@ const data = (() => {
 function parseContents(reactVDOM) {
 	const contents = []
 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
-	for (const { tag, hash, children } of headers) {
+	for (const { tag, id, hash, children } of headers) {
 		switch (tag) {
 		case "h1":
 		case "h2":
 			contents.push({
+				id,
 				hash,
+				nested: [],
 				children: toInnerText(children),
-				subheaders: [],
 			})
 			break
 		case "h3":
 		case "h4":
 		case "h5":
 		case "h6":
-			if (!contents.length || !contents[contents.length - 1].subheaders) {
+			if (!contents.length || !contents[contents.length - 1].nested) {
 				// No-op
 				break
 			}
-			contents[contents.length - 1].subheaders.push({
+			contents[contents.length - 1].nested.push({
+				id,
 				hash,
 				children: toInnerText(children),
 			})
 			break
-		// default:
-		// 	// No-op
-		// 	break
+		default:
+			// No-op
+			break
 		}
 	}
 	return contents
@@ -202,13 +204,13 @@ const App = () => {
 
 	// Debounces status.
 	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const status = parseStatus(editor, editorSettings.metadata)
-			setStatus(status)
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
+		// const id = setTimeout(() => {
+		const status = parseStatus(editor, editorSettings.metadata)
+		setStatus(status)
+		// }, 16.67)
+		// return () => {
+		// 	clearTimeout(id)
+		// }
 	}, [editor, editorSettings.metadata])
 
 	// Debounces renderers.
@@ -313,8 +315,8 @@ const App = () => {
 					</div>
 					<div className="h-2" />
 					<ul>
-						{contents.map(({ hash, children, subheaders }) => (
-							<li key={hash}>
+						{contents.map(({ id, hash, nested, children }) => (
+							<li key={hash} onClick={e => window.scrollTo(0, document.getElementById(id).offsetTop - 128)}>
 								<a href={`#${hash}`}>
 									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 										{children || (
@@ -323,8 +325,8 @@ const App = () => {
 									</h1>
 								</a>
 								<ul>
-									{subheaders.map(({ hash, children }) => (
-										<li key={hash}>
+									{nested.map(({ id, hash, children }) => (
+										<li key={hash} onClick={e => window.scrollTo(0, document.getElementById(id).offsetTop - 128)}>
 											<a href={`#${hash}`}>
 												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 													{children || (
