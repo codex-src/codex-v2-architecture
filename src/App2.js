@@ -168,7 +168,8 @@ function parseContents(reactVDOM) {
 	return contents
 }
 
-function parseStatus(editor, metadata) {
+// Computes the LHS status string.
+function computeStatusLHS(editor) {
 	const lhs = ((chars, lines) => {
 		if (editor.pos1.pos === editor.pos2.pos) {
 			if (!editor.focused) {
@@ -182,10 +183,20 @@ function parseStatus(editor, metadata) {
 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
 		}
 	})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+	return lhs
+}
+
+// Computes the RHS status string.
+function computeStatusRHS(editor) {
+	const str = toText(editor.reactVDOM)
+	const metadata = {
+		words: str.split(/\s+/).filter(Boolean).length,
+		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute
+	}
 	const rhs = ((words, minutes) => {
 		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
 	})(metadata.words, metadata.minutes)
-	return [lhs, rhs]
+	return rhs
 }
 
 // Returns a new scroll handler; scrolls to an ID.
@@ -220,10 +231,7 @@ const App = () => {
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	const [title, setTitle] = React.useState(() => "")
-	const [contents, setContents] = React.useState(() => parseContents(editor.reactVDOM))
-	const [status, setStatus] = React.useState(() => ["", ""])
 
-	// Sets title (debounced).
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			const title = toText(editor.reactVDOM.slice(0, 1)).split("\n", 1)[0]
@@ -232,9 +240,10 @@ const App = () => {
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor.reactVDOM])
+	}, [editor])
 
-	// Sets contents (debounced).
+	const [contents, setContents] = React.useState(() => parseContents(editor.reactVDOM))
+
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			const contents = parseContents(editor.reactVDOM)
@@ -243,13 +252,26 @@ const App = () => {
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor.reactVDOM])
+	}, [editor])
 
-	// Sets status.
+	const [statusLHS, setStatusLHS] = React.useState("")
+
 	React.useEffect(() => {
-		const status = parseStatus(editor, editorSettings.metadata)
-		setStatus(status)
-	}, [editor, editorSettings.metadata])
+		const statusLHS = computeStatusLHS(editor)
+		setStatusLHS(statusLHS)
+	}, [editor])
+
+	const [statusRHS, setStatusRHS] = React.useState("")
+
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const statusRHS = computeStatusRHS(editor)
+			setStatusRHS(statusRHS)
+		}, 100)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [editor])
 
 	// Debounces renderers.
 	React.useEffect(() => {
@@ -408,14 +430,14 @@ const App = () => {
 							{/* LHS */}
 							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{status[0]}
+									{statusLHS}
 								</p>
 							</div>
 
 							{/* RHS */}
 							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{status[1]}
+									{statusRHS}
 								</p>
 							</div>
 						</div>

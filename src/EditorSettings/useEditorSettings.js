@@ -40,9 +40,9 @@ function initialState(defaultRenderer) {
 	return state
 }
 
-const CHARACTERS_PER_WORD =   4.7 // eslint-disable-line no-multi-spaces
-const WORDS_PER_MINUTE    = 300.0 // eslint-disable-line no-multi-spaces
-
+// const CHARACTERS_PER_WORD =   4.7 // eslint-disable-line no-multi-spaces
+// const WORDS_PER_MINUTE    = 300.0 // eslint-disable-line no-multi-spaces
+//
 // // Parses metadata from a text-representation of an editor.
 // function parseMetadata(text) {
 // 	const runes = [...text].length
