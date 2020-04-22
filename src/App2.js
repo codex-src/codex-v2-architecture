@@ -249,21 +249,30 @@ const App = () => {
 					dispatch={editorSettingsDispatch}
 				/>
 
+				{/* Table of contents */}
 				<div className="py-32 grid-toc-editor">
-
-					{/* TODO: Add two-way binding? */}
 					<div className="pb-12 grid-toc overflow-x-hidden">
 						{(toc => (
 							toc.length > 0 && (
 								<React.Fragment>
-									<div className="pt-1 pb-3 flex flex-row items-center transform scale-90 origin-left">
-										{/* <svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg> */}
-										<svg class="mr-2 flex-shrink-0 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-										<p className="font-medium text-xs tracking-widest truncate text-gray-600">
+									<div className="py-1 flex flex-row items-center !transform !scale-90 !origin-left">
+										<svg
+											className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
+											fill="none"
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											viewBox="0 0 24 24"
+										>
+											<path d="M4 6h16M4 12h16M4 18h7"></path>
+										</svg>
+										<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
 											{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
 											CONTENTS
 										</p>
 									</div>
+									<div className="h-2" />
 									<ul>
 										{toc.map(({ hash, children, subheaders }) => (
 											<li key={hash}>
