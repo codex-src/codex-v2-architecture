@@ -1,59 +1,24 @@
 import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
+import { toHTML } from "Editor2/cmap"
 
-import {
-	// toReact_js,
-	toHTML,
-	toHTML__BEM,
-	toText,
-} from "Editor2/cmap"
-
-// Maps render modes to an language extension.
-const extensionMap = {
-	[renderModesEnum.Readme]: "", // FIXME?
-	[renderModesEnum.Text]: "",
+// Maps renderModesEnum to language extensions.
+const extMap = {
 	[renderModesEnum.JSON]: "json",
 	[renderModesEnum.HTML]: "html",
-	[renderModesEnum.HTML__BEM]: "html",
-	[renderModesEnum.React_js]: "jsx",
 }
 
 function initialState(defaultRenderer) {
 	const state = {
-		metadata: {
-			title: "Loading…", // Do not use "" reverts to "Untitled"
-			runes: 0,
-			words: 0,
-			minutes: 0,
-		},
 		readOnly: false,
-		// debugCSS: false,
 		showSidebar: false,
 		renderMode: renderModesEnum[defaultRenderer],
-		extension: extensionMap[defaultRenderer],
-		// [renderModesEnum.Text]: "",
+		extension: extMap[defaultRenderer] || "",
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
-		// [renderModesEnum.HTML__BEM]: "",
-		// [renderModesEnum.React_js]: "",
 	}
 	return state
 }
-
-// const CHARACTERS_PER_WORD =   4.7 // eslint-disable-line no-multi-spaces
-// const WORDS_PER_MINUTE    = 300.0 // eslint-disable-line no-multi-spaces
-//
-// // Parses metadata from a text-representation of an editor.
-// function parseMetadata(text) {
-// 	const runes = [...text].length
-// 	const metadata = {
-// 		title: text.split("\n", 1)[0],
-// 		runes,
-// 		words: text.split(/\s+/).filter(Boolean).length,
-// 		minutes: Math.round(runes / CHARACTERS_PER_WORD / WORDS_PER_MINUTE),
-// 	}
-// 	return metadata
-// }
 
 const methods = state => ({
 	// Updates settings.
@@ -70,9 +35,7 @@ const methods = state => ({
 				null,
 				"\t",
 			),
-			[renderModesEnum.HTML]:         toHTML(editorState.reactVDOM),
-			// [renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
-			// [renderModesEnum.React_js]:  toReact_js(editorState.reactVDOM),
+			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
@@ -102,30 +65,9 @@ const methods = state => ({
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
-	// showHTML__BEM() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.HTML__BEM) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.HTML__BEM
-	// 	state.extension = "html"
-	// },
-	// showReact_js() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.React_js) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.React_js
-	// 	state.extension = "jsx"
-	// },
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},
-	// toggleCSSDebugger() {
-	// 	state.debugCSS = !state.debugCSS
-	// },
 	toggleSidebar() {
 		state.showSidebar = !state.showSidebar
 	},
