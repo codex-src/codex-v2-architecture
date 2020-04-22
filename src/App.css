@@ -133,16 +133,27 @@ html {
 .grid-contents-editor {
 	display: grid;
 	grid-template-areas:
-		". contents . editor ."
-		". .        . editor .";
+		". contents . editor - - ."
+		". .        . editor - - .";
 
-	grid-template-columns: 1fr 192px 64px minmax(640px, 768px) 2fr;
+	grid-template-columns: 1fr 192px 64px 768px 64px 192px 1fr;
 }
 .grid-contents {
 	grid-area: contents;
 }
 .grid-editor {
 	grid-area: editor;
+}
+
+@media (max-width: 1328px) { /* 128px === px-6 + 192px + 64px + 768px + 64px + 192px + px-6 */
+	.grid-contents-editor {
+		display: grid;
+		grid-template-areas:
+			". contents . editor ."
+			". .        . editor .";
+
+		grid-template-columns: 1fr 192px 64px minmax(640px, 768px) 1fr;
+	}
 }
 
 /* +-----+ */
