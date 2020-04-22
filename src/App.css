@@ -117,47 +117,37 @@ html {
 	scroll-behavior: smooth;
 }
 
-.grid-toc {
+.grid-contents {
 	position: sticky;
 	top: 128px;
 }
 
-.grid-toc-editor {
+.grid-contents-editor {
 	display: grid;
 	grid-template-areas:
-		". . toc . editor . . . ."
-		". . .   . editor . . . .";
+		". contents . editor ."
+		". .        . editor .";
 
-	grid-template-columns:
-		1fr
-			24px
-				192px
-			64px
-				minmax(640px, 720px)
-			24px
-		2fr;
+	grid-template-columns: 1fr 192px 64px minmax(640px, 720px) 2fr;
 }
-.grid-toc {
-	grid-area: toc;
+.grid-contents {
+	grid-area: contents;
 }
 .grid-editor {
 	grid-area: editor;
 }
 
-/* 944 === 24 + 192 + 64 + 640 + 24 */
+/* 944 === px-6 + 192 + 64 + 640 + px-6 */
 @media (max-width: 944px) {
-	.grid-toc {
+	.grid-contents {
 		position: static;
 	}
-	.grid-toc-editor {
+	.grid-contents-editor {
 		grid-template-areas:
-			". toc    ."
-			". editor .";
+			"contents"
+			"editor";
 
-		grid-template-columns:
-			24px
-				1fr
-			24px;
+		grid-template-columns: 1fr;
 	}
 }
 

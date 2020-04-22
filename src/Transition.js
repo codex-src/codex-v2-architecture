@@ -13,7 +13,7 @@ function Transition({ show, enter, enterFrom, enterTo, leave, leaveFrom, leaveTo
 	return (
 		<CSSTransition
 			unmountOnExit
-			in={show}
+			in={Boolean(show)}
 			addEndListener={(node, done) => {
 				node.addEventListener("transitionend", done, false)
 			}}

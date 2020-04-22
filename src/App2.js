@@ -209,39 +209,38 @@ const App = () => {
 	// Parse a table of contents.
 	//
 	// TODO: Extract
-	const parseToC = reactVDOM => {
-		const toc = []
+	const parseContents = reactVDOM => {
+		const contents = []
 		const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
 		for (const each of headers) {
 			switch (each.tag) {
 			case "h1":
 			case "h2":
-				toc.push({ ...each, subheaders: [] })
+				contents.push({ ...each, subheaders: [] })
 				break
 			case "h3":
 			case "h4":
 			case "h5":
 			case "h6":
-				if (!toc.length || !toc[toc.length - 1].subheaders) {
+				if (!contents.length || !contents[contents.length - 1].subheaders) {
 					// No-op
 					break
 				}
-				toc[toc.length - 1].subheaders.push(each)
+				contents[contents.length - 1].subheaders.push(each)
 				break
 			default:
 				// No-op
 				break
 			}
 		}
-		// console.log(toc)
-		return toc
+		// console.log(contents)
+		return contents
 		// console.log(reactVDOM.filter(each => each.type === typeEnum.Header))
 	}
 
 	return (
-		// <div className="py-32 flex flex-row justify-center">
-			// <div className="px-6 w-full max-w-screen-md">
-		<React.Fragment>
+			<div className="px-6 py-32">
+				{/* <React.Fragment> */}
 
 				{/* Settings */}
 				<FixedEditorSettings
@@ -249,64 +248,60 @@ const App = () => {
 					dispatch={editorSettingsDispatch}
 				/>
 
-				{/* Table of contents */}
-				<div className="py-32 grid-toc-editor">
-					<div className="pb-12 grid-toc overflow-x-hidden">
-						{(toc => (
-							toc.length > 0 && (
-								<React.Fragment>
-									<div className="py-1 flex flex-row items-center !transform !scale-90 !origin-left">
-										<svg
-											className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
-											fill="none"
-											stroke="currentColor"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth="2"
-											viewBox="0 0 24 24"
-										>
-											<path d="M4 6h16M4 12h16M4 18h7"></path>
-										</svg>
-										<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-											{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
-											CONTENTS
-										</p>
-									</div>
-									<div className="h-2" />
-									<ul>
-										{toc.map(({ hash, children, subheaders }) => (
-											<li key={hash}>
-												<a href={`#${hash}`}>
-													<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-														{toInnerText(children) || (
-															"Untitled"
-														)}
-													</h1>
-												</a>
-												{subheaders.length > 0 && (
-													<ul>
-														{subheaders.map(({ hash, children }) => (
-															<li key={hash}>
-																<a href={`#${hash}`}>
-																	<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-																		{toInnerText(children) || (
-																			"Untitled"
-																		)}
-																	</h2>
-																</a>
-															</li>
-														))}
-													</ul>
-												)}
-											</li>
-										))}
-									</ul>
-								</React.Fragment>
-							)
-						))(parseToC(editor.reactVDOM))}
-					</div>
+				{/* Grid */}
+				<div className="grid-contents-editor">
 
-					{/* Editor section */}
+					{/* LHS */}
+					{(contents => (
+						<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0%" : "100%" }}>
+							<div className="py-1 flex flex-row items-center">
+								<svg
+									className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
+									fill="none"
+									stroke="currentColor"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									viewBox="0 0 24 24"
+								>
+									<path d="M4 6h16M4 12h16M4 18h7"></path>
+								</svg>
+								<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
+									{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
+									CONTENTS
+								</p>
+							</div>
+							<div className="h-2" />
+							<ul>
+								{contents.map(({ hash, children, subheaders }) => (
+									<li key={hash}>
+										<a href={`#${hash}`}>
+											<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+												{toInnerText(children) || (
+													"Untitled"
+												)}
+											</h1>
+										</a>
+										<ul>
+											{subheaders.map(({ hash, children }) => (
+												<li key={hash}>
+													<a href={`#${hash}`}>
+														<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+															{toInnerText(children) || (
+																"Untitled"
+															)}
+														</h2>
+													</a>
+												</li>
+											))}
+										</ul>
+									</li>
+								))}
+							</ul>
+						</div>
+					))(parseContents(editor.reactVDOM))}
+
+					{/* RHS */}
 					<div className="grid-editor">
 
 						{/* Editor */}
@@ -361,9 +356,9 @@ const App = () => {
 
 				</div>
 
-		</React.Fragment>
+			{/* </React.Fragment> */}
 
-			// </div>
+			</div>
 		// </div>
 	)
 }
