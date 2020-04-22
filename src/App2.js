@@ -203,6 +203,7 @@ const App = () => {
 	// Parse a table of contents.
 	//
 	// TODO: Extract
+	// TODO: Change behavior for ### H3
 	const parseContents = reactVDOM => {
 		const contents = []
 		const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
@@ -227,9 +228,7 @@ const App = () => {
 				break
 			}
 		}
-		// console.log(contents)
 		return contents
-		// console.log(reactVDOM.filter(each => each.type === typeEnum.Header))
 	}
 
 	return (
@@ -299,9 +298,11 @@ const App = () => {
 
 					{/* Editor */}
 					<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+						{/* TODO: Add React.forwardRef */}
 						<Editor
 							className="grid-editor"
-							// NOTE: 25px === <Paragraph>
+							// TODO: Use a ref to compute the height of
+							// the last data-codex-node or data-codex-root
 							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
 							state={editor}
 							dispatch={editorDispatch}

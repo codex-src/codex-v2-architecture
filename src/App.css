@@ -133,7 +133,7 @@ html {
 		". contents . editor ."
 		". .        . editor .";
 
-	grid-template-columns: 1fr 192px 64px minmax(640px, 720px) 2fr;
+	grid-template-columns: 1fr 192px 64px minmax(640px, 768px) 2fr;
 }
 .grid-contents {
 	grid-area: contents;
