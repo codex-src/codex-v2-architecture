@@ -35,7 +35,7 @@ const ReactEditor = ({ state, dispatch }) => {
 	)
 }
 
-const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
+const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -105,7 +105,7 @@ const Editor = ({ tag, id, className, style, state, dispatch, readOnly }) => {
 
 	return (
 		React.createElement(
-			tag || "div",
+			"div",
 			{
 				ref,
 

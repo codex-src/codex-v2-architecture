@@ -23,21 +23,49 @@ const ReadmeEditor = ({ readOnly }) => {
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
-const FixedEditorSettings = ({ state, dispatch }) => (
+const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 	// NOTE: Use flex flex-col because of the sidebar
 	<div className="px-3 py-2 pb-10 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
-		{/* Buttons */}
-		<div className="flex-shrink-0 flex flex-row justify-end w-full">
-	 		<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-					<Button
-						className="m-1 font-medium text-xs underline"
-						onClick={dispatch.toggleReadOnly}
+		{/* Settings */}
+		<div className="flex-shrink-0 flex flex-row justify-between w-full">
+
+			{/* LHS */}
+			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+
+				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
+					<p className="font-medium text-xs text-gray-600">
+						{saveStatus <= 1 ? (
+							"Saving…"
+						) : (
+							"Saved"
+						)}
+					</p>
+					<svg
+						className="ml-2 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+						style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
+						fill="none"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth="2"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
 					>
-						Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
-					</Button>
+						{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
+						<path d="M5 13l4 4L19 7"></path>
+					</svg>
 				</div>
+
+			</div>
+
+			{/* RHS */}
+			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+				<Button
+					className="m-1 font-medium text-xs underline"
+					onClick={dispatch.toggleReadOnly}
+				>
+					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
+				</Button>
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showReadme}
@@ -57,6 +85,7 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				JSON
 	 			</Button>
 			</div>
+
 		</div>
 
 		{/* Sidebar */}
@@ -213,7 +242,33 @@ const App = () => {
 	const [editor, editorDispatch] = useEditor(data)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
-	const [title, setTitle] = React.useState(() => "")
+	const [saveStatus, setSaveStatus] = React.useState(0)
+
+	// Saves to localStorage (debounced).
+	const mounted = React.useRef()
+	React.useEffect(() => {
+		if (!mounted.current) {
+			mounted.current = true
+			return
+		}
+		setSaveStatus(1)
+		const ids = []
+		ids.push(setTimeout(() => {
+			const json = JSON.stringify({ data: editor.data })
+			localStorage.setItem(LOCALSTORAGE_KEY, json)
+			ids.push(setTimeout(() => {
+				setSaveStatus(2)
+				ids.push(setTimeout(() => {
+					setSaveStatus(3)
+				}, 1e3))
+			}, 2e3))
+		}, 100))
+		return () => {
+			ids.slice().reverse().map(each => clearTimeout(each))
+		}
+	}, [editor.data])
+
+	const [title, setTitle] = React.useState("")
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
@@ -276,17 +331,6 @@ const App = () => {
 		editorSettingsDispatch,
 	])
 
-	// Saves to localStorage (debounced).
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const json = JSON.stringify({ data: editor.data })
-			localStorage.setItem(LOCALSTORAGE_KEY, json)
-		}, 100)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [editor.data])
-
 	// Manages read-only mode.
 	React.useEffect(() => {
 		const handler = e => {
@@ -340,6 +384,7 @@ const App = () => {
 
 			{/* Settings */}
 			<FixedEditorSettings
+				saveStatus={saveStatus}
 				state={editorSettings}
 				dispatch={editorSettingsDispatch}
 			/>
@@ -351,7 +396,7 @@ const App = () => {
 				<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0" : "1" }}>
 					<div className="py-1 flex flex-row items-center">
 						<svg
-							className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
+							className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
 							fill="none"
 							stroke="currentColor"
 							strokeLinecap="round"
@@ -359,6 +404,7 @@ const App = () => {
 							strokeWidth="2"
 							viewBox="0 0 24 24"
 						>
+							{/* <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path> */}
 							<path d="M4 6h16M4 12h16M4 18h7"></path>
 						</svg>
 						<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
