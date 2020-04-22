@@ -119,8 +119,6 @@ const data = (() => {
 	return json.data
 })()
 
-// Parse a table of contents.
-//
 // TODO: Change behavior for ### H3
 function parseContents(reactVDOM) {
 	const contents = []
@@ -156,8 +154,28 @@ function parseContents(reactVDOM) {
 	return contents
 }
 
+function parseStatus(editor, metadata) {
+	const lhs = ((chars, lines) => {
+		if (editor.pos1.pos === editor.pos2.pos) {
+			if (!editor.focused) {
+				return "No selection"
+			}
+			return `Line ${format(editor.pos1.y + 1)}, column ${format(editor.pos1.x + 1)}`
+		} else {
+			if (!editor.focused) {
+				return "No selection"
+			}
+			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
+		}
+	})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+	const rhs = ((words, minutes) => {
+		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
+	})(metadata.words, metadata.minutes)
+	return [lhs, rhs]
+}
+
 // Shorthand.
-function commas(n) {
+function format(n) {
 	return n.toLocaleString("en")
 }
 
@@ -169,8 +187,9 @@ const App = () => {
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	const [contents, setContents] = React.useState(() => parseContents(editor.reactVDOM))
+	const [status, setStatus] = React.useState(() => ["", ""])
 
-	// Debounces contents by one frame.
+	// Debounces contents.
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			const contents = parseContents(editor.reactVDOM)
@@ -181,7 +200,18 @@ const App = () => {
 		}
 	}, [editor.reactVDOM])
 
-	// Debounces renderers by one frame.
+	// Debounces status.
+	React.useEffect(() => {
+		const id = setTimeout(() => {
+			const status = parseStatus(editor, editorSettings.metadata)
+			setStatus(status)
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
+	}, [editor, editorSettings.metadata])
+
+	// Debounces renderers.
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			editorSettingsDispatch.shallowUpdate(editor)
@@ -334,30 +364,14 @@ const App = () => {
 							{/* LHS */}
 							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{editor.pos1.pos === editor.pos2.pos ? (
-										(() => {
-											if (!editor.focused) {
-												return "No selection"
-											}
-											return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
-										})()
-									) : (
-										((chars, lines) => {
-											if (!editor.focused) {
-												return "No selection"
-											}
-											return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
-										})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
-									)}
+									{status[0]}
 								</p>
 							</div>
 
 							{/* RHS */}
 							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{((words, minutes) => (
-										`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
-									))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
+									{status[1]}
 								</p>
 							</div>
 						</div>
