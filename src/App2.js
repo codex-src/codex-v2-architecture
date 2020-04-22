@@ -348,7 +348,7 @@ const App = () => {
 			<div className="grid-contents-editor">
 
 				{/* LHS */}
-				<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0%" : "100%" }}>
+				<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0" : "1" }}>
 					<div className="py-1 flex flex-row items-center">
 						<svg
 							className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
@@ -416,10 +416,10 @@ const App = () => {
 					{/* Status bars */}
 					{!editor.readOnly && (
 						<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0%" : "100%" }}>
+							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0" : "1" }}>
 								{statusLHS}
 							</p>
-							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0%" : "100%" }}>
+							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0" : "1" }}>
 								{statusRHS}
 							</p>
 						</div>
