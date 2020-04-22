@@ -24,8 +24,8 @@ const ReadmeEditor = ({ readOnly }) => {
 }
 
 const FixedEditorSettings = ({ state, dispatch }) => (
-	// NOTE: Usese flex flex-col for the sidebar
-	<div className="p-3 pb-4 fixed inset-0 flex flex-col z-40 pointer-events-none">
+	// NOTE: Use flex flex-col because of the sidebar
+	<div className="px-3 py-2 pb-10 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 		{/* Buttons */}
 		<div className="flex-shrink-0 flex flex-row justify-end w-full">
