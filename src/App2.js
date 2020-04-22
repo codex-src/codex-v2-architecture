@@ -176,9 +176,17 @@ function parseStatus(editor, metadata) {
 	return [lhs, rhs]
 }
 
+// Returns a new scroll handler; scrolls to an ID.
+//
+// ---------------
+// |    128px    |
+// ---------------
+// TITLE … # Title
+//
 function newScrollHandler(e, id) {
 	e.preventDefault()
-	window.scrollTo(0, document.getElementById(id).offsetTop - 128)
+	const element = document.getElementById(id)
+	window.scrollTo(0, element.offsetTop - 128)
 }
 
 // Shorthand.
@@ -314,7 +322,6 @@ const App = () => {
 							<path d="M4 6h16M4 12h16M4 18h7"></path>
 						</svg>
 						<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-							{/* CONTENTS */}
 							{(editorSettings.metadata.title || "Untitled").toUpperCase()}
 						</p>
 					</div>
@@ -369,14 +376,14 @@ const App = () => {
 						<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 
 							{/* LHS */}
-							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
+							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 									{status[0]}
 								</p>
 							</div>
 
 							{/* RHS */}
-							<div className="px-3 py-1 bg-white border pointer-events-auto" style={{ borderRadius: "0.75rem" }}>
+							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
 								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
 									{status[1]}
 								</p>

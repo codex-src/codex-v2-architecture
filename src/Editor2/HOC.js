@@ -4,8 +4,9 @@ import React from "react"
 // contenteditable
 
 // NOTE: Shadows browser API
-export const Node = ({ id, tag, style, ...props }) => (
+export const Node = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
+		ref,
 		id,
 		"style": {
 			whiteSpace: "pre-wrap", // Takes precedence (because of <Pre>)
@@ -14,10 +15,11 @@ export const Node = ({ id, tag, style, ...props }) => (
 		"data-codex-node": true,
 		...props,
 	})
-)
+))
 
-export const Root = ({ id, tag, style, ...props }) => (
+export const Root = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
+		ref,
 		id,
 		"style": {
 			whiteSpace: "pre-wrap", // Takes precedence (because of <Pre>)
@@ -26,4 +28,4 @@ export const Root = ({ id, tag, style, ...props }) => (
 		"data-codex-root": true,
 		...props,
 	})
-)
+))
