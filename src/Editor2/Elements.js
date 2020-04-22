@@ -84,8 +84,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id} className="text-md-blue-a400">
-		{/* FIXME: blue-a400 needed? */}
-		<Markdown className="text-md-blue-a400" syntax={syntax}>
+		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}

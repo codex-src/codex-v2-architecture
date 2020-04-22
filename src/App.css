@@ -120,6 +120,8 @@ html {
 .grid-contents {
 	position: sticky;
 	top: 128px; /* 128px === py-32 */
+
+	/* max-height: 384px; */
 }
 
 /* +--------------+ */

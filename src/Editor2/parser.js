@@ -376,8 +376,7 @@ function parseElements(nodes) {
 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 					id: each.id,
 					syntax: [syntax],
-					// text,
-					// hash: newHash(text),
+					// text: text,
 					hash: newHash(toInnerText(parseInlineElements(each.data.slice(syntax.length)))),
 					children: parseInlineElements(each.data.slice(syntax.length)),
 				})
