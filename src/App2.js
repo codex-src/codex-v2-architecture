@@ -303,7 +303,7 @@ const App = () => {
 							className="grid-editor"
 							// TODO: Use a ref to compute the height of
 							// the last data-codex-node or data-codex-root
-							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 18 }}
 							state={editor}
 							dispatch={editorDispatch}
 							readOnly={editorSettings.readOnly}
