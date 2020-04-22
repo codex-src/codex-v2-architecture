@@ -28,50 +28,58 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	<div className="p-3 pb-4 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 		{/* Buttons */}
-		<div className="flex-shrink-0 flex flex-row justify-between w-full">
+		<div className="flex-shrink-0 flex flex-row justify-end w-full">
 
 			{/* LHS */}
-			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-				<Button
-					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-					onClick={dispatch.toggleReadOnly}
-				>
-					Preview mode ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
-				</Button>
-			</div>
+			{/* <div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto"> */}
+			{/* 	<Button */}
+			{/* 		className="m-1 font-medium text-xs underline" */}
+			{/* 		onClick={dispatch.toggleReadOnly} */}
+			{/* 	> */}
+			{/* 		Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P) */}
+			{/* 	</Button> */}
+			{/* </div> */}
 
 			{/* RHS */}
 	 		<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+					<Button
+						className="m-1 font-medium text-xs underline"
+						onClick={dispatch.toggleReadOnly}
+					>
+						Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
+					</Button>
+				</div>
 	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showReadme}
 	 			>
 	 				Readme (esc)
 	 			</Button>
 	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-	 				onClick={dispatch.showJSON}
-	 			>
-	 				JSON
-	 			</Button>
-	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showHTML}
 	 			>
 	 				HTML
 	 			</Button>
+	 			{/* <Button */}
+	 			{/* 	className="m-1 font-medium text-xs underline" */}
+	 			{/* 	onClick={dispatch.showHTML__BEM} */}
+	 			{/* > */}
+	 			{/* 	HTML (BEM) */}
+	 			{/* </Button> */}
 	 			<Button
-	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
-	 				onClick={dispatch.showHTML__BEM}
+	 				className="m-1 font-medium text-xs underline"
+	 				onClick={dispatch.showJSON}
 	 			>
-	 				HTML (BEM)
+	 				JSON
 	 			</Button>
 			</div>
 
 		</div>
 
 		{/* Sidebar */}
-		<div className="flex-shrink-0 h-6" />
+		<div className="flex-shrink-0 h-2" />
 		<Transition
 			show={state.showSidebar}
 			enter="transition ease-out duration-300"
@@ -187,9 +195,17 @@ function parseStatus(editor, metadata) {
 // ---------------
 // TITLE … # Title
 //
-function newScrollHandler(e, id) {
+function newScrollHandler(e, id, hash) {
+	// NOTE: Use e.preventDefault and e.stopPropagation
+	// because handlers are nested
 	e.preventDefault()
+	e.stopPropagation()
 	const element = document.getElementById(id)
+	if (!element) {
+		// No-op
+		return
+	}
+	window.location.hash = hash
 	window.scrollTo(0, element.offsetTop - 128)
 }
 
@@ -337,7 +353,7 @@ const App = () => {
 					<div className="h-2" />
 					<ul>
 						{contents.map(({ id, hash, nested, children }) => (
-							<li key={hash} onClick={e => newScrollHandler(e, id)}>
+							<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 								<a href={`#${hash}`}>
 									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 										{children || (
@@ -347,7 +363,7 @@ const App = () => {
 								</a>
 								<ul>
 									{nested.map(({ id, hash, children }) => (
-										<li key={hash} onClick={e => newScrollHandler(e, id)}>
+										<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 											<a href={`#${hash}`}>
 												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 													{children || (
