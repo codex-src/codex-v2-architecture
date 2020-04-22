@@ -65,7 +65,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 	// style={{ paddingTop: "1em" }}
 	return (
 		<Root ref={ref} id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+			<IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 				<Markdown syntax={syntax}>
 					{toReact(children) || (
 						<br />
@@ -95,7 +95,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</Node>
 ))
 
-// NOTE: Compound React element
+// NOTE: Compound element
 export const Blockquote = React.memo(({ id, children }) => {
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
@@ -114,7 +114,7 @@ export const Pre = props => (
 	<Node style={{ whiteSpace: "pre" }} {...props} />
 )
 
-// NOTE: Compound React element
+// NOTE: Compound element
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
