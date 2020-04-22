@@ -37,7 +37,8 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 						Saving
 					</p>
 					<svg
-						className="ml-2 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+						// NOTE: ml-1 is preferable to ml-2
+						className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
 						style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
 						fill="none"
 						strokeLinecap="round"
