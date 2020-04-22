@@ -146,9 +146,9 @@ function parseContents(reactVDOM) {
 				children: toInnerText(children),
 			})
 			break
-		default:
-			// No-op
-			break
+		// default:
+		// 	// No-op
+		// 	break
 		}
 	}
 	return contents
@@ -202,13 +202,13 @@ const App = () => {
 
 	// Debounces status.
 	React.useEffect(() => {
-		// const id = setTimeout(() => {
-		const status = parseStatus(editor, editorSettings.metadata)
-		setStatus(status)
-		// }, 16.67)
-		// return () => {
-		// 	clearTimeout(id)
-		// }
+		const id = setTimeout(() => {
+			const status = parseStatus(editor, editorSettings.metadata)
+			setStatus(status)
+		}, 16.67)
+		return () => {
+			clearTimeout(id)
+		}
 	}, [editor, editorSettings.metadata])
 
 	// Debounces renderers.
