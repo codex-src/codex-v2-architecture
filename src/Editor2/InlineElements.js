@@ -50,7 +50,7 @@ export const StrongEmphasis = ({ syntax, children }) => (
 export const Code = ({ syntax, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
-		<Span className="py-px font-mono text-sm text-red-600 bg-red-100 rounded-sm" {...attrs.code}>
+		<Span className="px-1 py-px font-mono text-sm text-red-600 bg-red-100 rounded" {...attrs.code}>
 			<Markdown className="text-red-600" syntax={syntax}>
 				{!readOnly ? (
 					children
