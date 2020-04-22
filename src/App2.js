@@ -254,7 +254,6 @@ const App = () => {
 	// Debounces renderers.
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			editorSettingsDispatch.shallowUpdate(editor)
 			if (!editorSettings.showSidebar) {
 				// No-op
 				return
@@ -312,7 +311,13 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			editorSettingsDispatch.toggleSidebar()
+			// Debounce by one frame (match useEffect):
+			const id = setTimeout(() => {
+				editorSettingsDispatch.toggleSidebar()
+			}, 16.67)
+			return () => {
+				clearTimeout(id)
+			}
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
