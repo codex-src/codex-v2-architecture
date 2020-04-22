@@ -125,7 +125,7 @@ function parseContents(reactVDOM) {
 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
 	for (const { tag, id, hash, children } of headers) {
 		switch (tag) {
-		case "h1":
+		// case "h1":
 		case "h2":
 			contents.push({
 				id,
@@ -174,6 +174,11 @@ function parseStatus(editor, metadata) {
 		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
 	})(metadata.words, metadata.minutes)
 	return [lhs, rhs]
+}
+
+function newScrollHandler(e, id) {
+	e.preventDefault()
+	window.scrollTo(0, document.getElementById(id).offsetTop - 128)
 }
 
 // Shorthand.
@@ -309,14 +314,14 @@ const App = () => {
 							<path d="M4 6h16M4 12h16M4 18h7"></path>
 						</svg>
 						<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-							{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
-							CONTENTS
+							{/* CONTENTS */}
+							{(editorSettings.metadata.title || "Untitled").toUpperCase()}
 						</p>
 					</div>
 					<div className="h-2" />
 					<ul>
 						{contents.map(({ id, hash, nested, children }) => (
-							<li key={hash} onClick={e => window.scrollTo(0, document.getElementById(id).offsetTop - 128)}>
+							<li key={hash} onClick={e => newScrollHandler(e, id)}>
 								<a href={`#${hash}`}>
 									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 										{children || (
@@ -326,7 +331,7 @@ const App = () => {
 								</a>
 								<ul>
 									{nested.map(({ id, hash, children }) => (
-										<li key={hash} onClick={e => window.scrollTo(0, document.getElementById(id).offsetTop - 128)}>
+										<li key={hash} onClick={e => newScrollHandler(e, id)}>
 											<a href={`#${hash}`}>
 												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 													{children || (
@@ -352,7 +357,7 @@ const App = () => {
 							className="grid-editor"
 							// TODO: Use a ref to compute the height of
 							// the last data-codex-node or data-codex-root
-							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 18 }}
+							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
 							state={editor}
 							dispatch={editorDispatch}
 							readOnly={editorSettings.readOnly}

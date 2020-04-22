@@ -10,12 +10,16 @@
 	font-family: "iA Writer Mono var", monospace;
 	letter-spacing: 0; /* Needed because of .codex-editor */
 }
-
-.codex-editor:not(.feature-read-only) * {
+.codex-editor * {
 	caret-color: #000;
 }
-/* .codex-editor:not(.feature-read-only) ::selection { */
-/* 	background-color: #448aff3f; */
+
+/* .codex-editor:not(.feature-read-only) [data-codex-root] { */
+/* 	transition-duration: 500ms; */
+/* } */
+/* .codex-editor:not(.feature-read-only) [data-codex-root]:hover { */
+/* 	background-color: #448aff1f; */
+/* 	transition-duration: 500ms; */
 /* } */
 
 .codex-editor .text-lg .font-medium,
@@ -62,7 +66,7 @@
 .codex-editor .emojis.emojis-1,
 .codex-editor .emojis.emojis-2,
 .codex-editor .emojis.emojis-3 {
-	font-size: 208.3333%; /* Resolves to 250%; use 4x precision because of Chrome */
+	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
 /* .codex-editor:not(.feature-read-only) .markdown:not( .font-mono) { */

@@ -38,12 +38,12 @@ function trim(str) {
 }
 
 const headerClassNames = {
-	h1: trim("font-semibold text-3xl leading-tight antialiased"),
-	h2: trim("font-semibold text-2xl leading-tight antialiased"),
-	h3: trim("font-semibold text-xl  leading-tight antialiased"),
-	h4: trim("font-semibold text-lg  leading-snug  antialiased"),
-	h5: trim("font-semibold text-lg  leading-snug  antialiased"),
-	h6: trim("font-semibold text-lg  leading-snug  antialiased"),
+	h1: trim("font-semibold text-3xl leading-tight text-black antialiased"),
+	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
+	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h4: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
+	h5: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
+	h6: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
 }
 
 // Conditionally wraps a React element.
@@ -75,6 +75,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
 })
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
+ 	// style={{ margin: !children && "-0.25em 0" }}
 	<Root id={id} className={!emojis ? null : `emojis emojis-${emojis}`}>
 		{toReact(children) || (
 			<br />
@@ -83,7 +84,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id} className="text-md-blue-a400">
+	<Node id={id} className="text-gray-600">
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -92,24 +93,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</Node>
 ))
 
-// // NOTE: Compound React element
-// export const Blockquote = React.memo(({ id, children }) => {
-// 	const style = { backgroundColor: "#2979ff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
-// 	return (
-// 		<Root id={id} className="px-8 py-4" style={style}>
-// 			{children.map(({ type: T, ...each }) => (
-// 				React.createElement(typeEnumMap[T], {
-// 					key: each.id,
-// 					...each,
-// 				})
-// 			))}
-// 		</Root>
-// 	)
-// })
-
 // NOTE: Compound React element
 export const Blockquote = React.memo(({ id, children }) => {
-	const style = { boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
+	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
 		<Root id={id} className="px-6" style={style}>
 			{children.map(({ type: T, ...each }) => (
