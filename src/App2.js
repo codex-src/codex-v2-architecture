@@ -121,7 +121,7 @@ function computeContents(reactVDOM) {
 			contents.push({
 				id,
 				hash,
-				nested: [],
+				secondary: [],
 				children: toInnerText(children),
 			})
 			break
@@ -129,15 +129,15 @@ function computeContents(reactVDOM) {
 		case "h4":
 		case "h5":
 		case "h6":
-			if (!contents.length || !contents[contents.length - 1].nested) {
+			if (!contents.length || !contents[contents.length - 1].secondary) {
 				contents.push({
-					id: "no-op",
+					id: "",
 					hash: "",
-					nested: [],
+					secondary: [],
 					children: "",
 				})
 			}
-			contents[contents.length - 1].nested.push({
+			contents[contents.length - 1].secondary.push({
 				id,
 				hash,
 				children: toInnerText(children),
@@ -367,9 +367,9 @@ const App = () => {
 					</div>
 					<div className="h-2" />
 					<ul>
-						{contents.map(({ id, hash, nested, children }) => (
+						{contents.map(({ id, hash, secondary, children }) => (
 							<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-								{id !== "no-op" && (
+								{id !== "" && (
 									<a href={`#${hash}`}>
 										<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 											{children || (
@@ -379,7 +379,7 @@ const App = () => {
 									</a>
 								)}
 								<ul>
-									{nested.map(({ id, hash, children }) => (
+									{secondary.map(({ id, hash, children }) => (
 										<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 											<a href={`#${hash}`}>
 												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">

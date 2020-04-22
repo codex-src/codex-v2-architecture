@@ -46,35 +46,29 @@ const headerClassNames = {
 	h6: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
 }
 
-// Conditionally wraps a React element.
-const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
-	if (!cond) {
-		return children
-	}
-	return <Wrapper>{children}</Wrapper>
-}
+// // Conditionally wraps a React element.
+// const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
+// 	if (!cond) {
+// 		return children
+// 	}
+// 	return <Wrapper>{children}</Wrapper>
+// }
+//
+// const HeaderAnchor = ({ hash, children }) => (
+// 	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
+// )
 
-const HeaderAnchor = ({ hash, children }) => (
-	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
-)
-
-export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
-	const ref = React.useRef()
-	const [{ readOnly }] = useEditorState()
-
-	// style={{ paddingTop: "1em" }}
-	return (
-		<Root ref={ref} id={id} className={headerClassNames[tag]}>
-			<IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
-				<Markdown syntax={syntax}>
-					{toReact(children) || (
-						<br />
-					)}
-				</Markdown>
-			</IfWrapper>
-		</Root>
-	)
-})
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
+	<Root id={id} className={headerClassNames[tag]}>
+		{/* <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}> */}
+		<Markdown syntax={syntax}>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+		{/* </IfWrapper> */}
+	</Root>
+))
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
  	// style={{ margin: !children && "-0.25em 0" }}
