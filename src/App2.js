@@ -245,7 +245,8 @@ const App = () => {
 		const id = setTimeout(() => {
 			const statusRHS = computeStatusRHS(editor)
 			setStatusRHS(statusRHS)
-		}, 100)
+		// NOTE: Do not use 100 -- breaks fade effect
+		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
@@ -406,14 +407,12 @@ const App = () => {
 					</DocumentTitle>
 
 					{/* Status bars */}
-					{/* TODO: Add fade-in effect */}
 					{!editor.readOnly && (
-						<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-							{/* NOTE: Matches settings aesthetic */}
+						<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
 							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0%" : "100%" }}>
 								{statusLHS}
 							</p>
-							<p className="font-medium text-xs" style={{ fontFeatureSettings: "'tnum'" }}>
+							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0%" : "100%" }}>
 								{statusRHS}
 							</p>
 						</div>
