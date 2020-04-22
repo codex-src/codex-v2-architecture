@@ -125,11 +125,15 @@ const data = (() => {
 function parseContents(reactVDOM) {
 	const contents = []
 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
-	for (const each of headers) {
-		switch (each.tag) {
+	for (const { tag, hash, children } of headers) {
+		switch (tag) {
 		case "h1":
 		case "h2":
-			contents.push({ ...each, subheaders: [] })
+			contents.push({
+				hash,
+				children: toInnerText(children),
+				subheaders: [],
+			})
 			break
 		case "h3":
 		case "h4":
@@ -139,7 +143,10 @@ function parseContents(reactVDOM) {
 				// No-op
 				break
 			}
-			contents[contents.length - 1].subheaders.push(each)
+			contents[contents.length - 1].subheaders.push({
+				hash,
+				children: toInnerText(children),
+			})
 			break
 		default:
 			// No-op
@@ -280,7 +287,7 @@ const App = () => {
 							<li key={hash}>
 								<a href={`#${hash}`}>
 									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-										{toInnerText(children) || (
+										{children || (
 											"Untitled"
 										)}
 									</h1>
@@ -290,7 +297,7 @@ const App = () => {
 										<li key={hash}>
 											<a href={`#${hash}`}>
 												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-													{toInnerText(children) || (
+													{children || (
 														"Untitled"
 													)}
 												</h2>
