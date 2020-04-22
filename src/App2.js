@@ -62,6 +62,12 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 			>
 	 				HTML
 	 			</Button>
+	 			<Button
+	 				className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
+	 				onClick={dispatch.showHTML__BEM}
+	 			>
+	 				HTML (BEM)
+	 			</Button>
 			</div>
 
 		</div>
@@ -200,21 +206,9 @@ const App = () => {
 		}
 	}, [editorSettingsDispatch])
 
-	// // Parse a table of contents.
-	// const parseToC = reactVDOM => {
-	// 	const toc = []
-	// 	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
-	// 	for (const each of headers) {
-	// 		if (each.tag === "h1") {
-	// 			toc.push({ ...each, subheaders: [] })
-	// 		} else if (toc.length) {
-	// 			toc[toc.length - 1].subheaders.push(each)
-	// 		}
-	// 	}
-	// 	return toc
-	// }
-
 	// Parse a table of contents.
+	//
+	// TODO: Extract
 	const parseToC = reactVDOM => {
 		const toc = []
 		const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
@@ -264,8 +258,9 @@ const App = () => {
 								<React.Fragment>
 									<div className="pt-1 pb-3 flex flex-row items-center transform scale-90 origin-left">
 										{/* <svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg> */}
-										<svg class="mr-2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-										<p className="font-medium text-xs tracking-widest text-gray-600">
+										<svg class="mr-2 flex-shrink-0 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+										<p className="font-medium text-xs tracking-widest truncate text-gray-600">
+											{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
 											CONTENTS
 										</p>
 									</div>
@@ -273,7 +268,7 @@ const App = () => {
 										{toc.map(({ hash, children, subheaders }) => (
 											<li key={hash}>
 												<a href={`#${hash}`}>
-													<h1 className="py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+													<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 														{toInnerText(children) || (
 															"Untitled"
 														)}
@@ -284,7 +279,7 @@ const App = () => {
 														{subheaders.map(({ hash, children }) => (
 															<li key={hash}>
 																<a href={`#${hash}`}>
-																	<h2 className="pl-4 py-1 font-medium text-sm text-gray-600 hover:text-blue-500 truncate transition duration-300">
+																	<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 																		{toInnerText(children) || (
 																			"Untitled"
 																		)}

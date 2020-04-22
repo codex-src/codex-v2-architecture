@@ -83,7 +83,8 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id}>
+	<Node id={id} className="text-md-blue-a400">
+		{/* FIXME: blue-a400 needed? */}
 		<Markdown className="text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -92,11 +93,26 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</Node>
 ))
 
+// // NOTE: Compound React element
+// export const Blockquote = React.memo(({ id, children }) => {
+// 	const style = { backgroundColor: "#2979ff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
+// 	return (
+// 		<Root id={id} className="px-8 py-4" style={style}>
+// 			{children.map(({ type: T, ...each }) => (
+// 				React.createElement(typeEnumMap[T], {
+// 					key: each.id,
+// 					...each,
+// 				})
+// 			))}
+// 		</Root>
+// 	)
+// })
+
 // NOTE: Compound React element
 export const Blockquote = React.memo(({ id, children }) => {
-	const style = { backgroundColor: "#2979ff0f", boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
+	const style = { boxShadow: "inset 0.125em 0 var(--md-blue-a400)" }
 	return (
-		<Root id={id} className="py-4 px-8" style={style}>
+		<Root id={id} className="px-6" style={style}>
 			{children.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,

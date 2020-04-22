@@ -2,9 +2,9 @@ import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
 
 import {
-	// toHTML__BEM,
 	// toReact_js,
 	toHTML,
+	toHTML__BEM,
 	toText,
 } from "Editor2/cmap"
 
@@ -79,9 +79,9 @@ const methods = state => ({
 				null,
 				"\t",
 			),
-			[renderModesEnum.HTML]:         toHTML(editorState.reactVDOM),
-			// [renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
-			// [renderModesEnum.React_js]:  toReact_js(editorState.reactVDOM),
+			[renderModesEnum.HTML]:        toHTML(editorState.reactVDOM),
+			[renderModesEnum.HTML__BEM]:   toHTML__BEM(editorState.reactVDOM),
+			// [renderModesEnum.React_js]: toReact_js(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
