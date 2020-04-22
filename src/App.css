@@ -137,7 +137,7 @@ html {
 	grid-area: editor;
 }
 
-/* 944 === px-6 + 192 + 64 + 640 + px-6 */
+/* 944px === px-6 + 192px + 64px + 640px + px-6 */
 @media (max-width: 944px) {
 	.grid-contents {
 		position: static;

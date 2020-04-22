@@ -32,14 +32,8 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 					className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Preview mode: {!state.readOnly ? "off" : "on"} ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-p)
+					Preview mode ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
 				</Button>
-				{/* <Button */}
-				{/* 	className="m-1 px-3 py-2 bg-white hover:bg-gray-100 rounded-lg shadow transition duration-75" */}
-				{/* 	onClick={dispatch.toggleCSSDebugger} */}
-				{/* > */}
-				{/* 	Toggle CSS debugger: {`${state.debugCSS}`} */}
-				{/* </Button> */}
 			</div>
 
 			{/* RHS */}
@@ -239,127 +233,123 @@ const App = () => {
 	}
 
 	return (
-			<div className="px-6 py-32">
-				{/* <React.Fragment> */}
+		<div className="px-6 py-32">
 
-				{/* Settings */}
-				<FixedEditorSettings
-					state={editorSettings}
-					dispatch={editorSettingsDispatch}
-				/>
+			{/* Settings */}
+			<FixedEditorSettings
+				state={editorSettings}
+				dispatch={editorSettingsDispatch}
+			/>
 
-				{/* Grid */}
-				<div className="grid-contents-editor">
+			{/* Grid */}
+			<div className="grid-contents-editor">
 
-					{/* LHS */}
-					{(contents => (
-						<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0%" : "100%" }}>
-							<div className="py-1 flex flex-row items-center">
-								<svg
-									className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
-									fill="none"
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									viewBox="0 0 24 24"
-								>
-									<path d="M4 6h16M4 12h16M4 18h7"></path>
-								</svg>
-								<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-									{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
-									CONTENTS
+				{/* LHS */}
+				{(contents => (
+					<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0%" : "100%" }}>
+						<div className="py-1 flex flex-row items-center">
+							<svg
+								className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500 transform scale-95 origin-left"
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+							>
+								<path d="M4 6h16M4 12h16M4 18h7"></path>
+							</svg>
+							<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
+								{/* {(editorSettings.metadata.title || "Untitled").toUpperCase()} */}
+								CONTENTS
+							</p>
+						</div>
+						<div className="h-2" />
+						<ul>
+							{contents.map(({ hash, children, subheaders }) => (
+								<li key={hash}>
+									<a href={`#${hash}`}>
+										<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+											{toInnerText(children) || (
+												"Untitled"
+											)}
+										</h1>
+									</a>
+									<ul>
+										{subheaders.map(({ hash, children }) => (
+											<li key={hash}>
+												<a href={`#${hash}`}>
+													<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+														{toInnerText(children) || (
+															"Untitled"
+														)}
+													</h2>
+												</a>
+											</li>
+										))}
+									</ul>
+								</li>
+							))}
+						</ul>
+					</div>
+				))(parseContents(editor.reactVDOM))}
+
+				{/* RHS */}
+				<div className="grid-editor">
+
+					{/* Editor */}
+					<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
+						<Editor
+							className="grid-editor"
+							// NOTE: 25px === <Paragraph>
+							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+							state={editor}
+							dispatch={editorDispatch}
+							readOnly={editorSettings.readOnly}
+						/>
+					</DocumentTitle>
+
+					{/* Status bars */}
+					{!editor.readOnly && (
+						<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+
+							{/* LHS */}
+							<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+									{editor.pos1.pos === editor.pos2.pos ? (
+										(() => {
+											if (!editor.focused) {
+												return "No selection"
+											}
+											return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
+										})()
+									) : (
+										((chars, lines) => {
+											if (!editor.focused) {
+												return "No selection"
+											}
+											return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
+										})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+									)}
 								</p>
 							</div>
-							<div className="h-2" />
-							<ul>
-								{contents.map(({ hash, children, subheaders }) => (
-									<li key={hash}>
-										<a href={`#${hash}`}>
-											<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-												{toInnerText(children) || (
-													"Untitled"
-												)}
-											</h1>
-										</a>
-										<ul>
-											{subheaders.map(({ hash, children }) => (
-												<li key={hash}>
-													<a href={`#${hash}`}>
-														<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-															{toInnerText(children) || (
-																"Untitled"
-															)}
-														</h2>
-													</a>
-												</li>
-											))}
-										</ul>
-									</li>
-								))}
-							</ul>
-						</div>
-					))(parseContents(editor.reactVDOM))}
 
-					{/* RHS */}
-					<div className="grid-editor">
-
-						{/* Editor */}
-						<DocumentTitle title={editorSettings.metadata.title || "Untitled"}>
-							<Editor
-								// className={editorSettings.debugCSS && "debug-css"}
-								className="grid-editor"
-								style={{ fontSize: 17 }}
-								state={editor}
-								dispatch={editorDispatch}
-								readOnly={editorSettings.readOnly}
-							/>
-						</DocumentTitle>
-
-						{/* Status bars */}
-						{!editor.readOnly && (
-							<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-
-								{/* LHS */}
-								<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-									<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-										{editor.pos1.pos === editor.pos2.pos ? (
-											(() => {
-												if (!editor.focused) {
-													return "No selection"
-												}
-												return `Line ${commas(editor.pos1.y + 1)}, column ${commas(editor.pos1.x + 1)}`
-											})()
-										) : (
-											((chars, lines) => {
-												if (!editor.focused) {
-													return "No selection"
-												}
-												return `Selected ${lines < 2 ? "" : `${commas(lines)} lines, `}${commas(chars)} character${chars === 1 ? "" : "s"}`
-											})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
-										)}
-									</p>
-								</div>
-
-								{/* RHS */}
-								<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
-									<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-										{((words, minutes) => (
-											`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
-										))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
-									</p>
-								</div>
+							{/* RHS */}
+							<div className="px-3 py-1 bg-white rounded-full shadow-hero pointer-events-auto">
+								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
+									{((words, minutes) => (
+										`${commas(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${commas(minutes)} minute read`}`
+									))(editorSettings.metadata.words, editorSettings.metadata.minutes)}
+								</p>
 							</div>
-						)}
-
-					</div>
+						</div>
+					)}
 
 				</div>
 
-			{/* </React.Fragment> */}
-
 			</div>
-		// </div>
+
+		</div>
 	)
 }
 
