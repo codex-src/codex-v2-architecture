@@ -29,18 +29,6 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 
 		{/* Buttons */}
 		<div className="flex-shrink-0 flex flex-row justify-end w-full">
-
-			{/* LHS */}
-			{/* <div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto"> */}
-			{/* 	<Button */}
-			{/* 		className="m-1 font-medium text-xs underline" */}
-			{/* 		onClick={dispatch.toggleReadOnly} */}
-			{/* 	> */}
-			{/* 		Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P) */}
-			{/* 	</Button> */}
-			{/* </div> */}
-
-			{/* RHS */}
 	 		<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
 				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
 					<Button
@@ -62,12 +50,6 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 			>
 	 				HTML
 	 			</Button>
-	 			{/* <Button */}
-	 			{/* 	className="m-1 font-medium text-xs underline" */}
-	 			{/* 	onClick={dispatch.showHTML__BEM} */}
-	 			{/* > */}
-	 			{/* 	HTML (BEM) */}
-	 			{/* </Button> */}
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showJSON}
@@ -75,7 +57,6 @@ const FixedEditorSettings = ({ state, dispatch }) => (
 	 				JSON
 	 			</Button>
 			</div>
-
 		</div>
 
 		{/* Sidebar */}
@@ -425,22 +406,15 @@ const App = () => {
 					</DocumentTitle>
 
 					{/* Status bars */}
+					{/* TODO: Add fade-in effect */}
 					{!editor.readOnly && (
-						<div className="px-6 py-4 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-
-							{/* LHS */}
-							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
-								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{statusLHS}
-								</p>
-							</div>
-
-							{/* RHS */}
-							<div className="px-3 py-1 bg-white border rounded-full pointer-events-auto">
-								<p className="font-medium text-xs tracking-wide" style={{ fontFeatureSettings: "'tnum'" }}>
-									{statusRHS}
-								</p>
-							</div>
+						<div className="px-4 py-3 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+							<p className="font-medium text-xs" style={{ fontFeatureSettings: "'tnum'" }}>
+								{statusLHS}
+							</p>
+							<p className="font-medium text-xs" style={{ fontFeatureSettings: "'tnum'" }}>
+								{statusRHS}
+							</p>
 						</div>
 					)}
 
