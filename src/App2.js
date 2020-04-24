@@ -251,6 +251,10 @@ const App = () => {
 	const [showContents, setShowContents] = React.useState(true)
 
 	// Manages table of contents.
+	//
+	// TODO: There is one bug when the table of contents is
+	// hidden and then the window is resized; a passive event
+	// listener needs to be added to handle this case
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(e.shiftKey && isMetaOrCtrlKey(e) && e.keyCode === 49)) { // 49: 1
