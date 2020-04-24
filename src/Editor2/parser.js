@@ -108,6 +108,8 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
 		// Fast path:
+		//
+		// TODO: Fast path empty strings?
 		if (!isASCIIPunctuation(str[x]) && str[x] <= "\u00ff") { // Use "\u00ff" to guard BMP range, etc.
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
@@ -117,11 +119,11 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			continue
 		}
 		// Convenience variables:
-		const char = str[x]
+		const char = str[x] // TODO: Deprecate
 		const nchars = str.length - x
-		switch (true) {
+		switch (str[x]) {
 		// <Escape>
-		case char === "\\":
+		case "\\":
 	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
 				parsed.push({
 					type: typeEnum.Escape,
@@ -136,7 +138,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 		// <Emphasis>
-		case char === "_":
+		case "_":
 			// _Emphasis_
 			if (nchars >= "_x_".length) {
 				const res = parseGFMType({
@@ -158,7 +160,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 		// <StrongEmphasis>
 		// <Strong>
 		// <Emphasis>
-		case char === "*":
+		case "*":
 			// ***Strong emphasis***
 			if (nchars >= "***x***".length && str.slice(x, x + 3) === "***") {
 				const res = parseGFMType({
@@ -208,7 +210,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 		// <Strikethrough>
-		case char === "~":
+		case "~":
 			// ~~Strikethrough~~
 			if (nchars >= "~~x~~".length && str.slice(x, x + 2) === "~~") {
 				const res = parseGFMType({
@@ -228,7 +230,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 		// <Code>
-		case char === "`":
+		case "`":
 			if (nchars >= `x`.length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
@@ -248,7 +250,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 
 			// // <A> (1 of 2)
-			// case char === "h":
+			// case "h":
 			// 	// https://
 			// 	//
 			// 	// TODO: Eat "www."
@@ -287,7 +289,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// 	// No-op
 			// 	break
 			// // <A> (2 of 2)
-			// case char === "[":
+			// case "[":
 			// 	// [A](href)
 			// 	if (nchars >= "[x](x)".length) {
 			// 		const lhs = registerType(null, "]")(str, x)
@@ -354,6 +356,8 @@ function parseElements(nodes) {
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast path:
+		//
+		// TODO: Fast path empty strings?
 		if (nodes[x].data.length && !isASCIIPunctuation(nodes[x].data[0])) {
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
@@ -370,11 +374,11 @@ function parseElements(nodes) {
 		}
 		// Convenience variables:
 		const each = nodes[x]
-		const char = each.data.charAt(0)
+		const char = each.data.charAt(0) // TODO: Deprecate
 		const nchars = each.data.length
-		switch (true) {
+		switch (each.data.charAt(0)) { // FIXME?
 		// <Header>
-		case char === "#":
+		case "#":
 			// # H1 … ###### H6
 			if (
 				(nchars >= 2 && each.data.slice(0, 2) === "# ") ||
@@ -402,7 +406,7 @@ function parseElements(nodes) {
 		// <Blockquote>
 		//
 		// TODO: Add nested <Blockquote>
-		case char === ">":
+		case ">":
 			// > Blockquote
 			if (
 				(nchars >= 2 && each.data.slice(0, 2) === "> ") ||
@@ -440,7 +444,7 @@ function parseElements(nodes) {
 			// No-op
 			break
 		// <CodeBlock>
-		case char === "`":
+		case "`":
 			if (
 				nchars >= 3 &&
 				each.data.slice(0, 3) === "```" &&
@@ -477,13 +481,27 @@ function parseElements(nodes) {
 			// No-op
 			break
 		// <Break>
-		case char === "-" || char === "*":
-			// --- OR ***
-			if (nchars === 3 && each.data === char.repeat(3)) {
+		case "-":
+			// ***
+			if (nchars === 3 && each.data === "---") {
 				parsed.push({
 					type: typeEnum.Break,
 					id: each.id,
-					syntax: [char.repeat(3)],
+					syntax: ["---"],
+					children: null,
+				})
+				continue
+			}
+			// No-op
+			break
+		// <Break> (alternate syntax)
+		case "*":
+			// ***
+			if (nchars === 3 && each.data === "***") {
+				parsed.push({
+					type: typeEnum.Break,
+					id: each.id,
+					syntax: ["***"],
 					children: null,
 				})
 				continue
