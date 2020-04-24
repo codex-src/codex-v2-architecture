@@ -384,11 +384,22 @@ const App = () => {
 				dispatch={editorSettingsDispatch}
 			/>
 
+			{/* <div class="px-6 flex flex-row justify-center"> */}
+			{/* 	<div class="hidden lg:block flex-shrink-0 w-48"> */}
+			{/* 		hello */}
+			{/* 	</div> */}
+			{/* 	<div class="hidden lg:block flex-shrink-0 w-16"></div> */}
+			{/* 	<div class="xl:flex-shrink-0 w-full max-w-3xl"> */}
+			{/* 		hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello */}
+			{/* 	</div> */}
+			{/* 	<div class="hidden xl:block w-64"></div> */}
+			{/* </div> */}
+
 			{/* Grid */}
-			<div className="grid-contents-editor">
+			<div className="flex flex-row justify-center">
 
 				{/* LHS */}
-				<div className="pb-12 grid-contents overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0" : "1" }}>
+				<div className="pb-12 flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0" : "1" }}>
 					<div className="py-1 flex flex-row items-center">
 						<svg
 							className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
@@ -437,8 +448,11 @@ const App = () => {
 					</ul>
 				</div>
 
+				{/* Spacer */}
+				<div class="flex-shrink-0 hidden lg:block w-16"></div>
+
 				{/* RHS */}
-				<div className="grid-editor">
+				<div className="xl:flex-shrink-0 w-full max-w-3xl">
 
 					{/* Editor */}
 					<DocumentTitle title={title || "Untitled"}>
@@ -465,6 +479,9 @@ const App = () => {
 					</div>
 
 				</div>
+
+				{/* Spacer */}
+				<div class="hidden xl:block w-64"></div>
 
 			</div>
 
