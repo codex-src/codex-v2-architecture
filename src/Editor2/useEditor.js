@@ -13,13 +13,11 @@ function newEditorState(data) {
 	const pos2 = newPos()
 	const initialState = {
 		readOnly: false,                         // Is read-only?
-		// mounted: false,                       // Is mounted?
 		focused: false,                          // Is focused?
 		data,                                    // Data data (string)
 		nodes,                                   // Document nodes
 		pos1,                                    // Start cursor data structure
 		pos2,                                    // End cursor data structure
-		// TODO: Rename to extendedNodeIDs?
 		extPosRange: ["", ""],                   // Extended node (ID) range
 		history: {                               // History object
 			correctedPos: false,                   // Corrected pos before first change event?
@@ -49,12 +47,6 @@ const methods = state => ({
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},
-
-	// // Records that the editor is mounted.
-	// setMounted() {
-	// 	state.mounted = true
-	// },
-
 	// Focuses the editor.
 	focus() {
 		state.focused = true
@@ -65,12 +57,6 @@ const methods = state => ({
 	},
 	// Selects the editor.
 	select(pos1, pos2) {
-
-		// const y1 = Math.max(pos1.y - 2, 0)
-		// const y2 = Math.min(pos2.y + 2, state.nodes.length - 1)
-		// const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
-		// Object.assign(state, { pos1, pos2, extPosRange })
-
 		// Decrement by 2:
 		let y1 = pos1.y - 2
 		if (y1 < 0) {
@@ -84,6 +70,213 @@ const methods = state => ({
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
+
+	// write(substr, dropL = 0, dropR = 0) {
+	// 	// Create a new action:
+	// 	this.registerAction(ActionTypes.INPUT)
+	// 	if (!state.history.index && !state.resetPos) {
+	// 		Object.assign(state.history.stack[0], {
+	// 			pos1: state.pos1,
+	// 			pos2: state.pos2,
+	// 		})
+	// 		state.resetPos = true
+	// 	}
+	// 	this.dropRedos()
+	// 	// Drop bytes (L):
+	// 	state.pos1.pos -= dropL
+	// 	while (dropL) {
+	// 		const bytesToStart = state.pos1.x
+	// 		if (dropL <= bytesToStart) {
+	// 			state.pos1.x -= dropL
+	// 			dropL = 0
+	// 			break // XOR
+	// 		}
+	// 		dropL -= bytesToStart + 1
+	// 		state.pos1.y--
+	// 		state.pos1.x = state.body[state.pos1.y].data.length
+	// 	}
+	// 	// Drop bytes (R):
+	// 	state.pos2.pos += dropR
+	// 	while (dropR) {
+	// 		const bytesToEnd = state.body[state.pos2.y].data.length - state.pos2.x
+	// 		if (dropR <= bytesToEnd) {
+	// 			state.pos2.x += dropR
+	// 			dropR = 0
+	// 			break // XOR
+	// 		}
+	// 		dropR -= bytesToEnd + 1
+	// 		state.pos2.y++
+	// 		state.pos2.x = 0 // Reset
+	// 	}
+	// 	// Parse the new nodes:
+	// 	const nodes = newNodes(substr)
+	// 	const startNode = state.body[state.pos1.y]
+	// 	const endNode = { ...state.body[state.pos2.y] } // Create a new reference
+	// 	// Start node:
+	// 	startNode.data = startNode.data.slice(0, state.pos1.x) + nodes[0].data
+	// 	state.body.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
+	// 	// End node:
+	// 	let node = startNode
+	// 	if (nodes.length > 1) {
+	// 		node = nodes[nodes.length - 1]
+	// 	}
+	// 	node.data += endNode.data.slice(state.pos2.x)
+	// 	// Update data, pos1, and pos2:
+	// 	const data = state.body.map(each => each.data).join("\n")
+	// 	const pos1 = { ...state.pos1, pos: state.pos1.pos + substr.length }
+	// 	const pos2 = { ...pos1 }
+	// 	Object.assign(state, { data, pos1, pos2 })
+	// 	this.render()
+	// },
+	// // Backspaces one character.
+	// backspaceChar() {
+	// 	let dropL = 0
+	// 	if (!state.selected && state.pos1.pos) { // Inverse
+	// 		const substr = state.data.slice(0, state.pos1.pos)
+	// 		const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 		dropL = rune.length
+	// 	}
+	// 	this.write("", dropL, 0)
+	// },
+	// // Backspaces one word.
+	// backspaceWord() {
+	// 	if (state.selected) {
+	// 		this.write("")
+	// 		return
+	// 	}
+	// 	// Iterate to a non-h. white space:
+	// 	let index = state.pos1.pos
+	// 	while (index) {
+	// 		const substr = state.data.slice(0, index)
+	// 		const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 		if (!rune || !utf8.isHWhiteSpace(rune)) {
+	// 			// No-op
+	// 			break
+	// 		}
+	// 		index -= rune.length
+	// 	}
+	// 	// Get the next rune:
+	// 	const substr = state.data.slice(0, index)
+	// 	const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 	// Iterate to an alphanumeric rune OR a non-alphanumeric
+	// 	// rune based on the next rune:
+	// 	if (rune && !utf8.isAlphanum(rune)) {
+	// 		// Iterate to an alphanumeric rune:
+	// 		while (index) {
+	// 			const substr = state.data.slice(0, index)
+	// 			const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 			if (!rune || utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+	// 				// No-op
+	// 				break
+	// 			}
+	// 			index -= rune.length
+	// 		}
+	// 	} else if (rune && utf8.isAlphanum(rune)) {
+	// 		// Iterate to a non-alphanumeric rune:
+	// 		while (index) {
+	// 			const substr = state.data.slice(0, index)
+	// 			const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 			if (!rune || !utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+	// 				// No-op
+	// 				break
+	// 			}
+	// 			index -= rune.length
+	// 		}
+	// 	}
+	// 	// Get the number of bytes to drop:
+	// 	let dropL = state.pos1.pos - index
+	// 	if (!dropL && index - 1 >= 0 && state.data[index - 1] === "\n") {
+	// 		dropL = 1
+	// 	}
+	// 	this.write("", dropL, 0)
+	// },
+	// // Backspaces one paragraph (does not discern EOL).
+	// backspaceLine() {
+	// 	if (state.selected) {
+	// 		this.write("")
+	// 		return
+	// 	}
+	// 	// Iterate to a v. white space rune:
+	// 	let index = state.pos1.pos
+	// 	while (index >= 0) {
+	// 		const substr = state.data.slice(0, index)
+	// 		const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+	// 		if (!rune || utf8.isVWhiteSpace(rune)) {
+	// 			// No-op
+	// 			break
+	// 		}
+	// 		index -= rune.length
+	// 	}
+	// 	// Get the number of bytes to drop:
+	// 	let dropL = state.pos1.pos - index
+	// 	if (!dropL && index - 1 >= 0 && state.data[index - 1] === "\n") {
+	// 		dropL = 1
+	// 	}
+	// 	this.write("", dropL, 0)
+	// },
+	// // Backspaces one character (forwards).
+	// backspaceCharForwards() {
+	// 	let dropR = 0
+	// 	if (!state.selected && state.pos1.pos < state.data.length) { // Inverse
+	// 		const substr = state.data.slice(state.pos1.pos)
+	// 		const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
+	// 		dropR = rune.length
+	// 	}
+	// 	this.write("", 0, dropR)
+	// },
+	// // Backspaces one word (forwards).
+	// backspaceWordForwards() {
+	// 	if (state.selected) {
+	// 		this.write("")
+	// 		return
+	// 	}
+	// 	// Iterate to a non-h. white space:
+	// 	let index = state.pos1.pos
+	// 	while (index < state.data.length) {
+	// 		const substr = state.data.slice(index)
+	// 		const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
+	// 		if (!rune || !utf8.isHWhiteSpace(rune)) {
+	// 			// No-op
+	// 			break
+	// 		}
+	// 		index += rune.length
+	// 	}
+	// 	// Get the next rune:
+	// 	const substr = state.data.slice(index)
+	// 	const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
+	// 	// Iterate to an alphanumeric rune OR a non-alphanumeric
+	// 	// rune based on the next rune:
+	// 	if (rune && !utf8.isAlphanum(rune)) {
+	// 		// Iterate to an alphanumeric rune:
+	// 		while (index < state.data.length) {
+	// 			const substr = state.data.slice(index)
+	// 			const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
+	// 			if (!rune || utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+	// 				// No-op
+	// 				break
+	// 			}
+	// 			index += rune.length
+	// 		}
+	// 	} else if (rune && utf8.isAlphanum(rune)) {
+	// 		// Iterate to a non-alphanumeric rune:
+	// 		while (index < state.data.length) {
+	// 			const substr = state.data.slice(index)
+	// 			const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
+	// 			if (!rune || !utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+	// 				// No-op
+	// 				break
+	// 			}
+	// 			index += rune.length
+	// 		}
+	// 	}
+	// 	// Get the number of bytes to drop:
+	// 	let dropR = index - state.pos1.pos
+	// 	if (!dropR && index < state.data.length && state.data[index] === "\n") {
+	// 		dropR = 1
+	// 	}
+	// 	this.write("", 0, dropR)
+	// },
+
 	// Writes character data.
 	write(data) {
 		// Correct pos before first change event:

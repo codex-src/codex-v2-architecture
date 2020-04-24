@@ -457,7 +457,7 @@ const App = () => {
 									// NOTE: Use duration-200 instead of duration-300
 									show={!hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform -translate-x-6"
+									enterFrom="opacity-0 transform -translate-x-6" // TODO: Remove opacity?
 									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
@@ -469,7 +469,7 @@ const App = () => {
 									// NOTE: Use duration-200 instead of duration-300
 									show={hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform translate-x-6"
+									enterFrom="opacity-0 transform translate-x-6" // TODO: Remove opacity?
 									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
