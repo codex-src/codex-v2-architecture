@@ -1,3 +1,4 @@
+// import Icon from "Icon"
 import Button from "Button"
 import DocumentTitle from "DocumentTitle"
 import Editor from "Editor2/Editor"
@@ -238,6 +239,7 @@ const App = () => {
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
 	const [saveStatus, setSaveStatus] = React.useState(0)
+	const [hoveredContents, setHoveredContents] = React.useState(false)
 
 	// Saves to localStorage (debounced).
 	const mounted = React.useRef()
@@ -378,16 +380,19 @@ const App = () => {
 		// NOTE: Use items-start for sticky
 		<div className="px-6 py-32 flex flex-row justify-center items-start">
 
-			{/* Settings */}
+			{/* Fixed settings */}
 			<FixedEditorSettings
 				saveStatus={saveStatus}
 				state={editorSettings}
 				dispatch={editorSettingsDispatch}
 			/>
 
+			{/* <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> */}
+			{/* <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path></svg> */}
+
 			{/* LHS */}
 			<div className="pb-12 sticky flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
-				<div className="py-1 flex flex-row items-center">
+				<div className="py-1 flex flex-row items-center" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
 					<svg
 						className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
 						fill="none"
@@ -397,11 +402,38 @@ const App = () => {
 						strokeWidth="2"
 						viewBox="0 0 24 24"
 					>
-						{/* <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path> */}
-						<path d="M4 6h16M4 12h16M4 18h7"></path>
+						<Transition
+							// NOTE: Use duration-200 instead of duration-300
+							show={!hoveredContents}
+							enter="transition ease-out duration-200"
+							enterFrom="transform opacity-0 -translate-x-64"
+							enterTo="transform opacity-100 translate-x-0"
+							leave="transition ease-in duration-200"
+							leaveFrom="transform opacity-100 translate-x-0"
+							leaveTo="transform opacity-0 -translate-x-64"
+						>
+							<path d="M4 6h16M4 12h16M4 18h7"></path>
+						</Transition>
+						<Transition
+							// NOTE: Use duration-200 instead of duration-300
+							show={hoveredContents}
+							enter="transition ease-out duration-200"
+							enterFrom="transform opacity-0 translate-x-64"
+							enterTo="transform opacity-100 translate-x-0"
+							leave="transition ease-in duration-200"
+							leaveFrom="transform opacity-100 translate-x-0"
+							leaveTo="transform opacity-0 translate-x-64"
+						>
+							{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
+							<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+						</Transition>
 					</svg>
-					<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-						{(title.trim() || "Untitled").toUpperCase()}
+					<p className="font-semibold text-xs tracking-wide uppercase truncate text-gray-500">
+						{!hoveredContents ? (
+							title.trim() || "Untitled"
+						) : (
+							"Hide sidebar"
+						)}
 					</p>
 				</div>
 				<div className="h-2" />
@@ -411,9 +443,7 @@ const App = () => {
 							{id !== "" && (
 								<a href={`#${hash}`}>
 									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-										{children || (
-											 "Untitled"
-										)}
+										{children || "Untitled"}
 									</h1>
 								</a>
 							)}
@@ -422,9 +452,7 @@ const App = () => {
 									<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 										<a href={`#${hash}`}>
 											<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-												{children || (
-													"Untitled"
-												)}
+												{children || "Untitled"}
 											</h2>
 										</a>
 									</li>
