@@ -391,8 +391,9 @@ const App = () => {
 			{/* <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path></svg> */}
 
 			{/* LHS */}
-			<div className="pb-12 sticky flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
-				<Button className="py-1 flex flex-row items-center text-gray-500 hover:text-blue-500 transition duration-200" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
+			<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
+				{/* NOTE: Use w-full because of <Button> */}
+				<Button className="py-1 flex flex-row items-center w-full text-gray-500 hover:text-blue-500 truncate transition duration-200" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
 					<svg
 						className="mr-2 flex-shrink-0 w-4 h-4"
 						fill="none"
