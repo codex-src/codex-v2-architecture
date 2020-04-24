@@ -231,7 +231,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 		// <Code>
 		case "`":
-			if (nchars >= `x`.length) {
+			if (nchars >= "x".length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
 					syntax: "`",
@@ -365,8 +365,9 @@ function parseElements(nodes) {
 				id: nodes[x].id,
 				emojis: (
 					children &&
-					children.reduce &&
-					children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+					children.every &&
+					children.every(each => each && each.type && each.type === typeEnum.Emoji) &&
+					children.length
 				),
 				children,
 			})
@@ -518,8 +519,9 @@ function parseElements(nodes) {
 			id: each.id,
 			emojis: (
 				children &&
-				children.reduce &&
-				children.reduce((count, each) => count + (each && each.type && each.type === typeEnum.Emoji), 0)
+				children.every &&
+				children.every(each => each && each.type && each.type === typeEnum.Emoji) &&
+				children.length
 			),
 			children,
 		})
