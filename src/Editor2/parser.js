@@ -34,65 +34,99 @@ import {
 // 	return { parsed, x }
 // }
 
+// // Parses a GitHub Flavored Markdown (GFM) type.
+// function parseGFMType({ type, syntax, str, x }) {
+// 	const shouldRecurse = type !== typeEnum.Code
+//
+// 	// Prepare an escaped search regex:
+// 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
+// 	let patternOffset = 0
+// 	switch (syntax[0]) {
+// 	// case "_":
+// 	// 	// Underscores cannot be escaped and must be proceeded
+// 	// 	// by a space or an ASCII punctuation character:
+// 	// 	if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) {
+// 	// 		return null
+// 	// 	}
+// 	// 	pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+// 	// 	patternOffset++
+// 	// 	break
+// 	case "`":
+// 		// No-op
+// 		break
+// 	default:
+// 		// // Etc. cannot be escaped:
+// 		// pattern = `[^\\\\]${pattern}`
+// 		// patternOffset++
+// 		// break
+//
+// 		// Underscores cannot be escaped and must be proceeded
+// 		// by a space or an ASCII punctuation character:
+// 		if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) /* || isASCIIPunctuation(str[x - 1]) */)) {
+// 			return null
+// 		}
+// 		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+// 		patternOffset++
+// 		break
+// 	}
+// 	// Match cannot be empty:
+// 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
+// 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
+// 		return null
+// 	// Match cannot be preceded or proceeded by a space (sans code):
+// 	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1]))) {
+// 		return null
+// 	// Match cannot be redundant (e.g. ___, ***, and ~~~):
+// 	} else if (str[x + syntax.length] === syntax[0]) {
+// 		return null
+// 	}
+// 	// Increment start syntax:
+// 	x += syntax.length
+// 	const parsed = {
+// 		type,
+// 		syntax,
+// 		children: !shouldRecurse ? str.slice(x, x + offset) : parseInlineElements(str.slice(x, x + offset)),
+// 	}
+// 	// Increment offset and end syntax:
+// 	x += offset + syntax.length
+// 	return { parsed, x2: x }
+// }
+
 // Parses a GitHub Flavored Markdown (GFM) type.
 //
-// NOTE: Does not match start syntax
-function parseGFMType({
-	type,   // The parsed enum type
-	syntax, // The syntax (end syntax) // TODO: Rename to endSyntax?
-	str,    // Argument string
-	x,  // Arugment x (number)
-}) {
-	const shouldRecurse = type !== typeEnum.Code
-
-	// Prepare an escaped search regex:
+// NOTE: This implementation is intentionally simplified
+function parseGFMType({ type, syntax, str, x }) {
+	// Syntax must be preceded by a BOL or a space (e.g. ·*):
+	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1])) {
+		return null
+	}
+	// Prepare an escaped regex pattern:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
-	switch (syntax[0]) {
-	// case "_":
-	// 	// Underscores cannot be escaped and must be proceeded
-	// 	// by a space or an ASCII punctuation character:
-	// 	if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) {
-	// 		return null
-	// 	}
-	// 	pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
-	// 	patternOffset++
-	// 	break
-	case "`":
-		// No-op
-		break
-	default:
-		// // Etc. cannot be escaped:
-		// pattern = `[^\\\\]${pattern}`
-		// patternOffset++
-		// break
-
-		// Underscores cannot be escaped and must be proceeded
-		// by a space or an ASCII punctuation character:
-		if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) /* || isASCIIPunctuation(str[x - 1]) */)) {
-			return null
-		}
-		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+	if (syntax[0] !== "`") { // Exempt code
+		pattern = `[^\\\\]${pattern}`
 		patternOffset++
-		break
 	}
+	// Syntax must be proceeded by a space or an EOL:
+	pattern += `(${ASCIIWhitespacePattern}|$)`
 	// Match cannot be empty:
 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
 		return null
-	// Match cannot be preceded or proceeded by a space (sans code):
-	} else if (syntax[0] !== "`" && (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1]))) {
+	// Match cannot be surrounded by a space (e.g. *·match·*):
+	} else if (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1])) {
 		return null
-	// Match cannot be redundant (e.g. ___, ***, and ~~~):
-	} else if (str[x + syntax.length] === syntax[0]) {
+	// Match start or end cannot be redundant (e.g. ***):
+	} else if (str[x + syntax.length] === syntax[0] || str[x + syntax.length + offset - 1] === syntax[syntax.length - 1]) {
 		return null
 	}
 	// Increment start syntax:
 	x += syntax.length
 	const parsed = {
 		type,
-		syntax,
-		children: !shouldRecurse ? str.slice(x, x + offset) : parseInlineElements(str.slice(x, x + offset)),
+		syntax: syntax,
+		children: type !== typeEnum.Code ? parseInlineElements(str.slice(x, x + offset)) :
+			str.slice(x, x + offset),
 	}
 	// Increment offset and end syntax:
 	x += offset + syntax.length
