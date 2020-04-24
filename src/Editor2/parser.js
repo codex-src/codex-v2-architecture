@@ -49,21 +49,30 @@ function parseGFMType({
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
 	switch (syntax[0]) {
-	case "_":
-		// Underscores cannot be escaped and must be proceeded
-		// by a space or an ASCII punctuation character:
-		if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) {
-			return null
-		}
-		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
-		patternOffset++
-		break
+	// case "_":
+	// 	// Underscores cannot be escaped and must be proceeded
+	// 	// by a space or an ASCII punctuation character:
+	// 	if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) {
+	// 		return null
+	// 	}
+	// 	pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
+	// 	patternOffset++
+	// 	break
 	case "`":
 		// No-op
 		break
 	default:
-		// Etc. cannot be escaped:
-		pattern = `[^\\\\]${pattern}`
+		// // Etc. cannot be escaped:
+		// pattern = `[^\\\\]${pattern}`
+		// patternOffset++
+		// break
+
+		// Underscores cannot be escaped and must be proceeded
+		// by a space or an ASCII punctuation character:
+		if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) /* || isASCIIPunctuation(str[x - 1]) */)) {
+			return null
+		}
+		pattern = `[^\\\\]${pattern}(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
 		patternOffset++
 		break
 	}
@@ -90,7 +99,8 @@ function parseGFMType({
 	return { parsed, x2: x }
 }
 
-// TODO: https://github.github.com/gfm/#delimiter-stack
+// TODO (1): Memoize previously parsed elements
+// TODO (2): https://github.github.com/gfm/#delimiter-stack
 function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	if (!str) {
 		return null
@@ -106,7 +116,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			parsed[parsed.length - 1] += str[x]
 			continue
 		}
-		// Allocate convenience variables:
+		// Convenience variables:
 		const char = str[x]
 		const nchars = str.length - x
 		switch (true) {
@@ -125,13 +135,35 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			}
 			// No-op
 			break
-		// <StrongEm> OR <Strong> OR <Em>
-		case char === "*" || char === "_":
-			// ***Strong emphasis*** OR ___Strong emphasis___
-			if (nchars >= "***x***".length && str.slice(x, x + 3) === char.repeat(3)) {
+		// <Emphasis>
+		case char === "_":
+			// _Emphasis_
+			if (nchars >= "_x_".length) {
+				const res = parseGFMType({
+					type: typeEnum.Emphasis,
+					syntax: "_",
+					str,
+					x,
+				})
+				if (!res) {
+					// No-op
+					break
+				}
+				parsed.push(res.parsed)
+				x = res.x2 - 1
+				continue
+			}
+			// No-op
+			break
+		// <StrongEmphasis>
+		// <Strong>
+		// <Emphasis>
+		case char === "*":
+			// ***Strong emphasis***
+			if (nchars >= "***x***".length && str.slice(x, x + 3) === "***") {
 				const res = parseGFMType({
 					type: typeEnum.StrongEmphasis,
-					syntax: char.repeat(3),
+					syntax: "***",
 					str,
 					x,
 				})
@@ -142,11 +174,11 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				parsed.push(res.parsed)
 				x = res.x2 - 1
 				continue
-			// **Strong** OR __Strong__
-			} else if (nchars >= "**x**".length && str.slice(x, x + 2) === char.repeat(2)) {
+			// **Strong**
+			} else if (nchars >= "**x**".length && str.slice(x, x + 2) === "**") {
 				const res = parseGFMType({
 					type: typeEnum.Strong,
-					syntax: char.repeat(2),
+					syntax: "**",
 					str,
 					x,
 				})
@@ -157,11 +189,11 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				parsed.push(res.parsed)
 				x = res.x2 - 1
 				continue
-			// _Emphasis_ OR *Emphasis*
+			// *Emphasis*
 			} else if (nchars >= "*x*".length) {
 				const res = parseGFMType({
 					type: typeEnum.Emphasis,
-					syntax: char,
+					syntax: "*",
 					str,
 					x,
 				})
@@ -181,22 +213,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			if (nchars >= "~~x~~".length && str.slice(x, x + 2) === "~~") {
 				const res = parseGFMType({
 					type: typeEnum.Strikethrough,
-					syntax: char.repeat(2),
-					str,
-					x,
-				})
-				if (!res) {
-					// No-op
-					break
-				}
-				parsed.push(res.parsed)
-				x = res.x2 - 1
-				continue
-			// ~Strikethrough~
-			} else if (nchars >= "~x~".length) {
-				const res = parseGFMType({
-					type: typeEnum.Strikethrough,
-					syntax: char,
+					syntax: "~~",
 					str,
 					x,
 				})
@@ -321,7 +338,6 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			continue
 		}
 		parsed[parsed.length - 1] += char
-		// continue
 	}
 	if (parsed.length === 1 && typeof parsed[0] === "string") {
 		return parsed[0]
@@ -343,7 +359,6 @@ function parseElements(nodes) {
 			parsed.push({
 				type: typeEnum.Paragraph,
 				id: nodes[x].id,
-				// The number of emojis:
 				emojis: (
 					children &&
 					children.reduce &&
@@ -353,7 +368,7 @@ function parseElements(nodes) {
 			})
 			continue
 		}
-		// Allocate convenience variables:
+		// Convenience variables:
 		const each = nodes[x]
 		const char = each.data.charAt(0)
 		const nchars = each.data.length
@@ -385,6 +400,8 @@ function parseElements(nodes) {
 			// No-op
 			break
 		// <Blockquote>
+		//
+		// TODO: Add nested <Blockquote>
 		case char === ">":
 			// > Blockquote
 			if (
@@ -481,7 +498,6 @@ function parseElements(nodes) {
 		parsed.push({
 			type: typeEnum.Paragraph,
 			id: each.id,
-			// The number of emojis:
 			emojis: (
 				children &&
 				children.reduce &&
@@ -489,220 +505,8 @@ function parseElements(nodes) {
 			),
 			children,
 		})
-		// continue
 	}
 	return parsed
 }
-
-// // Parses GFM str to a VDOM representation.
-// export function parseGFM(str) {
-// 	const newHash = newHashEpoch()
-//
-// 	const data = []
-// 	const body = str.split("\n")
-// 	for (let x = 0; x < body.length; x++) {
-// 		const each = body[x]
-// 		const char = each.charAt(0)
-// 		const nchars = each.length
-// 		switch (true) {
-// 		// <Header>
-// 		case char === "#":
-// 			// # Header
-// 			// ## Subheader
-// 			// ### H3
-// 			// #### H4
-// 			// ##### H5
-// 			// ###### H6
-// 			if (
-// 				(nchars >= 2 && each.slice(0, 2) === "# ") ||
-// 				(nchars >= 3 && each.slice(0, 3) === "## ") ||
-// 				(nchars >= 4 && each.slice(0, 4) === "### ") ||
-// 				(nchars >= 5 && each.slice(0, 5) === "#### ") ||
-// 				(nchars >= 6 && each.slice(0, 6) === "##### ") ||
-// 				(nchars >= 7 && each.slice(0, 7) === "###### ")
-// 			) {
-// 				const syntax = each.slice(0, each.indexOf(" ") + 1)
-// 				data.push({
-// 					type: Header,
-// 					tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
-// 					id: uuidv4(),
-// 					syntax: [syntax],
-// 					hash: newHash(toInnerString(parseInlineElements(each.slice(syntax.length)))),
-// 					children: parseInlineElements(each.slice(syntax.length)),
-// 				})
-// 				continue
-// 			}
-// 			break
-// 		// <Blockquote>
-// 		case char === ">":
-// 			// > Blockquote
-// 			if (
-// 				(nchars >= 2 && each.slice(0, 2) === "> ") ||
-// 				(nchars === 1 && each === ">")
-// 			) {
-// 				const x1 = x
-// 				let x2 = x1
-// 				x2++
-// 				// Iterate to end syntax:
-// 				while (x2 < body.length) {
-// 					if (
-// 						(body[x2].length < 2 || body[x2].slice(0, 2) !== "> ") &&
-// 						(body[x2].length !== 1 || body[x2] !== ">")
-// 					) {
-// 						// No-op
-// 						break
-// 					}
-// 					x2++
-// 				}
-// 				data.push({
-// 					type: Blockquote,
-// 					id: uuidv4(),
-// 					children: body.slice(x1, x2).map(each => ({
-// 						type: BquoteParagraph,
-// 						id: uuidv4(),
-// 						syntax: [each.slice(0, 2)],
-// 						children: parseInlineElements(each.slice(2)),
-// 					})),
-// 				})
-// 				x = x2 - 1
-// 				continue
-// 			}
-// 			break
-// 		// <CodeBlock>
-// 		case char === "`":
-// 			// ```
-// 			// Code block
-// 			// ```
-// 			if (
-// 				nchars >= 3 &&
-// 				each.slice(0, 3) === "```" &&
-// 				each.slice(3).indexOf("`") === -1 && // Negate backticks
-// 				x + 1 < body.length
-// 			) {
-// 				const x1 = x
-// 				let x2 = x1
-// 				x2++
-// 				// Iterate to end syntax:
-// 				while (x2 < body.length) {
-// 					if (body[x2].length === 3 && body[x2] === "```") {
-// 						// No-op
-// 						break
-// 					}
-// 					x2++
-// 				}
-// 				if (x2 === body.length) { // Unterminated
-// 					x = x1
-// 					break
-// 				}
-// 				x2++ // Iterate once past end
-// 				const info = each.slice(3)
-// 				data.push({
-// 					type: CodeBlock,
-// 					id: uuidv4(),
-// 					syntax: [body[x1], body[x2 - 1]],
-// 					info,
-// 					extension: info.split(".").slice(-1)[0].toLowerCase(),
-// 					children: x1 + 1 === x2 - 1
-// 						? ""
-// 						: `${body.slice(x1 + 1, x2 - 1).join("\n")}\n`,
-// 					// .slice(each.length, -3) // Trim syntax
-// 					// .slice(1),              // Trim start paragraph
-// 				})
-// 				x = x2 - 1
-// 				continue
-// 			}
-// 			break
-// 		// <List>
-// 		case char === "\t" || (
-// 			(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
-// 			(each !== "---" && each !== "***") // Negate break
-// 		):
-// 			// - List
-// 			// 1. List
-// 			if (nchars >= "- ".length && AnyListRe.test(each)) {
-// 				const x1 = x
-// 				let x2 = x1
-// 				x2++
-// 				// Iterate to end syntax:
-// 				while (x2 < body.length) {
-// 					if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
-// 						// No-op
-// 						break
-// 					}
-// 					x2++
-// 				}
-// 				const range = body.slice(x1, x2)
-// 				data.push(parseList(range))
-// 				x = x2 - 1
-// 				continue
-// 			}
-// 			break
-// 		// <Image>
-// 		//
-// 		// TODO: Move to parseInlineElements to support
-// 		// [![Image](href)](href) syntax?
-// 		case char === "!":
-// 			// ![Image](href)
-// 			if (nchars >= "![](x)".length) {
-// 				const lhs = registerType(null, "]")(each, "!".length, { minOffset: 0 })
-// 				if (!lhs) {
-// 					// No-op
-// 					break
-// 				}
-// 				// Check ( syntax:
-// 				if (lhs.x2 < nchars && each[lhs.x2] !== "(") {
-// 					// No-op
-// 					break
-// 				}
-// 				const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
-// 				if (!rhs) {
-// 					// No-op
-// 					break
-// 				}
-// 				data.push({
-// 					type: Image,
-// 					id: uuidv4(),
-// 					// syntax: ["![", "](…)"],
-// 					syntax: ["![", `](${rhs.data.children})`],
-// 					src: rhs.data.children,
-// 					alt: toInnerString(lhs.data.children),
-// 					children: lhs.data.children,
-// 				})
-// 				continue
-// 			}
-// 			break
-// 		// <Break>
-// 		case char === "-" || char === "*":
-// 			// ---
-// 			// ***
-// 			if (nchars === 3 && each === char.repeat(3)) {
-// 				data.push({
-// 					type: Break,
-// 					id: uuidv4(),
-// 					syntax: [each],
-// 					children: null,
-// 				})
-// 				continue
-// 			}
-// 			break
-// 		default:
-// 			// No-op
-// 			break
-// 		}
-// 		// <Paragraph>
-// 		const children = parseInlineElements(each)
-// 		data.push({
-// 			type: Paragraph,
-// 			id: uuidv4(),
-// 			emojis: (
-// 				children &&
-// 				children.every &&
-// 				children.every(each => each.type === E)
-// 			),
-// 			children,
-// 		})
-// 	}
-// 	return data
-// }
 
 export default parseElements

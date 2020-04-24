@@ -126,6 +126,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					wordBreak: "break-word",
 				},
 
+				// TODO: Refactor state.readOnly?
 				onFocus: () => {
 					if (state.readOnly) {
 						// No-op

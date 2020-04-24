@@ -25,7 +25,7 @@ const ReadmeEditor = ({ readOnly }) => {
 
 const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 	// NOTE: Use flex flex-col because of the sidebar
-	<div className="px-3 py-2 pb-10 fixed inset-0 flex flex-col z-40 pointer-events-none">
+	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 		{/* Settings */}
 		<div className="flex-shrink-0 flex flex-row justify-between w-full">
@@ -456,16 +456,14 @@ const App = () => {
 					</DocumentTitle>
 
 					{/* Status bars */}
-					{!editor.readOnly && (
-						<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0" : "1" }}>
-								{statusLHS}
-							</p>
-							<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: !editor.focused ? "0" : "1" }}>
-								{statusRHS}
-							</p>
-						</div>
-					)}
+					<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+						<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+							{statusLHS}
+						</p>
+						<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+							{statusRHS}
+						</p>
+					</div>
 
 				</div>
 

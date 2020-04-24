@@ -41,9 +41,9 @@ const headerClassNames = {
 	h1: trim("font-semibold text-3xl leading-tight text-black antialiased"),
 	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
 	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h4: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
-	h5: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
-	h6: trim("font-semibold text-lg  leading-snug  text-black antialiased"),
+	h4: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h5: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h6: trim("font-semibold text-xl  leading-tight text-black antialiased"),
 }
 
 // // Conditionally wraps a React element.
@@ -133,32 +133,32 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	return (
 		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
 			{/* NOTE: inline-block is needed for overflow-x-scroll */}
-			<span className="inline-block">
-				<Pre id={nodes[0].id} className="leading-none">
+			{/* <span className="inline-block"> */}
+				<Node id={nodes[0].id} className="leading-none">
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</Pre>
+				</Node>
 				{$nodes.map(each => (
 					// TODO: Add support for read-only line numbers
-					<Pre key={each.id} id={each.id} className="leading-snug">
+					<Node key={each.id} id={each.id} className="leading-snug">
 						<span dangerouslySetInnerHTML={{
 							__html: each.data || (
 								"<br />"
 							),
 						}} />
-					</Pre>
+					</Node>
 				))}
-				<Pre id={nodes[nodes.length - 1].id} className="leading-none">
+				<Node id={nodes[nodes.length - 1].id} className="leading-none">
 					<Markdown syntax={[syntax[1]]}>
 						{readOnly && (
 							<br />
 						)}
 					</Markdown>
-				</Pre>
-			</span>
+				</Node>
+			{/* </span> */}
 		</Root>
 	)
 })
