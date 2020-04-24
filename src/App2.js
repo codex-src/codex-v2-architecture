@@ -238,8 +238,36 @@ const App = () => {
 	const [editor, editorDispatch] = useEditor(data)
 	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
 
+	// Save status:
+	//
+	// 0 - Init // FIXME: Remove?
+	// 1 - Unsaved
+	// 2 - Saved
+	// 3 - Saved -- hidden
+	//
 	const [saveStatus, setSaveStatus] = React.useState(0)
-	const [hoveredContents, setHoveredContents] = React.useState(false)
+
+	// Show table of contents:
+	const [showContents, setShowContents] = React.useState(true)
+
+	// Manages table of contents.
+	React.useEffect(() => {
+		const handler = e => {
+			if (!(e.shiftKey && isMetaOrCtrlKey(e) && e.keyCode === 49)) { // 49: 1
+				// No-op
+				return
+			}
+			e.preventDefault()
+			setShowContents(!showContents)
+		}
+		document.addEventListener("keydown", handler)
+		return () => {
+			document.removeEventListener("keydown", handler)
+		}
+	}, [showContents])
+
+	// Hovering table of contents header:
+	const [hoverContents, setHoverContents] = React.useState(false)
 
 	// Saves to localStorage (debounced).
 	const mounted = React.useRef()
@@ -331,13 +359,7 @@ const App = () => {
 	// Manages read-only mode.
 	React.useEffect(() => {
 		const handler = e => {
-			const ok = (
-				!e.shiftKey &&
-				!e.altKey &&
-				isMetaOrCtrlKey(e) &&
-				e.keyCode === 80 // 80: P
-			)
-			if (!ok) {
+			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
 				// No-op
 				return
 			}
@@ -358,7 +380,7 @@ const App = () => {
 	// Manages sidebar (debounced -- match useEffect).
 	React.useEffect(() => {
 		const handler = e => {
-			if (e.keyCode !== 27) { // 27: Escape
+			if (!(e.keyCode === 27)) { // 27: Escape
 				// No-op
 				return
 			}
@@ -387,85 +409,104 @@ const App = () => {
 				dispatch={editorSettingsDispatch}
 			/>
 
-			{/* <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> */}
-			{/* <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path></svg> */}
-
 			{/* LHS */}
-			<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
-				{/* NOTE: Use w-full because of <Button> */}
-				<Button className="py-1 flex flex-row items-center w-full text-gray-500 hover:text-blue-500 truncate transition duration-200" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
-					<svg
-						className="mr-2 flex-shrink-0 w-4 h-4"
-						fill="none"
-						stroke="currentColor"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth="2"
-						viewBox="0 0 24 24"
-					>
-						<Transition
-							// NOTE: Use duration-200 instead of duration-300
-							show={!hoveredContents}
-							enter="transition ease-out duration-200"
-							enterFrom="transform opacity-0 -translate-x-64"
-							enterTo="transform opacity-100 translate-x-0"
-							leave="transition ease-in duration-200"
-							leaveFrom="transform opacity-100 translate-x-0"
-							leaveTo="transform opacity-0 -translate-x-64"
-						>
-							<path d="M4 6h16M4 12h16M4 18h7"></path>
-						</Transition>
-						<Transition
-							// NOTE: Use duration-200 instead of duration-300
-							show={hoveredContents}
-							enter="transition ease-out duration-200"
-							enterFrom="transform opacity-0 translate-x-64"
-							enterTo="transform opacity-100 translate-x-0"
-							leave="transition ease-in duration-200"
-							leaveFrom="transform opacity-100 translate-x-0"
-							leaveTo="transform opacity-0 translate-x-64"
-						>
-							{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
-							<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-						</Transition>
-					</svg>
-					<p className="font-semibold text-xs tracking-wide uppercase truncate">
-						{!hoveredContents ? (
-							title.trim() || "Untitled"
-						) : (
-							"Hide sidebar (⇧-1)"
-						)}
-					</p>
-				</Button>
-				<div className="h-2" />
-				<ul>
-					{contents.map(({ id, hash, secondary, children }) => (
-						<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-							{id !== "" && (
-								<a href={`#${hash}`}>
-									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-										{children || "Untitled"}
-									</h1>
-								</a>
-							)}
-							<ul>
-								{secondary.map(({ id, hash, children }) => (
-									<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-										<a href={`#${hash}`}>
-											<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-												{children || "Untitled"}
-											</h2>
-										</a>
-									</li>
-								))}
-							</ul>
-						</li>
-					))}
-				</ul>
-			</div>
+			<Transition
+				unmountOnExit={window.innerWidth <= 1328}
+				show={showContents}
+				enter="transition duration-300"
+				enterFrom="transform -translate-x-6"
+				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
+				leave="transition duration-300"
+				leaveFrom="transform translate-x-0"
+				leaveTo="opacity-0 transform -translate-x-6 pointer-events-none"
+			>
+				<React.Fragment>
 
-			{/* Spacer */}
-			<div className="flex-shrink-0 hidden lg:block w-16"></div>
+					{/* Contents */}
+					<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
+						<Button
+							// NOTE (1): Use w-full text-left because of <Button>
+							// NOTE (2): Use duration-200 instead of duration-300
+							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-200"
+							onPointerEnter={() => setHoverContents(true)}
+							onPointerLeave={() => setHoverContents(false)}
+							onClick={() => setShowContents(false)}
+						>
+							<svg
+								className="mr-2 flex-shrink-0 w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+							>
+								<Transition
+									// NOTE: Use duration-200 instead of duration-300
+									show={!hoverContents}
+									enter="transition duration-200"
+									enterFrom="transform opacity-0 -translate-x-6"
+									enterTo="transform opacity-100 translate-x-0"
+									leave="transition duration-200"
+									leaveFrom="transform opacity-100 translate-x-0"
+									leaveTo="transform opacity-0 -translate-x-6"
+								>
+									<path d="M4 6h16M4 12h16M4 18h7"></path>
+								</Transition>
+								<Transition
+									// NOTE: Use duration-200 instead of duration-300
+									show={hoverContents}
+									enter="transition duration-200"
+									enterFrom="transform opacity-0 translate-x-6"
+									enterTo="transform opacity-100 translate-x-0"
+									leave="transition duration-200"
+									leaveFrom="transform opacity-100 translate-x-0"
+									leaveTo="transform opacity-0 translate-x-6"
+								>
+									{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
+									<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+								</Transition>
+							</svg>
+							<p className="font-semibold text-xs tracking-wide uppercase truncate">
+								{!hoverContents ? (
+									title.trim() || "Untitled"
+								) : (
+									"HIDE CONTENTS (⇧-1)"
+								)}
+							</p>
+						</Button>
+						<div className="h-2" />
+						<ul>
+							{contents.map(({ id, hash, secondary, children }) => (
+								<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+									{id !== "" && (
+										<a href={`#${hash}`}>
+											<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+												{children || "Untitled"}
+											</h1>
+										</a>
+									)}
+									<ul>
+										{secondary.map(({ id, hash, children }) => (
+											<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+												<a href={`#${hash}`}>
+													<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+														{children || "Untitled"}
+													</h2>
+												</a>
+											</li>
+										))}
+									</ul>
+								</li>
+							))}
+						</ul>
+					</div>
+
+					{/* Spacer */}
+					<div className="flex-shrink-0 hidden lg:block w-16"></div>
+
+				</React.Fragment>
+			</Transition>
 
 			{/* RHS */}
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
