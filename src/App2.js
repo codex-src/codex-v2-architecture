@@ -96,11 +96,11 @@ const FixedEditorSettings = ({ showContentsState: [showContents, setShowContents
 		<Transition
 			show={state.showSidebar}
 			enter="transition ease-out duration-300"
-			enterFrom="transform opacity-0 translate-x-64"
+			enterFrom="transform opacity-0 translate-x-32"
 			enterTo="transform opacity-100 translate-x-0"
 			leave="transition ease-in duration-300"
 			leaveFrom="transform opacity-100 translate-x-0"
-			leaveTo="transform opacity-0 translate-x-64"
+			leaveTo="transform opacity-0 translate-x-32"
 		>
 			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
 				{state.renderMode === renderModesEnum.Readme ? (
@@ -422,15 +422,14 @@ const App = () => {
 
 			{/* LHS */}
 			<Transition
-				// NOTE: Use duration-200 instead of duration-300
 				unmountOnExit={window.innerWidth <= 1328}
 				show={showContents}
-				enter="transition duration-200"
-				enterFrom="transform -translate-x-6"
+				enter="transition duration-300"
+				enterFrom="transform -translate-x-16"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
-				leave="transition duration-200"
+				leave="transition duration-300"
 				leaveFrom="transform translate-x-0"
-				leaveTo="opacity-0 transform -translate-x-6 pointer-events-none"
+				leaveTo="opacity-0 transform -translate-x-16 pointer-events-none"
 			>
 				<React.Fragment>
 
@@ -438,8 +437,8 @@ const App = () => {
 					<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
 						<Button
 							// NOTE (1): Use w-full text-left because of <Button>
-							// NOTE (2): Use duration-200 instead of duration-300
-							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-200"
+							// NOTE (2): Use duration-300 instead of duration-300
+							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
 							onPointerEnter={() => setHoverContents(true)}
 							onPointerLeave={() => setHoverContents(false)}
 							onClick={() => setShowContents(false)}
@@ -454,26 +453,28 @@ const App = () => {
 								viewBox="0 0 24 24"
 							>
 								<Transition
-									// NOTE: Use duration-200 instead of duration-300
+									// NOTE: Use duration-200 instead of
+									// duration-300
 									show={!hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform -translate-x-6" // TODO: Remove opacity?
+									enterFrom="opacity-0 transform -translate-x-8" // TODO: Remove opacity?
 									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
-									leaveTo="opacity-0 transform -translate-x-6"
+									leaveTo="opacity-0 transform -translate-x-8"
 								>
 									<path d="M4 6h16M4 12h16M4 18h7"></path>
 								</Transition>
 								<Transition
-									// NOTE: Use duration-200 instead of duration-300
+									// NOTE: Use duration-200 instead of
+									// duration-300
 									show={hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform translate-x-6" // TODO: Remove opacity?
+									enterFrom="opacity-0 transform translate-x-8" // TODO: Remove opacity?
 									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
-									leaveTo="opacity-0 transform translate-x-6"
+									leaveTo="opacity-0 transform translate-x-8"
 								>
 									{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
 									<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
