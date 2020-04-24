@@ -96,8 +96,8 @@ import {
 //
 // NOTE: This implementation is intentionally simplified
 function parseGFMType({ type, syntax, str, x }) {
-	// Syntax must be preceded by a BOL or a space (e.g. ·*):
-	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1])) {
+	// Syntax must be preceded by a BOL or a space:
+	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1])) { // E.g. ·*match*
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -113,20 +113,25 @@ function parseGFMType({ type, syntax, str, x }) {
 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
 		return null
-	// Match cannot be surrounded by a space (e.g. *·match·*):
-	} else if (isASCIIWhitespace(str[x + syntax.length]) || isASCIIWhitespace(str[x + syntax.length + offset - 1])) {
+	// Match cannot be surrounded by a space:
+	} else if (
+		isASCIIWhitespace(str[x + syntax.length]) ||           // E.g. *·match
+		isASCIIWhitespace(str[x + syntax.length + offset - 1]) // E.g. match·*
+	) {
 		return null
-	// Match start or end cannot be redundant (e.g. ***):
-	} else if (str[x + syntax.length] === syntax[0] || str[x + syntax.length + offset - 1] === syntax[syntax.length - 1]) {
+	// Match start or end cannot be redundant:
+	} else if (
+		str[x + syntax.length] === syntax[0] ||                              // E.g. ****match
+		str[x + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. match****
 		return null
 	}
 	// Increment start syntax:
 	x += syntax.length
 	const parsed = {
 		type,
-		syntax: syntax,
-		children: type !== typeEnum.Code ? parseInlineElements(str.slice(x, x + offset)) :
-			str.slice(x, x + offset),
+		syntax,
+		children: type !== typeEnum.Code ? parseInlineElements(str.slice(x, x + offset))
+			: str.slice(x, x + offset),
 	}
 	// Increment offset and end syntax:
 	x += offset + syntax.length
