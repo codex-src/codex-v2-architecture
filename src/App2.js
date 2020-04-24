@@ -424,10 +424,10 @@ const App = () => {
 			<Transition
 				unmountOnExit={window.innerWidth <= 1328}
 				show={showContents}
-				enter="transition duration-300"
+				enter="transition ease-out duration-300"
 				enterFrom="transform -translate-x-16"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
-				leave="transition duration-300"
+				leave="transition ease-in duration-300"
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-16 pointer-events-none"
 			>
