@@ -1,4 +1,3 @@
-// import Icon from "Icon"
 import Button from "Button"
 import DocumentTitle from "DocumentTitle"
 import Editor from "Editor2/Editor"
@@ -24,7 +23,7 @@ const ReadmeEditor = ({ readOnly }) => {
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
-const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
+const FixedEditorSettings = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => (
 	// NOTE: Use flex flex-col because of the sidebar
 	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
@@ -33,8 +32,14 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 
 			{/* LHS */}
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+				<Button
+					className="m-1 font-medium text-xs underline"
+					onClick={() => setShowContents(!showContents)}
+				>
+					Toggle contents (⇧1)
+				</Button>
 				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
-					<p className="font-medium text-xs text-gray-600">
+					<p className="font-medium text-xs">
 						Saving
 					</p>
 					<svg
@@ -44,7 +49,8 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 						fill="none"
 						strokeLinecap="round"
 						strokeLinejoin="round"
-						strokeWidth="2"
+						// strokeWidth="2"
+						strokeWidth="2.5"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
 					>
@@ -257,7 +263,7 @@ const App = () => {
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(e.shiftKey && isMetaOrCtrlKey(e) && e.keyCode === 49)) { // 49: 1
+			if (!(e.shiftKey && /* isMetaOrCtrlKey(e) && */ e.keyCode === 49)) { // 49: 1
 				// No-op
 				return
 			}
@@ -290,7 +296,7 @@ const App = () => {
 				ids.push(setTimeout(() => {
 					setSaveStatus(3)
 				}, 1e3))
-			}, 1e3))
+			}, 500))
 		}, 100))
 		return () => {
 			ids.slice().reverse().map(each => clearTimeout(each))
@@ -408,7 +414,8 @@ const App = () => {
 
 			{/* Fixed settings */}
 			<FixedEditorSettings
-				saveStatus={saveStatus}
+				showContentsState={[showContents, setShowContents]}
+				saveStatusState={[saveStatus, setSaveStatus]}
 				state={editorSettings}
 				dispatch={editorSettingsDispatch}
 			/>
@@ -449,11 +456,11 @@ const App = () => {
 									// NOTE: Use duration-200 instead of duration-300
 									show={!hoverContents}
 									enter="transition duration-200"
-									enterFrom="transform opacity-0 -translate-x-6"
-									enterTo="transform opacity-100 translate-x-0"
+									enterFrom="opacity-0 transform -translate-x-6"
+									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
-									leaveFrom="transform opacity-100 translate-x-0"
-									leaveTo="transform opacity-0 -translate-x-6"
+									leaveFrom="opacity-100 transform translate-x-0"
+									leaveTo="opacity-0 transform -translate-x-6"
 								>
 									<path d="M4 6h16M4 12h16M4 18h7"></path>
 								</Transition>
@@ -461,11 +468,11 @@ const App = () => {
 									// NOTE: Use duration-200 instead of duration-300
 									show={hoverContents}
 									enter="transition duration-200"
-									enterFrom="transform opacity-0 translate-x-6"
-									enterTo="transform opacity-100 translate-x-0"
+									enterFrom="opacity-0 transform translate-x-6"
+									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
-									leaveFrom="transform opacity-100 translate-x-0"
-									leaveTo="transform opacity-0 translate-x-6"
+									leaveFrom="opacity-100 transform translate-x-0"
+									leaveTo="opacity-0 transform translate-x-6"
 								>
 									{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
 									<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -475,7 +482,7 @@ const App = () => {
 								{!hoverContents ? (
 									title.trim() || "Untitled"
 								) : (
-									"HIDE CONTENTS (⇧-1)"
+									`Hide Contents (⇧1)`
 								)}
 							</p>
 						</Button>

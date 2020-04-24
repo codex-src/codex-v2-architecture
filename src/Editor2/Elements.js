@@ -134,30 +134,30 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 		// overflow-x-scroll scrolling-touch
 		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded" {...attrs.code}>
 			{/* <span className="inline-block"> */}
-				<Node id={nodes[0].id} className="leading-none">
-					<Markdown syntax={[syntax[0]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
+			<Node id={nodes[0].id} className="leading-none">
+				<Markdown syntax={[syntax[0]]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
+			</Node>
+			{$nodes.map(each => (
+				// TODO: Add support for read-only line numbers
+				<Node key={each.id} id={each.id} className="leading-snug">
+					<span dangerouslySetInnerHTML={{
+						__html: each.data || (
+							"<br />"
+						),
+					}} />
 				</Node>
-				{$nodes.map(each => (
-					// TODO: Add support for read-only line numbers
-					<Node key={each.id} id={each.id} className="leading-snug">
-						<span dangerouslySetInnerHTML={{
-							__html: each.data || (
-								"<br />"
-							),
-						}} />
-					</Node>
-				))}
-				<Node id={nodes[nodes.length - 1].id} className="leading-none">
-					<Markdown syntax={[syntax[1]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
-				</Node>
+			))}
+			<Node id={nodes[nodes.length - 1].id} className="leading-none">
+				<Markdown syntax={[syntax[1]]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
+			</Node>
 			{/* </span> */}
 		</Root>
 	)
@@ -166,12 +166,12 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
 
-	const style = { verticalAlign: "12.5%" }
+	const style = { verticalAlign: "15%" }
 	return (
 		<Root id={id}>
 			<Markdown syntax={syntax}>
 				{readOnly && (
-					<hr className="inline-block w-full border-t-2 border-b-2" style={style} />
+					<hr className="inline-block w-full border-t-2" style={style} />
 				)}
 			</Markdown>
 		</Root>
