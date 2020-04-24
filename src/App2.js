@@ -60,7 +60,7 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 					className="m-1 font-medium text-xs underline"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "ctrl" : "⌘"}-P)
+					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}-P)
 				</Button>
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
@@ -256,7 +256,7 @@ const App = () => {
 				ids.push(setTimeout(() => {
 					setSaveStatus(3)
 				}, 1e3))
-			}, 1e3 - 100))
+			}, 1e3))
 		}, 100))
 		return () => {
 			ids.slice().reverse().map(each => clearTimeout(each))
@@ -375,7 +375,8 @@ const App = () => {
 	}, [editorSettingsDispatch])
 
 	return (
-		<div className="px-6 py-32">
+		// NOTE: Use items-start for sticky
+		<div className="px-6 py-32 flex flex-row justify-center items-start">
 
 			{/* Settings */}
 			<FixedEditorSettings
@@ -384,106 +385,90 @@ const App = () => {
 				dispatch={editorSettingsDispatch}
 			/>
 
-			{/* <div className="px-6 flex flex-row justify-center"> */}
-			{/* 	<div className="hidden lg:block flex-shrink-0 w-48"> */}
-			{/* 		hello */}
-			{/* 	</div> */}
-			{/* 	<div className="hidden lg:block flex-shrink-0 w-16"></div> */}
-			{/* 	<div className="xl:flex-shrink-0 w-full max-w-3xl"> */}
-			{/* 		hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello */}
-			{/* 	</div> */}
-			{/* 	<div className="hidden xl:block w-64"></div> */}
-			{/* </div> */}
-
-			{/* Grid */}
-			<div className="flex flex-row justify-center">
-
-				{/* LHS */}
-				<div className="pb-12 flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ opacity: !contents.length ? "0" : "1" }}>
-					<div className="py-1 flex flex-row items-center">
-						<svg
-							className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
-							fill="none"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							viewBox="0 0 24 24"
-						>
-							{/* <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path> */}
-							<path d="M4 6h16M4 12h16M4 18h7"></path>
-						</svg>
-						<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
-							{(title.trim() || "Untitled").toUpperCase()}
-						</p>
-					</div>
-					<div className="h-2" />
-					<ul>
-						{contents.map(({ id, hash, secondary, children }) => (
-							<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-								{id !== "" && (
-									<a href={`#${hash}`}>
-										<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-											{children || (
-												 "Untitled"
-											)}
-										</h1>
-									</a>
-								)}
-								<ul>
-									{secondary.map(({ id, hash, children }) => (
-										<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
-											<a href={`#${hash}`}>
-												<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-													{children || (
-														"Untitled"
-													)}
-												</h2>
-											</a>
-										</li>
-									))}
-								</ul>
-							</li>
-						))}
-					</ul>
+			{/* LHS */}
+			<div className="pb-12 sticky flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
+				<div className="py-1 flex flex-row items-center">
+					<svg
+						className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
+						fill="none"
+						stroke="currentColor"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth="2"
+						viewBox="0 0 24 24"
+					>
+						{/* <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path> */}
+						<path d="M4 6h16M4 12h16M4 18h7"></path>
+					</svg>
+					<p className="font-semibold text-xs tracking-wide truncate text-gray-500">
+						{(title.trim() || "Untitled").toUpperCase()}
+					</p>
 				</div>
+				<div className="h-2" />
+				<ul>
+					{contents.map(({ id, hash, secondary, children }) => (
+						<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+							{id !== "" && (
+								<a href={`#${hash}`}>
+									<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+										{children || (
+											 "Untitled"
+										)}
+									</h1>
+								</a>
+							)}
+							<ul>
+								{secondary.map(({ id, hash, children }) => (
+									<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+										<a href={`#${hash}`}>
+											<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+												{children || (
+													"Untitled"
+												)}
+											</h2>
+										</a>
+									</li>
+								))}
+							</ul>
+						</li>
+					))}
+				</ul>
+			</div>
 
-				{/* Spacer */}
-				<div className="flex-shrink-0 hidden lg:block w-16"></div>
+			{/* Spacer */}
+			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 
-				{/* RHS */}
-				<div className="xl:flex-shrink-0 w-full max-w-3xl">
+			{/* RHS */}
+			<div className="xl:flex-shrink-0 w-full max-w-3xl">
 
-					{/* Editor */}
-					<DocumentTitle title={title || "Untitled"}>
-						{/* TODO: Add React.forwardRef */}
-						<Editor
-							className="grid-editor"
-							// TODO: Use a ref to compute the height of
-							// the last data-codex-node or data-codex-root
-							style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
-							state={editor}
-							dispatch={editorDispatch}
-							readOnly={editorSettings.readOnly}
-						/>
-					</DocumentTitle>
+				{/* Editor */}
+				<DocumentTitle title={title || "Untitled"}>
+					{/* TODO: Add React.forwardRef */}
+					<Editor
+						className="grid-editor"
+						// TODO: Use a ref to compute the height of
+						// the last data-codex-node or data-codex-root
+						style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+						state={editor}
+						dispatch={editorDispatch}
+						readOnly={editorSettings.readOnly}
+					/>
+				</DocumentTitle>
 
-					{/* Status bars */}
-					<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-						<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
-							{statusLHS}
-						</p>
-						<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
-							{statusRHS}
-						</p>
-					</div>
-
+				{/* Status bars */}
+				<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
+					<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+						{statusLHS}
+					</p>
+					<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+						{statusRHS}
+					</p>
 				</div>
-
-				{/* Spacer */}
-				<div className="hidden xl:block w-64"></div>
 
 			</div>
+
+			{/* Spacer */}
+			<div className="hidden xl:block w-64"></div>
 
 		</div>
 	)

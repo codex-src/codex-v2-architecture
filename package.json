@@ -14,10 +14,10 @@
     "uuidv4": "^6.0.6"
   },
   "scripts": {
-    "start": "react-scripts start",
     "tailwind-start": "yarn tailwind build src/stylesheets/tailwind.css -o src/stylesheets/tailwind.generated.css",
-    "build": "react-scripts build",
+    "start": "react-scripts start",
     "tailwind-build": "yarn postcss src/stylesheets/tailwind.css --output src/stylesheets/tailwind.generated.css --env production",
+    "build": "yarn tailwind-build && react-scripts build && yarn tailwind-start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
