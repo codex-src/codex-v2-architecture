@@ -36,7 +36,7 @@ const FixedEditorSettings = ({ showContentsState: [showContents, setShowContents
 					className="m-1 font-medium text-xs underline"
 					onClick={() => setShowContents(!showContents)}
 				>
-					Toggle contents (⇧1)
+					Toggle contents ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)
 				</Button>
 				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
 					<p className="font-medium text-xs">
@@ -263,7 +263,7 @@ const App = () => {
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(e.shiftKey && /* isMetaOrCtrlKey(e) && */ e.keyCode === 49)) { // 49: 1
+			if (!(e.shiftKey && isMetaOrCtrlKey(e) && e.keyCode === 49)) { // 49: 1
 				// No-op
 				return
 			}
@@ -484,7 +484,7 @@ const App = () => {
 								{!hoverContents ? (
 									title.trim() || "Untitled"
 								) : (
-									`Hide Contents (⇧1)`
+									`Hide Contents (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)`
 								)}
 							</p>
 						</Button>
