@@ -422,12 +422,13 @@ const App = () => {
 
 			{/* LHS */}
 			<Transition
+				// NOTE: Use duration-200 instead of duration-300
 				unmountOnExit={window.innerWidth <= 1328}
 				show={showContents}
-				enter="transition duration-300"
+				enter="transition duration-200"
 				enterFrom="transform -translate-x-6"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
-				leave="transition duration-300"
+				leave="transition duration-200"
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-6 pointer-events-none"
 			>
