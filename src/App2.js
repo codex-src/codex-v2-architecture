@@ -384,15 +384,15 @@ const App = () => {
 				dispatch={editorSettingsDispatch}
 			/>
 
-			{/* <div class="px-6 flex flex-row justify-center"> */}
-			{/* 	<div class="hidden lg:block flex-shrink-0 w-48"> */}
+			{/* <div className="px-6 flex flex-row justify-center"> */}
+			{/* 	<div className="hidden lg:block flex-shrink-0 w-48"> */}
 			{/* 		hello */}
 			{/* 	</div> */}
-			{/* 	<div class="hidden lg:block flex-shrink-0 w-16"></div> */}
-			{/* 	<div class="xl:flex-shrink-0 w-full max-w-3xl"> */}
+			{/* 	<div className="hidden lg:block flex-shrink-0 w-16"></div> */}
+			{/* 	<div className="xl:flex-shrink-0 w-full max-w-3xl"> */}
 			{/* 		hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello */}
 			{/* 	</div> */}
-			{/* 	<div class="hidden xl:block w-64"></div> */}
+			{/* 	<div className="hidden xl:block w-64"></div> */}
 			{/* </div> */}
 
 			{/* Grid */}
@@ -449,7 +449,7 @@ const App = () => {
 				</div>
 
 				{/* Spacer */}
-				<div class="flex-shrink-0 hidden lg:block w-16"></div>
+				<div className="flex-shrink-0 hidden lg:block w-16"></div>
 
 				{/* RHS */}
 				<div className="xl:flex-shrink-0 w-full max-w-3xl">
@@ -481,7 +481,7 @@ const App = () => {
 				</div>
 
 				{/* Spacer */}
-				<div class="hidden xl:block w-64"></div>
+				<div className="hidden xl:block w-64"></div>
 
 			</div>
 
