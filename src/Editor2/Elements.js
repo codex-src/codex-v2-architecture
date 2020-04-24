@@ -104,9 +104,9 @@ export const Blockquote = React.memo(({ id, children }) => {
 	)
 })
 
-export const Pre = props => (
-	<Node style={{ whiteSpace: "pre" }} {...props} />
-)
+// export const Pre = props => (
+// 	<Node style={{ whiteSpace: "pre" }} {...props} />
+// )
 
 // NOTE: Compound element
 export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
@@ -131,8 +131,8 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	}, [extension, nodes])
 
 	return (
-		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded overflow-x-scroll scrolling-touch" {...attrs.code}>
-			{/* NOTE: inline-block is needed for overflow-x-scroll */}
+		// overflow-x-scroll scrolling-touch
+		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded" {...attrs.code}>
 			{/* <span className="inline-block"> */}
 				<Node id={nodes[0].id} className="leading-none">
 					<Markdown syntax={[syntax[0]]}>

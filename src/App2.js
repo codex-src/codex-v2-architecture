@@ -99,7 +99,6 @@ const FixedEditorSettings = ({ saveStatus, state, dispatch }) => (
 				{state.renderMode === renderModesEnum.Readme ? (
 					<ReadmeEditor readOnly={state.readOnly} />
 				) : (
-					/* NOTE: inline-block is needed for overflow-x-scroll */
 					<span className="inline-block">
 						<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 							<Highlighted extension={state.extension}>
