@@ -4,35 +4,14 @@ import typeEnum from "./typeEnum"
 import { toInnerText } from "./cmap"
 
 import {
+	// ASCIIPunctuationPattern,
 	// HTTP,
 	// HTTPS,
-	ASCIIPunctuationPattern,
+	// safeURLRe,
 	ASCIIWhitespacePattern,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
-	// safeURLRe,
 } from "./spec"
-
-// function parseCode(str, x) {
-// 	const syntax = "`"
-// 	const phrase = `${syntax}x${syntax}`
-//
-// 	if (!(x < str.length && str.slice(x, x + syntax.length) === syntax && str.length - x >= phrase.length)) {
-// 		return null
-// 	}
-// 	const offset = str.slice(x + syntax.length).search(`\\${syntax}`)
-// 	if (offset <= 0) {
-// 		return null
-// 	}
-// 	x += syntax.length
-// 	const parsed = {
-// 		type: typeEnum.Code,
-// 		syntax,
-// 		children: str.slice(x, x + offset),
-// 	}
-// 	x += offset + syntax.length
-// 	return { parsed, x }
-// }
 
 // // Parses a GitHub Flavored Markdown (GFM) type.
 // function parseGFMType({ type, syntax, str, x }) {
@@ -93,8 +72,6 @@ import {
 // }
 
 // Parses a GitHub Flavored Markdown (GFM) type.
-//
-// NOTE: This implementation is intentionally simplified
 function parseGFMType({ type, syntax, str, x }) {
 	// Syntax must be preceded by a BOL or a space:
 	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1])) { // E.g. ·*match*
@@ -125,7 +102,8 @@ function parseGFMType({ type, syntax, str, x }) {
 		str[x + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. match****
 		return null
 	}
-	// Increment start syntax:
+	// Increment start syntax (assumes start and end syntax
+	// are the same):
 	x += syntax.length
 	const parsed = {
 		type,
@@ -146,10 +124,8 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	}
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
-		// Fast path:
-		//
-		// TODO: Fast path empty strings?
-		if (!isASCIIPunctuation(str[x]) && str[x] <= "\u00ff") { // Use "\u00ff" to guard BMP range, etc.
+		// Fast pass:
+		if (!isASCIIPunctuation(str[x]) && str[x] <= "\u00ff") {
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
 				continue
@@ -157,8 +133,6 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			parsed[parsed.length - 1] += str[x]
 			continue
 		}
-		// Convenience variables:
-		const char = str[x] // TODO: Deprecate
 		const nchars = str.length - x
 		switch (str[x]) {
 		// <Escape>
@@ -166,7 +140,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
 				parsed.push({
 					type: typeEnum.Escape,
-					syntax: [char],
+					syntax: ["\\"],
 					children: str[x + 1],
 				})
 				// Increment to the next character; the punctuation
@@ -375,10 +349,10 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 		}
 		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
-			parsed.push(char)
+			parsed.push(str[x])
 			continue
 		}
-		parsed[parsed.length - 1] += char
+		parsed[parsed.length - 1] += str[x]
 	}
 	if (parsed.length === 1 && typeof parsed[0] === "string") {
 		return parsed[0]
@@ -394,10 +368,8 @@ function parseElements(nodes) {
 
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
-		// Fast path:
-		//
-		// TODO: Fast path empty strings?
-		if (nodes[x].data.length && !isASCIIPunctuation(nodes[x].data[0])) {
+		// Fast pass:
+		if (!nodes[x].data.length || !isASCIIPunctuation(nodes[x].data[0])) {
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
 				type: typeEnum.Paragraph,
@@ -412,11 +384,9 @@ function parseElements(nodes) {
 			})
 			continue
 		}
-		// Convenience variables:
 		const each = nodes[x]
-		const char = each.data.charAt(0) // TODO: Deprecate
 		const nchars = each.data.length
-		switch (each.data.charAt(0)) { // FIXME?
+		switch (each.data[0]) { // Safe because of fast pass
 		// <Header>
 		case "#":
 			// # H1 … ###### H6
