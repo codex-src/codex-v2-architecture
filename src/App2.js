@@ -392,9 +392,9 @@ const App = () => {
 
 			{/* LHS */}
 			<div className="pb-12 sticky flex-shrink-0 hidden lg:block w-48 overflow-x-hidden transition duration-300" style={{ top: 128, opacity: !contents.length ? "0" : "1" }}>
-				<div className="py-1 flex flex-row items-center" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
+				<Button className="py-1 flex flex-row items-center text-gray-500 hover:text-blue-500 transition duration-200" onPointerEnter={() => setHoveredContents(true)} onPointerLeave={() => setHoveredContents(false)}>
 					<svg
-						className="mr-2 flex-shrink-0 w-4 h-4 text-gray-500"
+						className="mr-2 flex-shrink-0 w-4 h-4"
 						fill="none"
 						stroke="currentColor"
 						strokeLinecap="round"
@@ -428,14 +428,14 @@ const App = () => {
 							<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 						</Transition>
 					</svg>
-					<p className="font-semibold text-xs tracking-wide uppercase truncate text-gray-500">
+					<p className="font-semibold text-xs tracking-wide uppercase truncate">
 						{!hoveredContents ? (
 							title.trim() || "Untitled"
 						) : (
-							"Hide sidebar"
+							"Hide sidebar (⇧-1)"
 						)}
 					</p>
-				</div>
+				</Button>
 				<div className="h-2" />
 				<ul>
 					{contents.map(({ id, hash, secondary, children }) => (
