@@ -425,11 +425,11 @@ const App = () => {
 				unmountOnExit={window.innerWidth <= 1328}
 				show={showContents}
 				enter="transition ease-out duration-300"
-				enterFrom="transform -translate-x-16"
+				enterFrom="transform -translate-x-32"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
 				leave="transition ease-in duration-300"
 				leaveFrom="transform translate-x-0"
-				leaveTo="opacity-0 transform -translate-x-16 pointer-events-none"
+				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
 				<React.Fragment>
 
@@ -540,10 +540,12 @@ const App = () => {
 
 				{/* Status bars */}
 				<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-					<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+					{/* NOTE: Use duration-200 instead of duration-300 */}
+					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
 						{statusLHS}
 					</p>
-					<p className="font-medium text-xs transition duration-300" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
+					{/* NOTE: Use duration-200 instead of duration-300 */}
+					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
 						{statusRHS}
 					</p>
 				</div>
