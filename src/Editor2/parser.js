@@ -276,7 +276,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 				let [href] = safeURLRe.exec(str.slice(x))
 				if (href.length === syntax.length) {
 					// No-op; defer to end
-				} else if (!isAlphanum(href[href.length - 1]) || href[href.length - 1] === "/") {
+				} else if (!(isAlphanum(href[href.length - 1]) || href[href.length - 1] === "/")) {
 					href = href.slice(0, href.length - 1)
 				}
 				parsed.push({
