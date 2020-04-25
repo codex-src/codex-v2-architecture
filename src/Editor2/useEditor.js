@@ -175,59 +175,51 @@ const methods = state => ({
 		}
 		this.dropBytes(dropL, 0)
 	},
+	// Backspaces one word (RTL).
+	backspaceWordRTL() {
+		if (state.pos1.pos !== state.pos2.pos) {
+			this.write("")
+			return
+		}
+		// Iterate white space:
+		let pos = state.pos1.pos // eslint-disable-line prefer-destructuring
+		while (pos) {
+			const substr = state.data.slice(0, pos)
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			if (!utf8.isHWhiteSpace(rune)) {
+				// No-op
+				break
+			}
+			pos -= rune.length
+		}
+		// Iterate non-alphanumerics:
+		while (pos) {
+			const substr = state.data.slice(0, pos)
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			if (utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+				// No-op
+				break
+			}
+			pos -= rune.length
+		}
+		// Iterate alphanumerics:
+		while (pos) {
+			const substr = state.data.slice(0, pos)
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			if (!utf8.isAlphanum(rune)) {
+				// No-op
+				break
+			}
+			pos -= rune.length
+		}
+		// Get dropL:
+		let dropL = state.pos1.pos - pos
+		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
+			dropL = 1
+		}
+		this.dropBytes(dropL, 0)
+	},
 
-	// // Backspaces one word.
-	// backspaceWord() {
-	// 	if (state.pos1.pos !== state.pos2.pos) {
-	// 		this.write("")
-	// 		return
-	// 	}
-	// 	// Iterate to a non-h. white space:
-	// 	let index = state.pos1.pos
-	// 	while (index) {
-	// 		const substr = state.data.slice(0, index)
-	// 		const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-	// 		if (!rune || !utf8.isHWhiteSpace(rune)) {
-	// 			// No-op
-	// 			break
-	// 		}
-	// 		index -= rune.length
-	// 	}
-	// 	// Get the next rune:
-	// 	const substr = state.data.slice(0, index)
-	// 	const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-	// 	// Iterate to an alphanumeric rune OR a non-alphanumeric
-	// 	// rune based on the next rune:
-	// 	if (rune && !utf8.isAlphanum(rune)) {
-	// 		// Iterate to an alphanumeric rune:
-	// 		while (index) {
-	// 			const substr = state.data.slice(0, index)
-	// 			const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-	// 			if (!rune || utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-	// 				// No-op
-	// 				break
-	// 			}
-	// 			index -= rune.length
-	// 		}
-	// 	} else if (rune && utf8.isAlphanum(rune)) {
-	// 		// Iterate to a non-alphanumeric rune:
-	// 		while (index) {
-	// 			const substr = state.data.slice(0, index)
-	// 			const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-	// 			if (!rune || !utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-	// 				// No-op
-	// 				break
-	// 			}
-	// 			index -= rune.length
-	// 		}
-	// 	}
-	// 	// Get the number of bytes to drop:
-	// 	let dropL = state.pos1.pos - index
-	// 	if (!dropL && index - 1 >= 0 && state.data[index - 1] === "\n") {
-	// 		dropL = 1
-	// 	}
-	// 	this.write("", dropL, 0)
-	// },
 	// // Backspaces one paragraph (does not discern EOL).
 	// backspaceLine() {
 	// 	if (state.pos1.pos !== state.pos2.pos) {
@@ -251,17 +243,6 @@ const methods = state => ({
 	// 		dropL = 1
 	// 	}
 	// 	this.write("", dropL, 0)
-	// },
-
-	// // Backspaces one rune (RTL).
-	// backspaceRuneRTL() {
-	// 	let dropL = 0
-	// 	if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
-	// 		const substr = state.data.slice(state.pos1.pos - state.pos1.x, state.pos1.pos)
-	// 		const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-	// 		dropL = (rune || "\n").length
-	// 	}
-	// 	this.dropBytes(dropL, 0)
 	// },
 
 	// Backspaces one rune (LTR).

@@ -239,12 +239,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					// Backspace word RTL:
 					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace word")
+						dispatch.backspaceWordRTL()
+						// console.log("backspace word")
 						return
 					// Backspace rune RTL:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						// console.log("backspace-rune")
+						console.log("backspace-rune")
 						dispatch.backspaceRuneRTL()
 						return
 					// Backspace word LTR:
