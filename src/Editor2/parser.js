@@ -262,31 +262,27 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 			// <Anchor> (1 of 2)
-			case "h":
-				// https:// OR https://
-				//
-				// TODO: Eat "www."
-				if (
-					(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
-					(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
-				) {
-					const matches = safeURLRe.exec(str.slice(x))
-					let offset = 0
-					if (matches) {
-						offset = matches[0].length
-					}
-					const secure = str.slice(x).startsWith("https://")
-					parsed.push({
-						type: typeEnum.Anchor,
-						syntax: [!secure ? HTTP : HTTPS],
-						href: matches[0],
-						children: matches[0].slice((!secure ? HTTP : HTTPS).length),
-					})
-					x += offset - 1
-					continue
-				}
-				// No-op
-				break
+		case "h":
+			// https:// OR https://
+			//
+			// TODO: Eat "www."
+			if (
+				(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
+				(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
+			) {
+				const syntax = str.slice(x).split("://", 1)[0] + "://"
+				const [href] = safeURLRe.exec(str.slice(x))
+				parsed.push({
+					type: typeEnum.Anchor,
+					syntax: [syntax],
+					href,
+					children: href.slice(syntax.length),
+				})
+				x += href.length - 1
+				continue
+			}
+			// No-op
+			break
 
 			// // <A> (2 of 2)
 			// case "[":
