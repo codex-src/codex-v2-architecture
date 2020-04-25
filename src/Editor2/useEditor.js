@@ -70,77 +70,113 @@ const methods = state => ({
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
+	// Commits a mutation.
+	commitMutation() {
+		if (!state.history.index && !state.history.correctedPos) {
+			Object.assign(state.history.stack[0], {
+				pos1: { ...state.pos1 },
+				pos2: { ...state.pos2 },
+			})
+			state.history.correctedPos = true
+		}
+		this.dropRedos()
+	},
+	// Drops L and R bytes.
+	dropBytes(dropL, dropR) {
+		this.commitMutation()
 
-	// write(substr, dropL = 0, dropR = 0) {
-	// 	// Create a new action:
-	// 	this.registerAction(ActionTypes.INPUT)
-	// 	if (!state.history.index && !state.resetPos) {
-	// 		Object.assign(state.history.stack[0], {
-	// 			pos1: state.pos1,
-	// 			pos2: state.pos2,
-	// 		})
-	// 		state.resetPos = true
-	// 	}
-	// 	this.dropRedos()
-	// 	// Drop bytes (L):
-	// 	state.pos1.pos -= dropL
-	// 	while (dropL) {
-	// 		const bytesToStart = state.pos1.x
-	// 		if (dropL <= bytesToStart) {
-	// 			state.pos1.x -= dropL
-	// 			dropL = 0
-	// 			break // XOR
-	// 		}
-	// 		dropL -= bytesToStart + 1
-	// 		state.pos1.y--
-	// 		state.pos1.x = state.body[state.pos1.y].data.length
-	// 	}
-	// 	// Drop bytes (R):
-	// 	state.pos2.pos += dropR
-	// 	while (dropR) {
-	// 		const bytesToEnd = state.body[state.pos2.y].data.length - state.pos2.x
-	// 		if (dropR <= bytesToEnd) {
-	// 			state.pos2.x += dropR
-	// 			dropR = 0
-	// 			break // XOR
-	// 		}
-	// 		dropR -= bytesToEnd + 1
-	// 		state.pos2.y++
-	// 		state.pos2.x = 0 // Reset
-	// 	}
-	// 	// Parse the new nodes:
-	// 	const nodes = newNodes(substr)
-	// 	const startNode = state.body[state.pos1.y]
-	// 	const endNode = { ...state.body[state.pos2.y] } // Create a new reference
-	// 	// Start node:
-	// 	startNode.data = startNode.data.slice(0, state.pos1.x) + nodes[0].data
-	// 	state.body.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
-	// 	// End node:
-	// 	let node = startNode
-	// 	if (nodes.length > 1) {
-	// 		node = nodes[nodes.length - 1]
-	// 	}
-	// 	node.data += endNode.data.slice(state.pos2.x)
-	// 	// Update data, pos1, and pos2:
-	// 	const data = state.body.map(each => each.data).join("\n")
-	// 	const pos1 = { ...state.pos1, pos: state.pos1.pos + substr.length }
-	// 	const pos2 = { ...pos1 }
-	// 	Object.assign(state, { data, pos1, pos2 })
-	// 	this.render()
-	// },
-	// // Backspaces one character.
-	// backspaceChar() {
-	// 	let dropL = 0
-	// 	if (!state.selected && state.pos1.pos) { // Inverse
-	// 		const substr = state.data.slice(0, state.pos1.pos)
-	// 		const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-	// 		dropL = rune.length
-	// 	}
-	// 	this.write("", dropL, 0)
-	// },
+		// LHS:
+		state.pos1.pos -= dropL
+		while (dropL) {
+			const offset = state.pos1.x
+			if (dropL <= offset) {
+				state.pos1.x -= dropL
+				dropL = 0
+				break
+			}
+			dropL -= offset + 1
+			state.pos1.y--
+ 			// Reset to EOL:
+			state.pos1.x = state.nodes[state.pos1.y].data.length
+		}
+		// RHS:
+		state.pos2.pos += dropR
+		while (dropR) {
+			const reverseOffset = state.nodes[state.pos2.y].data.length - state.pos2.x
+			if (dropR <= reverseOffset) {
+				state.pos2.x += dropR
+				dropR = 0
+				break
+			}
+			dropR -= reverseOffset + 1
+			state.pos2.y++
+ 			// Reset to BOL:
+			state.pos2.x = 0
+		}
+		this.write("") // FIXME?
+	},
+	// Writes character data.
+	write(data) {
+		this.commitMutation()
+
+		// Parse new nodes:
+		const nodes = newNodes(data)
+		const node1 = state.nodes[state.pos1.y]
+		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
+		// Concatenate the end of the start node:
+		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
+		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
+		// Concatenate the start of the end node:
+		//
+		// NOTE: The end node can be the start node or the end
+		// of the new nodes
+		let node = node1
+		if (nodes.length > 1) {
+			node = nodes[nodes.length - 1]
+		}
+		node.data += node2.data.slice(state.pos2.x)
+		// Update and rerender:
+		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
+		const pos2 = { ...pos1 }
+		Object.assign(state, { pos1, pos2 })
+		this.render()
+	},
+	// Input method for onCompositionEnd and onInput.
+	input(nodes, atEnd, [pos1, pos2]) {
+		this.commitMutation()
+
+		// Get the start offset:
+		const key1 = nodes[0].id
+		const offset1 = state.nodes.findIndex(each => each.id === key1)
+		if (offset1 === -1) {
+			throw new Error("input: offset1 out of bounds")
+		}
+		// Get the end offset:
+		const key2 = nodes[nodes.length - 1].id
+		const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
+		if (offset2 === -1) {
+			throw new Error("input: offset2 out of bounds")
+		}
+		// Update and rerender:
+		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
+		Object.assign(state, { pos1, pos2 })
+		this.render()
+	},
+
+	// Backspaces (RTL).
+	backspaceRTL() {
+		// let dropL = 0
+		// if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
+		// 	const substr = state.data.slice(0, state.pos1.pos)
+		// 	const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
+		// 	dropL = rune.length
+		// }
+		// this.write("", dropL, 0)
+	},
+
 	// // Backspaces one word.
 	// backspaceWord() {
-	// 	if (state.selected) {
+	// 	if (state.pos1.pos !== state.pos2.pos) {
 	// 		this.write("")
 	// 		return
 	// 	}
@@ -192,7 +228,7 @@ const methods = state => ({
 	// },
 	// // Backspaces one paragraph (does not discern EOL).
 	// backspaceLine() {
-	// 	if (state.selected) {
+	// 	if (state.pos1.pos !== state.pos2.pos) {
 	// 		this.write("")
 	// 		return
 	// 	}
@@ -217,7 +253,7 @@ const methods = state => ({
 	// // Backspaces one character (forwards).
 	// backspaceCharForwards() {
 	// 	let dropR = 0
-	// 	if (!state.selected && state.pos1.pos < state.data.length) { // Inverse
+	// 	if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) { // Inverse
 	// 		const substr = state.data.slice(state.pos1.pos)
 	// 		const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
 	// 		dropR = rune.length
@@ -226,7 +262,7 @@ const methods = state => ({
 	// },
 	// // Backspaces one word (forwards).
 	// backspaceWordForwards() {
-	// 	if (state.selected) {
+	// 	if (state.pos1.pos !== state.pos2.pos) {
 	// 		this.write("")
 	// 		return
 	// 	}
@@ -277,73 +313,6 @@ const methods = state => ({
 	// 	this.write("", 0, dropR)
 	// },
 
-	// Writes character data.
-	write(data) {
-		// Correct pos before first change event:
-		//
-		// TODO: Extract to changeEvent?
-		if (!state.history.index && !state.history.correctedPos) {
-			Object.assign(state.history.stack[0], {
-				pos1: state.pos1,
-				pos2: state.pos2,
-			})
-			state.history.correctedPos = true
-		}
-		this.dropRedos()
-
-		// Parse new nodes:
-		const nodes = newNodes(data)
-		const node1 = state.nodes[state.pos1.y]
-		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
-		// Concatenate the end of the start node:
-		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
-		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
-		// Concatenate the start of the end node:
-		//
-		// NOTE: The end node can be the start node or the end
-		// of the new nodes
-		let node = node1
-		if (nodes.length > 1) {
-			node = nodes[nodes.length - 1]
-		}
-		node.data += node2.data.slice(state.pos2.x)
-		// Update and rerender:
-		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
-		const pos2 = { ...pos1 }
-		Object.assign(state, { pos1, pos2 })
-		this.render()
-	},
-	// Input method for onCompositionEnd and onInput.
-	input(nodes, atEnd, [pos1, pos2]) {
-		// Correct pos before first change event:
-		//
-		// TODO: Extract to changeEvent?
-		if (!state.history.index && !state.history.correctedPos) {
-			Object.assign(state.history.stack[0], {
-				pos1: state.pos1,
-				pos2: state.pos2,
-			})
-			state.history.correctedPos = true
-		}
-		this.dropRedos()
-
-		// Get the start offset:
-		const key1 = nodes[0].id
-		const offset1 = state.nodes.findIndex(each => each.id === key1)
-		if (offset1 === -1) {
-			throw new Error("input: offset1 out of bounds")
-		}
-		// Get the end offset:
-		const key2 = nodes[nodes.length - 1].id
-		const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
-		if (offset2 === -1) {
-			throw new Error("input: offset2 out of bounds")
-		}
-		// Update and rerender:
-		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
-		Object.assign(state, { pos1, pos2 })
-		this.render()
-	},
 	// Inserts a tab character.
 	tab() {
 		this.write("\t")
