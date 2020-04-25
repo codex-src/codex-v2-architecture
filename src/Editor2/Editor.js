@@ -231,32 +231,33 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						return
 					}
 
-					// Backspace paragraph RTL:
+					// RTL backspace paragraph:
 					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace line")
+						// TODO
 						return
-					// Backspace word RTL:
+					// RTL backspace word:
 					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
+						console.log("backspaceWordRTL")
 						dispatch.backspaceWordRTL()
-						// console.log("backspace word")
 						return
-					// Backspace rune RTL:
+					// RTL backspace rune:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace-rune")
+						console.log("backspaceRuneRTL")
 						dispatch.backspaceRuneRTL()
 						return
-					// Backspace word LTR:
+					// LTR backspace word:
 					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {
 						e.preventDefault()
-						console.log("delete word")
+						console.log("backspaceWordLTR")
+						dispatch.backspaceWordLTR()
 						return
-					// Backspace rune LTR:
+					// LTR backspace rune:
 					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
 						e.preventDefault()
-						// console.log("delete-rune")
+						console.log("backspaceRuneLTR")
 						dispatch.backspaceRuneLTR()
 						return
 					}
