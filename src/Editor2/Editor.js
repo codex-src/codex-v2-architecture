@@ -10,11 +10,6 @@ import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
 
 import {
-	// detectBackspaceLTR,
-	// detectBackspaceLTRWord,
-	// detectBackspaceParagraphRTL,
-	// detectBackspaceRTL,
-	// detectBackspaceWordRTL,
 	detectRedo,
 	detectUndo,
 	isMetaOrCtrlKey,
@@ -59,14 +54,23 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					mounted.current = true
 					return
 				}
-				if (mutations) {
-					const s = mutations === 1 ? "" : "s"
-					console.log(`synced dom: ${mutations} mutation${s}`)
-				}
+
+				// if (mutations) {
+				// 	const s = mutations === 1 ? "" : "s"
+				// 	console.log(`synced dom: ${mutations} mutation${s}`)
+				// }
+
 				// Sync DOM cursors:
-				const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
-				if (syncedPos) {
-					console.log("synced pos")
+				try {
+					const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
+
+					// if (syncedPos) {
+					// 	console.log("synced pos")
+					// }
+
+				} catch (error) {
+					console.error(error)
+					return
 				}
 				// Force select for edge-cases such as forward-
 				// backspace (pos does not change but the DOM does):
@@ -240,7 +244,8 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					// Backspace rune RTL:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace rune")
+						// console.log("backspace rune")
+						dispatch.backspaceRuneRTL()
 						return
 					// Backspace word LTR:
 					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {

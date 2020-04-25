@@ -1,3 +1,5 @@
+import * as emojiTrie from "emoji-trie"
+import * as utf8 from "encoding/utf8"
 import parse from "./parser"
 import useMethods from "use-methods"
 
@@ -163,15 +165,17 @@ const methods = state => ({
 		this.render()
 	},
 
-	// Backspaces (RTL).
-	backspaceRTL() {
-		// let dropL = 0
-		// if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
-		// 	const substr = state.data.slice(0, state.pos1.pos)
-		// 	const rune = emojiTrie.atEnd(substr) || utf8.atEnd(substr)
-		// 	dropL = rune.length
-		// }
-		// this.write("", dropL, 0)
+	// Backspaces one rune (RTL).
+	backspaceRuneRTL() {
+		let dropL = 0
+		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
+			const substr = state.data.slice(0, state.pos1.pos) // TODO: Use pos.x?
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			console.log({ rune })
+			dropL = rune.length
+		}
+		// console.log(dropL)
+		this.dropBytes(dropL, 0)
 	},
 
 	// // Backspaces one word.
