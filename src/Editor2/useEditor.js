@@ -192,25 +192,34 @@ const methods = state => ({
 			}
 			pos -= rune.length
 		}
-		// Iterate non-alphanumerics:
-		while (pos) {
-			const substr = state.data.slice(0, pos)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			if (utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-				// No-op
-				break
-			}
-			pos -= rune.length
-		}
+		// Iterate alphanumerics OR non-alphanumerics based on
+		// the next rune:
+		const substr = state.data.slice(0, pos)
+		const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+		if (!rune.length) {
+			// No-op; defer to end
 		// Iterate alphanumerics:
-		while (pos) {
-			const substr = state.data.slice(0, pos)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			if (!utf8.isAlphanum(rune)) {
-				// No-op
-				break
+		} else if (utf8.isAlphanum(rune)) {
+			while (pos) {
+				const substr = state.data.slice(0, pos)
+				const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+				if (!utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+					// No-op
+					break
+				}
+				pos -= rune.length
 			}
-			pos -= rune.length
+		// Iterate non-alphanumerics:
+		} else {
+			while (pos) {
+				const substr = state.data.slice(0, pos)
+				const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+				if (utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
+					// No-op
+					break
+				}
+				pos -= rune.length
+			}
 		}
 		// Get dropL:
 		let dropL = state.pos1.pos - pos
