@@ -354,6 +354,57 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	return parsed
 }
 
+// /* eslint-disable no-multi-spaces, no-useless-escape */
+// const AnyListRe      = /^\t*(?:- \[( |x)\] |[\-\+\*] |\d+\. )/
+// const NumberedListRe = /^\t*\d+\. /
+// /* eslint-enable no-multi-spaces, no-useless-escape */
+//
+// // Parses a list-based VDOM representation from a range of
+// // paragraphs.
+// function parseList(range) {
+// 	let tag = !NumberedListRe.test(range[0]) ? "ul" : "ol"
+// 	const data = {
+// 		type: List,
+// 		tag,
+// 		id: uuidv4(),
+// 		children: [],
+// 	}
+// 	for (const each of range) {
+// 		const [syntax] = each.match(AnyListRe)
+// 		const substr = each.slice(syntax.length)
+// 		let ref = data.children
+// 		let deep = 0
+// 		const depth = syntax.search(/[^\t]/)
+// 		while (deep < depth) {
+// 			if (!ref.length || ref[ref.length - 1].type !== List) {
+// 				tag = !NumberedListRe.test(each) ? "ul" : "ol"
+// 				ref.push({
+// 					type: List,
+// 					tag,
+// 					id: uuidv4(),
+// 					children: [],
+// 				})
+// 			}
+// 			ref = ref[ref.length - 1].children
+// 			deep++
+// 		}
+// 		let checked = null
+// 		if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) {
+// 			const value = syntax[syntax.length - 3] === "x"
+// 			checked = { value }
+// 		}
+// 		ref.push({
+// 			type: !checked ? ListItem : TodoItem,
+// 			tag,
+// 			id: uuidv4(),
+// 			syntax: [syntax],
+// 			checked,
+// 			children: parseInnerGFM(substr),
+// 		})
+// 	}
+// 	return data
+// }
+
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
@@ -484,6 +535,33 @@ function parseElements(nodes) {
 			}
 			// No-op
 			break
+
+		// // <List>
+		// case char === "\t" || (
+		// 	(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
+		// 	(each !== "---" && each !== "***") // Negate break
+		// ):
+		// 	// - List
+		// 	// 1. List
+		// 	if (nchars >= "- ".length && AnyListRe.test(each)) {
+		// 		const x1 = index
+		// 		let x2 = x1
+		// 		x2++
+		// 		// Iterate to end syntax:
+		// 		while (x2 < body.length) {
+		// 			if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
+		// 				// No-op
+		// 				break
+		// 			}
+		// 			x2++
+		// 		}
+		// 		const range = body.slice(x1, x2)
+		// 		data.push(parseList(range))
+		// 		index = x2 - 1
+		// 		continue
+		// 	}
+		// 	break
+
 		// <Break>
 		case "-":
 			// ***

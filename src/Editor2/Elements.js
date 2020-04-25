@@ -163,6 +163,58 @@ export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes })
 	)
 })
 
+// export const ListItem = React.memo(({ syntax, depth, checked, data }) => (
+// 	<Node tag="li" className="-ml-5 my-2 flex flex-row">
+// 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+// 			<span>{toInnerReact(data)}</span>
+// 		</Markdown>
+// 	</Node>
+// ))
+//
+// const Todo = ({ className, ...props }) => (
+// 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
+// )
+//
+// // Prepares a checked state and functions e.g. {...etc}.
+// function useTodo(initialValue) {
+// 	const [done, setDone] = React.useState(initialValue)
+// 	const etc = {
+// 		checked: done,
+// 		onChange: e => {
+// 			setDone(!done)
+// 		},
+// 	}
+// 	return [done, etc]
+// }
+//
+// export const TodoItem = React.memo(({ syntax, checked, data }) => {
+// 	const [done, etc] = useTodo(checked.value)
+//
+// 	const style = {
+// 		margin: "0.3125em 0.5em 0 calc((16 - 11.55) / 16 * -1em)",
+// 		borderRadius: "0.3125em",
+// 	}
+// 	return (
+// 		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={done && attrs.strike.style}>
+// 			<Markdown className="hidden" syntax={syntax}>
+// 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
+// 				too dark and overwritten by attrs.strike.style */}
+// 				<Todo className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!done ? "shadow-hero" : "shadow"} transition duration-150`} style={style} {...etc} />
+// 				<span>{toInnerReact(data)}</span>
+// 			</Markdown>
+// 		</Node>
+// 	)
+// })
+//
+// // NOTE: Compound component
+// export const List = React.memo(({ tag, id, data }) => (
+// 	<Node tag={tag} id={id} className="ml-5">
+// 		{data.map(({ type: Type, children: data, ...each }) => (
+// 			<Type key={each.id} data={data} {...each} />
+// 		))}
+// 	</Node>
+// ))
+
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
 
