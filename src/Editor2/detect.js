@@ -11,21 +11,67 @@ export function isMetaOrCtrlKey(e) {
 	return e.ctrlKey && !e.metaKey
 }
 
-// NOTE: DO NOT USE -- DOES NOT WORK AS EXPECTED
-//
-// // Matches a key code event.
-// //
-// // NOTE: shiftKey, altKey, and metaOrCtrlKey do not
-// // passthrough
-// function matchKeyCode(e, keyCode, { shiftKey, altKey, metaOrCtrlKey }) {
+// // Detects whether a key down event is backspace RTL.
+// export function detectBackspaceRTL(e) {
 // 	const ok = (
-// 		e.shiftKey === Boolean(shiftKey) &&
-// 		e.altKey === Boolean(altKey) &&
-// 		isMetaOrCtrlKey(e) === Boolean(metaOrCtrlKey) &&
-// 		e.keycode === keyCode
+// 		!e.shiftKey &&
+// 		!e.altKey &&
+// 		!isMetaOrCtrlKey(e) &&
+// 		e.keyCode === keyCodes.backspace
 // 	)
 // 	return ok
 // }
+//
+// // Detects whether a key down event is backspace word RTL.
+// export function detectBackspaceWordRTL(e) {
+// 	const ok = (
+// 		!e.shiftKey &&
+// 		!e.altKey &&
+// 		isMetaOrCtrlKey(e) &&
+// 		e.keyCode === keyCodes.Z
+// 	)
+// 	return ok
+// }
+//
+// // Detects whether a key down event is backspace paragraph
+// // RTL.
+// export function detectBackspaceParagraphRTL(e) {
+// 	const ok = (
+// 		!e.shiftKey &&
+// 		!e.altKey &&
+// 		isMetaOrCtrlKey(e) &&
+// 		e.keyCode === keyCodes.Z
+// 	)
+// 	return ok
+// }
+//
+// // Detects whether a key down event is backspace LTR.
+// export function detectBackspaceLTR(e) {
+// 	const ok = (
+// 		!e.shiftKey &&
+// 		!e.altKey &&
+// 		isMetaOrCtrlKey(e) &&
+// 		e.keyCode === keyCodes.Z
+// 	)
+// 	return ok
+// }
+//
+// // Detects whether a key down event is backspace word LTR.
+// export function detectBackspaceLTRWord(e) {
+// 	const ok = (
+// 		!e.shiftKey &&
+// 		!e.altKey &&
+// 		isMetaOrCtrlKey(e) &&
+// 		e.keyCode === keyCodes.Z
+// 	)
+// 	return ok
+// }
+
+// detectBackspaceRTL
+// detectBackspaceWordRTL
+// detectBackspaceParagraphRTL
+// detectBackspaceLTR
+// detectBackspaceLTRWord
 
 // Detects whether a key down event is undo.
 export function detectUndo(e) {

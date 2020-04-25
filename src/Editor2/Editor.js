@@ -10,15 +10,17 @@ import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
 
 import {
+	// detectBackspaceLTR,
+	// detectBackspaceLTRWord,
+	// detectBackspaceParagraphRTL,
+	// detectBackspaceRTL,
+	// detectBackspaceWordRTL,
 	detectRedo,
 	detectUndo,
+	isMetaOrCtrlKey,
 } from "./detect"
 
 import "./Editor.css"
-
-// ;(() => {
-// 	document.body.classList.toggle("debug-css")
-// })()
 
 // TODO: Add React.memo?
 const ReactEditor = ({ state, dispatch }) => {
@@ -224,18 +226,48 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						// No-op
 						return
 					}
+
+					// Backspace paragraph RTL:
+					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
+						e.preventDefault()
+						console.log("backspace line")
+						return
+					// Backspace word RTL:
+					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
+						e.preventDefault()
+						console.log("backspace word")
+						return
+					// Backspace rune RTL:
+					} else if (e.keyCode === keyCodes.Backspace) {
+						e.preventDefault()
+						console.log("backspace rune")
+						return
+					// Backspace word LTR:
+					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {
+						e.preventDefault()
+						console.log("delete word")
+						return
+					// Backspace rune LTR:
+					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
+						e.preventDefault()
+						console.log("delete rune")
+						return
+					}
+
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
 						dispatch.tab()
 						return
-					// Enter (EOL):
+					// EOL:
 					} else if (e.keyCode === keyCodes.Enter) {
 						e.preventDefault()
 						dispatch.enter()
 						return
+					}
+
 					// Undo:
-					} else if (detectUndo(e)) {
+					if (detectUndo(e)) {
 						e.preventDefault()
 						dispatch.undo()
 						return
