@@ -326,8 +326,9 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			}
 			// No-op
 			break
+		// <Emoji>
 		default:
-			// <Emoji>
+			// 😀
 			const emojiInfo = emojiTrie.atStart(str.slice(x))
 			if (emojiInfo && emojiInfo.status === "fully-qualified") { // TODO: Add "component"?
 				parsed.push({
