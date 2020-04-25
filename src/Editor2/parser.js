@@ -245,6 +245,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 		// <Code>
 		case "`":
+			// `Code`
 			if (nchars >= "x".length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
@@ -264,7 +265,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 			// <Anchor> (1 of 2)
 		case "h":
-			// https:// OR https://
+			// https:// OR http://
 			if (
 				(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
 				(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
