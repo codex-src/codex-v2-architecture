@@ -496,7 +496,7 @@ const App = () => {
 									{id !== "" && (
 										<a href={`#${hash}`}>
 											<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-												{children || "Untitled"}
+												{children.trim() || "Untitled"}
 											</h1>
 										</a>
 									)}
@@ -505,7 +505,7 @@ const App = () => {
 											<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 												<a href={`#${hash}`}>
 													<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
-														{children || "Untitled"}
+														{children.trim() || "Untitled"}
 													</h2>
 												</a>
 											</li>
