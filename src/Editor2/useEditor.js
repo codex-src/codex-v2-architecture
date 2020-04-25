@@ -231,7 +231,6 @@ const methods = state => ({
 				pos -= rune.length
 			}
 		}
-		// Get dropL:
 		let dropL = state.pos1.pos - pos
 		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
 			dropL = 1
@@ -284,7 +283,6 @@ const methods = state => ({
 				pos += rune.length
 			}
 		}
-		// Get dropR:
 		let dropR = pos - state.pos1.pos
 		if (!dropR && pos < state.data.length && state.data[pos] === "\n") {
 			dropR = 1
@@ -308,7 +306,6 @@ const methods = state => ({
 			}
 			pos -= rune.length
 		}
-		// Get dropL:
 		let dropL = state.pos1.pos - pos
 		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
 			dropL = 1
