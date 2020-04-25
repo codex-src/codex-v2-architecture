@@ -25,7 +25,7 @@ const ReadmeEditor = ({ readOnly }) => {
 
 const FixedEditorPreferences = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => (
 	// NOTE: Use flex flex-col because of the sidebar
-	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none">
+	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none translate-z">
 
 		{/* Preferences */}
 		<div className="flex-shrink-0 flex flex-row justify-between">
