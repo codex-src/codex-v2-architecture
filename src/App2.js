@@ -27,8 +27,8 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 	// NOTE: Use flex flex-col because of the sidebar
 	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
-		{/* Settings */}
-		<div className="flex-shrink-0 flex flex-row justify-between w-full">
+		{/* Preferences */}
+		<div className="flex-shrink-0 flex flex-row justify-between">
 
 			{/* LHS */}
 			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
@@ -67,13 +67,13 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 					className="m-1 font-medium text-xs underline"
 					onClick={dispatch.toggleReadOnly}
 				>
-					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}-P)
+					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
 				</Button>
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showReadme}
 	 			>
-	 				Readme (esc)
+	 				Readme (Esc)
 	 			</Button>
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
@@ -242,7 +242,7 @@ function format(n) {
 const App = () => {
 	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
-	const [editorSettings, editorSettingsDispatch] = useEditorPreferences(renderModesEnum.Readme)
+	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
 	// Save status:
 	//
@@ -350,11 +350,11 @@ const App = () => {
 	// Sets renderers (debounced).
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			if (!editorSettings.showSidebar) {
+			if (!editorPrefs.showSidebar) {
 				// No-op
 				return
 			}
-			editorSettingsDispatch.update(editor)
+			editorPrefsDispatch.update(editor)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
@@ -362,8 +362,8 @@ const App = () => {
 	}, [
 		// Logically sorted:
 		editor,
-		editorSettings.showSidebar,
-		editorSettingsDispatch,
+		editorPrefs.showSidebar,
+		editorPrefsDispatch,
 	])
 
 	// Manages read-only mode.
@@ -375,7 +375,7 @@ const App = () => {
 			}
 			e.preventDefault()
 			editorDispatch.toggleReadOnly()
-			editorSettingsDispatch.toggleReadOnly()
+			editorPrefsDispatch.toggleReadOnly()
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
@@ -384,7 +384,7 @@ const App = () => {
 	}, [
 		// Logically sorted:
 		editorDispatch,
-		editorSettingsDispatch,
+		editorPrefsDispatch,
 	])
 
 	// Manages sidebar (debounced -- match useEffect).
@@ -396,7 +396,7 @@ const App = () => {
 			}
 			e.preventDefault()
 			const id = setTimeout(() => {
-				editorSettingsDispatch.toggleSidebar()
+				editorPrefsDispatch.toggleSidebar()
 			}, 16.67)
 			return () => {
 				clearTimeout(id)
@@ -406,7 +406,12 @@ const App = () => {
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [editorSettingsDispatch])
+	}, [editorPrefsDispatch])
+
+	// const [timer, setTimer] = React.useState(false)
+	// React.useEffect(() => {
+	// 	setTimer(editorPrefs.readOnly)
+	// }, [editorPrefs.readOnly])
 
 	return (
 		// NOTE: Use items-start for sticky
@@ -416,9 +421,38 @@ const App = () => {
 			<FixedEditorPreferences
 				showContentsState={[showContents, setShowContents]}
 				saveStatusState={[saveStatus, setSaveStatus]}
-				state={editorSettings}
-				dispatch={editorSettingsDispatch}
+				state={editorPrefs}
+				dispatch={editorPrefsDispatch}
 			/>
+
+			{/* NOTE: Use p-2 instead of px-3 py-2 */}
+			{/* FIXME: Does z-index conflict with status bars? */}
+			<div className="p-2 fixed inset-0 pointer-events-none">
+				<div className="flex flex-row justify-start items-end h-full">
+
+					<Transition
+						// NOTE: Use duration-200 instead of
+						// duration-300
+						show={editorPrefs.readOnly}
+						enter="transition ease-out duration-200"
+						enterFrom="opacity-0 transform translate-y-8"
+						enterTo="opacity-100 transform translate-y-0"
+						leave="transition ease-in duration-200"
+						leaveFrom="opacity-100 transform translate-y-0"
+						leaveTo="opacity-0 transform translate-y-8"
+					>
+						<div className="rounded-lg shadow-lg">
+							<Button className="px-4 py-3 bg-black font-medium tracking-px text-white rounded-lg shadow-lg pointer-events-auto"  onClick={editorPrefsDispatch.toggleReadOnly}>
+								Enabled Preview Mode
+								<span className="ml-4 text-gray-400">
+									Undo
+								</span>
+							</Button>
+						</div>
+					</Transition>
+
+				</div>
+			</div>
 
 			{/* LHS */}
 			<Transition
@@ -457,8 +491,8 @@ const App = () => {
 									// duration-300
 									show={!hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform -translate-x-8" // TODO: Remove opacity?
-									enterTo="opacity-100 transform translate-x-0"
+									enterFrom="transform -translate-x-8"
+									enterTo="opacity-100 transform translate-x-0" // FIXME: Remove opacity?
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform -translate-x-8"
@@ -472,7 +506,7 @@ const App = () => {
 									show={hoverContents}
 									enter="transition duration-200"
 									enterFrom="transform translate-x-8"
-									enterTo="opacity-100 transform translate-x-0"
+									enterTo="opacity-100 transform translate-x-0" // FIXME: Remove opacity?
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform translate-x-8"
@@ -485,7 +519,7 @@ const App = () => {
 								{!hoverContents ? (
 									title.trim() || "Untitled"
 								) : (
-									`Hide Contents (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)`
+									`Hide Contents (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "CTRL" : "⌘"}⇧1)`
 								)}
 							</p>
 						</Button>
@@ -535,7 +569,7 @@ const App = () => {
 						style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
 						state={editor}
 						dispatch={editorDispatch}
-						readOnly={editorSettings.readOnly}
+						readOnly={editorPrefs.readOnly}
 					/>
 				</DocumentTitle>
 
