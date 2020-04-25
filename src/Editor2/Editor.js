@@ -230,51 +230,45 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						// No-op
 						return
 					}
-
 					// Backspace paragraph:
+					//
+					// NOTE: Ordered by precedence
 					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace-paragraph")
 						dispatch.backspaceParagraph()
 						return
 					// Backspace word:
-					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
+					} else if (e.altKey && e.keyCode === keyCodes.Backspace) { // FIXME: e.altKey for non-macOS?
 						e.preventDefault()
-						console.log("backspace-word")
 						dispatch.backspaceWord()
 						return
 					// Backspace rune:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspace-rune")
 						dispatch.backspaceRune()
 						return
 					// Forward-backspace word:
 					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {
 						e.preventDefault()
-						console.log("forward-backspace-word")
 						dispatch.forwardBackspaceWord()
 						return
 					// Forward-backspace rune:
 					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
 						e.preventDefault()
-						console.log("forward-backspace-rune")
 						dispatch.forwardBackspaceRune()
 						return
 					}
-
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
 						dispatch.tab()
 						return
-					// EOL:
+					// Enter:
 					} else if (e.keyCode === keyCodes.Enter) {
 						e.preventDefault()
 						dispatch.enter()
 						return
 					}
-
 					// Undo:
 					if (detectUndo(e)) {
 						e.preventDefault()
@@ -305,17 +299,63 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						// No-op
 						return
 					}
-					// Force rerender when empty:
-					if (!ref.current.childNodes.length) { // Takes precedence?
+					// Force rerender when empty (takes precedence):
+					if (!ref.current.childNodes.length) {
 						dispatch.render()
 						return
 					}
-					// Dedupe "compositionend" event (not tested):
+					// Dedupe "compositionend":
 					//
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
 						dedupedCompositionEnd.current = false
 						return
+					}
+					// Intercept data-codex-node or data-codex-root
+					// events:
+					//
+					// NOTE: Do not trust Chrome (as of 81) for
+					// e.nativeEvent.inputType:
+					//
+					// backspace-word -> "deleteWordBackward"
+					// backspace-rune -> "deleteWordBackward" ??
+					//
+					// https://w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+					switch (navigator.vendor !== "Google Inc." && e.nativeEvent.inputType) {
+					// Backspace (any):
+					case "deleteHardLineBackward":
+					case "deleteSoftLineBackward":
+						dispatch.backspaceParagraph()
+						return
+					case "deleteWordBackward":
+						dispatch.backspaceWord()
+						return
+					case "deleteContentBackward":
+						dispatch.backspaceRune()
+						return
+					case "deleteWordForward":
+						dispatch.forwardBackspaceWord()
+						return
+					// Forward-backspace (any):
+					case "deleteContentForward":
+						dispatch.forwardBackspaceRune()
+						return
+					// Enter:
+					case "insertLineBreak":
+					case "insertParagraph":
+						dispatch.enter()
+						return
+					// Undo:
+					case "historyUndo":
+						dispatch.undo()
+						return
+					// Redo:
+					case "historyRedo":
+						dispatch.redo()
+						return
+					default:
+						// No-op
+						break
 					}
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
