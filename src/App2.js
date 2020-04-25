@@ -429,13 +429,11 @@ const App = () => {
 			<div className="p-2 fixed inset-0 pointer-events-none">
 				<div className="flex flex-row justify-start items-end h-full">
 					<Transition
-						// NOTE: Use duration-200 instead of
-						// duration-300
 						show={editorPrefs.readOnly}
-						enter="transition ease-out duration-200"
+						enter="transition ease-out duration-300"
 						enterFrom="opacity-0 transform translate-y-8"
 						enterTo="opacity-100 transform translate-y-0"
-						leave="transition ease-in duration-200"
+						leave="transition ease-in duration-300"
 						leaveFrom="opacity-100 transform translate-y-0"
 						leaveTo="opacity-0 transform translate-y-8"
 					>
@@ -485,7 +483,8 @@ const App = () => {
 							>
 								<Transition
 									// NOTE: Use duration-200 instead of
-									// duration-300
+									// duration-300 and omit transition-
+									// timing-function
 									show={!hoverContents}
 									enter="transition duration-200"
 									enterFrom="opacity-0 transform -translate-x-8"
@@ -499,7 +498,8 @@ const App = () => {
 								</Transition>
 								<Transition
 									// NOTE: Use duration-200 instead of
-									// duration-300
+									// duration-300 and omit transition-
+									// timing-function
 									show={hoverContents}
 									enter="transition duration-200"
 									enterFrom="opacity-0 transform translate-x-8"
@@ -572,11 +572,13 @@ const App = () => {
 
 				{/* Status bars */}
 				<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-					{/* NOTE: Use duration-200 instead of duration-300 */}
+					{/* NOTE: Use duration-200 instead of duration-300
+					and omit transition-timing-function */}
 					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
 						{statusLHS}
 					</p>
-					{/* NOTE: Use duration-200 instead of duration-300 */}
+					{/* NOTE: Use duration-200 instead of duration-300
+					and omit transition-timing-function */}
 					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
 						{statusRHS}
 					</p>
