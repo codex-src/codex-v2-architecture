@@ -235,7 +235,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
 						console.log("backspace-paragraph")
-						// dispatch.backspaceParagraph()
+						dispatch.backspaceParagraph()
 						return
 					// Backspace word:
 					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {

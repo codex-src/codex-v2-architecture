@@ -191,8 +191,8 @@ const methods = state => ({
 			this.write("")
 			return
 		}
-		// Iterate white space:
-		let pos = state.pos1.pos // eslint-disable-line prefer-destructuring
+		// Iterate spaces:
+		let { pos } = state.pos1
 		while (pos) {
 			const substr = state.data.slice(0, pos)
 			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
@@ -244,8 +244,8 @@ const methods = state => ({
 			this.write("")
 			return
 		}
-		// Iterate white space:
-		let pos = state.pos1.pos // eslint-disable-line prefer-destructuring
+		// Iterate spaces:
+		let { pos } = state.pos1
 		while (pos < state.data.length) {
 			const substr = state.data.slice(pos)
 			const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
@@ -290,6 +290,30 @@ const methods = state => ({
 			dropR = 1
 		}
 		this.dropBytes(0, dropR)
+	},
+	// Backspaces one paragraph.
+	backspaceParagraph() {
+		if (state.pos1.pos !== state.pos2.pos) {
+			this.write("")
+			return
+		}
+		// Iterate non-breaks:
+		let { pos } = state.pos1
+		while (pos) {
+			const substr = state.data.slice(0, pos)
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			if (utf8.isVWhiteSpace(rune)) {
+				// No-op
+				break
+			}
+			pos -= rune.length
+		}
+		// Get dropL:
+		let dropL = state.pos1.pos - pos
+		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
+			dropL = 1
+		}
+		this.dropBytes(dropL, 0)
 	},
 	// Inserts a tab character.
 	tab() {
