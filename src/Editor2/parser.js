@@ -111,7 +111,8 @@ function parseGFMType({ type, syntax, str, x }) {
 	const parsed = {
 		type,
 		syntax,
-		children: type !== typeEnum.Code ? parseInlineElements(str.slice(x, x + offset))
+		children: type !== typeEnum.Code && (type !== typeEnum.Anchor && syntax !== ")")
+			? parseInlineElements(str.slice(x, x + offset))
 			: str.slice(x, x + offset),
 	}
 	// Increment offset and end syntax:
@@ -293,39 +294,38 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			}
 			// No-op
 			break
-
-			// // <A> (2 of 2)
-			// case "[":
-			// 	// [A](href)
-			// 	if (nchars >= "[x](x)".length) {
-			// 		const lhs = registerType(null, "]")(str, x)
-			// 		if (!lhs) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		// Check ( syntax:
-			// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		const rhs = registerType(null, ")", { recurse: false })(str, lhs.x2)
-			// 		if (!rhs) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		data.push({
-			// 			type: A,
-			// 			// syntax: ["[", "](…)"],
-			// 			syntax: ["[", `](${rhs.data.children})`],
-			// 			href: rhs.data.children.trim(),
-			// 			children: lhs.data.children,
-			// 		})
-			// 		x = rhs.x2 - 1
-			// 		continue
-			// 	}
-			// 	// No-op
-			// 	break
-
+		// <Anchor> (2 of 2)
+		case "[":
+			// [Anchor](href)
+			if (nchars >= "[x](x)".length) {
+				const lhs = parseGFMType({ type: typeEnum.Anchor, syntax: "]", str, x })
+				if (!lhs) {
+					// No-op
+					break
+				}
+				// Check ( syntax:
+				if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
+					// No-op
+					break
+				}
+				// lhs.x2++
+				const rhs = parseGFMType({ type: typeEnum.Anchor, syntax: ")", str, x: lhs.x2 })
+				if (!rhs) {
+					// No-op
+					break
+				}
+				parsed.push({
+					type: typeEnum.Anchor,
+					// syntax: ["[", "](…)"],
+					syntax: ["[", `](${rhs.parsed.children})`],
+					href: rhs.parsed.children.trim(), // FIXME: Remove trim?
+					children: lhs.parsed.children,
+				})
+				x = rhs.x2 - 1
+				continue
+			}
+			// No-op
+			break
 		default:
 			// <Emoji>
 			const emojiInfo = emojiTrie.atStart(str.slice(x))
