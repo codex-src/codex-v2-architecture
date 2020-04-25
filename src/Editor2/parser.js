@@ -5,7 +5,7 @@ import { isAlphanum } from "encoding/ascii"
 import { toInnerText } from "./cmap"
 
 import {
-	// ASCIIPunctuationPattern,
+	ASCIIPunctuationPattern,
 	ASCIIWhitespacePattern,
 	HTTP,
 	HTTPS,
@@ -74,8 +74,9 @@ import {
 
 // Parses a GitHub Flavored Markdown (GFM) type.
 function parseGFMType({ type, syntax, str, x }) {
-	// Syntax must be preceded by a BOL or a space:
-	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1])) { // E.g. ·*match*
+	// Syntax must be preceded by a BOL, space, or ASCII
+	// punctuation character:
+	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1]) && !isASCIIPunctuation(str[x - 1])) { // E.g. ·*match*
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -85,8 +86,9 @@ function parseGFMType({ type, syntax, str, x }) {
 		pattern = `[^\\\\]${pattern}`
 		patternOffset++
 	}
-	// Syntax must be proceeded by a space or an EOL:
-	pattern += `(${ASCIIWhitespacePattern}|$)`
+	// Syntax must be proceeded by a space, EOL, or ASCII
+	// punctuation character:
+	pattern += `(${ASCIIWhitespacePattern}|${ASCIIPunctuationPattern}|$)`
 	// Match cannot be empty:
 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
