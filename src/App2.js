@@ -435,9 +435,9 @@ const App = () => {
 						<div className="rounded-lg shadow-lg">
 							<Button className="px-4 py-3 flex flex-row items-center bg-black font-medium text-white rounded-lg shadow-lg pointer-events-auto" onClick={editorPrefsDispatch.toggleReadOnly}>
 								<svg className="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-									{/* <path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" fillRule="evenodd" /> */}
+									{/* <path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" fillRule="evenodd"></path> */}
 									<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-									<path d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" fill-rule="evenodd"></path>
+									<path d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" fillRule="evenodd"></path>
 								</svg>
 								Preview mode
 								<span className="ml-4 text-gray-300">Undo</span>
