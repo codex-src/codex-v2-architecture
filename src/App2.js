@@ -36,7 +36,7 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 					className="m-1 font-medium text-xs underline"
 					onClick={() => setShowContents(!showContents)}
 				>
-					Toggle contents ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)
+					Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)
 				</Button>
 				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
 					<p className="font-medium text-xs">
@@ -425,11 +425,9 @@ const App = () => {
 				dispatch={editorPrefsDispatch}
 			/>
 
-			{/* NOTE: Use p-2 instead of px-3 py-2 */}
-			{/* FIXME: Does z-index conflict with status bars? */}
+			{/* Preview button (for read-only mode) */}
 			<div className="p-2 fixed inset-0 pointer-events-none">
 				<div className="flex flex-row justify-start items-end h-full">
-
 					<Transition
 						// NOTE: Use duration-200 instead of
 						// duration-300
@@ -450,7 +448,6 @@ const App = () => {
 							</Button>
 						</div>
 					</Transition>
-
 				</div>
 			</div>
 
@@ -491,8 +488,8 @@ const App = () => {
 									// duration-300
 									show={!hoverContents}
 									enter="transition duration-200"
-									enterFrom="transform -translate-x-8"
-									enterTo="opacity-100 transform translate-x-0" // FIXME: Remove opacity?
+									enterFrom="opacity-0 transform -translate-x-8"
+									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform -translate-x-8"
@@ -505,8 +502,8 @@ const App = () => {
 									// duration-300
 									show={hoverContents}
 									enter="transition duration-200"
-									enterFrom="transform translate-x-8"
-									enterTo="opacity-100 transform translate-x-0" // FIXME: Remove opacity?
+									enterFrom="opacity-0 transform translate-x-8"
+									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform translate-x-8"
@@ -519,7 +516,7 @@ const App = () => {
 								{!hoverContents ? (
 									title.trim() || "Untitled"
 								) : (
-									`Hide Contents (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "CTRL" : "⌘"}⇧1)`
+									`Hide Outline (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "CTRL" : "⌘"}⇧1)`
 								)}
 							</p>
 						</Button>
