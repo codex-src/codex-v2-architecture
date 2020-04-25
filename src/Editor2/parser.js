@@ -5,12 +5,12 @@ import { toInnerText } from "./cmap"
 
 import {
 	// ASCIIPunctuationPattern,
-	// HTTP,
-	// HTTPS,
-	// safeURLRe,
 	ASCIIWhitespacePattern,
+	HTTP,
+	HTTPS,
 	isASCIIPunctuation,
 	isASCIIWhitespace,
+	safeURLRe,
 } from "./spec"
 
 // // Parses a GitHub Flavored Markdown (GFM) type.
@@ -125,7 +125,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
 		// Fast pass:
-		if (!isASCIIPunctuation(str[x]) && str[x] <= "\u00ff") {
+		if (!isASCIIPunctuation(str[x]) && str[x] !== "h" && str[x] <= "\u00ff") { // TODO: Add "w" for "www"?
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
 				continue
@@ -262,45 +262,49 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// No-op
 			break
 
-			// // <A> (1 of 2)
-			// case "h":
-			// 	// https://
-			// 	//
-			// 	// TODO: Eat "www."
-			// 	if (nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) {
-			// 		const matches = safeURLRe.exec(str.slice(x))
-			// 		let offset = 0
-			// 		if (matches) {
-			// 			offset = matches[0].length
-			// 		}
-			// 		data.push({
-			// 			type: A,
-			// 			syntax: [HTTPS],
-			// 			href: matches[0],
-			// 			children: matches[0].slice(HTTPS.length),
-			// 		})
-			// 		x += offset - 1
-			// 		continue
-			// 	// http://
-			// 	//
-			// 	// TODO: Eat "www."
-			// 	} else if (nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP) {
-			// 		const matches = safeURLRe.exec(str.slice(x))
-			// 		let offset = 0
-			// 		if (matches) {
-			// 			offset = matches[0].length
-			// 		}
-			// 		data.push({
-			// 			type: A,
-			// 			syntax: [HTTP],
-			// 			href: matches[0],
-			// 			children: matches[0].slice(HTTP.length),
-			// 		})
-			// 		x += offset - 1
-			// 		continue
-			// 	}
-			// 	// No-op
-			// 	break
+			// <A> (1 of 2)
+			case "h":
+				// https://
+				//
+				// TODO: Eat "www."
+				if (nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) {
+					const matches = safeURLRe.exec(str.slice(x))
+					let offset = 0
+					if (matches) {
+						offset = matches[0].length
+					}
+					parsed.push({
+						type: typeEnum.Anchor,
+						syntax: [HTTPS],
+						href: matches[0],
+						children: matches[0].slice(HTTPS.length),
+					})
+					x += offset - 1
+					continue
+
+				// // http://
+				// //
+				// // TODO: Eat "www."
+				// } else if (nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP) {
+				// 	const matches = safeURLRe.exec(str.slice(x))
+				// 	let offset = 0
+				// 	if (matches) {
+				// 		offset = matches[0].length
+				// 	}
+				// 	data.push({
+				// 		type: A,
+				// 		syntax: [HTTP],
+				// 		href: matches[0],
+				// 		children: matches[0].slice(HTTP.length),
+				// 	})
+				// 	x += offset - 1
+				// 	continue
+				// }
+
+				}
+				// No-op
+				break
+
 			// // <A> (2 of 2)
 			// case "[":
 			// 	// [A](href)
@@ -369,7 +373,7 @@ function parseElements(nodes) {
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast pass:
-		if (!nodes[x].data.length || !isASCIIPunctuation(nodes[x].data[0])) {
+		if (!nodes[x].data.length || !isASCIIPunctuation(nodes[x].data[0])) { // TODO: Add "h" for "https://" and "http://"?
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
 				type: typeEnum.Paragraph,

@@ -66,7 +66,7 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapText[typeEnum.StrongEmphasis]      = data => toInnerString(data.children)
 	cmapText[typeEnum.Code]                = data => data.children
 	cmapText[typeEnum.Strikethrough]       = data => toInnerString(data.children)
-	// cmapText[typeEnum.A]                = data => toInnerString(data.children)
+	cmapText[typeEnum.Anchor]              = data => toInnerString(data.children)
 	cmapText[typeEnum.Header]              = data => toInnerString(data.children)
 	cmapText[typeEnum.Paragraph]           = data => toInnerString(data.children)
 	cmapText[typeEnum.BlockquoteItem]      = data => toInnerString(data.children)
@@ -85,7 +85,7 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapHTML[typeEnum.StrongEmphasis]      = data => `<strong><em>${toInnerString(data.children, cmapHTML)}</em></strong>`
 	cmapHTML[typeEnum.Code]                = data => `<code>${toInnerString(data.children, cmapHTML)}</code>`
 	cmapHTML[typeEnum.Strikethrough]       = data => `<strike>${toInnerString(data.children, cmapHTML)}</strike>`
-	// cmapHTML[typeEnum.A]                = data => `<a href="${data.href}">${toInnerString(data.children, cmapHTML)}</a>`
+	cmapHTML[typeEnum.Anchor]              = data => `<a href="${data.href}">${toInnerString(data.children, cmapHTML)}</a>`
 	cmapHTML[typeEnum.Header]              = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</${data.tag}>\n</a>`
 	cmapHTML[typeEnum.Paragraph]           = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.BlockquoteItem]      = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
@@ -105,7 +105,7 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapHTML__BEM[typeEnum.StrongEmphasis] = data => `<strong class="strong"><em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
 	cmapHTML__BEM[typeEnum.Code]           = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
 	cmapHTML__BEM[typeEnum.Strikethrough]  = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
-	// cmapHTML__BEM[typeEnum.A]           = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
+	cmapHTML__BEM[typeEnum.Anchor]         = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
 	cmapHTML__BEM[typeEnum.Header]         = data => `<a class="a" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
 	cmapHTML__BEM[typeEnum.Paragraph]      = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[typeEnum.BlockquoteItem] = data => `<p class="blockquote__p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
@@ -124,7 +124,7 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapReact_js[typeEnum.StrongEmphasis]  = data => `<StrongEm>${toInnerString(data.children, cmapReact_js)}</StrongEm>`
 	cmapReact_js[typeEnum.Code]            = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
 	cmapReact_js[typeEnum.Strikethrough]   = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
-	// cmapReact_js[typeEnum.A]            = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
+	cmapReact_js[typeEnum.Anchor]          = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
 	cmapReact_js[typeEnum.Header]          = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
 	cmapReact_js[typeEnum.Paragraph]       = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[typeEnum.BlockquoteItem]  = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`

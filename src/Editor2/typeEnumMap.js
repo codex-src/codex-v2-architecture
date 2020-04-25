@@ -10,6 +10,7 @@ import {
 } from "./Elements"
 
 import {
+	Anchor,
 	Code,
 	Emoji,
 	Emphasis,
@@ -21,21 +22,22 @@ import {
 
 const typeEnumMap = {
 	// Elements:
+	[typeEnum.Blockquote]: Blockquote,
+	[typeEnum.BlockquoteItem]: BlockquoteItem,
+	[typeEnum.Break]: Break,
+	[typeEnum.CodeBlock]: CodeBlock,
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
-	[typeEnum.BlockquoteItem]: BlockquoteItem,
-	[typeEnum.Blockquote]: Blockquote,
-	[typeEnum.CodeBlock]: CodeBlock,
-	[typeEnum.Break]: Break,
 
 	// Inline elements:
-	[typeEnum.Escape]: Escape,
+	[typeEnum.Anchor]: Anchor,
+	[typeEnum.Code]: Code,
 	[typeEnum.Emoji]: Emoji,
 	[typeEnum.Emphasis]: Emphasis,
+	[typeEnum.Escape]: Escape,
+	[typeEnum.Strikethrough]: Strikethrough,
 	[typeEnum.Strong]: Strong,
 	[typeEnum.StrongEmphasis]: StrongEmphasis,
-	[typeEnum.Code]: Code,
-	[typeEnum.Strikethrough]: Strikethrough,
 }
 
 export default typeEnumMap

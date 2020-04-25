@@ -2,21 +2,22 @@ import Enum from "Enum"
 
 const typeEnum = new Enum(
 	// Elements:
-	"Header",
-	"Paragraph",
 	"Blockquote",
 	"BlockquoteItem",
-	"CodeBlock",
 	"Break",
+	"CodeBlock",
+	"Header",
+	"Paragraph",
 
 	// Inline elements:
-	"Escape",
+	"Anchor",
+	"Code",
 	"Emoji",
 	"Emphasis",
+	"Escape",
+	"Strikethrough",
 	"Strong",
 	"StrongEmphasis",
-	"Code",
-	"Strikethrough",
 )
 
 export default typeEnum

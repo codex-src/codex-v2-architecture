@@ -70,10 +70,10 @@ export const Strikethrough = ({ syntax, children }) => (
 	</Span>
 )
 
-// export const A = ({ syntax, href, children }) => (
-// 	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
-// 		<Markdown syntax={!children || syntax}>
-// 			{children || syntax}
-// 		</Markdown>
-// 	</a>
-// )
+export const Anchor = ({ syntax, href, children }) => (
+	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
+		<Markdown syntax={!children || syntax}>
+			{children || syntax}
+		</Markdown>
+	</a>
+)
