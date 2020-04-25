@@ -169,12 +169,10 @@ const methods = state => ({
 	backspaceRuneRTL() {
 		let dropL = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
-			const substr = state.data.slice(0, state.pos1.pos) // TODO: Use pos.x?
+			const substr = state.data.slice(state.pos1.pos - state.pos1.x, state.pos1.pos)
 			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			console.log({ rune })
-			dropL = rune.length
+			dropL = (rune || "\n").length
 		}
-		// console.log(dropL)
 		this.dropBytes(dropL, 0)
 	},
 
