@@ -36,7 +36,7 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 					className="m-1 font-medium text-xs underline"
 					onClick={() => setShowContents(!showContents)}
 				>
-					Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control" : "⌘"}⇧1)
+					Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 				</Button>
 				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
 					<p className="font-medium text-xs">
@@ -263,7 +263,7 @@ const App = () => {
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(e.shiftKey && isMetaOrCtrlKey(e) && e.keyCode === 49)) { // 49: 1
+			if (!(/* e.shiftKey && */ isMetaOrCtrlKey(e) && e.keyCode === 79)) { // 79: O
 				// No-op
 				return
 			}
@@ -369,7 +369,7 @@ const App = () => {
 	// Manages read-only mode.
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
+			if (!(/* e.shiftKey && */ isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
 				// No-op
 				return
 			}
@@ -425,7 +425,7 @@ const App = () => {
 				dispatch={editorPrefsDispatch}
 			/>
 
-			{/* Preview button (for read-only mode) */}
+			{/* Displaying Preview (for read-only mode) */}
 			<div className="p-2 fixed inset-0 pointer-events-none">
 				<div className="flex flex-row justify-start items-end h-full">
 					<Transition
@@ -440,7 +440,7 @@ const App = () => {
 						leaveTo="opacity-0 transform translate-y-8"
 					>
 						<div className="rounded-lg shadow-lg">
-							<Button className="px-4 py-3 bg-black font-medium tracking-px text-white rounded-lg shadow-lg pointer-events-auto"  onClick={editorPrefsDispatch.toggleReadOnly}>
+							<Button className="px-4 py-3 bg-black font-medium text-white rounded-lg shadow-lg pointer-events-auto" onClick={editorPrefsDispatch.toggleReadOnly}>
 								Displaying Preview
 								<span className="ml-4 text-gray-300">
 									Undo
@@ -516,7 +516,7 @@ const App = () => {
 								{!hoverContents ? (
 									title.trim() || "Untitled"
 								) : (
-									`Hide Outline (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "CTRL" : "⌘"}⇧1)`
+									`Hide Outline (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)`
 								)}
 							</p>
 						</Button>
