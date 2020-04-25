@@ -1,7 +1,7 @@
 import Enum from "Enum"
 
 const renderModesEnum = new Enum(
-	"Readme", // FIXME?
+	"Readme",
 	"Text",
 	"JSON",
 	"HTML",

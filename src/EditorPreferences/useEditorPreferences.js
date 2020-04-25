@@ -21,7 +21,7 @@ function initialState(defaultRenderer) {
 }
 
 const methods = state => ({
-	// Updates settings.
+	// Updates preferences.
 	update(editorState) {
 		Object.assign(state, {
 			[renderModesEnum.JSON]: JSON.stringify(
@@ -73,8 +73,8 @@ const methods = state => ({
 	},
 })
 
-function useEditorSettings(defaultRenderer) {
+function useEditorPreferences(defaultRenderer) {
 	return useMethods(methods, {}, () => initialState(defaultRenderer))
 }
 
-export default useEditorSettings
+export default useEditorPreferences

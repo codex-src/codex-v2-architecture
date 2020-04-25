@@ -4,11 +4,11 @@ import Editor from "Editor2/Editor"
 import Highlighted from "Highlighted"
 import raw from "raw.macro"
 import React from "react"
-import renderModesEnum from "EditorSettings/renderModesEnum"
+import renderModesEnum from "EditorPreferences/renderModesEnum"
 import Transition from "Transition"
 import typeEnum from "Editor2/typeEnum"
 import useEditor from "Editor2/useEditor"
-import useEditorSettings from "EditorSettings/useEditorSettings"
+import useEditorPreferences from "EditorPreferences/useEditorPreferences"
 import { isMetaOrCtrlKey } from "Editor2/detect"
 
 import {
@@ -23,7 +23,7 @@ const ReadmeEditor = ({ readOnly }) => {
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
-const FixedEditorSettings = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => (
+const FixedEditorPreferences = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => (
 	// NOTE: Use flex flex-col because of the sidebar
 	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
@@ -242,7 +242,7 @@ function format(n) {
 const App = () => {
 	// TODO: Use props.children instead of useEditor?
 	const [editor, editorDispatch] = useEditor(data)
-	const [editorSettings, editorSettingsDispatch] = useEditorSettings(renderModesEnum.Readme)
+	const [editorSettings, editorSettingsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
 	// Save status:
 	//
@@ -412,8 +412,8 @@ const App = () => {
 		// NOTE: Use items-start for sticky
 		<div className="px-6 py-32 flex flex-row justify-center items-start">
 
-			{/* Fixed settings */}
-			<FixedEditorSettings
+			{/* Preferences */}
+			<FixedEditorPreferences
 				showContentsState={[showContents, setShowContents]}
 				saveStatusState={[saveStatus, setSaveStatus]}
 				state={editorSettings}
