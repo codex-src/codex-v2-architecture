@@ -444,7 +444,7 @@ const App = () => {
 						<div className="rounded-lg shadow-lg">
 							<Button className="px-4 py-3 bg-black font-medium tracking-px text-white rounded-lg shadow-lg pointer-events-auto"  onClick={editorPrefsDispatch.toggleReadOnly}>
 								Displaying Preview
-								<span className="ml-4 text-gray-400">
+								<span className="ml-4 text-gray-300">
 									Undo
 								</span>
 							</Button>
