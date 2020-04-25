@@ -1,6 +1,7 @@
 import * as emojiTrie from "emoji-trie"
 import newHashEpoch from "./newHashEpoch"
 import typeEnum from "./typeEnum"
+import { isAlphanum } from "encoding/ascii"
 import { toInnerText } from "./cmap"
 
 import {
@@ -264,14 +265,20 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			// <Anchor> (1 of 2)
 		case "h":
 			// https:// OR https://
-			//
-			// TODO: Eat "www."
 			if (
 				(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
 				(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
 			) {
-				const syntax = str.slice(x).split("://", 1)[0] + "://"
-				const [href] = safeURLRe.exec(str.slice(x))
+				let syntax = `${str.slice(x).split("://", 1)[0]}://`
+				if (str.slice(x, x + syntax.length + 4) === `${syntax}www.`) {
+					syntax += "www."
+				}
+				let [href] = safeURLRe.exec(str.slice(x))
+				if (href.length === syntax.length) {
+					// No-op; defer to end
+				} else if (!isAlphanum(href[href.length - 1]) || href[href.length - 1] === "/") {
+					href = href.slice(0, href.length - 1)
+				}
 				parsed.push({
 					type: typeEnum.Anchor,
 					syntax: [syntax],

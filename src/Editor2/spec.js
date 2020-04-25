@@ -7,7 +7,7 @@ export const HTTP  = "http://"
 // forward-slash character.
 //
 // https://tools.ietf.org/html/rfc3986
-export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)[\w\/]/ // eslint-disable-line no-useless-escape
+export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
 
 // Returns whether a character is an ASCII punctuation
 // character as defined by the GFM spec.
