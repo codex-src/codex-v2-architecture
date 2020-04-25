@@ -425,7 +425,7 @@ const App = () => {
 				dispatch={editorPrefsDispatch}
 			/>
 
-			{/* Displaying Preview (for read-only mode) */}
+			{/* Preview mode */}
 			<div className="p-2 fixed inset-0 pointer-events-none">
 				<div className="flex flex-row justify-start items-end h-full">
 					<Transition
@@ -439,7 +439,7 @@ const App = () => {
 					>
 						<div className="rounded-lg shadow-lg">
 							<Button className="px-4 py-3 bg-black font-medium text-white rounded-lg shadow-lg pointer-events-auto" onClick={editorPrefsDispatch.toggleReadOnly}>
-								Displaying Preview
+								Preview mode
 								<span className="ml-4 text-gray-300">
 									Undo
 								</span>
