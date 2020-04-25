@@ -49,7 +49,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 		React.useCallback(() => {
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
-				const mutations = syncDOM(state.reactDOM, ref.current)
+				/* const mutations = */ syncDOM(state.reactDOM, ref.current)
 				if (!mounted.current || state.readOnly || !state.focused) {
 					mounted.current = true
 					return
@@ -62,7 +62,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 
 				// Sync DOM cursors:
 				try {
-					const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
+					/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
 
 					// if (syncedPos) {
 					// 	console.log("synced pos")
@@ -244,7 +244,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					// Backspace rune RTL:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						// console.log("backspace rune")
+						// console.log("backspace-rune")
 						dispatch.backspaceRuneRTL()
 						return
 					// Backspace word LTR:
@@ -255,7 +255,8 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 					// Backspace rune LTR:
 					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
 						e.preventDefault()
-						console.log("delete rune")
+						// console.log("delete-rune")
+						dispatch.backspaceRuneLTR()
 						return
 					}
 

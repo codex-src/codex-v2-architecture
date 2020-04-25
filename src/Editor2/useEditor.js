@@ -72,8 +72,9 @@ const methods = state => ({
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
-	// Commits a mutation.
-	commitMutation() {
+	// Mutates the editor; corrects pos on first mutation and
+	// drops redo states.
+	mutate() {
 		if (!state.history.index && !state.history.correctedPos) {
 			Object.assign(state.history.stack[0], {
 				pos1: { ...state.pos1 },
@@ -85,7 +86,7 @@ const methods = state => ({
 	},
 	// Drops L and R bytes.
 	dropBytes(dropL, dropR) {
-		this.commitMutation()
+		this.mutate()
 
 		// LHS:
 		state.pos1.pos -= dropL
@@ -119,7 +120,7 @@ const methods = state => ({
 	},
 	// Writes character data.
 	write(data) {
-		this.commitMutation()
+		this.mutate()
 
 		// Parse new nodes:
 		const nodes = newNodes(data)
@@ -145,7 +146,7 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
-		this.commitMutation()
+		this.mutate()
 
 		// Get the start offset:
 		const key1 = nodes[0].id
@@ -164,14 +165,13 @@ const methods = state => ({
 		Object.assign(state, { pos1, pos2 })
 		this.render()
 	},
-
 	// Backspaces one rune (RTL).
 	backspaceRuneRTL() {
 		let dropL = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
-			const substr = state.data.slice(state.pos1.pos - state.pos1.x, state.pos1.pos)
+			const substr = state.data.slice(0, state.pos1.pos)
 			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			dropL = (rune || "\n").length
+			dropL = rune.length
 		}
 		this.dropBytes(dropL, 0)
 	},
@@ -252,16 +252,29 @@ const methods = state => ({
 	// 	}
 	// 	this.write("", dropL, 0)
 	// },
-	// // Backspaces one character (forwards).
-	// backspaceCharForwards() {
-	// 	let dropR = 0
-	// 	if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) { // Inverse
-	// 		const substr = state.data.slice(state.pos1.pos)
-	// 		const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
-	// 		dropR = rune.length
+
+	// // Backspaces one rune (RTL).
+	// backspaceRuneRTL() {
+	// 	let dropL = 0
+	// 	if (state.pos1.pos === state.pos2.pos && state.pos1.pos) { // Inverse
+	// 		const substr = state.data.slice(state.pos1.pos - state.pos1.x, state.pos1.pos)
+	// 		const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+	// 		dropL = (rune || "\n").length
 	// 	}
-	// 	this.write("", 0, dropR)
+	// 	this.dropBytes(dropL, 0)
 	// },
+
+	// Backspaces one rune (LTR).
+	backspaceRuneLTR() {
+		let dropR = 0
+		if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) { // Inverse
+			const substr = state.data.slice(state.pos1.pos)
+			const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
+			dropR = rune.length
+		}
+		this.dropBytes(0, dropR)
+	},
+
 	// // Backspaces one word (forwards).
 	// backspaceWordForwards() {
 	// 	if (state.pos1.pos !== state.pos2.pos) {
