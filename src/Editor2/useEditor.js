@@ -165,8 +165,8 @@ const methods = state => ({
 		Object.assign(state, { pos1, pos2 })
 		this.render()
 	},
-	// RTL backspaces one rune.
-	backspaceRuneRTL() {
+	// Backspaces one rune.
+	backspaceRune() {
 		let dropL = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) {
 			const substr = state.data.slice(0, state.pos1.pos)
@@ -175,8 +175,8 @@ const methods = state => ({
 		}
 		this.dropBytes(dropL, 0)
 	},
-	// LTR backspaces one rune.
-	backspaceRuneLTR() {
+	// Forward-backspaces one rune.
+	forwardBackspaceRune() {
 		let dropR = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) {
 			const substr = state.data.slice(state.pos1.pos)
@@ -185,8 +185,8 @@ const methods = state => ({
 		}
 		this.dropBytes(0, dropR)
 	},
-	// RTL backspaces one word.
-	backspaceWordRTL() {
+	// Backspaces one word.
+	backspaceWord() {
 		if (state.pos1.pos !== state.pos2.pos) {
 			this.write("")
 			return
@@ -238,8 +238,8 @@ const methods = state => ({
 		}
 		this.dropBytes(dropL, 0)
 	},
-	// LTR backspaces one word.
-	backspaceWordLTR() {
+	// Forward-backspaces one word.
+	forwardBackspaceWord() {
 		if (state.pos1.pos !== state.pos2.pos) {
 			this.write("")
 			return

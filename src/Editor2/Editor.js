@@ -231,34 +231,35 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						return
 					}
 
-					// RTL backspace paragraph:
+					// Backspace paragraph:
 					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						// TODO
+						console.log("backspace-paragraph")
+						// dispatch.backspaceParagraph()
 						return
-					// RTL backspace word:
+					// Backspace word:
 					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspaceWordRTL")
-						dispatch.backspaceWordRTL()
+						console.log("backspace-word")
+						dispatch.backspaceWord()
 						return
-					// RTL backspace rune:
+					// Backspace rune:
 					} else if (e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
-						console.log("backspaceRuneRTL")
-						dispatch.backspaceRuneRTL()
+						console.log("backspace-rune")
+						dispatch.backspaceRune()
 						return
-					// LTR backspace word:
+					// Forward-backspace word:
 					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {
 						e.preventDefault()
-						console.log("backspaceWordLTR")
-						dispatch.backspaceWordLTR()
+						console.log("forward-backspace-word")
+						dispatch.forwardBackspaceWord()
 						return
-					// LTR backspace rune:
+					// Forward-backspace rune:
 					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
 						e.preventDefault()
-						console.log("backspaceRuneLTR")
-						dispatch.backspaceRuneLTR()
+						console.log("forward-backspace-rune")
+						dispatch.forwardBackspaceRune()
 						return
 					}
 
