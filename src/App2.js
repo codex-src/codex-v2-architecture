@@ -463,6 +463,7 @@ const App = () => {
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform -translate-x-8"
 								>
+									{/* <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path> */}
 									<path d="M4 6h16M4 12h16M4 18h7"></path>
 								</Transition>
 								<Transition
@@ -470,7 +471,7 @@ const App = () => {
 									// duration-300
 									show={hoverContents}
 									enter="transition duration-200"
-									enterFrom="opacity-0 transform translate-x-8" // TODO: Remove opacity?
+									enterFrom="transform translate-x-8"
 									enterTo="opacity-100 transform translate-x-0"
 									leave="transition duration-200"
 									leaveFrom="opacity-100 transform translate-x-0"
