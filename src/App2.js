@@ -408,11 +408,6 @@ const App = () => {
 		}
 	}, [editorPrefsDispatch])
 
-	// const [timer, setTimer] = React.useState(false)
-	// React.useEffect(() => {
-	// 	setTimer(editorPrefs.readOnly)
-	// }, [editorPrefs.readOnly])
-
 	return (
 		// NOTE: Use items-start for sticky
 		<div className="px-6 py-32 flex flex-row justify-center items-start">
