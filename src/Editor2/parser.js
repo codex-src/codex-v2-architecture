@@ -76,7 +76,7 @@ import {
 function parseGFMType({ type, syntax, str, x }) {
 	// Syntax must be preceded by a BOL, space, or ASCII
 	// punctuation character:
-	if (x - 1 >= 0 && !isASCIIWhitespace(str[x - 1]) && !isASCIIPunctuation(str[x - 1])) { // E.g. ·*match*
+	if (x - 1 >= 0 && !(isASCIIWhitespace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) { // E.g. ·*match*
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -111,7 +111,7 @@ function parseGFMType({ type, syntax, str, x }) {
 	const parsed = {
 		type,
 		syntax,
-		children: type !== typeEnum.Code && (type !== typeEnum.Anchor && syntax !== ")")
+		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
 			? parseInlineElements(str.slice(x, x + offset))
 			: str.slice(x, x + offset),
 	}
@@ -536,31 +536,31 @@ function parseElements(nodes) {
 			// No-op
 			break
 
-		// // <List>
-		// case char === "\t" || (
-		// 	(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
-		// 	(each !== "---" && each !== "***") // Negate break
-		// ):
-		// 	// - List
-		// 	// 1. List
-		// 	if (nchars >= "- ".length && AnyListRe.test(each)) {
-		// 		const x1 = index
-		// 		let x2 = x1
-		// 		x2++
-		// 		// Iterate to end syntax:
-		// 		while (x2 < body.length) {
-		// 			if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
-		// 				// No-op
-		// 				break
-		// 			}
-		// 			x2++
-		// 		}
-		// 		const range = body.slice(x1, x2)
-		// 		data.push(parseList(range))
-		// 		index = x2 - 1
-		// 		continue
-		// 	}
-		// 	break
+			// // <List>
+			// case char === "\t" || (
+			// 	(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
+			// 	(each !== "---" && each !== "***") // Negate break
+			// ):
+			// 	// - List
+			// 	// 1. List
+			// 	if (nchars >= "- ".length && AnyListRe.test(each)) {
+			// 		const x1 = index
+			// 		let x2 = x1
+			// 		x2++
+			// 		// Iterate to end syntax:
+			// 		while (x2 < body.length) {
+			// 			if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
+			// 				// No-op
+			// 				break
+			// 			}
+			// 			x2++
+			// 		}
+			// 		const range = body.slice(x1, x2)
+			// 		data.push(parseList(range))
+			// 		index = x2 - 1
+			// 		continue
+			// 	}
+			// 	break
 
 		// <Break>
 		case "-":
