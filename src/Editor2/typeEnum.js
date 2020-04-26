@@ -5,9 +5,9 @@ const typeEnum = new Enum(
 	"Blockquote",
 	"BlockquoteItem",
 	"Break",
-	"CodeBlock",
 	"Header",
 	"Paragraph",
+	"Preformatted",
 
 	// Inline elements:
 	"Anchor",

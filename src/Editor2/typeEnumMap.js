@@ -4,9 +4,9 @@ import {
 	Blockquote,
 	BlockquoteItem,
 	Break,
-	CodeBlock,
 	Header,
 	Paragraph,
+	Preformatted,
 } from "./Elements"
 
 import {
@@ -25,9 +25,9 @@ const typeEnumMap = {
 	[typeEnum.Blockquote]: Blockquote,
 	[typeEnum.BlockquoteItem]: BlockquoteItem,
 	[typeEnum.Break]: Break,
-	[typeEnum.CodeBlock]: CodeBlock,
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
+	[typeEnum.Preformatted]: Preformatted,
 
 	// Inline elements:
 	[typeEnum.Anchor]: Anchor,

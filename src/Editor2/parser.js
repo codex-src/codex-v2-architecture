@@ -498,7 +498,7 @@ function parseElements(nodes) {
 			}
 			// No-op
 			break
-		// <CodeBlock>
+		// <Preformatted>
 		case "`":
 			if (
 				nchars >= 3 &&
@@ -524,7 +524,7 @@ function parseElements(nodes) {
 				x2++ // Iterate once past end
 				// const infoString = each.data.slice(3)
 				parsed.push({
-					type: typeEnum.CodeBlock,
+					type: typeEnum.Preformatted,
 					id: nodes[x1].id,
 					syntax: [nodes[x1].data, nodes[x2 - 1].data],
 					extension: nodes[x1].data.slice(3).split(".").slice(-1)[0].toLowerCase(),

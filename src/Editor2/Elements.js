@@ -109,7 +109,7 @@ export const Blockquote = React.memo(({ id, children }) => {
 // )
 
 // NOTE: Compound element
-export const CodeBlock = React.memo(({ id, syntax, extension, children: nodes }) => {
+export const Preformatted = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
