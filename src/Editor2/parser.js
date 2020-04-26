@@ -426,6 +426,7 @@ export function parseElements(nodes) {
 				// Iterate to end syntax:
 				while (x2 < nodes.length) {
 					if (
+						// FIXME: Inverse statement
 						(nodes[x2].data.length < 2 || nodes[x2].data.slice(0, 2) !== "> ") &&
 						(nodes[x2].data.length !== 1 || nodes[x2].data !== ">")
 					) {
@@ -513,13 +514,13 @@ export function parseElements(nodes) {
 				x2++
 				// Iterate to end syntax:
 				while (x2 < nodes.length) {
-					if (nodes[x2].length < 2 || !AnyListRe.test(nodes[x2])) {
+					if (!(nodes[x2].data.length >= "- ".length && AnyListRe.test(nodes[x2].data))) {
 						// No-op
 						break
 					}
 					x2++
 				}
-				// console.log(parseAnyList(nodes.slice(x1, x2)))
+				console.log(parseAnyList(nodes.slice(x1, x2)))
 				parsed.push(parseAnyList(nodes.slice(x1, x2)))
 				x = x2 - 1
 				continue

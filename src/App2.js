@@ -18,7 +18,7 @@ import {
 
 import "./App.css"
 
-// document.body.classList.toggle("debug-css")
+document.body.classList.toggle("debug-css")
 
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
