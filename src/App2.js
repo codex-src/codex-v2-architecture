@@ -18,32 +18,6 @@ import {
 
 import "./App.css"
 
-// function useTransitionNav(ref) {
-// 	// Disable border-color and box-shadow:
-// 	React.useLayoutEffect(() => {
-// 		// ref.current.style.borderColor = "transparent"
-// 		ref.current.style.boxShadow = "none"
-// 	}, [ref])
-//
-// 	// Programmatically enable border-color and box-shadow:
-// 	React.useLayoutEffect(() => {
-// 		const handler = e => {
-// 			if (!window.scrollY) {
-// 				// ref.current.style.borderColor = "transparent"
-// 				ref.current.style.boxShadow = "none"
-// 			} else {
-// 				// ref.current.style.borderColor = ""
-// 				ref.current.style.boxShadow = ""
-// 			}
-// 		}
-// 		handler()
-// 		window.addEventListener("scroll", handler, false)
-// 		return () => {
-// 			window.removeEventListener("scroll", handler, false)
-// 		}
-// 	}, [ref])
-// }
-
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
@@ -52,12 +26,14 @@ const ReadmeEditor = ({ readOnly }) => {
 const FixedEditorPreferences = ({
 	showContentsState: [showContents, setShowContents],
 	saveStatusState: [saveStatus,
-	setSaveStatus],
+		setSaveStatus],
 	state,
 	dispatch,
 }) => {
 
-	const [y, setY] = React.useState(() => window.scrollY)
+	// console.log(window.scrollY)
+
+	const [y, setY] = React.useState(window.scrollY)
 
 	React.useLayoutEffect(() => {
 		const handler = e => {
