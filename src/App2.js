@@ -52,12 +52,14 @@ const FixedEditorPreferences = ({
 
 			{/* Preferences */}
 			<Transition
+				// NOTE: Use duration-200 not duration-300 and omit
+				// transition-timing-function
 				unmountOnExit={false}
 				show={y > 0}
-				enter="transition ease-out duration-300"
+				enter="transition duration-200"
 				enterFrom="bg-transparent shadow-none"
 				enterTo="bg-white shadow-hero"
-				leave="transition ease-in duration-300"
+				leave="transition duration-300"
 				leaveFrom="bg-white shadow-hero"
 				leaveTo="bg-transparent shadow-none"
 			>
