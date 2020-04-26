@@ -1,6 +1,8 @@
 import typeEnum from "./typeEnum"
 
 import {
+	AnyList,
+	AnyListItem,
 	Blockquote,
 	BlockquoteItem,
 	Break,
@@ -22,6 +24,8 @@ import {
 
 const typeEnumMap = {
 	// Elements:
+	[typeEnum.AnyList]: AnyList,
+	[typeEnum.AnyListItem]: AnyListItem,
 	[typeEnum.Blockquote]: Blockquote,
 	[typeEnum.BlockquoteItem]: BlockquoteItem,
 	[typeEnum.Break]: Break,

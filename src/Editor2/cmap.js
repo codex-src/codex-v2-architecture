@@ -72,9 +72,9 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapText[typeEnum.BlockquoteItem]      = data => toInnerString(data.children)
 	cmapText[typeEnum.Blockquote]          = data => toString(data.children)
 	cmapText[typeEnum.Preformatted]        = data => toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"))
-	// cmapText[typeEnum.ListItem]         = data => toInnerString(data.children)
+	cmapText[typeEnum.AnyListItem]         = data => toInnerString(data.children)
 	// cmapText[typeEnum.TodoItem]         = data => toInnerString(data.children)
-	// cmapText[typeEnum.List]             = data => toString(data.children)
+	cmapText[typeEnum.AnyList]             = data => toString(data.children)
 	// cmapText[typeEnum.Image]            = data => toInnerString(data.children)
 	cmapText[typeEnum.Break]               = data => ""
 
@@ -91,9 +91,9 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapHTML[typeEnum.BlockquoteItem]      = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.Blockquote]          = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML[typeEnum.Preformatted]        = data => `<pre${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML)}<!--\n--></code></pre>`
-	// cmapHTML[typeEnum.ListItem]         = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
+	cmapHTML[typeEnum.AnyListItem]         = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	// cmapHTML[typeEnum.TodoItem]         = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
-	// cmapHTML[typeEnum.List]             = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	cmapHTML[typeEnum.AnyList]             = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	// cmapHTML[typeEnum.Image]            = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML[typeEnum.Break]               = data => "<hr>"
 
@@ -110,9 +110,9 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapHTML__BEM[typeEnum.BlockquoteItem] = data => `<p class="blockquote__p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[typeEnum.Blockquote]     = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[typeEnum.Preformatted]   = data => `<pre class="preformatted"${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML__BEM)}<!--\n--></code></pre>`
-	// cmapHTML__BEM[typeEnum.ListItem]    = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	// cmapHTML__BEM[typeEnum.TodoItem]    = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}__li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	// cmapHTML__BEM[typeEnum.List]        = data => `<${data.tag} class="${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	cmapHTML__BEM[typeEnum.AnyListItem]    = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}__item">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	// cmapHTML__BEM[typeEnum.TodoItem]    = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}__item">\n\t<input class="${data.tag === "ul" ? "unordered" : "ordered"}__item__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	cmapHTML__BEM[typeEnum.AnyList]        = data => `<${data.tag} class="${data.tag === "ul" ? "unordered" : "ordered"}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
 	// cmapHTML__BEM[typeEnum.Image]       = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML__BEM[typeEnum.Break]          = data => "<hr class=\"horizontal-rule\">"
 
@@ -129,9 +129,9 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapReact_js[typeEnum.BlockquoteItem]  = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[typeEnum.Blockquote]      = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
 	cmapReact_js[typeEnum.Preformatted]    = data => `<Pre${!data.extension ? "" : ` info="${data.extension.toLowerCase()}"`}>\n{\`${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n")).replace(/`/g, "\\`")}\`}\n</Pre>`
-	// cmapReact_js[typeEnum.ListItem]     = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[typeEnum.AnyListItem]     = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	// cmapReact_js[typeEnum.TodoItem]     = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	// cmapReact_js[typeEnum.List]         = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
+	cmapReact_js[typeEnum.AnyList]         = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
 	// cmapReact_js[typeEnum.Image]        = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
 	cmapReact_js[typeEnum.Break]           = data => "<Break />"
 	//	/* eslint-enable no-multi-spaces */

@@ -2,6 +2,8 @@ import Enum from "Enum"
 
 const typeEnum = new Enum(
 	// Elements:
+	"AnyList",
+	"AnyListItem",
 	"Blockquote",
 	"BlockquoteItem",
 	"Break",

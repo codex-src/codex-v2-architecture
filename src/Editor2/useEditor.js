@@ -1,7 +1,7 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "encoding/utf8"
-import parse from "./parser"
 import useMethods from "use-methods"
+import { parseElements } from "./parser"
 
 import {
 	newNodes,
@@ -24,17 +24,16 @@ function newEditorState(data) {
 		history: {                               // History object
 			correctedPos: false,                   // Corrected pos before first change event?
 			stack: [                               // History state stack
-				{                                    // ...
-					data,                              // ...
-					nodes,                             // ...
-					pos1: { ...pos1 },                 // ...
-					pos2: { ...pos1 },                 // ...
-				},                                   // ...
-			],                                     // ...
+				{                                    //
+					data,                              //
+					nodes,                             //
+					pos1: { ...pos1 },                 //
+					pos2: { ...pos1 },                 //
+				},                                   //
+			],                                     //
 			index: 0,                              // History state stack index
-		},                                       // ...
-		// resetPos: false,                      // TODO: Did reset the cursors?
-		reactVDOM: parse(nodes),                 // React VDOM -- does not use React elements
+		},                                       //
+		reactVDOM: parseElements(nodes),         // React VDOM
 		reactDOM: document.createElement("div"), // React-managed DOM
 	}
 	return initialState
@@ -386,7 +385,7 @@ const methods = state => ({
 		// const data = state.nodes.map(each => each.data).join("\n")
 		// console.log(Date.now() - t)
 		// t = Date.now()
-		// const reactVDOM = parse(state.nodes)
+		// const reactVDOM = parseElements(state.nodes)
 		// console.log(Date.now() - t)
 		// Object.assign(state, {
 		// 	data,
@@ -395,7 +394,7 @@ const methods = state => ({
 
 		Object.assign(state, {
 			data: state.nodes.map(each => each.data).join("\n"),
-			reactVDOM: parse(state.nodes),
+			reactVDOM: parseElements(state.nodes),
 		})
 	},
 })
