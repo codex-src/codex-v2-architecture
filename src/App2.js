@@ -631,15 +631,15 @@ const App = () => {
 				{/* Status bars */}
 				<Transition
 					show={!editor.readOnly && editor.focused}
-					enter="transition duration-300"
-					enterFrom="opacity-0 transform translate-y-8"
-					enterTo="opacity-100 transform translate-y-0"
-					leave="transition duration-300"
-					leaveFrom="opacity-100 transform translate-y-0"
-					leaveTo="opacity-0 transform translate-y-8"
+					enter="transition ease-out duration-300"
+					enterFrom="opacity-0"
+					enterTo="opacity-100"
+					leave="transition ease-in duration-300"
+					leaveFrom="opacity-100"
+					leaveTo="opacity-0"
 				>
-					<div className="fixed inset-0 flex flex-row items-end pointer-events-none">
-						<div className="px-3 py-2 flex flex-row justify-between w-full bg-white shadow-hero">
+					<div className="fixed inset-0 hidden xl:flex flex-row items-end pointer-events-none">
+						<div className="px-3 py-2 flex flex-row justify-between w-full">
 							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
 								{statusLHS}
 							</p>
