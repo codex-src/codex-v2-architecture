@@ -81,6 +81,12 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 	 			>
 	 				HTML
 	 			</Button>
+	 			{/* <Button */}
+	 			{/* 	className="m-1 font-medium text-xs underline" */}
+	 			{/* 	onClick={dispatch.showHTML__BEM} */}
+	 			{/* > */}
+	 			{/* 	HTML__BEM */}
+	 			{/* </Button> */}
 	 			<Button
 	 				className="m-1 font-medium text-xs underline"
 	 				onClick={dispatch.showJSON}
@@ -280,10 +286,10 @@ const App = () => {
 	const [hoverContents, setHoverContents] = React.useState(false)
 
 	// Saves to localStorage (debounced).
-	const mounted = React.useRef()
+	const mounted1 = React.useRef()
 	React.useEffect(() => {
-		if (!mounted.current) {
-			mounted.current = true
+		if (!mounted1.current) {
+			mounted1.current = true
 			return
 		}
 		setSaveStatus(1)
@@ -340,7 +346,8 @@ const App = () => {
 		const id = setTimeout(() => {
 			const statusRHS = computeStatusRHS(editor)
 			setStatusRHS(statusRHS)
-		// NOTE: Do not use 100 -- breaks fade effect
+		// NOTE: Do not use more than ~16.67ms -- breaks fade
+		// effect
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
@@ -348,12 +355,18 @@ const App = () => {
 	}, [editor])
 
 	// Sets renderers (debounced).
+	const mounted2 = React.useRef()
 	React.useEffect(() => {
+		if (!mounted2.current) {
+			mounted2.current = true
+			editorPrefsDispatch.update(editor)
+			return
+		}
+		if (!editorPrefs.showSidebar) {
+			// No-op
+			return
+		}
 		const id = setTimeout(() => {
-			if (!editorPrefs.showSidebar) {
-				// No-op
-				return
-			}
 			editorPrefsDispatch.update(editor)
 		}, 16.67)
 		return () => {

@@ -1,6 +1,10 @@
 import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
-import { toHTML } from "Editor2/cmap"
+
+import {
+	// toHTML__BEM,
+	toHTML,
+} from "Editor2/cmap"
 
 // Maps renderModesEnum to language extensions.
 const extMap = {
@@ -16,6 +20,7 @@ function initialState(defaultRenderer) {
 		extension: extMap[defaultRenderer] || "",
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
+		// [renderModesEnum.HTML__BEM]: "",
 	}
 	return state
 }
@@ -27,6 +32,7 @@ const methods = state => ({
 			[renderModesEnum.JSON]: JSON.stringify(
 				{
 					...editorState,
+
 					data:      undefined,
 					history:   undefined,
 					reactVDOM: undefined,
@@ -36,6 +42,7 @@ const methods = state => ({
 				"\t",
 			),
 			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
+			// [renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
@@ -65,6 +72,15 @@ const methods = state => ({
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
+	// showHTML__BEM() {
+	// 	if (!state.showSidebar) {
+	// 		state.showSidebar = true
+	// 	} else if (state.renderMode === renderModesEnum.HTML__BEM) {
+	// 		state.showSidebar = false
+	// 	}
+	// 	state.renderMode = renderModesEnum.HTML__BEM
+	// 	state.extension = "html"
+	// },
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},

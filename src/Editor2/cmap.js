@@ -106,8 +106,8 @@ function toString(reactVDOM, cmap = cmapText) {
 	cmapHTML__BEM[typeEnum.Strikethrough]  = data => `<strike class="strikethrough">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
 	cmapHTML__BEM[typeEnum.Anchor]         = data => `<a class="anchor" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
 	cmapHTML__BEM[typeEnum.Header]         = data => `<a class="anchor" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header header--${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
-	cmapHTML__BEM[typeEnum.Paragraph]      = data => `<p class="paragraph${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
-	cmapHTML__BEM[typeEnum.BlockquoteItem] = data => `<p class="blockquote__paragraph">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
+	cmapHTML__BEM[typeEnum.Paragraph]      = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
+	cmapHTML__BEM[typeEnum.BlockquoteItem] = data => `<p class="blockquote__p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
 	cmapHTML__BEM[typeEnum.Blockquote]     = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	cmapHTML__BEM[typeEnum.Preformatted]   = data => `<pre class="preformatted"${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML__BEM)}<!--\n--></code></pre>`
 	// cmapHTML__BEM[typeEnum.ListItem]    = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
