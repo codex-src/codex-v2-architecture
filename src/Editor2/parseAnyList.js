@@ -13,6 +13,7 @@ export function parseAnyList(range) {
 		type: typeEnum.AnyList,
 		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",
 		id: range[0].id,
+		depth: 0,
 		children: [],
 	}
 	for (const each of range) {
@@ -27,6 +28,7 @@ export function parseAnyList(range) {
 					type: typeEnum.AnyList,
 					tag: UnorderedListRe.test(each.data) ? "ul" : "ol",
 					id: each.id,
+					depth: deep + 1, // Eagerly increment
 					children: [],
 				})
 			}
@@ -44,6 +46,7 @@ export function parseAnyList(range) {
 			tag: "li",
 			id: each.id,
 			syntax: [syntax],
+			depth,
 			// checked,
 			children: parseInlineElements(substr),
 		})

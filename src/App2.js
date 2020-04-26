@@ -18,7 +18,7 @@ import {
 
 import "./App.css"
 
-document.body.classList.toggle("debug-css")
+// document.body.classList.toggle("debug-css")
 
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
@@ -619,7 +619,7 @@ const App = () => {
 					<Editor
 						// // TODO: Use a ref to compute the height of
 						// // the last data-codex-node or data-codex-root
-						// style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+						style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
 						state={editor}
 						dispatch={editorDispatch}
 						readOnly={editorPrefs.readOnly}
@@ -630,7 +630,7 @@ const App = () => {
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
 					// omit transition-timing-function
-					show={!editor.readOnly && editor.focused}
+					show={!editor.readOnly}
 					enter="transition duration-200"
 					enterFrom="opacity-0"
 					enterTo="opacity-100"

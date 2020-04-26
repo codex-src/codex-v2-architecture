@@ -210,8 +210,9 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
-	<Node tag={tag} id={id} className="-ml-5 my-2 !flex !flex-row">
-		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} /* {...attrs.li} */>
+	// my-2 flex flex-row
+	<Node tag={tag} id={id} className="-ml-5">
+		<Markdown className="mr-2 text-md-blue-a400" style={{ MozTabSize: 0, tabSize: 0 }} syntax={syntax} /* {...attrs.li} */>
 			{toReact(children) || (
 				<br />
 			)}
@@ -219,31 +220,14 @@ export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
 	</Node>
 ))
 
-// // Describes any list; <ul> or <ol>.
-// export const AnyList = React.memo(({ tag, id, __recursions, children: nodes }) => (
-// 	// eslint-disable-next-line
-// 	React.createElement(!__recursions ? Root : Node, { tag, id, className: "ml-5" },
-// 		nodes.map(({ type: T, ...each }) => (
-// 			React.createElement(typeEnumMap[T], {
-// 				key: each.id,
-// 				__recursions: Number(__recursions) + 1,
-// 				...each,
-// 			})
-// 		)),
-// 	)
-// ))
-
 // Describes any list; <ul> or <ol>.
-export const AnyList = React.memo(({ tag, id, __recursions, children: nodes }) => {
-	// NOTE: Do not cast __recursions to a number; returns NaN
-	const HOC = __recursions === undefined ? Root : Node
-
+export const AnyList = React.memo(({ tag, id, depth, children: nodes }) => {
+	const HOC = !depth ? Root : Node
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
-					__recursions: __recursions === undefined ? 1 : __recursions + 1,
 					...each,
 				})
 			))}

@@ -3,8 +3,9 @@ import Markdown from "./Markdown"
 import React from "react"
 import useEditorState from "./useEditorState"
 
-const Span = ({ className, ...props }) => (
-	<span className={!className ? "markdown" : `markdown ${className}`} {...props} />
+const Span = props => (
+	// className={!className ? "markdown" : `markdown ${className}`}
+	<span {...props} />
 )
 
 export const Escape = ({ syntax, children }) => (

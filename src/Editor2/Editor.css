@@ -82,8 +82,9 @@
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
-	width: calc(11.55 / 16 * 1em);
+	width: calc(11.438 / 16 * 1em);
 	content: "•";
+	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
 
