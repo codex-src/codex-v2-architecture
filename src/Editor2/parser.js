@@ -536,60 +536,55 @@ function parseElements(nodes) {
 			// No-op
 			break
 
-			// // <List>
-			// case char === "\t" || (
-			// 	(char === "-" || char === "+" || char === "*" || (char >= "0" && char <= "9")) &&
-			// 	(each !== "---" && each !== "***") // Negate break
-			// ):
-			// 	// - List
-			// 	// 1. List
-			// 	if (nchars >= "- ".length && AnyListRe.test(each)) {
-			// 		const x1 = index
-			// 		let x2 = x1
-			// 		x2++
-			// 		// Iterate to end syntax:
-			// 		while (x2 < body.length) {
-			// 			if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
-			// 				// No-op
-			// 				break
-			// 			}
-			// 			x2++
-			// 		}
-			// 		const range = body.slice(x1, x2)
-			// 		data.push(parseList(range))
-			// 		index = x2 - 1
-			// 		continue
-			// 	}
-			// 	break
-
-		// <Break>
+		// <AnyList> or <Break>
+		case "\t":
 		case "-":
-			// ***
-			if (nchars === 3 && each.data === "---") {
-				parsed.push({
-					type: typeEnum.Break,
-					id: each.id,
-					syntax: ["---"],
-					children: null,
-				})
-				continue
-			}
-			// No-op
-			break
-		// <Break> (alternate syntax)
+		// case "+":
 		case "*":
-			// ***
-			if (nchars === 3 && each.data === "***") {
+		case "0":
+		case "1":
+		case "2":
+		case "3":
+		case "4":
+		case "5":
+		case "6":
+		case "7":
+		case "8":
+		case "9":
+			// *** or ---
+			if (nchars === 3 && each.data === "---" || each.data === "***") {
 				parsed.push({
 					type: typeEnum.Break,
 					id: each.id,
-					syntax: ["***"],
+					syntax: [each.data],
 					children: null,
 				})
 				continue
 			}
 			// No-op
 			break
+
+			// // - List
+			// // 1. List
+			// if (nchars >= "- ".length && AnyListRe.test(each)) {
+			// 	const x1 = index
+			// 	let x2 = x1
+			// 	x2++
+			// 	// Iterate to end syntax:
+			// 	while (x2 < body.length) {
+			// 		if (body[x2].length < 2 || !AnyListRe.test(body[x2])) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		x2++
+			// 	}
+			// 	const range = body.slice(x1, x2)
+			// 	data.push(parseList(range))
+			// 	index = x2 - 1
+			// 	continue
+			// }
+			// break
+
 		default:
 			// No-op
 			break

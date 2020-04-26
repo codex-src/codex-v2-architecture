@@ -89,12 +89,11 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</Node>
 ))
 
-// NOTE: Compound element
-export const Blockquote = React.memo(({ id, children }) => {
+export const Blockquote = React.memo(({ id, children: nodes }) => {
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
 		<Root id={id} className="px-6" style={style}>
-			{children.map(({ type: T, ...each }) => (
+			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
 					...each,
@@ -108,7 +107,6 @@ export const Blockquote = React.memo(({ id, children }) => {
 // 	<Node style={{ whiteSpace: "pre" }} {...props} />
 // )
 
-// NOTE: Compound element
 export const Preformatted = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
@@ -131,9 +129,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	}, [extension, nodes])
 
 	return (
-		// overflow-x-scroll scrolling-touch
 		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded" {...attrs.code}>
-			{/* <span className="inline-block"> */}
 			<Node id={nodes[0].id} className="leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
@@ -142,7 +138,6 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 				</Markdown>
 			</Node>
 			{$nodes.map(each => (
-				// TODO: Add support for read-only line numbers
 				<Node key={each.id} id={each.id} className="leading-snug">
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
@@ -158,10 +153,17 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 					)}
 				</Markdown>
 			</Node>
-			{/* </span> */}
 		</Root>
 	)
 })
+
+// onSelect
+// onTouchCancel onTouchEnd onTouchMove onTouchStart
+// onPointerDown onPointerMove onPointerUp onPointerCancel onGotPointerCapture
+// onLostPointerCapture onPointerEnter onPointerLeave onPointerOver onPointerOut
+// onClick onContextMenu onDoubleClick onDrag onDragEnd onDragEnter onDragExit
+// onDragLeave onDragOver onDragStart onDrop onMouseDown onMouseEnter onMouseLeave
+// onMouseMove onMouseOut onMouseOver onMouseUp
 
 // export const ListItem = React.memo(({ syntax, depth, checked, data }) => (
 // 	<Node tag="li" className="-ml-5 my-2 flex flex-row">
@@ -205,15 +207,30 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 // 		</Node>
 // 	)
 // })
-//
-// // NOTE: Compound component
-// export const List = React.memo(({ tag, id, data }) => (
-// 	<Node tag={tag} id={id} className="ml-5">
-// 		{data.map(({ type: Type, children: data, ...each }) => (
-// 			<Type key={each.id} data={data} {...each} />
-// 		))}
-// 	</Node>
-// ))
+
+export const ListItem = React.memo(({ syntax, children }) => (
+	<Node tag="li" className="-ml-5 my-2 flex flex-row">
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+			<span>
+				{toReact(children) || (
+					<br />
+				)}
+			</span>
+		</Markdown>
+	</Node>
+))
+
+// Describes any list; <ul> or <ol>.
+export const AnyList = React.memo(({ tag, id, children: nodes }) => (
+	<Root tag={tag} id={id} className="ml-5">
+		{nodes.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumMap[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</Root>
+))
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
