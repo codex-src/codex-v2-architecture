@@ -81,7 +81,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id} className="text-gray-600">
-		<Markdown syntax={syntax}>
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -208,21 +208,59 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 // 	)
 // })
 
+// function List(props) {
+// 	const TagName = !props.isNumbered ? "ul" : "ol"
+// 	return (
+// 		<TagName className="m-l:1.2">
+// 			{props.children.map((each, index) => (
+// 				!Array.isArray(each)
+// 					? (
+// 						<li key={index} className="m-l:-1.2">
+// 							<span style={{ display: "none" }} children={each.tabs} />
+// 							<Markdown className="m-r:0.4 c:blue-a200" style={{ fontFeatureSettings: props.isNumbered && "'tnum'" }} open={each.open}>
+// 								{each.children}
+// 							</Markdown>
+// 						</li>
+// 					)
+// 					: <List key={index} {...props} children={each} />
+// 			))}
+// 		</TagName>
+// 	)
+// }
+
+// // Describes a list item; <li>.
+// export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
+// 	// my-2 flex flex-row
+// 	<Node tag={tag} id={id} className="-ml-5 my-2">
+// 		<span style={{ display: "none" }}>{"\t".repeat(syntax[0].search("\t") === -1 ? 0 : 1 + syntax[0].search("\t"))}</span>
+// 		<Markdown className="mr-2 text-md-blue-a400" syntax={[syntax[0].split("\t").slice(-1)]} /* {...attrs.li} */>
+// 			{/* <span> */}
+// 			{toReact(children) || (
+// 				<br />
+// 			)}
+// 			{/* </span> */}
+// 		</Markdown>
+// 	</Node>
+// ))
+
 // Describes a list item; <li>.
-export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
-	// my-2 flex flex-row
-	<Node tag={tag} id={id} className="-ml-5">
-		<Markdown className="mr-2 text-md-blue-a400" style={{ MozTabSize: 0, tabSize: 0 }} syntax={syntax} /* {...attrs.li} */>
+export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
+	// console.log({tabs, syntax}) || (
+	<Node tag={tag} id={id} className="-ml-5 my-2">
+		{/* Takes precedence */}
+		<span className="hidden">{tabs}</span>
+		<Markdown className="!mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
 	</Node>
+	// )
 ))
 
 // Describes any list; <ul> or <ol>.
-export const AnyList = React.memo(({ tag, id, depth, children: nodes }) => {
-	const HOC = !depth ? Root : Node
+export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
+	const HOC = !tabs.length ? Root : Node
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
