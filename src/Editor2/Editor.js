@@ -125,10 +125,12 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 
 				style: {
 					...style, // Takes precedence
+					MozTabSize: 4,
+					tabSize: 4,
 					whiteSpace: "pre-wrap",
 					outline: "none",
-					// TODO: overflow-wrap does not work as expected
-					// overflowWrap: "break-word",
+					// NOTE: overflowWrap: "break-word" does not work
+					// as expected
 					wordBreak: "break-word",
 				},
 

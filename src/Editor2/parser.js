@@ -502,9 +502,6 @@ export function parseElements(nodes) {
 			}
 			// No-op
 			break
-
-			// case "+":
-
 		// <AnyList> or <Break>
 		case "\t":
 		case "-":
@@ -519,8 +516,6 @@ export function parseElements(nodes) {
 		case "7":
 		case "8":
 		case "9":
-			// console.log("test")
-
 			// - List item or 1. List item (etc.)
 			if (nchars >= 2 && AnyListRe.test(each.data)) {
 				const x1 = x
@@ -537,7 +532,6 @@ export function parseElements(nodes) {
 				parsed.push(parseAnyList(nodes.slice(x1, x2)))
 				x = x2 - 1
 				continue
-
 			// *** or ---
 			} else if (nchars === 3 && (each.data === "---" || each.data === "***")) {
 				parsed.push({
@@ -550,7 +544,6 @@ export function parseElements(nodes) {
 			}
 			// No-op
 			break
-
 		default:
 			// No-op
 			break
