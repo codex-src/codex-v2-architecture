@@ -617,9 +617,9 @@ const App = () => {
 				<DocumentTitle title={title || "Untitled"}>
 					{/* TODO: Add React.forwardRef */}
 					<Editor
-						// TODO: Use a ref to compute the height of
-						// the last data-codex-node or data-codex-root
-						style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+						// // TODO: Use a ref to compute the height of
+						// // the last data-codex-node or data-codex-root
+						// style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
 						state={editor}
 						dispatch={editorDispatch}
 						readOnly={editorPrefs.readOnly}
