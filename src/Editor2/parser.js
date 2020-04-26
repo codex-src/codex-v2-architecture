@@ -268,7 +268,7 @@ function parseInlineElements(str) { // TODO: Extract to parseInlineElements.js?
 			break
 			// <Anchor> (1 of 2)
 		case "h":
-			// https:// OR http://
+			// https:// or http://
 			if (
 				(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
 				(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
