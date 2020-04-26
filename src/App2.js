@@ -18,12 +18,12 @@ import {
 
 import "./App.css"
 
+// document.body.classList.toggle("debug-css")
+
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
-
-// document.body.classList.toggle("debug-css")
 
 const FixedEditorPreferences = ({
 	saveStatusState: [saveStatus, setSaveStatus],
@@ -553,7 +553,6 @@ const App = () => {
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform -translate-x-8"
 								>
-									{/* <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path> */}
 									<path d="M4 6h16M4 12h16M4 18h7"></path>
 								</Transition>
 								<Transition
@@ -567,7 +566,6 @@ const App = () => {
 									leaveFrom="opacity-100 transform translate-x-0"
 									leaveTo="opacity-0 transform translate-x-8"
 								>
-									{/* <path d="M7 16l-4-4m0 0l4-4m-4 4h18"></path> */}
 									<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 								</Transition>
 							</svg>
