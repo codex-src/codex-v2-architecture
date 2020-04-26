@@ -17,7 +17,7 @@
     "tailwind-start": "tailwind build src/stylesheets/tailwind.css -o src/stylesheets/tailwind.generated.css",
     "start": "react-scripts start",
     "tailwind-build": "postcss src/stylesheets/tailwind.css --output src/stylesheets/tailwind.generated.css --env production",
-    "build": "yarn tailwind-build && yarn react-scripts build && yarn tailwind-start",
+    "build": "yarn tailwind-build && yarn react-scripts build && osascript -e beep && yarn tailwind-start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
