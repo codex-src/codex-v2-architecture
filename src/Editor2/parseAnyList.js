@@ -34,7 +34,7 @@ export function parseAnyList(range) {
 			deep++
 		}
 		// let checked = null
-		// if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) {
+		// if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) { // TODO: Use slice?
 		// 	const value = syntax[syntax.length - 3] === "x"
 		// 	checked = { value }
 		// }

@@ -367,7 +367,9 @@ export function parseElements(nodes) {
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast pass:
-		if (!nodes[x].data.length || !isASCIIPunctuation(nodes[x].data[0])) { // TODO: Add "h" for "https://" and "http://"?
+		//
+ 		// TODO: Add "h" for "https://" and "http://"?
+		if (!nodes[x].data.length || (!isASCIIWhitespace(nodes[x].data[0]) && !isASCIIPunctuation(nodes[x].data[0]))) {
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
 				type: typeEnum.Paragraph,
@@ -505,6 +507,7 @@ export function parseElements(nodes) {
 		case "7":
 		case "8":
 		case "9":
+			// console.log("test")
 
 			// - List item or 1. List item (etc.)
 			if (nchars >= 2 && AnyListRe.test(each.data)) {
