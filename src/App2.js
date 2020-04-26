@@ -23,15 +23,15 @@ const ReadmeEditor = ({ readOnly }) => {
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
+// document.body.classList.toggle("debug-css")
+
 const FixedEditorPreferences = ({
+	saveStatusState: [saveStatus, setSaveStatus],
 	showContentsState: [showContents, setShowContents],
-	saveStatusState: [saveStatus,
-		setSaveStatus],
+	titleState: [title, setTitle],
 	state,
 	dispatch,
 }) => {
-
-	// console.log(window.scrollY)
 
 	const [y, setY] = React.useState(window.scrollY)
 
@@ -61,23 +61,25 @@ const FixedEditorPreferences = ({
 				leaveFrom="bg-white shadow-hero"
 				leaveTo="bg-transparent shadow-none"
 			>
-				{/* NOTE: Use py-1 not py-2 */}
-				<div className="-mx-4 px-3 py-1 flex-shrink-0 flex flex-row justify-between">
+				<div className="-mx-4 px-2 relative flex-shrink-0 flex flex-row justify-between">
 
 					{/* LHS */}
-					<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
 						<Button
-							className="m-1 font-medium text-xs underline"
+							className="p-2 font-medium text-xs underline"
 							onClick={() => setShowContents(!showContents)}
 						>
 							Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 						</Button>
-						<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
+						<div
+							className="p-2 flex flex-row items-center transition duration-300"
+							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
+						>
 							<p className="font-medium text-xs">
 								Saving
 							</p>
 							<svg
-								// NOTE: ml-1 is preferable to ml-2
+								// NOTE: Use ml-1 not ml-2
 								className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
 								style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
 								fill="none"
@@ -88,41 +90,53 @@ const FixedEditorPreferences = ({
 								stroke="currentColor"
 								viewBox="0 0 24 24"
 							>
-								{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
 								<path d="M5 13l4 4L19 7"></path>
 							</svg>
 						</div>
-
 					</div>
 
+					{/* Center */}
+					{/* <div className="absolute inset-0 flex flex-row justify-center items-center pointer-events-none"> */}
+					{/* 	<p className="hidden xl:flex flex-row justify-center items-center w-64 text-gray-500 truncate pointer-events-auto"> */}
+					{/* 		<svg */}
+					{/* 			className="mr-2 flex-shrink-0 w-4 h-4" */}
+					{/* 			fill="none" */}
+					{/* 			stroke="currentColor" */}
+					{/* 			strokeLinecap="round" */}
+					{/* 			strokeLinejoin="round" */}
+					{/* 			strokeWidth="2" */}
+					{/* 			viewBox="0 0 24 24" */}
+					{/* 		> */}
+					{/* 			<path d="M4 6h16M4 12h16M4 18h7"></path> */}
+					{/* 		</svg> */}
+					{/* 		<p className="font-semibold text-xs tracking-wide uppercase truncate"> */}
+					{/* 			{title.trim() || "Untitled"} */}
+					{/* 		</p> */}
+					{/* 	</p> */}
+					{/* </div> */}
+
 					{/* RHS */}
-					<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
 						<Button
-							className="m-1 font-medium text-xs underline"
+							className="p-2 font-medium text-xs underline"
 							onClick={dispatch.toggleReadOnly}
 						>
 							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
 						</Button>
 			 			<Button
-			 				className="m-1 font-medium text-xs underline"
+							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showReadme}
 			 			>
 			 				Readme (Esc)
 			 			</Button>
 			 			<Button
-			 				className="m-1 font-medium text-xs underline"
+							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showHTML}
 			 			>
 			 				HTML
 			 			</Button>
-			 			{/* <Button */}
-			 			{/* 	className="m-1 font-medium text-xs underline" */}
-			 			{/* 	onClick={dispatch.showHTML__BEM} */}
-			 			{/* > */}
-			 			{/* 	HTML__BEM */}
-			 			{/* </Button> */}
 			 			<Button
-			 				className="m-1 font-medium text-xs underline"
+							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showJSON}
 			 			>
 			 				JSON
@@ -463,8 +477,9 @@ const App = () => {
 
 			{/* Preferences */}
 			<FixedEditorPreferences
-				showContentsState={[showContents, setShowContents]}
 				saveStatusState={[saveStatus, setSaveStatus]}
+				showContentsState={[showContents, setShowContents]}
+				titleState={[title, setTitle]}
 				state={editorPrefs}
 				dispatch={editorPrefsDispatch}
 			/>
@@ -513,7 +528,7 @@ const App = () => {
 					<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
 						<Button
 							// NOTE: Use w-full text-left because of <Button>
-							className="py-1 flex flex-row not-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
+							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
 							onPointerEnter={() => setHoverContents(true)}
 							onPointerLeave={() => setHoverContents(false)}
 							onClick={() => setShowContents(false)}
@@ -624,8 +639,7 @@ const App = () => {
 					leaveTo="opacity-0 transform translate-y-8"
 				>
 					<div className="fixed inset-0 flex flex-row items-end pointer-events-none">
-						{/* NOTE: Use py-1 not py-2 */}
-						<div className="px-3 py-1 flex flex-row justify-between w-full bg-white shadow-hero">
+						<div className="px-3 py-2 flex flex-row justify-between w-full bg-white shadow-hero">
 							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
 								{statusLHS}
 							</p>
