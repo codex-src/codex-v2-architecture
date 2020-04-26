@@ -450,7 +450,7 @@ const App = () => {
 		editorPrefsDispatch,
 	])
 
-	// Manages sidebar (debounced -- match useEffect).
+	// Manages sidebar.
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(e.keyCode === 27)) { // 27: Escape
@@ -458,12 +458,12 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			const id = setTimeout(() => {
-				editorPrefsDispatch.toggleSidebar()
-			}, 16.67)
-			return () => {
-				clearTimeout(id)
-			}
+			// const id = setTimeout(() => {
+			editorPrefsDispatch.toggleSidebar()
+			// }, 16.67)
+			// return () => {
+			// 	clearTimeout(id)
+			// }
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
