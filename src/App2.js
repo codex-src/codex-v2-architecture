@@ -18,116 +18,143 @@ import {
 
 import "./App.css"
 
-function useTransitionNav(ref) {
-	// Disable border-color and box-shadow:
-	React.useLayoutEffect(() => {
-		// ref.current.style.borderColor = "transparent"
-		ref.current.style.boxShadow = "none"
-	}, [ref])
-
-	// Programmatically enable border-color and box-shadow:
-	React.useLayoutEffect(() => {
-		const handler = e => {
-			if (!window.scrollY) {
-				// ref.current.style.borderColor = "transparent"
-				ref.current.style.boxShadow = "none"
-			} else {
-				// ref.current.style.borderColor = ""
-				ref.current.style.boxShadow = ""
-			}
-		}
-		handler()
-		window.addEventListener("scroll", handler, false)
-		return () => {
-			window.removeEventListener("scroll", handler, false)
-		}
-	}, [ref])
-}
+// function useTransitionNav(ref) {
+// 	// Disable border-color and box-shadow:
+// 	React.useLayoutEffect(() => {
+// 		// ref.current.style.borderColor = "transparent"
+// 		ref.current.style.boxShadow = "none"
+// 	}, [ref])
+//
+// 	// Programmatically enable border-color and box-shadow:
+// 	React.useLayoutEffect(() => {
+// 		const handler = e => {
+// 			if (!window.scrollY) {
+// 				// ref.current.style.borderColor = "transparent"
+// 				ref.current.style.boxShadow = "none"
+// 			} else {
+// 				// ref.current.style.borderColor = ""
+// 				ref.current.style.boxShadow = ""
+// 			}
+// 		}
+// 		handler()
+// 		window.addEventListener("scroll", handler, false)
+// 		return () => {
+// 			window.removeEventListener("scroll", handler, false)
+// 		}
+// 	}, [ref])
+// }
 
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
-const FixedEditorPreferences = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => {
-	const ref = React.useRef()
+const FixedEditorPreferences = ({
+	showContentsState: [showContents, setShowContents],
+	saveStatusState: [saveStatus,
+	setSaveStatus],
+	state,
+	dispatch,
+}) => {
 
-	useTransitionNav(ref)
+	const [y, setY] = React.useState(() => window.scrollY)
+
+	React.useLayoutEffect(() => {
+		const handler = e => {
+			setY(window.scrollY)
+		}
+		handler()
+		window.addEventListener("scroll", handler, false)
+		return () => {
+			window.removeEventListener("scroll", handler, false)
+		}
+	}, [])
 
 	return (
 		// NOTE: Use flex flex-col because of the sidebar
 		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 			{/* Preferences */}
-			{/* NOTE: Use py-1 not py-2 */}
-			<div ref={ref} className="-mx-4 px-3 py-1 flex-shrink-0 flex flex-row justify-between bg-white shadow-hero transition duration-300">
+			<Transition
+				unmountOnExit={false}
+				show={y > 0}
+				enter="transition ease-out duration-300"
+				enterFrom="bg-transparent shadow-none"
+				enterTo="bg-white shadow-hero"
+				leave="transition ease-in duration-300"
+				leaveFrom="bg-white shadow-hero"
+				leaveTo="bg-transparent shadow-none"
+			>
+				{/* NOTE: Use py-1 not py-2 */}
+				<div className="-mx-4 px-3 py-1 flex-shrink-0 flex flex-row justify-between">
 
-				{/* LHS */}
-				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-					<Button
-						className="m-1 font-medium text-xs underline"
-						onClick={() => setShowContents(!showContents)}
-					>
-						Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
-					</Button>
-					<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
-						<p className="font-medium text-xs">
-							Saving
-						</p>
-						<svg
-							// NOTE: ml-1 is preferable to ml-2
-							className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
-							style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
-							fill="none"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							// strokeWidth="2"
-							strokeWidth="2.5"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
+					{/* LHS */}
+					<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+						<Button
+							className="m-1 font-medium text-xs underline"
+							onClick={() => setShowContents(!showContents)}
 						>
-							{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
-							<path d="M5 13l4 4L19 7"></path>
-						</svg>
+							Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
+						</Button>
+						<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
+							<p className="font-medium text-xs">
+								Saving
+							</p>
+							<svg
+								// NOTE: ml-1 is preferable to ml-2
+								className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+								style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
+								fill="none"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								// strokeWidth="2"
+								strokeWidth="2.5"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
+								<path d="M5 13l4 4L19 7"></path>
+							</svg>
+						</div>
+
+					</div>
+
+					{/* RHS */}
+					<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+						<Button
+							className="m-1 font-medium text-xs underline"
+							onClick={dispatch.toggleReadOnly}
+						>
+							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+						</Button>
+			 			<Button
+			 				className="m-1 font-medium text-xs underline"
+			 				onClick={dispatch.showReadme}
+			 			>
+			 				Readme (Esc)
+			 			</Button>
+			 			<Button
+			 				className="m-1 font-medium text-xs underline"
+			 				onClick={dispatch.showHTML}
+			 			>
+			 				HTML
+			 			</Button>
+			 			{/* <Button */}
+			 			{/* 	className="m-1 font-medium text-xs underline" */}
+			 			{/* 	onClick={dispatch.showHTML__BEM} */}
+			 			{/* > */}
+			 			{/* 	HTML__BEM */}
+			 			{/* </Button> */}
+			 			<Button
+			 				className="m-1 font-medium text-xs underline"
+			 				onClick={dispatch.showJSON}
+			 			>
+			 				JSON
+			 			</Button>
 					</div>
 
 				</div>
-
-				{/* RHS */}
-				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-					<Button
-						className="m-1 font-medium text-xs underline"
-						onClick={dispatch.toggleReadOnly}
-					>
-						Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-					</Button>
-		 			<Button
-		 				className="m-1 font-medium text-xs underline"
-		 				onClick={dispatch.showReadme}
-		 			>
-		 				Readme (Esc)
-		 			</Button>
-		 			<Button
-		 				className="m-1 font-medium text-xs underline"
-		 				onClick={dispatch.showHTML}
-		 			>
-		 				HTML
-		 			</Button>
-		 			{/* <Button */}
-		 			{/* 	className="m-1 font-medium text-xs underline" */}
-		 			{/* 	onClick={dispatch.showHTML__BEM} */}
-		 			{/* > */}
-		 			{/* 	HTML__BEM */}
-		 			{/* </Button> */}
-		 			<Button
-		 				className="m-1 font-medium text-xs underline"
-		 				onClick={dispatch.showJSON}
-		 			>
-		 				JSON
-		 			</Button>
-				</div>
-
-			</div>
+			</Transition>
 
 			{/* Sidebar */}
 			<div className="flex-shrink-0 h-4" />
@@ -613,10 +640,10 @@ const App = () => {
 				{/* Status bars */}
 				<Transition
 					show={!editor.readOnly && editor.focused}
-					enter="transition duration-200"
+					enter="transition duration-300"
 					enterFrom="opacity-0 transform translate-y-8"
 					enterTo="opacity-100 transform translate-y-0"
-					leave="transition duration-200"
+					leave="transition duration-300"
 					leaveFrom="opacity-100 transform translate-y-0"
 					leaveTo="opacity-0 transform translate-y-8"
 				>
