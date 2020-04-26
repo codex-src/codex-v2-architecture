@@ -9,10 +9,9 @@ export const UnorderedListRe = /^\t*[\-\*] /
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
 export function parseAnyList(range) {
-	let tag = UnorderedListRe.test(range[0].data) ? "ul" : "ol"
 	const result = {
 		type: typeEnum.AnyList,
-		tag,
+		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",
 		id: range[0].id,
 		children: [],
 	}
@@ -24,10 +23,9 @@ export function parseAnyList(range) {
 		const depth = syntax.search(/[^\t]/)
 		while (deep < depth) {
 			if (!ref.length || ref[ref.length - 1].type !== typeEnum.AnyList) {
-				tag = UnorderedListRe.test(each.data) ? "ul" : "ol"
 				ref.push({
 					type: typeEnum.AnyList,
-					tag,
+					tag: UnorderedListRe.test(each.data) ? "ul" : "ol",
 					id: each.id,
 					children: [],
 				})
@@ -43,7 +41,7 @@ export function parseAnyList(range) {
 		ref.push({
 			// type: !checked ? AnyListItem : TodoItem,
 			type: typeEnum.AnyListItem,
-			tag,
+			tag: "li",
 			id: each.id,
 			syntax: [syntax],
 			// checked,

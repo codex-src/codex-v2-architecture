@@ -284,7 +284,7 @@ export function parseInlineElements(str) {
 				let [href] = safeURLRe.exec(str.slice(x))
 				if (href.length === syntax.length) {
 					// No-op; defer to end
-				} else if (!(isAlphanum(href[href.length - 1]) || href[href.length - 1] === "/")) {
+				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {
 					href = href.slice(0, href.length - 1)
 				}
 				parsed.push({
@@ -426,7 +426,6 @@ export function parseElements(nodes) {
 				// Iterate to end syntax:
 				while (x2 < nodes.length) {
 					if (
-						// FIXME: Inverse statement
 						(nodes[x2].data.length < 2 || nodes[x2].data.slice(0, 2) !== "> ") &&
 						(nodes[x2].data.length !== 1 || nodes[x2].data !== ">")
 					) {
@@ -490,7 +489,7 @@ export function parseElements(nodes) {
 			// No-op
 			break
 
-		// case "+":
+			// case "+":
 
 		// <AnyList> or <Break>
 		case "\t":
@@ -508,19 +507,18 @@ export function parseElements(nodes) {
 		case "9":
 
 			// - List item or 1. List item (etc.)
-			if (nchars >= "- ".length && AnyListRe.test(each.data)) {
+			if (nchars >= 2 && AnyListRe.test(each.data)) {
 				const x1 = x
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
 				while (x2 < nodes.length) {
-					if (!(nodes[x2].data.length >= "- ".length && AnyListRe.test(nodes[x2].data))) {
+					if (nodes[x2].data.length < 2 || !AnyListRe.test(nodes[x2].data)) {
 						// No-op
 						break
 					}
 					x2++
 				}
-				console.log(parseAnyList(nodes.slice(x1, x2)))
 				parsed.push(parseAnyList(nodes.slice(x1, x2)))
 				x = x2 - 1
 				continue
