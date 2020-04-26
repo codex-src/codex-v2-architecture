@@ -363,7 +363,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						}
 						const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 						const nodes = readRoots(ref.current, [root1, root2])
-						console.log(nodes)
 						const [pos1, pos2] = computePosRange(ref.current)
 						dispatch.input(nodes, atEnd, [pos1, pos2])
 					},

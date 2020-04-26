@@ -11,7 +11,7 @@ function readRoot(root) {
 		for (const each of on.childNodes) {
 			recurse(each)
 			const next = each.nextElementSibling
-			if (next && next.getAttribute("data-codex-node")) {
+			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
 				nodes.push({ id: next.id, data: "" })
 			}
 		}
