@@ -536,10 +536,11 @@ function parseElements(nodes) {
 			// No-op
 			break
 
+		// case "+":
+
 		// <AnyList> or <Break>
 		case "\t":
 		case "-":
-		// case "+":
 		case "*":
 		case "0":
 		case "1":
@@ -552,7 +553,7 @@ function parseElements(nodes) {
 		case "8":
 		case "9":
 			// *** or ---
-			if (nchars === 3 && each.data === "---" || each.data === "***") {
+			if (nchars === 3 && (each.data === "---" || each.data === "***")) {
 				parsed.push({
 					type: typeEnum.Break,
 					id: each.id,
