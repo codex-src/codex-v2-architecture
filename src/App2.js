@@ -44,7 +44,6 @@ function useTransitionNav(ref) {
 	}, [ref])
 }
 
-
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
@@ -60,7 +59,8 @@ const FixedEditorPreferences = ({ showContentsState: [showContents, setShowConte
 		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 			{/* Preferences */}
-			<div ref={ref} className="-mx-4 px-3 py-2 flex-shrink-0 flex flex-row justify-between bg-white shadow-hero transition duration-300">
+			{/* NOTE: Use py-1 not py-2 */}
+			<div ref={ref} className="-mx-4 px-3 py-1 flex-shrink-0 flex flex-row justify-between bg-white shadow-hero transition duration-300">
 
 				{/* LHS */}
 				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
@@ -279,7 +279,7 @@ function format(n) {
 }
 
 const App = () => {
-	// TODO: Use props.children instead of useEditor?
+	// TODO: Use props.children not useEditor?
 	const [editor, editorDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
@@ -509,9 +509,8 @@ const App = () => {
 					{/* Contents */}
 					<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
 						<Button
-							// NOTE (1): Use w-full text-left because of <Button>
-							// NOTE (2): Use duration-300 instead of duration-300
-							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
+							// NOTE: Use w-full text-left because of <Button>
+							className="py-1 flex flex-row not-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
 							onPointerEnter={() => setHoverContents(true)}
 							onPointerLeave={() => setHoverContents(false)}
 							onClick={() => setShowContents(false)}
@@ -526,9 +525,8 @@ const App = () => {
 								viewBox="0 0 24 24"
 							>
 								<Transition
-									// NOTE: Use duration-200 instead of
-									// duration-300 and omit transition-
-									// timing-function
+									// NOTE: Use duration-200 not duration-300
+									// and omit transition-timing-function
 									show={!hoverContents}
 									enter="transition duration-200"
 									enterFrom="opacity-0 transform -translate-x-8"
@@ -541,9 +539,8 @@ const App = () => {
 									<path d="M4 6h16M4 12h16M4 18h7"></path>
 								</Transition>
 								<Transition
-									// NOTE: Use duration-200 instead of
-									// duration-300 and omit transition-
-									// timing-function
+									// NOTE: Use duration-200 not duration-300
+									// and omit transition-timing-function
 									show={hoverContents}
 									enter="transition duration-200"
 									enterFrom="opacity-0 transform translate-x-8"
@@ -624,7 +621,8 @@ const App = () => {
 					leaveTo="opacity-0 transform translate-y-8"
 				>
 					<div className="fixed inset-0 flex flex-row items-end pointer-events-none">
-						<div className="px-3 py-1 flex flex-row justify-between w-full">
+						{/* NOTE: Use py-1 not py-2 */}
+						<div className="px-3 py-1 flex flex-row justify-between w-full bg-white shadow-hero">
 							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
 								{statusLHS}
 							</p>
