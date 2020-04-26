@@ -639,7 +639,8 @@ const App = () => {
 					leaveTo="opacity-0"
 				>
 					<div className="fixed inset-0 hidden xl:flex flex-row items-end pointer-events-none">
-						<div className="px-3 py-2 flex flex-row justify-between w-full">
+						{/* NOTE: Use py-1 not py-2 */}
+						<div className="px-3 py-1 flex flex-row justify-between w-full">
 							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
 								{statusLHS}
 							</p>
