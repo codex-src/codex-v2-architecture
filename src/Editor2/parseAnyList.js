@@ -45,7 +45,6 @@ export function parseAnyList(range) {
 			tag: "li",
 			id: each.id,
 			syntax: [syntax],
-			// depth, // DEPRECATE: Use tabs (fix cmap)
 			tabs,
 			// checked,
 			children: parseInlineElements(substr),

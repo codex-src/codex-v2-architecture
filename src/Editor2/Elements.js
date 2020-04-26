@@ -244,19 +244,23 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 // ))
 
 // Describes a list item; <li>.
-export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
-	// console.log({tabs, syntax}) || (
-	<Node tag={tag} id={id} className="-ml-5 my-2">
-		{/* Takes precedence */}
-		<span className="hidden">{tabs}</span>
-		<Markdown className="!mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</Node>
-	// )
-))
+export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
+	const [{ readOnly }] = useEditorState()
+	return (
+		<Node tag={tag} id={id} className="-ml-5 my-1" style={{ display: readOnly && "flex", flexDirection: readOnly && "row" }}>
+			{/* Take precedence */}
+			<span className="hidden">{tabs}</span>
+			<Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+				{/* NOTE: <span> is needed for read-only mode */}
+				<span>
+					{toReact(children) || (
+						<br />
+					)}
+				</span>
+			</Markdown>
+		</Node>
+	)
+})
 
 // Describes any list; <ul> or <ol>.
 export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
