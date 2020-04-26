@@ -2,8 +2,8 @@ import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
 
 import {
-	// toHTML__BEM,
 	toHTML,
+	toReact_js,
 } from "Editor2/cmap"
 
 // Maps renderModesEnum to language extensions.
@@ -20,7 +20,7 @@ function initialState(defaultRenderer) {
 		extension: extMap[defaultRenderer] || "",
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
-		// [renderModesEnum.HTML__BEM]: "",
+		[renderModesEnum.React_js]: "",
 	}
 	return state
 }
@@ -42,7 +42,7 @@ const methods = state => ({
 				"\t",
 			),
 			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
-			// [renderModesEnum.HTML__BEM]: toHTML__BEM(editorState.reactVDOM),
+			[renderModesEnum.React_js]: toReact_js(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
@@ -72,15 +72,15 @@ const methods = state => ({
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
-	// showHTML__BEM() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.HTML__BEM) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.HTML__BEM
-	// 	state.extension = "html"
-	// },
+	showReact_js() {
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.React_js) {
+			state.showSidebar = false
+		}
+		state.renderMode = renderModesEnum.React_js
+		state.extension = "html"
+	},
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},

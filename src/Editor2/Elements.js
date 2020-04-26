@@ -58,15 +58,14 @@ const headerClassNames = {
 // 	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
 // )
 
+// <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<Root id={id} className={headerClassNames[tag]}>
-		{/* <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}> */}
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-		{/* </IfWrapper> */}
 	</Root>
 ))
 
@@ -81,7 +80,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id} className="text-gray-600">
-		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
+		<Markdown className="!mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -246,12 +245,15 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	const [{ readOnly }] = useEditorState()
+
+	// -1.25em === -ml-5
+	const style = { /* margin: "0.25em 0 0.25em -1.25em", */ display: readOnly && "flex", flexDirection: readOnly && "row" }
 	return (
-		<Node tag={tag} id={id} className="-ml-5 my-1" style={{ display: readOnly && "flex", flexDirection: readOnly && "row" }}>
-			{/* Take precedence */}
+		<Node tag={tag} id={id} className="-ml-5" style={style}>
+			{/* Takes precedence */}
 			<span className="hidden">{tabs}</span>
-			<Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-				{/* NOTE: <span> is needed for read-only mode */}
+			<Markdown className="!mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+				{/* NOTE: Use <span> for read-only mode */}
 				<span>
 					{toReact(children) || (
 						<br />

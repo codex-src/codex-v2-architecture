@@ -139,6 +139,12 @@ const FixedEditorPreferences = ({
 			 			</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
+			 				onClick={dispatch.showReact_js}
+			 			>
+			 				React JSX
+			 			</Button>
+			 			<Button
+							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showJSON}
 			 			>
 			 				JSON
