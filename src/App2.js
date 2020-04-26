@@ -18,113 +18,146 @@ import {
 
 import "./App.css"
 
+function useTransitionNav(ref) {
+	// Disable border-color and box-shadow:
+	React.useLayoutEffect(() => {
+		// ref.current.style.borderColor = "transparent"
+		ref.current.style.boxShadow = "none"
+	}, [ref])
+
+	// Programmatically enable border-color and box-shadow:
+	React.useLayoutEffect(() => {
+		const handler = e => {
+			if (!window.scrollY) {
+				// ref.current.style.borderColor = "transparent"
+				ref.current.style.boxShadow = "none"
+			} else {
+				// ref.current.style.borderColor = ""
+				ref.current.style.boxShadow = ""
+			}
+		}
+		handler()
+		window.addEventListener("scroll", handler, false)
+		return () => {
+			window.removeEventListener("scroll", handler, false)
+		}
+	}, [ref])
+}
+
+
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
 	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
-const FixedEditorPreferences = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => (
-	// NOTE: Use flex flex-col because of the sidebar
-	<div className="px-3 py-2 fixed inset-0 flex flex-col z-40 pointer-events-none translate-z">
+const FixedEditorPreferences = ({ showContentsState: [showContents, setShowContents], saveStatusState: [saveStatus, setSaveStatus], state, dispatch }) => {
+	const ref = React.useRef()
 
-		{/* Preferences */}
-		<div className="flex-shrink-0 flex flex-row justify-between">
+	useTransitionNav(ref)
 
-			{/* LHS */}
-			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-				<Button
-					className="m-1 font-medium text-xs underline"
-					onClick={() => setShowContents(!showContents)}
-				>
-					Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
-				</Button>
-				<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
-					<p className="font-medium text-xs">
-						Saving
-					</p>
-					<svg
-						// NOTE: ml-1 is preferable to ml-2
-						className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
-						style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
-						fill="none"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						// strokeWidth="2"
-						strokeWidth="2.5"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
+	return (
+		// NOTE: Use flex flex-col because of the sidebar
+		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
+
+			{/* Preferences */}
+			<div ref={ref} className="-mx-4 px-3 py-2 flex-shrink-0 flex flex-row justify-between bg-white shadow-hero transition duration-300">
+
+				{/* LHS */}
+				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+					<Button
+						className="m-1 font-medium text-xs underline"
+						onClick={() => setShowContents(!showContents)}
 					>
-						{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
-						<path d="M5 13l4 4L19 7"></path>
-					</svg>
+						Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
+					</Button>
+					<div className="m-1 flex flex-row items-center transition duration-300" style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}>
+						<p className="font-medium text-xs">
+							Saving
+						</p>
+						<svg
+							// NOTE: ml-1 is preferable to ml-2
+							className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+							style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
+							fill="none"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							// strokeWidth="2"
+							strokeWidth="2.5"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							{/* <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path> */}
+							<path d="M5 13l4 4L19 7"></path>
+						</svg>
+					</div>
+
+				</div>
+
+				{/* RHS */}
+				<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
+					<Button
+						className="m-1 font-medium text-xs underline"
+						onClick={dispatch.toggleReadOnly}
+					>
+						Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+					</Button>
+		 			<Button
+		 				className="m-1 font-medium text-xs underline"
+		 				onClick={dispatch.showReadme}
+		 			>
+		 				Readme (Esc)
+		 			</Button>
+		 			<Button
+		 				className="m-1 font-medium text-xs underline"
+		 				onClick={dispatch.showHTML}
+		 			>
+		 				HTML
+		 			</Button>
+		 			{/* <Button */}
+		 			{/* 	className="m-1 font-medium text-xs underline" */}
+		 			{/* 	onClick={dispatch.showHTML__BEM} */}
+		 			{/* > */}
+		 			{/* 	HTML__BEM */}
+		 			{/* </Button> */}
+		 			<Button
+		 				className="m-1 font-medium text-xs underline"
+		 				onClick={dispatch.showJSON}
+		 			>
+		 				JSON
+		 			</Button>
 				</div>
 
 			</div>
 
-			{/* RHS */}
-			<div className="-m-1 flex-shrink-0 flex flex-row pointer-events-auto">
-				<Button
-					className="m-1 font-medium text-xs underline"
-					onClick={dispatch.toggleReadOnly}
-				>
-					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-				</Button>
-	 			<Button
-	 				className="m-1 font-medium text-xs underline"
-	 				onClick={dispatch.showReadme}
-	 			>
-	 				Readme (Esc)
-	 			</Button>
-	 			<Button
-	 				className="m-1 font-medium text-xs underline"
-	 				onClick={dispatch.showHTML}
-	 			>
-	 				HTML
-	 			</Button>
-	 			{/* <Button */}
-	 			{/* 	className="m-1 font-medium text-xs underline" */}
-	 			{/* 	onClick={dispatch.showHTML__BEM} */}
-	 			{/* > */}
-	 			{/* 	HTML__BEM */}
-	 			{/* </Button> */}
-	 			<Button
-	 				className="m-1 font-medium text-xs underline"
-	 				onClick={dispatch.showJSON}
-	 			>
-	 				JSON
-	 			</Button>
-			</div>
+			{/* Sidebar */}
+			<div className="flex-shrink-0 h-4" />
+			<Transition
+				show={state.showSidebar}
+				enter="transition ease-out duration-300"
+				enterFrom="transform opacity-0 translate-x-32"
+				enterTo="transform opacity-100 translate-x-0"
+				leave="transition ease-in duration-300"
+				leaveFrom="transform opacity-100 translate-x-0"
+				leaveTo="transform opacity-0 translate-x-32"
+			>
+				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
+					{state.renderMode === renderModesEnum.Readme ? (
+						<ReadmeEditor readOnly={state.readOnly} />
+					) : (
+						<span className="inline-block">
+							<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+								<Highlighted extension={state.extension}>
+									{state[state.renderMode]}
+								</Highlighted>
+							</pre>
+						</span>
+					)}
+				</div>
+			</Transition>
 
 		</div>
-
-		{/* Sidebar */}
-		<div className="flex-shrink-0 h-2" />
-		<Transition
-			show={state.showSidebar}
-			enter="transition ease-out duration-300"
-			enterFrom="transform opacity-0 translate-x-32"
-			enterTo="transform opacity-100 translate-x-0"
-			leave="transition ease-in duration-300"
-			leaveFrom="transform opacity-100 translate-x-0"
-			leaveTo="transform opacity-0 translate-x-32"
-		>
-			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-				{state.renderMode === renderModesEnum.Readme ? (
-					<ReadmeEditor readOnly={state.readOnly} />
-				) : (
-					<span className="inline-block">
-						<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-							<Highlighted extension={state.extension}>
-								{state[state.renderMode]}
-							</Highlighted>
-						</pre>
-					</span>
-				)}
-			</div>
-		</Transition>
-
-	</div>
-)
+	)
+}
 
 const rant = `I seriously agree with this article. I find TypeScript to be a kind of exchange of productivity for correctness, which, to be honest, in the real-world is less practical. Think about it this way — would you rather have end-to-end tests that test your production-ready application or TypeScript complain in development? Think carefully, because the answer is not obvious. **TypeScript takes time to get right. A lot of time. This is time you could be testing your application _in the wild_, rather than testing its correctness in development.** Yes, there _is_ some crossover here, but it’s not 100%. When you use TypeScript, you are **betting on TypeScript** helping you more than hurting you.
 
@@ -581,18 +614,26 @@ const App = () => {
 				</DocumentTitle>
 
 				{/* Status bars */}
-				<div className="px-3 py-2 fixed inset-x-0 bottom-0 flex flex-row justify-between z-30 pointer-events-none">
-					{/* NOTE: Use duration-200 instead of duration-300
-					and omit transition-timing-function */}
-					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
-						{statusLHS}
-					</p>
-					{/* NOTE: Use duration-200 instead of duration-300
-					and omit transition-timing-function */}
-					<p className="font-medium text-xs transition duration-200" style={{ fontFeatureSettings: "'tnum'", opacity: editor.readOnly || !editor.focused ? "0" : "1" }}>
-						{statusRHS}
-					</p>
-				</div>
+				<Transition
+					show={!editor.readOnly && editor.focused}
+					enter="transition duration-200"
+					enterFrom="opacity-0 transform translate-y-8"
+					enterTo="opacity-100 transform translate-y-0"
+					leave="transition duration-200"
+					leaveFrom="opacity-100 transform translate-y-0"
+					leaveTo="opacity-0 transform translate-y-8"
+				>
+					<div className="fixed inset-0 flex flex-row items-end pointer-events-none">
+						<div className="px-3 py-1 flex flex-row justify-between w-full">
+							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
+								{statusLHS}
+							</p>
+							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
+								{statusRHS}
+							</p>
+						</div>
+					</div>
+				</Transition>
 
 			</div>
 
