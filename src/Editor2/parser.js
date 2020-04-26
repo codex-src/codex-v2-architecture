@@ -19,6 +19,16 @@ import {
 	safeURLRe,
 } from "./spec"
 
+// Tests wherther a character can be fast-tracked.
+function testFastPass(char) {
+	const ok = (
+		(char >= "a" && char !== "h" && char <= "z") || // Exempt "h" for "https://" and "http://"
+		char === " " ||                                 // Takes precedence
+		(char >= "A" && char <= "Z")
+	)
+	return ok
+}
+
 // // Parses a GitHub Flavored Markdown (GFM) type.
 // function parseGFMType({ type, syntax, str, x }) {
 // 	const shouldRecurse = type !== typeEnum.Code
@@ -133,7 +143,11 @@ export function parseInlineElements(str) {
 	const parsed = []
 	for (let x = 0; x < str.length; x++) {
 		// Fast pass:
-		if (!isASCIIPunctuation(str[x]) && str[x] !== "h" && str[x] <= "\u00ff") { // TODO: Add "w" for "www"?
+		if (
+			(str[x] >= "a" && str[x] !== "h" && str[x] <= "z") || // Exempt "h" for "https://" and "http://"
+			str[x] === " " ||                                     // Takes precedence
+			(str[x] >= "A" && str[x] <= "Z")
+		) {
 			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
 				parsed.push(str[x])
 				continue
@@ -367,9 +381,7 @@ export function parseElements(nodes) {
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast pass:
-		//
- 		// TODO: Add "h" for "https://" and "http://"?
-		if (!nodes[x].data.length || (!isASCIIWhitespace(nodes[x].data[0]) && !isASCIIPunctuation(nodes[x].data[0]))) {
+		if (!nodes[x].data.length || testFastPass(nodes[x].data[0])) {
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
 				type: typeEnum.Paragraph,
