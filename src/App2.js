@@ -626,11 +626,13 @@ const App = () => {
 
 				{/* Status bars */}
 				<Transition
+					// NOTE: Use duration-200 not duration-300 and
+					// omit transition-timing-function
 					show={!editor.readOnly && editor.focused}
-					enter="transition ease-out duration-300"
+					enter="transition duration-200"
 					enterFrom="opacity-0"
 					enterTo="opacity-100"
-					leave="transition ease-in duration-300"
+					leave="transition duration-200"
 					leaveFrom="opacity-100"
 					leaveTo="opacity-0"
 				>
