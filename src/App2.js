@@ -197,7 +197,7 @@ const FixedEditorPreferences = ({
 //
 // I’m sure some of you will say that TypeScript makes you more productive, and if you are one of these people, that’s great. But I found I ran into similar problems as Lucas — TypeScript’s documentation and error messages are far from friendly, and TypeScript as a system starts to break down the more complexity you introduce into your app, e.g. recursive types, etc. I’m having bugs where my IDE and app don’t even agree. And I simply don’t have the time to find the root cause of every problem I run into, because most of these problems are concerned with correctness.`
 
-const LOCALSTORAGE_KEY = "codex-app-v2.3"
+const LOCALSTORAGE_KEY = "codex-app-v2.4.1"
 
 const data = (() => {
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)

@@ -186,37 +186,6 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
 // 	return [done, etc]
 // }
 
-// export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-// 	// const [done, etc] = useTodo(checked.value)
-//
-// 	const style = {
-// 		// margin: "0.3125em 0.5em 0 calc((16 - 11.438) / 16 * -1em)",
-// 		marginLeft: "calc((16 - 11.438) / 16 * -1em)",
-// 		borderRadius: "0.3125em",
-// 	}
-// 	return (
-// 		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={/* done && */ attrs.strike.style}>
-// 			<span className="hidden">{tabs}</span>
-// 			{/* <Markdown syntax={syntax}> */}
-// 			<span className="mr-2 flex-shrink-0">
-// 				{/* <input type="checkbox" /> */}
-// 				{/* <input className={`form-checkbox w-4 h-4 text-md-blue-a200 ${!checked.value ? "shadow-hero" : "shadow"} transition duration-150`} style={style} type="checkbox" /> */}
-// 				<span className={`w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none`} style={style} tabIndex="1">
-// 					<svg fill="#fff" viewBox="0 0 16 16">
-// 						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-// 					</svg>
-// 				</span>
-// 			</span>
-// 			<span>
-// 				{toReact(children) || (
-// 					<br />
-// 				)}
-// 			</span>
-// 			{/* </Markdown> */}
-// 		</Node>
-// 	)
-// })
-
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
 	// const [done, etc] = useTodo(checked.value)
 
@@ -226,7 +195,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={/* done && */ attrs.strike.style}>
+		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={checked.value && attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* <span className="mr-2 flex-shrink-0"> */}
