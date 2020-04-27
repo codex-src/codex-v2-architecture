@@ -2,8 +2,6 @@ import { newPos } from "./constructors"
 
 // Computes a cursor data structure.
 function computePos(editorRoot, { ...range }) {
-	console.log(range)
-
 	const pos = newPos()
 	if (!range.node || !editorRoot.contains(range.node)) {
 		throw new Error("computePos: no such node or out of bounds")
@@ -16,6 +14,8 @@ function computePos(editorRoot, { ...range }) {
 	// }
 
 	// Iterate to the deepest node:
+	//
+	// FIXME: range.offset can be out of bounds
 	while (range.node.nodeType === Node.ELEMENT_NODE && range.offset < range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0

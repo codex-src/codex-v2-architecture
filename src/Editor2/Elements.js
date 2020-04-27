@@ -80,7 +80,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id} className="text-gray-600">
-		<Markdown className="mr-1 text-md-blue-a400" syntax={syntax}>
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -157,21 +157,18 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 })
 
 // Describes a list item; <li>.
-export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
-	const [{ readOnly }] = useEditorState()
-	return (
-		<Node tag={tag} id={id} className="-ml-5 my-2 flex flex-row">
-			<span className="hidden">{tabs}</span>
-			<Markdown className="mr-1 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-				<span>
-					{toReact(children) || (
-						<br />
-					)}
-				</span>
-			</Markdown>
-		</Node>
-	)
-})
+export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
+	<Node tag={tag} id={id} className="-ml-5 my-2 flex flex-row">
+		<span className="hidden">{tabs}</span>
+		<Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+			<span>
+				{toReact(children) || (
+					<br />
+				)}
+			</span>
+		</Markdown>
+	</Node>
+))
 
 // const Todo = ({ className, ...props }) => (
 // 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
@@ -201,7 +198,7 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 // 		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={/* done && */ attrs.strike.style}>
 // 			<span className="hidden">{tabs}</span>
 // 			{/* <Markdown syntax={syntax}> */}
-// 			<span className="mr-1 flex-shrink-0">
+// 			<span className="mr-2 flex-shrink-0">
 // 				{/* <input type="checkbox" /> */}
 // 				{/* <input className={`form-checkbox w-4 h-4 text-md-blue-a200 ${!checked.value ? "shadow-hero" : "shadow"} transition duration-150`} style={style} type="checkbox" /> */}
 // 				<span className={`w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none`} style={style} tabIndex="1">
@@ -231,24 +228,21 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	return (
 		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={/* done && */ attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
-			{/* <Markdown syntax={syntax}> */}
-			<span className="mr-1 flex-shrink-0">
-				<input className={`-mt-px form-checkbox w-4 h-4 text-md-blue-a200 ${!checked.value ? "shadow-hero" : "shadow"} transition duration-150`} style={style} type="checkbox" />
-			</span>
-			<span className="hidden">
-				{syntax[0]}
-			</span>
-			{/* <span className={`flex-shrink-0 w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none`} style={style} tabIndex="1"> */}
-			{/* 	<svg fill="#fff" viewBox="0 0 16 16"> */}
-			{/* 		<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path> */}
-			{/* 	</svg> */}
-			{/* </span> */}
-			<span>
-				{toReact(children) || (
-					<br />
-				)}
-			</span>
-			{/* </Markdown> */}
+			<Markdown className="hidden" syntax={syntax}>
+				{/* <span className="mr-2 flex-shrink-0"> */}
+				{/* 	<input className={`-mt-px form-checkbox w-4 h-4 text-md-blue-a200 ${!checked.value ? "shadow-hero" : "shadow"} transition duration-150`} style={style} type="checkbox" /> */}
+				{/* </span> */}
+				<span className={`mr-2 mt-1 flex-shrink-0 w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+					<svg fill="#fff" viewBox="0 0 16 16">
+						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+					</svg>
+				</span>
+				<span>
+					{toReact(children) || (
+						<br />
+					)}
+				</span>
+			</Markdown>
 		</Node>
 	)
 })
