@@ -25,7 +25,7 @@ const Syntax = ({ className, ...props }) => {
 	if (!props.children || readOnly) {
 		return null
 	}
-	// NOTE: className does not concatenate
+	// return <span className={!className ? "font-mono text-md-blue-a400" : `font-mono ${className}`} {...props} />
 	return <span className={!className ? "text-md-blue-a400" : className} {...props} />
 }
 

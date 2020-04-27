@@ -2,6 +2,8 @@ import { newPos } from "./constructors"
 
 // Computes a cursor data structure.
 function computePos(editorRoot, { ...range }) {
+	console.log(range)
+
 	const pos = newPos()
 	if (!range.node || !editorRoot.contains(range.node)) {
 		throw new Error("computePos: no such node or out of bounds")
@@ -14,10 +16,17 @@ function computePos(editorRoot, { ...range }) {
 	// }
 
 	// Iterate to the deepest node:
-	while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
+	while (range.node.nodeType === Node.ELEMENT_NODE && range.offset < range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
 	}
+
+	// // Iterate to the deepest node:
+	// while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
+	// 	range.node = range.node.childNodes[range.offset]
+	// 	range.offset = 0
+	// }
+
 	const recurse = on => {
 		if (on === range.node) {
 			Object.assign(pos, {

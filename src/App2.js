@@ -81,18 +81,12 @@ const FixedEditorPreferences = ({
 								Saving
 							</p>
 							<svg
-								// NOTE: Use ml-1 not ml-2
 								className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
 								style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
-								fill="none"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								// strokeWidth="2"
-								strokeWidth="2.5"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+								fill="currentColor"
+								viewBox="0 0 16 16"
 							>
-								<path d="M5 13l4 4L19 7"></path>
+								<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 							</svg>
 						</div>
 					</div>

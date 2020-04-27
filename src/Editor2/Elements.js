@@ -181,41 +181,50 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	)
 })
 
-const Todo = ({ className, ...props }) => (
-	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
-)
-
-// Prepares a checked state and functions e.g. {...etc}.
-function useTodo(initialValue) {
-	const [done, setDone] = React.useState(initialValue)
-	const etc = {
-		checked: done,
-		onChange: e => {
-			setDone(!done)
-		},
-	}
-	return [done, etc]
-}
+// const Todo = ({ className, ...props }) => (
+// 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
+// )
+//
+// // Prepares a checked state and functions e.g. {...etc}.
+// function useTodo(initialValue) {
+// 	const [done, setDone] = React.useState(initialValue)
+// 	const etc = {
+// 		checked: done,
+// 		onChange: e => {
+// 			setDone(!done)
+// 		},
+// 	}
+// 	return [done, etc]
+// }
 
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-	const [done, etc] = useTodo(checked.value)
+	// const [done, etc] = useTodo(checked.value)
 
 	const style = {
-		margin: "0.3125em 0.5em 0 calc((16 - 11.55) / 16 * -1em)", // FIXME
+		margin: "0.3125em 0.5em 0 calc((16 - 11.438) / 16 * -1em)",
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={done && attrs.strike.style}>
+		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={/* done && */ attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
-			<Markdown className="hidden" syntax={syntax}>
-				{/* FIXME: md-blue-a200? */}
-				<Todo className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!done ? "shadow-hero" : "shadow"} transition duration-200`} style={style} {...etc} />
-				<span>
-					{toReact(children) || (
-						<br />
-					)}
-				</span>
-			</Markdown>
+			{/* <Markdown syntax={syntax}> */}
+			<span className="mr-2 flex-shrink-0">
+				<input type="checkbox" />
+			</span>
+			<span className="hidden">
+				{syntax[0]}
+			</span>
+			{/* <span className={`flex-shrink-0 w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none`} style={style} tabIndex="1"> */}
+			{/* 	<svg fill="#fff" viewBox="0 0 16 16"> */}
+			{/* 		<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path> */}
+			{/* 	</svg> */}
+			{/* </span> */}
+			<span>
+				{toReact(children) || (
+					<br />
+				)}
+			</span>
+			{/* </Markdown> */}
 		</Node>
 	)
 })
