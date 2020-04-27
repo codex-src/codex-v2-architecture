@@ -78,7 +78,7 @@
 	/* transition-duration: 200ms; */
 }
 
-.codex-editor.feature-read-only ul > li:not(.checked):before {
+.codex-editor ul > li:not(.checked):before {
 	/* margin-right: 0.25em; */
 	margin-right: 0.5em;
 	flex-shrink: 0;
@@ -89,11 +89,11 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor.feature-read-only ul > li:first-of-type,
-.codex-editor.feature-read-only ol > li:first-of-type {
+.codex-editor ul > li:first-of-type,
+.codex-editor ol > li:first-of-type {
 	counter-reset: count;
 }
-.codex-editor.feature-read-only ol > li:before {
+.codex-editor ol > li:before {
 	/* margin-right: 0.25em; */
 	margin-right: 0.5em;
 	flex-shrink: 0;

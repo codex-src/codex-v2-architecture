@@ -160,7 +160,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
 	<Node tag={tag} id={id} className="-ml-5 my-2 flex flex-row">
 		<span className="hidden">{tabs}</span>
-		<Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+		<Markdown className="hidden" syntax={syntax}>
+		{/* <Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}> */}
 			<span>
 				{toReact(children) || (
 					<br />
