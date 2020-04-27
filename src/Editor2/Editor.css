@@ -69,16 +69,17 @@
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
-/* .codex-editor:not(.feature-read-only) .markdown:not( .font-mono) { */
-/* 	padding: 0.015625em 0; */
-/* 	transition-duration: 200ms; */
-/* } */
-/* .codex-editor:not(.feature-read-only) .markdown:not( .font-mono):hover { */
-/* 	background-color: #448aff1f; */
-/* 	transition-duration: 200ms; */
-/* } */
+{/* .codex-editor:not(.feature-read-only) .markdown:not( .font-mono) { */}
+{/* 	padding: 0.015625em 0; */}
+{/* 	transition-duration: 200ms; */}
+{/* } */}
+.codex-editor:not(.feature-read-only) .markdown:not( .font-mono) {
+	/* background-color: #448aff0f; */
+	/* transition-duration: 200ms; */
+}
 
 .codex-editor.feature-read-only ul > li:not(.checked):before {
+	/* margin-right: 0.25em; */
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;
@@ -93,6 +94,7 @@
 	counter-reset: count;
 }
 .codex-editor.feature-read-only ol > li:before {
+	/* margin-right: 0.25em; */
 	margin-right: 0.5em;
 	flex-shrink: 0;
 	display: inline-flex;

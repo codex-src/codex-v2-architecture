@@ -9,6 +9,7 @@ import {
 	Header,
 	Paragraph,
 	Preformatted,
+	TodoItem,
 } from "./Elements"
 
 import {
@@ -32,6 +33,7 @@ const typeEnumMap = {
 	[typeEnum.Header]: Header,
 	[typeEnum.Paragraph]: Paragraph,
 	[typeEnum.Preformatted]: Preformatted,
+	[typeEnum.TodoItem]: TodoItem,
 
 	// Inline elements:
 	[typeEnum.Anchor]: Anchor,

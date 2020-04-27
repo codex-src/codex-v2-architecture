@@ -10,6 +10,7 @@ const typeEnum = new Enum(
 	"Header",
 	"Paragraph",
 	"Preformatted",
+	"TodoItem",
 
 	// Inline elements:
 	"Anchor",

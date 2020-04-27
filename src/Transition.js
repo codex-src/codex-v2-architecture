@@ -2,6 +2,8 @@ import React from "react"
 import { CSSTransition } from "react-transition-group"
 
 // https://github.com/adamwathan/tailwind-ui-navbar-react/blob/1bbfde78deb96befc371d8726e41a32bdd66403d/pages/index.js#L4
+//
+// TODO: Change API to useLayoutEffect
 function Transition({
 	unmountOnExit, //
 	show,          // *Required

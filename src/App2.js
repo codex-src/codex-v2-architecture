@@ -99,22 +99,35 @@ const FixedEditorPreferences = ({
 
 					{/* Center */}
 					{/* <div className="absolute inset-0 flex flex-row justify-center items-center pointer-events-none"> */}
-					{/* 	<p className="hidden xl:flex flex-row justify-center items-center w-64 text-gray-500 truncate pointer-events-auto"> */}
-					{/* 		<svg */}
-					{/* 			className="mr-2 flex-shrink-0 w-4 h-4" */}
-					{/* 			fill="none" */}
-					{/* 			stroke="currentColor" */}
-					{/* 			strokeLinecap="round" */}
-					{/* 			strokeLinejoin="round" */}
-					{/* 			strokeWidth="2" */}
-					{/* 			viewBox="0 0 24 24" */}
-					{/* 		> */}
-					{/* 			<path d="M4 6h16M4 12h16M4 18h7"></path> */}
-					{/* 		</svg> */}
-					{/* 		<p className="font-semibold text-xs tracking-wide uppercase truncate"> */}
-					{/* 			{title.trim() || "Untitled"} */}
+					{/* 	<Transition */}
+					{/* 		// NOTE: Use duration-200 not duration-300 and */}
+					{/* 		// omit transition-timing-function */}
+					{/* 		unmountOnExit={false} */}
+					{/* 		show={y > 0} */}
+					{/* 		enter="transition duration-200" */}
+					{/* 		enterFrom="opacity-100" */}
+					{/* 		enterTo="opacity-0" */}
+					{/* 		leave="transition duration-300" */}
+					{/* 		leaveFrom="opacity-0" */}
+					{/* 		leaveTo="opacity-100" */}
+					{/* 	> */}
+					{/* 		<p className="hidden xl:flex flex-row justify-center items-center w-64 text-gray-500 truncate pointer-events-auto"> */}
+					{/* 			<svg */}
+					{/* 				className="mr-2 flex-shrink-0 w-4 h-4" */}
+					{/* 				fill="none" */}
+					{/* 				stroke="currentColor" */}
+					{/* 				strokeLinecap="round" */}
+					{/* 				strokeLinejoin="round" */}
+					{/* 				strokeWidth="2" */}
+					{/* 				viewBox="0 0 24 24" */}
+					{/* 			> */}
+					{/* 				<path d="M4 6h16M4 12h16M4 18h7"></path> */}
+					{/* 			</svg> */}
+					{/* 			<p className="font-semibold text-xs tracking-wide uppercase truncate"> */}
+					{/* 				{title.trim() || "Untitled"} */}
+					{/* 			</p> */}
 					{/* 		</p> */}
-					{/* 	</p> */}
+					{/* 	</Transition> */}
 					{/* </div> */}
 
 					{/* RHS */}

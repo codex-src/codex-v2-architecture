@@ -15,7 +15,6 @@ export function parseAnyList(range) {
 		tag,
 		id: range[0].id,
 		tabs: "",
-		// syntax: null
 		children: [],
 	}
 	for (const each of range) {
@@ -31,27 +30,26 @@ export function parseAnyList(range) {
 					tag,
 					id: each.id,
 					tabs: "\t".repeat(x + 1), // Eagerly increment
-					// syntax: null
 					children: [],
 				})
 			}
 			ref = ref[ref.length - 1].children
 			x++
 		}
-		// let checked = null
-		// if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) { // TODO: Use slice?
-		// 	const value = syntax[syntax.length - 3] === "x"
-		// 	checked = { value }
-		// }
+		let checked = null
+		if (syntax === "- [ ] " || syntax === "- [x] ") {
+			const value = syntax === "- [x] "
+			checked = { value }
+		}
 		ref.push({
-			// type: !checked ? AnyListItem : TodoItem,
-			type: typeEnum.AnyListItem,
+			// type: typeEnum.AnyListItem,
+			type: !checked ? typeEnum.AnyListItem : typeEnum.TodoItem,
 			tag: "li",
 			tagAncestor: tag,
 			id: each.id,
 			tabs,
 			syntax: [syntax],
-			// checked,
+			checked,
 			children: parseInlineElements(substr),
 		})
 	}

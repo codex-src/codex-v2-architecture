@@ -78,9 +78,10 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 	</Root>
 ))
 
+// TODO: Use className="font-mono" for space syntax?
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<Node id={id} className="text-gray-600">
-		<Markdown className="!mr-2 text-md-blue-a400" syntax={syntax}>
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -156,104 +157,59 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	)
 })
 
-// onSelect
-// onTouchCancel onTouchEnd onTouchMove onTouchStart
-// onPointerDown onPointerMove onPointerUp onPointerCancel onGotPointerCapture
-// onLostPointerCapture onPointerEnter onPointerLeave onPointerOver onPointerOut
-// onClick onContextMenu onDoubleClick onDrag onDragEnd onDragEnter onDragExit
-// onDragLeave onDragOver onDragStart onDrop onMouseDown onMouseEnter onMouseLeave
-// onMouseMove onMouseOut onMouseOver onMouseUp
-
-// export const ListItem = React.memo(({ syntax, depth, checked, data }) => (
-// 	<Node tag="li" className="-ml-5 my-2 flex flex-row">
-// 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax} {...attrs.li}>
-// 			<span>{toInnerReact(data)}</span>
-// 		</Markdown>
-// 	</Node>
-// ))
-//
-// const Todo = ({ className, ...props }) => (
-// 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
-// )
-//
-// // Prepares a checked state and functions e.g. {...etc}.
-// function useTodo(initialValue) {
-// 	const [done, setDone] = React.useState(initialValue)
-// 	const etc = {
-// 		checked: done,
-// 		onChange: e => {
-// 			setDone(!done)
-// 		},
-// 	}
-// 	return [done, etc]
-// }
-//
-// export const TodoItem = React.memo(({ syntax, checked, data }) => {
-// 	const [done, etc] = useTodo(checked.value)
-//
-// 	const style = {
-// 		margin: "0.3125em 0.5em 0 calc((16 - 11.55) / 16 * -1em)",
-// 		borderRadius: "0.3125em",
-// 	}
-// 	return (
-// 		<Node tag="li" className="checked -ml-5 my-2 flex flex-row" style={done && attrs.strike.style}>
-// 			<Markdown className="hidden" syntax={syntax}>
-// 				{/* NOTE: Use md-blue-a200 because md-blue-a400 is
-// 				too dark and overwritten by attrs.strike.style */}
-// 				<Todo className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!done ? "shadow-hero" : "shadow"} transition duration-150`} style={style} {...etc} />
-// 				<span>{toInnerReact(data)}</span>
-// 			</Markdown>
-// 		</Node>
-// 	)
-// })
-
-// function List(props) {
-// 	const TagName = !props.isNumbered ? "ul" : "ol"
-// 	return (
-// 		<TagName className="m-l:1.2">
-// 			{props.children.map((each, index) => (
-// 				!Array.isArray(each)
-// 					? (
-// 						<li key={index} className="m-l:-1.2">
-// 							<span style={{ display: "none" }} children={each.tabs} />
-// 							<Markdown className="m-r:0.4 c:blue-a200" style={{ fontFeatureSettings: props.isNumbered && "'tnum'" }} open={each.open}>
-// 								{each.children}
-// 							</Markdown>
-// 						</li>
-// 					)
-// 					: <List key={index} {...props} children={each} />
-// 			))}
-// 		</TagName>
-// 	)
-// }
-
-// // Describes a list item; <li>.
-// export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
-// 	// my-2 flex flex-row
-// 	<Node tag={tag} id={id} className="-ml-5 my-2">
-// 		<span style={{ display: "none" }}>{"\t".repeat(syntax[0].search("\t") === -1 ? 0 : 1 + syntax[0].search("\t"))}</span>
-// 		<Markdown className="mr-2 text-md-blue-a400" syntax={[syntax[0].split("\t").slice(-1)]} /* {...attrs.li} */>
-// 			{/* <span> */}
-// 			{toReact(children) || (
-// 				<br />
-// 			)}
-// 			{/* </span> */}
-// 		</Markdown>
-// 	</Node>
-// ))
-
 // Describes a list item; <li>.
+//
+// TODO: Use className="font-mono" for space syntax?
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	const [{ readOnly }] = useEditorState()
 
 	// -1.25em === -ml-5
-	const style = { /* margin: "0.25em 0 0.25em -1.25em", */ display: readOnly && "flex", flexDirection: readOnly && "row" }
+	// const style = { /* margin: "0.25em 0 0.25em -1.25em", */ display: readOnly && "flex", flexDirection: readOnly && "row" }
+	const style = { display: readOnly && "flex", flexDirection: readOnly && "row" }
 	return (
-		<Node tag={tag} id={id} className="-ml-5" style={style}>
-			{/* Takes precedence */}
+		<Node tag={tag} id={id} className="-ml-5 my-2" style={style}>
 			<span className="hidden">{tabs}</span>
-			<Markdown className="!mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
+			<Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}>
 				{/* NOTE: Use <span> for read-only mode */}
+				<span>
+					{toReact(children) || (
+						<br />
+					)}
+				</span>
+			</Markdown>
+		</Node>
+	)
+})
+
+const Todo = ({ className, ...props }) => (
+	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
+)
+
+// Prepares a checked state and functions e.g. {...etc}.
+function useTodo(initialValue) {
+	const [done, setDone] = React.useState(initialValue)
+	const etc = {
+		checked: done,
+		onChange: e => {
+			setDone(!done)
+		},
+	}
+	return [done, etc]
+}
+
+export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
+	const [done, etc] = useTodo(checked.value)
+
+	const style = {
+		margin: "0.3125em 0.5em 0 calc((16 - 11.55) / 16 * -1em)", // FIXME
+		borderRadius: "0.3125em",
+	}
+	return (
+		<Node tag={tag} id={id} className="checked -ml-5 my-2 flex flex-row" style={done && attrs.strike.style}>
+			<span className="hidden">{tabs}</span>
+			<Markdown className="hidden" syntax={syntax}>
+				{/* FIXME: md-blue-a200? */}
+				<Todo className={`flex-shrink-0 w-4 h-4 text-md-blue-a200 ${!done ? "shadow-hero" : "shadow"} transition duration-200`} style={style} {...etc} />
 				<span>
 					{toReact(children) || (
 						<br />
