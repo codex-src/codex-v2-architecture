@@ -78,14 +78,19 @@
 	/* transition-duration: 200ms; */
 }
 
-.codex-editor ul > li:not(.checked):before {
-	/* margin-right: 0.25em; */
-	margin-right: 0.5em;
-	flex-shrink: 0;
-	display: inline-flex;
-	width: calc(11.438 / 16 * 1em);
+/* ul { */
+/* 	list-style: none; */
+/* } */
+
+li {
+	position: relative;
+}
+
+.codex-editor ul > li:not(.todo):before  {
+	margin: 0 0 0 -22px;
+	position: absolute;
 	content: "•";
-	font-feature-settings: "tnum";
+ 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
 
@@ -93,13 +98,34 @@
 .codex-editor ol > li:first-of-type {
 	counter-reset: count;
 }
-.codex-editor ol > li:before {
-	/* margin-right: 0.25em; */
-	margin-right: 0.5em;
-	flex-shrink: 0;
-	display: inline-flex;
+.codex-editor ol > li:not(.todo):before  {
+	margin: 0 0 0 -22px;
+	position: absolute;
+	content: "•";
 	counter-increment: count;
 	content: counter(count) ". ";
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
+
+/* .codex-editor ul > li:not(.checked):before { */
+/* 	margin-right: 0.5em; */
+/* 	display: inline-block; */
+/* 	width: calc(11.438 / 16 * 1em); */
+/* 	content: "•"; */
+/* 	font-feature-settings: "tnum"; */
+/* 	color: var(--md-blue-a400); */
+/* } */
+/*  */
+/* .codex-editor ul > li:first-of-type, */
+/* .codex-editor ol > li:first-of-type { */
+/* 	counter-reset: count; */
+/* } */
+/* .codex-editor ol > li:before { */
+/* 	margin-right: 0.5em; */
+/* 	display: inline-block; */
+/* 	counter-increment: count; */
+/* 	content: counter(count) ". "; */
+/* 	font-feature-settings: "tnum"; */
+/* 	color: var(--md-blue-a400); */
+/* } */

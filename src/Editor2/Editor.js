@@ -110,7 +110,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 	)
 
 	return (
-		// <div>
+	// <div>
 
 		React.createElement(
 			"div",
@@ -163,20 +163,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						// No-op
 						return
 					}
-					// Bounds check:
-					//
-					// FIXME: Selects the entire editor when a user
-					// backspaces (not a synthetic backspace) the
-					// start of the second-to-first line
-					//
-					// Hello, world!
-					// <cursor><backspace>Hello, world!
-					//
-					// ->
-					//
-					// <cursor>Hello, world!<cursor>
-					//
-					// https://github.com/codex-src/codex-v2-architecture/commit/e975c1541b7354409879fca64ffd3ec9575edc9d
+					// Guard out of bounds range:
 					const range = selection.getRangeAt(0)
 					if (range.startContainer === ref.current || range.endContainer === ref.current) {
 						// Iterate to the deepest start node:
@@ -184,17 +171,14 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 						while (node1.childNodes.length) {
 							node1 = node1.childNodes[0]
 						}
-
-						// // Iterate to the deepest end node:
-						// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
-						// while (node2.childNodes.length) {
-						// 	node2 = node2.childNodes[node2.childNodes.length - 1]
-						// }
-
+						// Iterate to the deepest end node:
+						let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
+						while (node2.childNodes.length) {
+							node2 = node2.childNodes[node2.childNodes.length - 1]
+						}
 						// Correct range:
 						range.setStart(node1, 0)
-						// range.setEnd(node2, (node2.nodeValue || "").length)
-						range.collapse()
+						range.setEnd(node2, (node2.nodeValue || "").length)
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
@@ -232,6 +216,17 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 
 				onKeyDown: e => {
 					if (state.readOnly) {
+						// No-op
+						return
+					}
+					// NOTE: Safari registers select-all, cut, copy,
+					// and paste as key press events
+					if (navigator.vendor === "Apple Computer, Inc." && (
+						e.keyCode === keyCodes.A ||
+						e.keyCode === keyCodes.X ||
+						e.keyCode === keyCodes.C ||
+						e.keyCode === keyCodes.V
+					)) {
 						// No-op
 						return
 					}
@@ -415,30 +410,30 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 			},
 		)
 
-		// <div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
-		// 	{JSON.stringify(
-		// 		{
-		// 			...state,
-		// 			history:   undefined,
-		// 			reactVDOM: undefined,
-		// 			reactDOM:  undefined,
-		// 		},
-		// 		// state.history.stack.map(each => ({
-		// 		// 	...each,
-		// 		// 	data: undefined,
-		// 		// 	nodes: each.nodes.map(each => ({
-		// 		// 		...each,
-		// 		// 		data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`,
-		// 		// 	})),
-		// 		// 	pos1: undefined,
-		// 		// 	pos2: undefined,
-		// 		// })),
-		// 		null,
-		// 		"\t",
-		// 	)}
-		// </div>
+	// <div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
+	// 	{JSON.stringify(
+	// 		{
+	// 			...state,
+	// 			history:   undefined,
+	// 			reactVDOM: undefined,
+	// 			reactDOM:  undefined,
+	// 		},
+	// 		// state.history.stack.map(each => ({
+	// 		// 	...each,
+	// 		// 	data: undefined,
+	// 		// 	nodes: each.nodes.map(each => ({
+	// 		// 		...each,
+	// 		// 		data: !each.data ? "" : `${each.data.slice(0, 60 - 1)}…`,
+	// 		// 	})),
+	// 		// 	pos1: undefined,
+	// 		// 	pos2: undefined,
+	// 		// })),
+	// 		null,
+	// 		"\t",
+	// 	)}
+	// </div>
 
-		// </div>
+	// </div>
 	)
 }
 
