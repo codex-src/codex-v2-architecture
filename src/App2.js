@@ -73,6 +73,12 @@ const FixedEditorPreferences = ({
 						>
 							Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 						</Button>
+						<Button
+							className="p-2 font-medium text-xs underline"
+							onClick={dispatch.toggleReadOnly}
+						>
+							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+						</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
@@ -126,12 +132,6 @@ const FixedEditorPreferences = ({
 
 					{/* RHS */}
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.toggleReadOnly}
-						>
-							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-						</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showReadme}
@@ -150,12 +150,12 @@ const FixedEditorPreferences = ({
 			 			>
 			 				React JSX
 			 			</Button>
-			 			<Button
-							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.showJSON}
-			 			>
-			 				JSON
-			 			</Button>
+			 			{/* <Button */}
+						{/* 	className="p-2 font-medium text-xs underline" */}
+			 			{/* 	onClick={dispatch.showJSON} */}
+			 			{/* > */}
+			 			{/* 	JSON */}
+			 			{/* </Button> */}
 					</div>
 
 				</div>
@@ -317,12 +317,27 @@ const App = () => {
 
 	// Save status:
 	//
-	// 0 - Init // FIXME: Remove?
-	// 1 - Unsaved
-	// 2 - Saved
-	// 3 - Saved -- hidden
+	// 0 - Unsaved
+	// 1 - Saving
+	// 2 - Saved (check)
+	// 3 - Saved (check) -- hidden
 	//
 	const [saveStatus, setSaveStatus] = React.useState(0)
+
+	React.useEffect(() => {
+		const handler = e => {
+			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
+				// No-op
+				return
+			}
+			e.preventDefault()
+			// setSaveStatus(1) // TODO
+		}
+		document.addEventListener("keydown", handler)
+		return () => {
+			document.removeEventListener("keydown", handler)
+		}
+	}, [])
 
 	// Show table of contents:
 	const [showContents, setShowContents] = React.useState(true)
@@ -334,7 +349,7 @@ const App = () => {
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(/* e.shiftKey && */ isMetaOrCtrlKey(e) && e.keyCode === 79)) { // 79: O
+			if (!(isMetaOrCtrlKey(e) && e.keyCode === 79)) { // 79: O
 				// No-op
 				return
 			}
@@ -370,7 +385,7 @@ const App = () => {
 			}, 500))
 		}, 100))
 		return () => {
-			ids.slice().reverse().map(each => clearTimeout(each))
+			[...ids].reverse().map(each => clearTimeout(each))
 		}
 	}, [editor.data])
 
@@ -447,7 +462,7 @@ const App = () => {
 	// Manages read-only mode.
 	React.useEffect(() => {
 		const handler = e => {
-			if (!(/* e.shiftKey && */ isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
+			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
 				// No-op
 				return
 			}
