@@ -158,7 +158,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
-	<Node tag={tag} id={id} className="!-ml-5 my-2">
+	<Node tag={tag} id={id} className="my-2">
 		<span className="hidden">{tabs}</span>
 		<Markdown className="hidden" syntax={syntax}>
 		{/* <Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}> */}
@@ -193,7 +193,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag={tag} id={id} className="todo relative !-ml-5 my-2 flex flex-row" style={checked.value && attrs.strike.style}>
+		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* <span style={{ marginLeft: -22 }}> */}
