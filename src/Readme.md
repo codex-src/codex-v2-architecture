@@ -2,19 +2,15 @@
 
 > 👋 This is an _interactive_ readme; type to make changes!
 
-**Codex is a new WYSIWYG markdown editor _for_ developers.** Codex is based on GFM, that is, [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown) meaning your can format words using special syntax characters. This _also_ means you can copy notes in and out of the Codex editor and never loose formatting. ✨
+**Codex is a new WYSIWYG markdown editor for developers.** Codex is based on GFM, that is, [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown) meaning your can format words using special syntax characters. This also means you can copy notes in-and-out of the Codex editor and never loose formatting. ✨
 
 As you type, your note is saved to localStorage. This means you can refresh the page and your changes will persist. Note that this _doesn’t_ apply to the interactive readme.
 
 ## Inline elements:
 
-### _Italics_ and **bold**
-
 You can format your note using the following syntax characters: `_` or `*` for _italics_ or *italics*, `**` for **bold** and `***` for ***bold and italics***.
 
-### `Code`, ~~strikethrough~~, and [links](https://google.com)
-
-You can use ~`~ for `code`, `~~` for ~~strikethrough~~, and `[link](url)` for [links](https://google.com). You can also use `https://` to delimit a naked link. For example: https://google.com.
+You can use ~`~ or `~` for `code` or ~code~, `~~` for ~~strikethrough~~, and `[link](url)` for [links](https://google.com). You can also use `https://` to delimit a naked link. For example: https://google.com.
 
 ## Block elements:
 
@@ -51,8 +47,8 @@ You can add _many_ kinds of lists using the following syntax:
 
 - `- ` for **unordered** lists.
 - `1. ` (any number works) for **ordered** lists.
-	- Note in preview mode, the correct number is displayed for you.
-- `- [ ]` or `- [x]` for unchecked and checked **task items** (e.g. todo lists).
+
+You can also use `- ` for unchecked checkboxes and `- [x]` for checked checkboxes.
 
 For example:
 
