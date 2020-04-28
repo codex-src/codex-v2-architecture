@@ -97,7 +97,7 @@ function parseGFMType({ type, syntax, str, x }) {
 	// Prepare an escaped regex pattern:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
-	if (syntax[0] !== "`") { // Exempt code
+	if (type !== typeEnum.Code) {
 		pattern = `[^\\\\]${pattern}`
 		patternOffset++
 	}
@@ -196,7 +196,7 @@ export function parseInlineElements(str) {
 		// <Strong>
 		// <Emphasis>
 		case "*":
-			// ***Strong emphasis***
+			// ***Strong emphasis*** (takes precedence)
 			if (nchars >= "***x***".length && str.slice(x, x + 3) === "***") {
 				const res = parseGFMType({
 					type: typeEnum.StrongEmphasis,
@@ -211,7 +211,7 @@ export function parseInlineElements(str) {
 				parsed.push(res.parsed)
 				x = res.x2 - 1
 				continue
-			// **Strong**
+			// **Strong** (takes precedence)
 			} else if (nchars >= "**x**".length && str.slice(x, x + 2) === "**") {
 				const res = parseGFMType({
 					type: typeEnum.Strong,
@@ -244,9 +244,29 @@ export function parseInlineElements(str) {
 			}
 			// No-op
 			break
-		// <Strikethrough>
+		// <Code> (1 of 2)
+		case "`":
+			// `Code`
+			if (nchars >= "`x`".length) {
+				const res = parseGFMType({
+					type: typeEnum.Code,
+					syntax: "`",
+					str,
+					x,
+				})
+				if (!res) {
+					// No-op
+					break
+				}
+				parsed.push(res.parsed)
+				x = res.x2 - 1
+				continue
+			}
+			// No-op
+			break
+		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
-			// ~~Strikethrough~~
+			// ~~Strikethrough~~ (takes precedence)
 			if (nchars >= "~~x~~".length && str.slice(x, x + 2) === "~~") {
 				const res = parseGFMType({
 					type: typeEnum.Strikethrough,
@@ -261,16 +281,11 @@ export function parseInlineElements(str) {
 				parsed.push(res.parsed)
 				x = res.x2 - 1
 				continue
-			}
-			// No-op
-			break
-		// <Code>
-		case "`":
-			// `Code`
-			if (nchars >= "x".length) {
+			// ~Code~
+			} else if (nchars >= "~x~".length) {
 				const res = parseGFMType({
 					type: typeEnum.Code,
-					syntax: "`",
+					syntax: "~",
 					str,
 					x,
 				})
