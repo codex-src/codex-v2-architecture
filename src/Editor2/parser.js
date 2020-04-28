@@ -108,11 +108,11 @@ function parseGFMType({ type, syntax, str, x }) {
 	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
 		return null
-	// Match cannot be surrounded by a space:
-	} else if (
+	// Match cannot be surrounded by a space (non-code):
+	} else if (type !== typeEnum.Code && (
 		isASCIIWhitespace(str[x + syntax.length]) ||           // E.g. *·match
 		isASCIIWhitespace(str[x + syntax.length + offset - 1]) // E.g. match·*
-	) {
+	)) {
 		return null
 	// Match start or end cannot be redundant:
 	} else if (
@@ -482,9 +482,19 @@ export function parseElements(nodes) {
 			break
 		// <Preformatted>
 		case "`":
+		case "~":
+			// ```
+			// Preformatted
+			// ```
+			//
+			// or
+			//
+			// ~~~
+			// Preformatted
+			// ~~~
 			if (
 				nchars >= 3 &&
-				each.data.slice(0, 3) === "```" &&
+				(each.data.slice(0, 3) === "```" || each.data.slice(0, 3) === "~~~") &&
 				each.data.slice(3).indexOf("`") === -1 && // Negate backticks
 				x + 1 < nodes.length
 			) {
@@ -492,8 +502,9 @@ export function parseElements(nodes) {
 				let x2 = x1
 				x2++
 				// Iterate to end syntax:
+				const syntax = each.data.slice(0, 3)
 				while (x2 < nodes.length) {
-					if (nodes[x2].data.length === 3 && nodes[x2].data === "```") {
+					if (nodes[x2].data.length === 3 && nodes[x2].data === syntax) {
 						// No-op
 						break
 					}

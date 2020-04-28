@@ -14,7 +14,7 @@ You can format your note using the following syntax characters: `_` or `*` for _
 
 ### `Code`, ~~strikethrough~~, and [links](https://google.com)
 
-You can use ~`~ or `~` for `code` or ~code~, `~~` for ~~strikethrough~~, and `[link](url)` for [links](https://google.com). You can also use `https://` to delimit a naked link. For example: https://google.com.
+You can use ~`~ for `code`, `~~` for ~~strikethrough~~, and `[link](url)` for [links](https://google.com). You can also use `https://` to delimit a naked link. For example: https://google.com.
 
 ## Block elements:
 
