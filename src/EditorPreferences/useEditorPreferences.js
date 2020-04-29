@@ -4,7 +4,7 @@ import useMethods from "use-methods"
 import {
 	toHTML,
 	toReact_js,
-} from "Editor2/cmap"
+} from "Editor/cmap"
 
 // Maps renderModesEnum to language extensions.
 const extMap = {

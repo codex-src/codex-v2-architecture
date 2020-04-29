@@ -1,36 +1,13 @@
 import escape from "lodash/escape"
-
-import {
-	Blockquote,
-	BquoteParagraph,
-	Break,
-	CodeBlock,
-	Header,
-	Image,
-	List,
-	ListItem,
-	Paragraph,
-	TodoItem,
-} from "./Components"
-
-import {
-	A,
-	Code,
-	E,
-	Em,
-	Escape,
-	Strike,
-	Strong,
-	StrongAndEm,
-} from "./ComponentsText"
+import typeEnum from "./typeEnum"
 
 // Component maps.
 //
 /* eslint-disable no-multi-spaces */
-const cmapText      = new Map()
-const cmapHTML      = new Map()
-const cmapHTML__BEM = new Map()
-const cmapReact_js  = new Map()
+const cmapText      = {}
+const cmapHTML      = {}
+const cmapHTML__BEM = {}
+const cmapReact_js  = {}
 /* eslint-enable no-multi-spaces */
 
 const escapeReactMap = {
@@ -40,139 +17,138 @@ const escapeReactMap = {
 	"}": "&#125;",
 }
 
-// Escapes a string for React.
+// React-escapes a string.
 //
 // https://github.com/lodash/lodash/blob/3.0.0-npm-packages/lodash.escape/index.js
-function escapeReact(str) {
+function reactEscape(str) {
 	return (str || "").replace(/[<>{}]/g, char => escapeReactMap[char])
 }
 
-// Parses a nested VDOM representation to a string.
+// Converts a nested VDOM representation to a string.
 export function toInnerString(children, cmap = cmapText) {
-	const recurse = toInnerString
-
 	let str = ""
 	if (children === null || typeof children === "string") {
 		if (cmap === cmapText) {
 			return children || ""
 		}
 		// Return an escaped string or a break:
-		return (cmap !== cmapReact_js ? escape(children) : escapeReact(children)) ||
+		return (cmap !== cmapReact_js ? escape(children) : reactEscape(children)) ||
 			(cmap !== cmapReact_js ? "<br>" : "<br />")
 	}
 	for (const each of children) {
 		if (each === null || typeof each === "string") {
-			str += recurse(each, cmap)
+			str += toInnerString(each, cmap)
 			continue
 		}
-		const fn = cmap[each.type.type || each.type]
-		str += fn(each)
+		str += cmap[each.type](each)
 	}
 	return str
 }
 
-// Parses a VDOM representation to a string.
-function toString(data, cmap = cmapText) {
+// Converts a VDOM representation to a string.
+function toString(reactVDOM, cmap = cmapText) {
 	let str = ""
-	for (const each of data) {
-		const fn = cmap[each.type.type || each.type]
-		str += fn(each)
-		if (each !== data[data.length - 1]) {
+	for (const each of reactVDOM) {
+		str += cmap[each.type](each)
+		if (each !== reactVDOM[reactVDOM.length - 1]) {
 			str += "\n"
 		}
 	}
 	return str
 }
 
-export function toText(data) {
-	return toString(data, cmapText)
-}
-export function toHTML(data) {
-	return toString(data, cmapHTML)
-}
-export function toHTML__BEM(data) {
-	return toString(data, cmapHTML__BEM)
-}
-export function toReact_js(data) {
-	return toString(data, cmapReact_js)
-}
-
 ;(() => {
 	/* eslint-disable no-multi-spaces */
-	cmapText[Escape]                    = data => data.children
-	cmapText[E]                         = data => toInnerString(data.children)
-	cmapText[Em]                        = data => toInnerString(data.children)
-	cmapText[Strong]                    = data => toInnerString(data.children)
-	cmapText[StrongAndEm]               = data => toInnerString(data.children)
-	cmapText[Code]                      = data => data.children
-	cmapText[Strike]                    = data => toInnerString(data.children)
-	cmapText[A]                         = data => toInnerString(data.children)
-	cmapText[Header.type]               = data => toInnerString(data.children)
-	cmapText[Paragraph.type]            = data => toInnerString(data.children)
-	cmapText[BquoteParagraph.type]      = data => toInnerString(data.children)
-	cmapText[Blockquote.type]           = data => toString(data.children)
-	cmapText[CodeBlock.type]            = data => data.children.slice(0, -1)
-	cmapText[ListItem.type]             = data => toInnerString(data.children)
-	cmapText[TodoItem.type]             = data => toInnerString(data.children)
-	cmapText[List.type]                 = data => toString(data.children)
-	cmapText[Image.type]                = data => toInnerString(data.children)
-	cmapText[Break.type]                = data => ""
+	cmapText[typeEnum.Escape]             = data => data.children
+	cmapText[typeEnum.Emoji]              = data => toInnerString(data.children)
+	cmapText[typeEnum.Emphasis]           = data => toInnerString(data.children)
+	cmapText[typeEnum.Strong]             = data => toInnerString(data.children)
+	cmapText[typeEnum.StrongEmphasis]     = data => toInnerString(data.children)
+	cmapText[typeEnum.Code]               = data => data.children
+	cmapText[typeEnum.Strikethrough]      = data => toInnerString(data.children)
+	cmapText[typeEnum.Anchor]             = data => toInnerString(data.children)
+	cmapText[typeEnum.Header]             = data => toInnerString(data.children)
+	cmapText[typeEnum.Paragraph]          = data => toInnerString(data.children)
+	cmapText[typeEnum.BlockquoteItem]     = data => toInnerString(data.children)
+	cmapText[typeEnum.Blockquote]         = data => toString(data.children)
+	cmapText[typeEnum.Preformatted]       = data => toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"))
+	cmapText[typeEnum.AnyListItem]        = data => toInnerString(data.children)
+	cmapText[typeEnum.TodoItem]           = data => toInnerString(data.children)
+	cmapText[typeEnum.AnyList]            = data => toString(data.children)
+	// cmapText[typeEnum.Image]           = data => toInnerString(data.children)
+	cmapText[typeEnum.Break]              = data => ""
 
-	cmapHTML[Escape]                    = data => data.children
-	cmapHTML[E]                         = data => `<span aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML)}</span>`
-	cmapHTML[Em]                        = data => `<em>${toInnerString(data.children, cmapHTML)}</em>`
-	cmapHTML[Strong]                    = data => `<strong>${toInnerString(data.children, cmapHTML)}</strong>`
-	cmapHTML[StrongAndEm]               = data => `<strong><em>${toInnerString(data.children, cmapHTML)}</em></strong>`
-	cmapHTML[Code]                      = data => `<code>${toInnerString(data.children, cmapHTML)}</code>`
-	cmapHTML[Strike]                    = data => `<strike>${toInnerString(data.children, cmapHTML)}</strike>`
-	cmapHTML[A]                         = data => `<a href="${data.href}">${toInnerString(data.children, cmapHTML)}</a>`
-	cmapHTML[Header.type]               = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</${data.tag}>\n</a>`
-	cmapHTML[Paragraph.type]            = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
-	cmapHTML[BquoteParagraph.type]      = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
-	cmapHTML[Blockquote.type]           = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML[CodeBlock.type]            = data => `<pre${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children, cmapHTML).slice(0, -1)}<!--\n--></code></pre>`
-	cmapHTML[ListItem.type]             = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
-	cmapHTML[TodoItem.type]             = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
-	cmapHTML[List.type]                 = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML[Image.type]                = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
-	cmapHTML[Break.type]                = data => "<hr>"
+	cmapHTML[typeEnum.Escape]             = data => data.children
+	cmapHTML[typeEnum.Emoji]              = data => `<span aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML)}</span>`
+	cmapHTML[typeEnum.Emphasis]           = data => `<em>${toInnerString(data.children, cmapHTML)}</em>`
+	cmapHTML[typeEnum.Strong]             = data => `<strong>${toInnerString(data.children, cmapHTML)}</strong>`
+	cmapHTML[typeEnum.StrongEmphasis]     = data => `<strong><em>${toInnerString(data.children, cmapHTML)}</em></strong>`
+	cmapHTML[typeEnum.Code]               = data => `<code>${toInnerString(data.children, cmapHTML)}</code>`
+	cmapHTML[typeEnum.Strikethrough]      = data => `<strike>${toInnerString(data.children, cmapHTML)}</strike>`
+	cmapHTML[typeEnum.Anchor]             = data => `<a href="${data.href}">${toInnerString(data.children, cmapHTML)}</a>`
+	cmapHTML[typeEnum.Header]             = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</${data.tag}>\n</a>`
+	cmapHTML[typeEnum.Paragraph]          = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
+	cmapHTML[typeEnum.BlockquoteItem]     = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
+	cmapHTML[typeEnum.Blockquote]         = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
+	cmapHTML[typeEnum.Preformatted]       = data => `<pre${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML)}<!--\n--></code></pre>`
+	cmapHTML[typeEnum.AnyListItem]        = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
+	cmapHTML[typeEnum.TodoItem]           = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
+	cmapHTML[typeEnum.AnyList]            = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	// cmapHTML[typeEnum.Image]           = data => `<figure>\n\t<img src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
+	cmapHTML[typeEnum.Break]              = data => "<hr>"
 
-	cmapHTML__BEM[Escape]               = data => data.children
-	cmapHTML__BEM[E]                    = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML__BEM)}</span>`
-	cmapHTML__BEM[Em]                   = data => `<em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em>`
-	cmapHTML__BEM[Strong]               = data => `<strong class="strong">${toInnerString(data.children, cmapHTML__BEM)}</strong>`
-	cmapHTML__BEM[StrongAndEm]          = data => `<strong class="strong"><em class="em">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
-	cmapHTML__BEM[Code]                 = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
-	cmapHTML__BEM[Strike]               = data => `<strike class="strike">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
-	cmapHTML__BEM[A]                    = data => `<a class="a" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
-	cmapHTML__BEM[Header.type]          = data => `<a class="a" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
-	cmapHTML__BEM[Paragraph.type]       = data => `<p class="p${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
-	cmapHTML__BEM[BquoteParagraph.type] = data => `<p class="blockquote__p">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
-	cmapHTML__BEM[Blockquote.type]      = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	cmapHTML__BEM[CodeBlock.type]       = data => `<pre class="pre"${!data.extension ? "" : ` class="language-${(data.extension).toLowerCase()}"`}><code class="pre__code"><!--\n-->${toInnerString(data.children, cmapHTML__BEM).slice(0, -1)}<!--\n--></code></pre>`
-	cmapHTML__BEM[ListItem.type]        = data => `<li class="${data.tag}__li">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	cmapHTML__BEM[TodoItem.type]        = data => `<li class="${data.tag}__li">\n\t<input class="${data.tag}__li__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
-	cmapHTML__BEM[List.type]            = data => `<${data.tag} class="${data.tag}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
-	cmapHTML__BEM[Image.type]           = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
-	cmapHTML__BEM[Break.type]           = data => "<hr class=\"hr\">"
+	// cmapHTML__BEM[typeEnum.Escape]         = data => data.children
+	// cmapHTML__BEM[typeEnum.Emoji]          = data => `<span class="emoji" aria-label="${data.description}" role="img">${toInnerString(data.children, cmapHTML__BEM)}</span>`
+	// cmapHTML__BEM[typeEnum.Emphasis]       = data => `<em class="emphasis">${toInnerString(data.children, cmapHTML__BEM)}</em>`
+	// cmapHTML__BEM[typeEnum.Strong]         = data => `<strong class="strong">${toInnerString(data.children, cmapHTML__BEM)}</strong>`
+	// cmapHTML__BEM[typeEnum.StrongEmphasis] = data => `<strong class="strong"><em class="emphasis">${toInnerString(data.children, cmapHTML__BEM)}</em></strong>`
+	// cmapHTML__BEM[typeEnum.Code]           = data => `<code class="code">${toInnerString(data.children, cmapHTML__BEM)}</code>`
+	// cmapHTML__BEM[typeEnum.Strikethrough]  = data => `<strike class="strikethrough">${toInnerString(data.children, cmapHTML__BEM)}</strike>`
+	// cmapHTML__BEM[typeEnum.Anchor]         = data => `<a class="anchor" href="${data.href}" target="_blank">${toInnerString(data.children, cmapHTML__BEM)}</a>`
+	// cmapHTML__BEM[typeEnum.Header]         = data => `<a class="anchor" href="#${data.hash}">\n\t<${data.tag} id="${data.hash}" class="header header--${data.tag}">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</${data.tag}>\n</a>`
+	// cmapHTML__BEM[typeEnum.Paragraph]      = data => `<p class="paragraph${!data.emojis ? "" : ` emojis--${data.children.length}`}">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
+	// cmapHTML__BEM[typeEnum.BlockquoteItem] = data => `<p class="blockquote__paragraph">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</p>`
+	// cmapHTML__BEM[typeEnum.Blockquote]     = data => `<blockquote class="blockquote">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
+	// cmapHTML__BEM[typeEnum.Preformatted]   = data => `<pre class="preformatted"${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code class="preformatted__code"><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML__BEM)}<!--\n--></code></pre>`
+	// cmapHTML__BEM[typeEnum.AnyListItem]    = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}__item">\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	// // cmapHTML__BEM[typeEnum.TodoItem]    = data => `<li class="${data.tag === "ul" ? "unordered" : "ordered"}__item">\n\t<input class="${data.tag === "ul" ? "unordered" : "ordered"}__item__input--${!data.checked.value ? "unchecked" : "checked"}" type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML__BEM)}\n</li>`
+	// cmapHTML__BEM[typeEnum.AnyList]        = data => `<${data.tag} class="${data.tag === "ul" ? "unordered" : "ordered"}">${`\n${toString(data.children, cmapHTML__BEM).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
+	// // cmapHTML__BEM[typeEnum.Image]       = data => `<figure class="figure">\n\t<img class="figure__img" src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`}>${!data.alt ? "" : `\n\t<figcaption class="figure__figcaption">\n\t\t${toInnerString(data.children, cmapHTML__BEM)}\n\t</figcaption>`}\n</figure>`
+	// cmapHTML__BEM[typeEnum.Break]          = data => "<hr class=\"horizontal-rule\">"
 
-	cmapReact_js[Escape]                = data => data.children
-	cmapReact_js[E]                     = data => `<E>${toInnerString(data.children, cmapReact_js)}</E>`
-	cmapReact_js[Em]                    = data => `<Em>${toInnerString(data.children, cmapReact_js)}</Em>`
-	cmapReact_js[Strong]                = data => `<Strong>${toInnerString(data.children, cmapReact_js)}</Strong>`
-	cmapReact_js[StrongAndEm]           = data => `<StrongEm>${toInnerString(data.children, cmapReact_js)}</StrongEm>`
-	cmapReact_js[Code]                  = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
-	cmapReact_js[Strike]                = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
-	cmapReact_js[A]                     = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
-	cmapReact_js[Header.type]           = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
-	cmapReact_js[Paragraph.type]        = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
-	cmapReact_js[BquoteParagraph.type]  = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
-	cmapReact_js[Blockquote.type]       = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
-	cmapReact_js[CodeBlock.type]        = data => `<Pre${!data.extension ? "" : ` info="${(data.extension).toLowerCase()}"`}>\n{\`${toInnerString(data.children.slice(0, -1)).replace(/`/g, "\\`")}\`}\n</Pre>`
-	cmapReact_js[ListItem.type]         = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	cmapReact_js[TodoItem.type]         = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	cmapReact_js[List.type]             = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
-	cmapReact_js[Image.type]            = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
-	cmapReact_js[Break.type]            = data => "<Break />"
-	/* eslint-enable no-multi-spaces */
+	cmapReact_js[typeEnum.Escape]         = data => data.children
+	cmapReact_js[typeEnum.Emoji]          = data => `<E>${toInnerString(data.children, cmapReact_js)}</E>`
+	cmapReact_js[typeEnum.Emphasis]       = data => `<Em>${toInnerString(data.children, cmapReact_js)}</Em>`
+	cmapReact_js[typeEnum.Strong]         = data => `<Strong>${toInnerString(data.children, cmapReact_js)}</Strong>`
+	cmapReact_js[typeEnum.StrongEmphasis] = data => `<StrongEm>${toInnerString(data.children, cmapReact_js)}</StrongEm>`
+	cmapReact_js[typeEnum.Code]           = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
+	cmapReact_js[typeEnum.Strikethrough]  = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
+	cmapReact_js[typeEnum.Anchor]         = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
+	cmapReact_js[typeEnum.Header]         = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
+	cmapReact_js[typeEnum.Paragraph]      = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
+	cmapReact_js[typeEnum.BlockquoteItem] = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
+	cmapReact_js[typeEnum.Blockquote]     = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
+	cmapReact_js[typeEnum.Preformatted]   = data => `<Pre${!data.extension ? "" : ` info="${data.extension.toLowerCase()}"`}>\n{\`${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n")).replace(/`/g, "\\`")}\`}\n</Pre>`
+	cmapReact_js[typeEnum.AnyListItem]    = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[typeEnum.TodoItem]       = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[typeEnum.AnyList]        = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
+	// cmapReact_js[typeEnum.Image]       = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
+	cmapReact_js[typeEnum.Break]          = data => "<Break />"
+	//	/* eslint-enable no-multi-spaces */
 })()
+
+export function toInnerText(children) {
+	return toInnerString(children)
+}
+export function toText(reactVDOM) {
+	return toString(reactVDOM)
+}
+export function toHTML(reactVDOM) {
+	return toString(reactVDOM, cmapHTML)
+}
+export function toHTML__BEM(reactVDOM) {
+	return toString(reactVDOM, cmapHTML__BEM)
+}
+export function toReact_js(reactVDOM) {
+	return toString(reactVDOM, cmapReact_js)
+}

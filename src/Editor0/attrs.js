@@ -1,4 +1,4 @@
-// Extraneous shared attributes.
+// Shared attributes.
 const attrs = {
 	code: {
 		style: {
@@ -19,6 +19,13 @@ const attrs = {
 	a: {
 		target: "_blank",
 		rel: "noopener noreferrer",
+	},
+	li: {
+		style: {
+			MozTabSize: 0,
+			tabSize: 0,
+			fontFeatureSettings: "'tnum'",
+		},
 	},
 }
 

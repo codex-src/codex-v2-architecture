@@ -1,47 +1,48 @@
 import React from "react"
 import useEditorState from "./useEditorState"
 
-// Gets syntax from a string or an array of strings.
-function getSyntax(syntax) {
-	let startSyntax = ""
-	let endSyntax = ""
+// Parses syntax from a string or array of strings to an
+// array of strings.
+function parseSyntax(syntax) {
+	let s1 = ""
+	let s2 = ""
 	if (syntax === null) {
-		// No-op
+		// No-op; defer to end
 	} else if (typeof syntax === "string") {
-		startSyntax = syntax
-		endSyntax = syntax
+		s1 = syntax
+		s2 = syntax
 	} else if (Array.isArray(syntax)) {
-		startSyntax = syntax[0]
+		s1 = syntax[0]
 		if (syntax.length === 2) {
-			endSyntax = syntax[1]
+			s2 = syntax[1]
 		}
 	}
-	return [startSyntax, endSyntax]
+	return [s1, s2]
 }
 
-const Syntax = props => {
-	const [state] = useEditorState()
-	if (!props.children || state.readOnly) {
+const Syntax = ({ className, ...props }) => {
+	const [{ readOnly }] = useEditorState()
+	if (!props.children || readOnly) {
 		return null
 	}
-	// NOTE: props.className doesn’t concatenate
-	return <span className="text-md-blue-a400" {...props} />
+	// return <span className={!className ? "font-mono text-md-blue-a400" : `font-mono ${className}`} {...props} />
+	return <span className={!className ? "text-md-blue-a400" : className} {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {
-	const [startSyntax, endSyntax] = getSyntax(syntax)
+	const [syntax1, syntax2] = parseSyntax(syntax)
 	return (
 		<React.Fragment>
 
 			{/* LHS */}
 			<Syntax {...props}>
-				{startSyntax}
+				{syntax1}
 			</Syntax>
 
 			{/* RHS */}
 			{props.children}
 			<Syntax {...props}>
-				{endSyntax}
+				{syntax2}
 			</Syntax>
 
 		</React.Fragment>
