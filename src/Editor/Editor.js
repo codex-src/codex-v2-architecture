@@ -279,9 +279,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							dispatch.tab()
 						} else {
 							if (!e.shiftKey) {
-								dispatch.tabLI() // TODO: Rename
+								dispatch.tabListItems() // TODO: Rename
 							} else {
-								dispatch.detabLI() // TODO: Rename
+								dispatch.detabListItem() // TODO: Rename
 							}
 						}
 

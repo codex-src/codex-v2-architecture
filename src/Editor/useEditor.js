@@ -316,12 +316,12 @@ const methods = state => ({
 		}
 		this.dropBytes(dropL, 0)
 	},
-	// Inserts a tab character.
+	// Inserts a tab character at the insertion point.
 	tab() {
 		this.write("\t")
 	},
-	// Detabs a list item (removes a tab from the start).
-	detabLI() {
+	// Detabs once.
+	detabListItem() {
 		const ref = state.nodes[state.pos1.y]
 		if (!ref.data.length || ref.data[0] !== "\t") {
 			// No-op
@@ -333,22 +333,18 @@ const methods = state => ({
 		state.pos2 = { ...state.pos1 }
 		this.render()
 	},
-	// Tabs a list item (adds a tab to the start).
-	tabLI() {
+	// Tabs one-to-many list items.
+	tabListItems() {
 		this.mutate()
-
-		// FIXME: Add support for many lines
-		state.nodes[state.pos1.y].data = `\t${state.nodes[state.pos1.y].data}`
-		state.pos1.pos++
-		state.pos2 = { ...state.pos1 }
-
+		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
+		for (let x = 0; x < nodes.length; x++) {
+			nodes[x].data = `\t${nodes[x].data}`
+			if (!x) {
+				state.pos1.pos++
+			}
+			state.pos2.pos++
+		}
 		this.render()
-
-		// this.mutate()
-		// // Update and rerender:
-		// state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
-		// Object.assign(state, { pos1, pos2 })
-		// this.render()
 	},
 	// Inserts an EOL character.
 	enter() {
