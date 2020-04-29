@@ -77,13 +77,13 @@ const FixedEditorPreferences = ({
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.zoomOut}
 			 			>
-			 				Zoom Out (⌘⇧-)
+			 				Zoom Out  ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧-)
 			 			</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.zoomIn}
 			 			>
-			 				Zoom In (⌘⇧+)
+			 				Zoom In  ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧+)
 			 			</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
@@ -138,6 +138,12 @@ const FixedEditorPreferences = ({
 
 					{/* RHS */}
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
+						<Button
+							className="p-2 font-medium text-xs underline"
+							onClick={dispatch.toggleReadOnly}
+						>
+							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+						</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showReadme}
@@ -154,14 +160,8 @@ const FixedEditorPreferences = ({
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showReact_js}
 			 			>
-			 				React JSX
+			 				JSX
 			 			</Button>
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.toggleReadOnly}
-						>
-							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-						</Button>
 					</div>
 
 				</div>
@@ -678,8 +678,7 @@ const App = () => {
 					leaveTo="opacity-0"
 				>
 					<div className="fixed inset-0 hidden xl:flex flex-row items-end pointer-events-none">
-						{/* NOTE: Use py-1 not py-2 */}
-						<div className="px-3 py-1 flex flex-row justify-between w-full">
+						<div className="px-3 py-2 flex flex-row justify-between w-full">
 							<p className="font-medium text-xs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
 								{statusLHS}
 							</p>
