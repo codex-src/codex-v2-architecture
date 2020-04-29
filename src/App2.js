@@ -340,6 +340,8 @@ const App = () => {
 	}, [])
 
 	// Show table of contents:
+	//
+	// TODO: Rename to outline?
 	const [showContents, setShowContents] = React.useState(true)
 
 	// Manages table of contents.
