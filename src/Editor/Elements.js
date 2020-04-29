@@ -171,25 +171,31 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	)
 })
 
-export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-	const s1 = {
-		marginLeft: "1ch",
-		...(checked.value && attrs.strike.style),
-	}
-	const s2 = {
+const Todo = ({ checked }) => {
+	const style = {
 		marginLeft: "calc(-1ch - 1.25em)",
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag={tag} id={id} className="todo relative my-2" style={s1}>
+		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+			<svg fill="#fff" viewBox="0 0 16 16">
+				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+			</svg>
+		</span>
+	)
+}
+
+export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
+	const style = {
+		marginLeft: "1ch",
+		...(checked && attrs.strike.style),
+	}
+	return (
+		<Node tag={tag} id={id} className="todo relative my-2" style={style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
-					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={s2} tabIndex="0">
-						<svg fill="#fff" viewBox="0 0 16 16">
-							<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-						</svg>
-					</span>
+					<Todo checked={checked} />
 				</div>
 				{toReact(children) || (
 					<br />

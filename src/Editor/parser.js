@@ -192,9 +192,7 @@ export function parseInlineElements(str) {
 			}
 			// No-op
 			break
-		// <StrongEmphasis>
-		// <Strong>
-		// <Emphasis>
+		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis*** (takes precedence)
 			if (nchars >= "***x***".length && str.slice(x, x + 3) === "***") {

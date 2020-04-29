@@ -42,14 +42,13 @@ export function parseAnyList(range) {
 			checked = { value }
 		}
 		ref.push({
-			// type: typeEnum.AnyListItem,
 			type: !checked ? typeEnum.AnyListItem : typeEnum.TodoItem,
 			tag: "li",
-			tagAncestor: tag,
 			id: each.id,
 			tabs,
 			syntax: [syntax],
-			checked,
+			// ...checked,
+			checked: !checked ? undefined : checked.value,
 			children: parseInlineElements(substr),
 		})
 	}
