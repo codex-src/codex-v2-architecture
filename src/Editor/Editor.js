@@ -42,6 +42,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 	// Registers props.
 	React.useLayoutEffect(() => {
+		// FIXME: autoFocus overwrites focused
 		dispatch.registerProps({
 			readOnly,
 			autoFocus,
@@ -242,7 +243,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
 						const selection = document.getSelection()
-						const range = selection.getRangeAt(0) // Assumes a selection
+						// if (!selection.rangeCount) {
+						// 	// No-op
+						// 	return
+						// }
+						// TODO: Technically, we can virtualize this
+						// logic
+						const range = selection.getRangeAt(0)
 						if (state.pos1.pos === state.pos2.pos && !isListItemElement(ascendNode(range.startContainer))) {
 							dispatch.tab()
 						} else if (!e.shiftKey) {
@@ -255,7 +262,47 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						// Enter:
 					} else if (e.keyCode === keyCodes.Enter) {
 						e.preventDefault()
-						dispatch.enter()
+
+						const selection = document.getSelection()
+						// if (!selection.rangeCount) {
+						// 	// No-op
+						// 	return
+						// }
+						const range = selection.getRangeAt(0)
+
+						let syntax = ""
+						if (state.pos1.pos === state.pos2.pos && isListItemElement(ascendNode(range.startContainer))) {
+							const [lhs, rhs] = state.nodes[state.pos1.y].data.split(" ", 2)
+							syntax = !rhs.length ? "" : `${lhs} `
+						}
+
+						if (!syntax) {
+							dispatch.enter()
+						} else {
+							dispatch.enterSyntax(syntax)
+						}
+
+						// if (state.pos1.pos === state.pos2.pos) {
+						// 	const { id } state.nodes[state.pos1.y]
+						// 	state.reactVDOM.find(each => )
+						// }
+
+						// const selection = document.getSelection()
+						// // if (!selection.rangeCount) {
+						// // 	// No-op
+						// // 	return
+						// // }
+						// const range = selection.getRangeAt(0)
+						// if (/* state.pos1.pos === state.pos2.pos && */ !isListItemElement(ascendNode(range.startContainer))) {
+						// 	dispatch.enter()
+						// // } else if (!e.shiftKey) { // FIXME
+						// // 	dispatch.tabMany()
+						// // }
+						// } else {
+						// dispatch.autoEnter()
+						// }
+
+						// dispatch.enter()
 						return
 					}
 					// Backspace paragraph:
@@ -353,20 +400,20 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					case "deleteWordForward":
 						dispatch.forwardBackspaceWord()
 						return
-						// Forward-backspace (any):
+					// Forward-backspace (any):
 					case "deleteContentForward":
 						dispatch.forwardBackspaceRune()
 						return
-						// Enter:
+					// Enter:
 					case "insertLineBreak":
 					case "insertParagraph":
 						dispatch.enter()
 						return
-						// Undo:
+					// Undo:
 					case "historyUndo":
 						dispatch.undo()
 						return
-						// Redo:
+					// Redo:
 					case "historyRedo":
 						dispatch.redo()
 						return

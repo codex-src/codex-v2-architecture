@@ -320,23 +320,6 @@ const methods = state => ({
 	tab() {
 		this.write("\t")
 	},
-	// Detabs one-to-many paragraphs.
-	detabMany() {
-		this.mutate()
-		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
-		for (let x = 0; x < nodes.length; x++) {
-			if (!nodes[x].data.length || nodes[x].data[0] !== "\t") {
-				// No-op
-				continue
-			}
-			nodes[x].data = nodes[x].data.slice(1)
-			if (!x) {
-				state.pos1.pos--
-			}
-			state.pos2.pos--
-		}
-		this.render()
-	},
 	// Tabs one-to-many paragraphs.
 	tabMany() {
 		this.mutate()
@@ -354,9 +337,30 @@ const methods = state => ({
 		}
 		this.render()
 	},
+	// Detabs one-to-many paragraphs.
+	detabMany() {
+		this.mutate()
+		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
+		for (let x = 0; x < nodes.length; x++) {
+			if (!nodes[x].data.length || nodes[x].data[0] !== "\t") {
+				// No-op
+				continue
+			}
+			nodes[x].data = nodes[x].data.slice(1)
+			if (!x) {
+				state.pos1.pos--
+			}
+			state.pos2.pos--
+		}
+		this.render()
+	},
 	// Inserts an EOL character.
 	enter() {
 		this.write("\n")
+	},
+	// Inserts an auto-completing EOL.
+	enterSyntax(synax) {
+		this.write(`\n${synax}`)
 	},
 	// Cuts character data.
 	cut() {
