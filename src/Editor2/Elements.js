@@ -158,10 +158,9 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
-	<Node tag={tag} id={id} className="my-2">
+	<Node tag={tag} id={id} className="my-2" data-codex-content={syntax[0]}>
 		<span className="hidden">{tabs}</span>
 		<Markdown className="hidden" syntax={syntax}>
-		{/* <Markdown className="mr-2 flex-shrink-0 text-md-blue-a400" syntax={syntax} {...attrs.li}> */}
 			{toReact(children) || (
 				<br />
 			)}
@@ -189,23 +188,20 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	// const [done, etc] = useTodo(checked.value)
 
 	const style = {
-		marginLeft: -28,
+		marginLeft: "-1.5em", // FIXME?
 		borderRadius: "0.3125em",
 	}
 	return (
 		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
-				{/* <span style={{ marginLeft: -22 }}> */}
 				<div className="absolute">
 					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
 						<svg fill="#fff" viewBox="0 0 16 16">
 							<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 						</svg>
 					</span>
-					{/* <input className={`-mt-px form-checkbox w-4 h-4 text-md-blue-a200 ${!checked.value ? "shadow-hero" : "shadow"} transition duration-150`} style={style} type="checkbox" /> */}
 				</div>
-				{/* </span> */}
 				{/* <span className={`mr-2 mt-1 flex-shrink-0 w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0"> */}
 				{/* 	<svg fill="#fff" viewBox="0 0 16 16"> */}
 				{/* 		<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path> */}
@@ -223,7 +219,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node
 	return (
-		<HOC tag={tag} id={id} className="ml-5" style={{ marginLeft: "calc(1.12875em)" }}>
+		<HOC tag={tag} id={id}>
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,

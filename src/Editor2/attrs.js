@@ -20,13 +20,6 @@ const attrs = {
 		target: "_blank",
 		rel: "noopener noreferrer",
 	},
-	li: {
-		style: {
-			MozTabSize: 0,
-			tabSize: 0,
-			// fontFeatureSettings: "'tnum'",
-		},
-	},
 	// contenteditable: {
 	// 	whiteSpace: "pre-wrap",
 	// 	outline: "none",

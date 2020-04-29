@@ -73,21 +73,29 @@ li {
 	position: relative;
 }
 
-.codex-editor ul > li:not(.todo):before  {
-	margin: 0 0 0 -22px; /* FIXME */
-	position: absolute;
-	content: "•";
- 	font-feature-settings: "tnum";
+.codex-editor:not(.feature-read-only) ul > li:not(.todo):before  {
+	margin-right: 0.5em;
+	content: attr(data-codex-content);
+	color: var(--md-blue-a400);
+}
+.codex-editor.feature-read-only ul > li:not(.todo):before  {
+	margin-right: 0.5em;
+	content: "• ";
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ul > li:first-of-type,
 .codex-editor ol > li:first-of-type {
 	counter-reset: count;
 }
-.codex-editor ol > li:not(.todo):before  {
-	margin: 0 0 0 -22px; /* FIXME */
-	position: absolute;
+.codex-editor:not(.feature-read-only) ol > li:not(.todo):before  {
+	margin-right: 0.5em;
+	counter-increment: count;
+	content: attr(data-codex-content);
+	font-feature-settings: "tnum";
+	color: var(--md-blue-a400);
+}
+.codex-editor.feature-read-only ol > li:not(.todo):before  {
+	margin-right: 0.5em;
 	counter-increment: count;
 	content: counter(count) ". ";
 	font-feature-settings: "tnum";
