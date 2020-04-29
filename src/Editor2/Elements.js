@@ -158,7 +158,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
-	<Node tag={tag} id={id} className="my-2" data-codex-content={syntax[0]}>
+	<Node tag={tag} id={id} className="my-2 -ml-5" data-codex-content={syntax[0]}>
 		<span className="hidden">{tabs}</span>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
@@ -219,7 +219,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node
 	return (
-		<HOC tag={tag} id={id}>
+		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
