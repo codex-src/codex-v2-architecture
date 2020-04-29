@@ -86,7 +86,7 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ol > li:first-of-type {
+.codex-editor ol > li:not(.todo):first-of-type {
 	counter-reset: count;
 }
 .codex-editor:not(.feature-read-only) ol > li:not(.todo):before  {

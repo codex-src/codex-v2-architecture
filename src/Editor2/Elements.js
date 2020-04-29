@@ -165,11 +165,11 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 		// supported inside of calc
 		"style": {
 			"--content-length": syntax[0].slice(0, syntax[0].length - 2).length,
-			marginLeft: "calc(var(--content-length) * 1ch + 1.25em)",
+			marginLeft: "calc(var(--content-length) * 1ch)",
 		},
 	}
 	return (
-		<Node tag={tag} id={id} className="my-2 -ml-5" {...attrs}>
+		<Node tag={tag} id={id} className="my-2" {...attrs}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				{toReact(children) || (
@@ -196,22 +196,48 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 // 	return [done, etc]
 // }
 
+// export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
+// 	// const [done, etc] = useTodo(checked.value)
+//
+// 	const style = {
+// 		marginLeft: "-1.5em", // FIXME?
+// 		borderRadius: "0.3125em",
+// 	}
+// 	return (
+// 		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
+// 			<span className="hidden">{tabs}</span>
+// 			<Markdown className="hidden" syntax={syntax}>
+// 				<span className={`-mt-px mr-4 inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+// 					<svg fill="#fff" viewBox="0 0 16 16">
+// 						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+// 					</svg>
+// 				</span>
+// 				{toReact(children) || (
+// 					<br />
+// 				)}
+// 			</Markdown>
+// 		</Node>
+// 	)
+// })
+
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
 	// const [done, etc] = useTodo(checked.value)
 
 	const style = {
-		marginLeft: "-1.5em", // FIXME?
+		marginLeft: "-1.75em",
 		borderRadius: "0.3125em",
 	}
 	return (
 		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
-				<span className={`-mt-px mr-4 inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
-					<svg fill="#fff" viewBox="0 0 16 16">
-						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-					</svg>
-				</span>
+				<div className="absolute">
+					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+						<svg fill="#fff" viewBox="0 0 16 16">
+							<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+						</svg>
+					</span>
+				</div>
 				{toReact(children) || (
 					<br />
 				)}
@@ -221,10 +247,10 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 })
 
 // Describes any list; <ul> or <ol>.
-export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
+export const AnyList = React.memo(({ type, tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node
 	return (
-		<HOC tag={tag} id={id} /* className="ml-5" */>
+		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
