@@ -102,6 +102,9 @@ const methods = state => ({
 		}
 		state.fontSize++
 	},
+	resetZoom() {
+		state.fontSize = 17
+	},
 })
 
 function useEditorPreferences(defaultRenderer) {

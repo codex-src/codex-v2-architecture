@@ -74,16 +74,47 @@ const FixedEditorPreferences = ({
 							Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 						</Button>
 			 			<Button
-							className="p-2 font-medium text-xs underline"
+							className="p-2 flex flex-row items-center font-medium text-xs underline"
 			 				onClick={dispatch.zoomOut}
 			 			>
-			 				Zoom Out  ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧-)
+			 				Zoom Out
+							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧-) */}
+							<svg
+								className="ml-1 w-4 h-4"
+								fill="none"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+							</svg>
+			 			</Button>
+			 			<Button
+							className="p-2 flex flex-row items-center font-medium text-xs underline"
+			 				onClick={dispatch.zoomIn}
+			 			>
+			 				Zoom In
+							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧+) */}
+							<svg
+								className="ml-1 w-4 h-4"
+								fill="none"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								{/* <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path> */}
+								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+							</svg>
 			 			</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.zoomIn}
+			 				onClick={dispatch.resetZoom}
 			 			>
-			 				Zoom In  ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧+)
+			 				Reset Zoom
 			 			</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
@@ -160,7 +191,7 @@ const FixedEditorPreferences = ({
 							className="p-2 font-medium text-xs underline"
 			 				onClick={dispatch.showReact_js}
 			 			>
-			 				JSX
+			 				React JSX
 			 			</Button>
 					</div>
 
@@ -651,10 +682,8 @@ const App = () => {
 
 				{/* Editor */}
 				<DocumentTitle title={title || "Untitled"}>
-					{/* TODO: Add React.forwardRef */}
+					{/* TODO: Add React.forwardRef? */}
 					<Editor
-						// TODO: Use a ref to compute the height of
-						// the last data-codex-node or data-codex-root
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
 							fontSize: editorPrefs.fontSize,
@@ -662,7 +691,7 @@ const App = () => {
 						state={editor}
 						dispatch={editorDispatch}
 						readOnly={editorPrefs.readOnly}
-						autoFocus
+						autoFocus={!data.length}
 					/>
 				</DocumentTitle>
 
