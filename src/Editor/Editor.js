@@ -33,6 +33,19 @@ const ReactEditor = ({ state, dispatch }) => {
 	)
 }
 
+// Returns whether the selection is collapsed and focused on
+// a list item element e.g. <li>.
+function isFocusedLI(editorRoot) {
+	const selection = document.getSelection()
+	const range = selection.getRangeAt(0) // Assumes state.focused
+	if (range.collapsed) { // FIXME
+		// TODO: Guard editorRoot bounds?
+		const element = ascendNode(range.startContainer)
+		return (element && element.nodeType === Node.ELEMENT_NODE && element.nodeName === "LI")
+	}
+	return false
+}
+
 const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) => {
 	const ref = React.useRef()
 
@@ -240,21 +253,16 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
-						const isFocusedLI = editorRoot => {
-							const selection = document.getSelection()
-							const range = selection.getRangeAt(0)
-							if (range.collapsed) {
-								// TODO: Guard editorRoot bounds?
-								const element = ascendNode(range.startContainer)
-								return (element && element.nodeType === Node.ELEMENT_NODE && element.nodeName === "LI")
-							}
-							return false
-						}
 						if (!isFocusedLI(ref.current)) {
 							dispatch.tab()
 						} else {
-							dispatch.tabMany()
+							if (!e.shiftKey) {
+								dispatch.tabLI()
+							} else {
+								dispatch.detabLI()
+							}
 						}
+						// No-op
 						return
 						// Enter:
 					} else if (e.keyCode === keyCodes.Enter) {

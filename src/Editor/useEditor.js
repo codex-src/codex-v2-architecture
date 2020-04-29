@@ -320,10 +320,24 @@ const methods = state => ({
 	tab() {
 		this.write("\t")
 	},
-	// Inserts many tab characters.
-	tabMany() {
+	// Detabs a list item (removes a tab from the start).
+	detabLI() {
+		const ref = state.nodes[state.pos1.y]
+		if (!ref.data.length || ref.data[0] !== "\t") {
+			// No-op
+			return
+		}
+		this.mutate()
+		ref.data = ref.data.slice(1)
+		state.pos1.pos--
+		state.pos2 = { ...state.pos1 }
+		this.render()
+	},
+	// Tabs a list item (adds a tab to the start).
+	tabLI() {
 		this.mutate()
 
+		// FIXME: Add support for many lines
 		state.nodes[state.pos1.y].data = `\t${state.nodes[state.pos1.y].data}`
 		state.pos1.pos++
 		state.pos2 = { ...state.pos1 }
