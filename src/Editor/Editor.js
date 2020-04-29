@@ -8,6 +8,7 @@ import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
+import { AnyListRe } from "./parseAnyList"
 import { ascendNode } from "./ascendNodes"
 import { isListItemElement } from "./listElements"
 
@@ -269,40 +270,23 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						// 	return
 						// }
 						const range = selection.getRangeAt(0)
-
-						let syntax = ""
+						let enterSyntax = ""
 						if (state.pos1.pos === state.pos2.pos && isListItemElement(ascendNode(range.startContainer))) {
-							const [lhs, rhs] = state.nodes[state.pos1.y].data.split(" ", 2)
-							syntax = !rhs.length ? "" : `${lhs} `
+							const node = state.nodes[state.pos1.y]
+							const [, tabs, syntax] = node.data.match(AnyListRe)
+							if ((tabs + syntax).length === node.data.length) {
+								dispatch.backspaceParagraph()
+								return
+							} else {
+								enterSyntax = tabs + syntax
+							}
 						}
-
-						if (!syntax) {
+						if (!enterSyntax) {
 							dispatch.enter()
 						} else {
-							dispatch.enterSyntax(syntax)
+							dispatch.enterSyntax(enterSyntax)
 						}
 
-						// if (state.pos1.pos === state.pos2.pos) {
-						// 	const { id } state.nodes[state.pos1.y]
-						// 	state.reactVDOM.find(each => )
-						// }
-
-						// const selection = document.getSelection()
-						// // if (!selection.rangeCount) {
-						// // 	// No-op
-						// // 	return
-						// // }
-						// const range = selection.getRangeAt(0)
-						// if (/* state.pos1.pos === state.pos2.pos && */ !isListItemElement(ascendNode(range.startContainer))) {
-						// 	dispatch.enter()
-						// // } else if (!e.shiftKey) { // FIXME
-						// // 	dispatch.tabMany()
-						// // }
-						// } else {
-						// dispatch.autoEnter()
-						// }
-
-						// dispatch.enter()
 						return
 					}
 					// Backspace paragraph:
