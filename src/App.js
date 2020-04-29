@@ -618,6 +618,7 @@ const App = () => {
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
 							fontSize: editorPrefs.fontSize,
+							// lineHeight: 1.625,
 						}}
 						state={editor}
 						dispatch={editorDispatch}

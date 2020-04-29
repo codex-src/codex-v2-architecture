@@ -529,6 +529,8 @@ export function parseElements(nodes) {
 			// No-op
 			break
 		// <AnyList> or <Break>
+		//
+		// case "_": // ___
 		case "\t":
 		case "-":
 		case "*":
@@ -542,7 +544,7 @@ export function parseElements(nodes) {
 		case "7":
 		case "8":
 		case "9":
-			// - List item or 1. List item (etc.)
+			// <AnyList>
 			if (nchars >= 2 && AnyListRe.test(each.data)) {
 				const x1 = x
 				let x2 = x1
@@ -559,7 +561,7 @@ export function parseElements(nodes) {
 				x = x2 - 1
 				continue
 			// *** or ---
-			} else if (nchars === 3 && (each.data === "---" || each.data === "***")) {
+			} else if (nchars === 3 && (each.data === "---" || each.data === "***" /* || each.data === "___" */ )) {
 				parsed.push({
 					type: typeEnum.Break,
 					id: each.id,

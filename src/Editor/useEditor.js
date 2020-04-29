@@ -355,13 +355,15 @@ const methods = state => ({
 		this.render()
 	},
 	// Inserts an EOL character.
-	enter() {
-		this.write("\n")
+	enter(syntax = "") {
+		this.write(`\n${syntax}`)
 	},
-	// Inserts an auto-completing EOL.
-	enterSyntax(synax) {
-		this.write(`\n${synax}`)
-	},
+
+	// // Inserts an auto-completing EOL.
+	// enterSyntax(synax) {
+	// 	this.write(`\n${synax}`)
+	// },
+
 	// Cuts character data.
 	cut() {
 		this.write("")

@@ -244,12 +244,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
 						const selection = document.getSelection()
-						// if (!selection.rangeCount) {
-						// 	// No-op
-						// 	return
-						// }
-						// TODO: Technically, we can virtualize this
-						// logic
 						const range = selection.getRangeAt(0)
 						if (state.pos1.pos === state.pos2.pos && !isListItemElement(ascendNode(range.startContainer))) {
 							dispatch.tab()
@@ -264,29 +258,33 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					} else if (e.keyCode === keyCodes.Enter) {
 						e.preventDefault()
 
-						const selection = document.getSelection()
-						// if (!selection.rangeCount) {
-						// 	// No-op
-						// 	return
-						// }
-						const range = selection.getRangeAt(0)
+						// Returns whether the start cursor is focused
+						// on a list item element e.g. <li>.
+						const isFocusedListItemElement = e => {
+							const selection = document.getSelection()
+							if (!selection.rangeCount) {
+								return false
+							}
+							const range = selection.getRangeAt(0)
+							return isListItemElement(ascendNode(range.startContainer))
+						}
+
 						let enterSyntax = ""
-						if (state.pos1.pos === state.pos2.pos && isListItemElement(ascendNode(range.startContainer))) {
+						if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
 							const node = state.nodes[state.pos1.y]
 							const [, tabs, syntax] = node.data.match(AnyListRe)
 							if ((tabs + syntax).length === node.data.length) {
 								dispatch.backspaceParagraph()
 								return
-							} else {
-								enterSyntax = tabs + syntax
+							}
+							enterSyntax = tabs + syntax
+							if (syntax[0] >= "0" && syntax[0] <= "9") {
+								enterSyntax = `${tabs}1. `
+							} else if (syntax === "- [ ] " || syntax === "- [x] ") {
+								enterSyntax = `${tabs}- [ ] `
 							}
 						}
-						if (!enterSyntax) {
-							dispatch.enter()
-						} else {
-							dispatch.enterSyntax(enterSyntax)
-						}
-
+						dispatch.enter(enterSyntax)
 						return
 					}
 					// Backspace paragraph:
