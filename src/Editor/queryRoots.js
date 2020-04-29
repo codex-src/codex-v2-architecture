@@ -1,23 +1,16 @@
 import uuidv4 from "uuid/v4"
-
-// Ascends to the nearest data-codex-root element.
-function ascend(node) {
-	while (node && (!node.getAttribute || !node.getAttribute("data-codex-root"))) {
-		node = node.parentElement
-	}
-	return node
-}
+import { ascendRoot } from "./ascendNodes"
 
 // Queries data-codex-root elements.
 //
 // NOTE: atEnd records whether the end node (root) changed
 // because of an enter or backspace event
 function queryRoots(editorRoot, [extPos1ID, extPos2ID]) {
-	const node1 = ascend(document.getElementById(extPos1ID))
+	const node1 = ascendRoot(document.getElementById(extPos1ID))
 	if (!node1 || !editorRoot.contains(node1)) {
 		throw new Error("queryRoots: no such node1 or out of bounds")
 	}
-	let node2 = ascend(document.getElementById(extPos2ID))
+	let node2 = ascendRoot(document.getElementById(extPos2ID))
 	let node2AtEnd = false
 	// Guard enter pressed on node2:
 	const next = node2 && node2.nextElementSibling

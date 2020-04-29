@@ -8,6 +8,7 @@ import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
+import { ascendNode } from "./ascendNodes"
 
 import {
 	detectRedo,
@@ -236,6 +237,31 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						// No-op
 						return
 					}
+					// Tab:
+					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+						e.preventDefault()
+						const isFocusedLI = editorRoot => {
+							const selection = document.getSelection()
+							const range = selection.getRangeAt(0)
+							if (range.collapsed) {
+								// TODO: Guard editorRoot bounds?
+								const element = ascendNode(range.startContainer)
+								return (element && element.nodeType === Node.ELEMENT_NODE && element.nodeName === "LI")
+							}
+							return false
+						}
+						if (!isFocusedLI(ref.current)) {
+							dispatch.tab()
+						} else {
+							dispatch.tabMany()
+						}
+						return
+						// Enter:
+					} else if (e.keyCode === keyCodes.Enter) {
+						e.preventDefault()
+						dispatch.enter()
+						return
+					}
 					// Backspace paragraph:
 					//
 					// NOTE: Ordered by precedence
@@ -262,17 +288,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
 						e.preventDefault()
 						dispatch.forwardBackspaceRune()
-						return
-					}
-					// Tab:
-					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
-						e.preventDefault()
-						dispatch.tab()
-						return
-						// Enter:
-					} else if (e.keyCode === keyCodes.Enter) {
-						e.preventDefault()
-						dispatch.enter()
 						return
 					}
 					// Undo:

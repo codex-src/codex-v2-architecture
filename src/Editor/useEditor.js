@@ -320,6 +320,22 @@ const methods = state => ({
 	tab() {
 		this.write("\t")
 	},
+	// Inserts many tab characters.
+	tabMany() {
+		this.mutate()
+
+		state.nodes[state.pos1.y].data = `\t${state.nodes[state.pos1.y].data}`
+		state.pos1.pos++
+		state.pos2 = { ...state.pos1 }
+
+		this.render()
+
+		// this.mutate()
+		// // Update and rerender:
+		// state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
+		// Object.assign(state, { pos1, pos2 })
+		// this.render()
+	},
 	// Inserts an EOL character.
 	enter() {
 		this.write("\n")
