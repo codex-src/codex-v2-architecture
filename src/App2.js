@@ -75,15 +75,15 @@ const FixedEditorPreferences = ({
 						</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
-			 				// onClick={dispatch.showJSON}
+			 				onClick={dispatch.zoomOut}
 			 			>
-			 				Zoom - (⌘⇧-)
+			 				Zoom Out (⌘⇧-)
 			 			</Button>
 			 			<Button
 							className="p-2 font-medium text-xs underline"
-			 				// onClick={dispatch.showJSON}
+			 				onClick={dispatch.zoomIn}
 			 			>
-			 				Zoom + (⌘⇧+)
+			 				Zoom In (⌘⇧+)
 			 			</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
@@ -653,9 +653,12 @@ const App = () => {
 				<DocumentTitle title={title || "Untitled"}>
 					{/* TODO: Add React.forwardRef */}
 					<Editor
-						// // TODO: Use a ref to compute the height of
-						// // the last data-codex-node or data-codex-root
-						style={{ paddingBottom: "calc(100vh - 128px - 25px)", fontSize: 17 }}
+						// TODO: Use a ref to compute the height of
+						// the last data-codex-node or data-codex-root
+						style={{
+							paddingBottom: "calc(100vh - 128px)",
+							fontSize: editorPrefs.fontSize,
+						}}
 						state={editor}
 						dispatch={editorDispatch}
 						readOnly={editorPrefs.readOnly}

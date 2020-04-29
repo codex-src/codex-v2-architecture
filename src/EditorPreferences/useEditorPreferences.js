@@ -16,6 +16,7 @@ function initialState(defaultRenderer) {
 	const state = {
 		readOnly: false,
 		showSidebar: false,
+		fontSize: 17,
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: extMap[defaultRenderer] || "",
 		[renderModesEnum.JSON]: "",
@@ -86,6 +87,22 @@ const methods = state => ({
 	},
 	toggleSidebar() {
 		state.showSidebar = !state.showSidebar
+	},
+	zoomOut() {
+		if (state.fontSize <= 13) {
+			// No-op
+			return
+		}
+		// state.fontSize *= 0.9
+		state.fontSize -= 2
+	},
+	zoomIn() {
+		if (state.fontSize >= 21) {
+			// No-op
+			return
+		}
+		// state.fontSize *= 1.1
+		state.fontSize += 2
 	},
 })
 
