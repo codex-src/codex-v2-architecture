@@ -195,18 +195,11 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
-				<div className="absolute">
-					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
-						<svg fill="#fff" viewBox="0 0 16 16">
-							<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-						</svg>
-					</span>
-				</div>
-				{/* <span className={`mr-2 mt-1 flex-shrink-0 w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0"> */}
-				{/* 	<svg fill="#fff" viewBox="0 0 16 16"> */}
-				{/* 		<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path> */}
-				{/* 	</svg> */}
-				{/* </span> */}
+				<span className={`-mt-px mr-4 inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+					<svg fill="#fff" viewBox="0 0 16 16">
+						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+					</svg>
+				</span>
 				{toReact(children) || (
 					<br />
 				)}

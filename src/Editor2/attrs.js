@@ -20,11 +20,6 @@ const attrs = {
 		target: "_blank",
 		rel: "noopener noreferrer",
 	},
-	// contenteditable: {
-	// 	whiteSpace: "pre-wrap",
-	// 	outline: "none",
-	// 	overflowWrap: "break-word",
-	// },
 }
 
 export default attrs
