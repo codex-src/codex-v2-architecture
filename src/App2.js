@@ -208,11 +208,11 @@ const LOCALSTORAGE_KEY = "codex-app-v2.4.1"
 const data = (() => {
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 	if (!cache) {
-		return raw("./App.md")
+		return "" // raw("./App.md")
 	}
 	const json = JSON.parse(cache)
 	if (!json.data) {
-		return raw("./App.md")
+		return "" // raw("./App.md")
 	}
 	return json.data
 })()
@@ -662,6 +662,7 @@ const App = () => {
 						state={editor}
 						dispatch={editorDispatch}
 						readOnly={editorPrefs.readOnly}
+						autoFocus
 					/>
 				</DocumentTitle>
 

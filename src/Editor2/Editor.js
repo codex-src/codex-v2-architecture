@@ -32,7 +32,7 @@ const ReactEditor = ({ state, dispatch }) => {
 	)
 }
 
-const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
+const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -40,8 +40,11 @@ const Editor = ({ id, className, style, state, dispatch, readOnly }) => {
 
 	// Registers props.
 	React.useLayoutEffect(() => {
-		dispatch.registerProps(readOnly)
-	}, [readOnly, dispatch])
+		dispatch.registerProps({
+			readOnly,
+			autoFocus,
+		})
+	}, [readOnly, autoFocus, dispatch])
 
 	// Renders to the DOM.
 	const mounted = React.useRef()
