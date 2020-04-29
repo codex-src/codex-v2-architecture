@@ -8,7 +8,11 @@ import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
-import { ascendNode } from "./ascendNodes"
+
+import {
+	ascendNode,
+	ascendRoot,
+} from "./ascendNodes"
 
 import {
 	detectRedo,
@@ -31,19 +35,6 @@ const ReactEditor = ({ state, dispatch }) => {
 			))}
 		</Provider>
 	)
-}
-
-// Returns whether the selection is collapsed and focused on
-// a list item element e.g. <li>.
-function isFocusedLI(editorRoot) {
-	const selection = document.getSelection()
-	const range = selection.getRangeAt(0) // Assumes state.focused
-	if (range.collapsed) { // FIXME
-		// TODO: Guard editorRoot bounds?
-		const element = ascendNode(range.startContainer)
-		return (element && element.nodeType === Node.ELEMENT_NODE && element.nodeName === "LI")
-	}
-	return false
 }
 
 const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) => {
@@ -253,15 +244,47 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
-						if (!isFocusedLI(ref.current)) {
+
+						// Returns whether a node is a list item element
+						// e.g. <li>.
+						function isListItemElement(node) {
+							const ok = (
+								node &&
+								node.nodeType === Node.ELEMENT_NODE &&
+								node.nodeName === "LI"
+							)
+							return ok
+						}
+
+						// Returns whether a node is a list element e.g.
+						// <ul> or <ol>.
+						function isListElement(node) {
+							const ok = (
+								node &&
+								node.nodeType === Node.ELEMENT_NODE &&
+								(node.nodeName === "UL" || node.nodeName === "OL")
+							)
+							return ok
+						}
+
+						const selection = document.getSelection()
+						const range = selection.getRangeAt(0) // Assumes a selection
+						const ok = (
+							isListItemElement(ascendNode(range.startContainer)) &&
+							isListItemElement(ascendNode(range.endContainer)) &&
+							isListElement(ascendRoot(range.commonAncestorContainer))
+						)
+
+						if (!ok) {
 							dispatch.tab()
 						} else {
 							if (!e.shiftKey) {
-								dispatch.tabLI()
+								dispatch.tabLI() // TODO: Rename
 							} else {
-								dispatch.detabLI()
+								dispatch.detabLI() // TODO: Rename
 							}
 						}
+
 						// No-op
 						return
 						// Enter:
