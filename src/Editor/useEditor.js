@@ -342,6 +342,10 @@ const methods = state => ({
 		this.mutate()
 		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
 		for (let x = 0; x < nodes.length; x++) {
+			// if (nodes[x].data.length && nodes[x].data.slice(0, 20) === "\t".repeat(20)) {
+			// 	// No-op
+			// 	continue
+			// }
 			nodes[x].data = `\t${nodes[x].data}`
 			if (!x) {
 				state.pos1.pos++

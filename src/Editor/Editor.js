@@ -8,11 +8,8 @@ import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
-
-import {
-	ascendNode,
-	ascendRoot,
-} from "./ascendNodes"
+import { ascendNode } from "./ascendNodes"
+import { isListItemElement } from "./listElements"
 
 import {
 	detectRedo,
@@ -244,49 +241,15 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						e.preventDefault()
-
-						// Returns whether a node is a list item element
-						// e.g. <li>.
-						function isListItemElement(node) {
-							const ok = (
-								node &&
-								node.nodeType === Node.ELEMENT_NODE &&
-								node.nodeName === "LI"
-							)
-							return ok
-						}
-
-						// Returns whether a node is a list element e.g.
-						// <ul> or <ol>.
-						function isListElement(node) {
-							const ok = (
-								node &&
-								node.nodeType === Node.ELEMENT_NODE &&
-								(node.nodeName === "UL" || node.nodeName === "OL")
-							)
-							return ok
-						}
-
 						const selection = document.getSelection()
 						const range = selection.getRangeAt(0) // Assumes a selection
-						const tabMany = (
-							!range.collapsed || (
-								isListItemElement(ascendNode(range.startContainer)) &&
-								isListItemElement(ascendNode(range.endContainer)) &&
-								isListElement(ascendRoot(range.commonAncestorContainer))
-							)
-						)
-
-						if (!tabMany) {
+						if (state.pos1.pos === state.pos2.pos && !isListItemElement(ascendNode(range.startContainer))) {
 							dispatch.tab()
+						} else if (!e.shiftKey) {
+							dispatch.tabMany()
 						} else {
-							if (!e.shiftKey) {
-								dispatch.tabMany()
-							} else {
-								dispatch.detabMany()
-							}
+							dispatch.detabMany()
 						}
-
 						// No-op
 						return
 						// Enter:
