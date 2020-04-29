@@ -320,21 +320,37 @@ const methods = state => ({
 	tab() {
 		this.write("\t")
 	},
-	// Detabs once.
-	detabListItem() {
-		const ref = state.nodes[state.pos1.y]
-		if (!ref.data.length || ref.data[0] !== "\t") {
-			// No-op
-			return
-		}
+	// Detabs one-to-many paragraphs.
+	detabMany() {
+		// const ref = state.nodes[state.pos1.y]
+		// if (!ref.data.length || ref.data[0] !== "\t") {
+		// 	// No-op
+		// 	return
+		// }
+		// this.mutate()
+		// ref.data = ref.data.slice(1)
+		// state.pos1.pos--
+		// state.pos2 = { ...state.pos1 }
+		// this.render()
+
 		this.mutate()
-		ref.data = ref.data.slice(1)
-		state.pos1.pos--
-		state.pos2 = { ...state.pos1 }
+		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
+		// let counter = 0
+		for (let x = 0; x < nodes.length; x++) {
+			if (nodes[x].data[0] !== "\t") {
+				// No-op
+				continue
+			}
+			nodes[x].data = nodes[x].data.slice(1)
+			if (!x) {
+				state.pos1.pos--
+			}
+			state.pos2.pos--
+		}
 		this.render()
 	},
-	// Tabs one-to-many list items.
-	tabListItems() {
+	// Tabs one-to-many paragraphs.
+	tabMany() {
 		this.mutate()
 		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
 		for (let x = 0; x < nodes.length; x++) {

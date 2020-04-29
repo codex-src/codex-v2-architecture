@@ -269,19 +269,21 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 						const selection = document.getSelection()
 						const range = selection.getRangeAt(0) // Assumes a selection
-						const ok = (
-							isListItemElement(ascendNode(range.startContainer)) &&
-							isListItemElement(ascendNode(range.endContainer)) &&
-							isListElement(ascendRoot(range.commonAncestorContainer))
+						const tabMany = (
+							!range.collapsed || (
+								isListItemElement(ascendNode(range.startContainer)) &&
+								isListItemElement(ascendNode(range.endContainer)) &&
+								isListElement(ascendRoot(range.commonAncestorContainer))
+							)
 						)
 
-						if (!ok) {
+						if (!tabMany) {
 							dispatch.tab()
 						} else {
 							if (!e.shiftKey) {
-								dispatch.tabListItems() // TODO: Rename
+								dispatch.tabMany()
 							} else {
-								dispatch.detabListItem() // TODO: Rename
+								dispatch.detabMany()
 							}
 						}
 
