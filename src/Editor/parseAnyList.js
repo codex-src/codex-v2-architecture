@@ -21,8 +21,7 @@ export function parseAnyList(range) {
 		const [, tabs, syntax] = each.data.match(AnyListRe)
 		const substr = each.data.slice((tabs + syntax).length)
 		let ref = result.children
-		let x = ""
-		while (x < tabs.length) {
+		for (let x = 0; x < tabs.length; x++) {
 			if (!ref.length || ref[ref.length - 1].type !== typeEnum.AnyList) {
 				tag = UnorderedListRe.test(each.data) ? "ul" : "ol"
 				ref.push({
@@ -34,21 +33,18 @@ export function parseAnyList(range) {
 				})
 			}
 			ref = ref[ref.length - 1].children
-			x++
 		}
-		let checked = null
+		let checked = -1
 		if (syntax === "- [ ] " || syntax === "- [x] ") {
-			const value = syntax === "- [x] "
-			checked = { value }
+			checked = Number(syntax === "- [x] ")
 		}
 		ref.push({
-			type: !checked ? typeEnum.AnyListItem : typeEnum.TodoItem,
+			type: checked === -1 ? typeEnum.AnyListItem : typeEnum.TodoItem,
 			tag: "li",
 			id: each.id,
 			tabs,
 			syntax: [syntax],
-			// ...checked,
-			checked: !checked ? undefined : checked.value,
+			checked: checked === -1 ? undefined : Boolean(checked),
 			children: parseInlineElements(substr),
 		})
 	}
