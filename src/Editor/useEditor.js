@@ -322,22 +322,10 @@ const methods = state => ({
 	},
 	// Detabs one-to-many paragraphs.
 	detabMany() {
-		// const ref = state.nodes[state.pos1.y]
-		// if (!ref.data.length || ref.data[0] !== "\t") {
-		// 	// No-op
-		// 	return
-		// }
-		// this.mutate()
-		// ref.data = ref.data.slice(1)
-		// state.pos1.pos--
-		// state.pos2 = { ...state.pos1 }
-		// this.render()
-
 		this.mutate()
 		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
-		// let counter = 0
 		for (let x = 0; x < nodes.length; x++) {
-			if (nodes[x].data[0] !== "\t") {
+			if (!nodes[x].data.length || nodes[x].data[0] !== "\t") {
 				// No-op
 				continue
 			}
