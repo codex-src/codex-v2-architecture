@@ -71,14 +71,20 @@ const FixedEditorPreferences = ({
 							className="p-2 font-medium text-xs underline"
 							onClick={() => setShowContents(!showContents)}
 						>
-							Toggle Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
+							Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 						</Button>
-						<Button
+			 			<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.toggleReadOnly}
-						>
-							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-						</Button>
+			 				// onClick={dispatch.showJSON}
+			 			>
+			 				Zoom - (⌘⇧-)
+			 			</Button>
+			 			<Button
+							className="p-2 font-medium text-xs underline"
+			 				// onClick={dispatch.showJSON}
+			 			>
+			 				Zoom + (⌘⇧+)
+			 			</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
@@ -150,12 +156,12 @@ const FixedEditorPreferences = ({
 			 			>
 			 				React JSX
 			 			</Button>
-			 			{/* <Button */}
-						{/* 	className="p-2 font-medium text-xs underline" */}
-			 			{/* 	onClick={dispatch.showJSON} */}
-			 			{/* > */}
-			 			{/* 	JSON */}
-			 			{/* </Button> */}
+						<Button
+							className="p-2 font-medium text-xs underline"
+							onClick={dispatch.toggleReadOnly}
+						>
+							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+						</Button>
 					</div>
 
 				</div>
