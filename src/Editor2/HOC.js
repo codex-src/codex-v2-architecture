@@ -3,7 +3,7 @@ import React from "react"
 // NOTE: Shadows browser API
 export const Node = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
-		ref, // TODO: Remove React.forwardRef?
+		ref,
 		id,
 		"style": {
 			// NOTE: white-space: pre-wrap is needed because of
@@ -18,7 +18,7 @@ export const Node = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 
 export const Root = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
-		ref, // TODO: Remove React.forwardRef?
+		ref,
 		id,
 		"style": {
 			// NOTE: white-space: pre-wrap is needed because of

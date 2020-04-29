@@ -74,12 +74,14 @@
 }
 
 .codex-editor:not(.feature-read-only) ul > li:not(.todo):before  {
-	margin-right: 0.5em;
+	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+	position: absolute;
 	content: attr(data-codex-content);
 	color: var(--md-blue-a400);
 }
 .codex-editor.feature-read-only ul > li:not(.todo):before  {
-	margin-right: 0.5em;
+	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+	position: absolute;
 	content: "• ";
 	color: var(--md-blue-a400);
 }
@@ -88,14 +90,16 @@
 	counter-reset: count;
 }
 .codex-editor:not(.feature-read-only) ol > li:not(.todo):before  {
-	margin-right: 0.5em;
+	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+	position: absolute;
 	counter-increment: count;
 	content: attr(data-codex-content);
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
 .codex-editor.feature-read-only ol > li:not(.todo):before  {
-	margin-right: 0.5em;
+	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+	position: absolute;
 	counter-increment: count;
 	content: counter(count) ". ";
 	font-feature-settings: "tnum";

@@ -157,16 +157,28 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 })
 
 // Describes a list item; <li>.
-export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
-	<Node tag={tag} id={id} className="my-2 -ml-5" data-codex-content={syntax[0]}>
-		<span className="hidden">{tabs}</span>
-		<Markdown className="hidden" syntax={syntax}>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</Node>
-))
+export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
+	// TODO: Use a computed width when copyNode is working
+	const attrs = {
+		"data-codex-content": syntax[0],
+		// NOTE: Use a CSS variable because attr is not
+		// supported inside of calc
+		"style": {
+			"--content-length": syntax[0].slice(0, syntax[0].length - 2).length,
+			marginLeft: "calc(var(--content-length) * 1ch + 1.25em)",
+		},
+	}
+	return (
+		<Node tag={tag} id={id} className="my-2 -ml-5" {...attrs}>
+			<span className="hidden">{tabs}</span>
+			<Markdown className="hidden" syntax={syntax}>
+				{toReact(children) || (
+					<br />
+				)}
+			</Markdown>
+		</Node>
+	)
+})
 
 // const Todo = ({ className, ...props }) => (
 // 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
@@ -212,7 +224,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 export const AnyList = React.memo(({ tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node
 	return (
-		<HOC tag={tag} id={id} className="ml-5">
+		<HOC tag={tag} id={id} /* className="ml-5" */>
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
