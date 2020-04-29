@@ -69,18 +69,8 @@
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
-.codex-editor li {
-	position: relative;
-}
-
-.codex-editor:not(.feature-read-only) ul > li:not(.todo):before  {
-	margin-left: calc(var(--content-length) * -1ch - 1.25em);
-	position: absolute;
-	content: attr(data-codex-content);
-	color: var(--md-blue-a400);
-}
-.codex-editor.feature-read-only ul > li:not(.todo):before  {
-	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+.codex-editor ul > li:not(.todo):before  {
+	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	content: "• ";
 	color: var(--md-blue-a400);
@@ -89,41 +79,12 @@
 .codex-editor ol > li:not(.todo):first-of-type {
 	counter-reset: count;
 }
-.codex-editor:not(.feature-read-only) ol > li:not(.todo):before  {
-	margin-left: calc(var(--content-length) * -1ch - 1.25em);
-	position: absolute;
-	counter-increment: count;
-	content: attr(data-codex-content);
-	font-feature-settings: "tnum";
-	color: var(--md-blue-a400);
-}
-.codex-editor.feature-read-only ol > li:not(.todo):before  {
-	margin-left: calc(var(--content-length) * -1ch - 1.25em);
+/* margin-left: calc(var(--content-length) * -1ch - 1.25em); */
+.codex-editor ol > li:not(.todo):before  {
+	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	counter-increment: count;
 	content: counter(count) ". ";
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
-
-/* .codex-editor ul > li:not(.checked):before { */
-/* 	margin-right: 0.5em; */
-/* 	display: inline-block; */
-/* 	width: calc(11.438 / 16 * 1em); */
-/* 	content: "•"; */
-/* 	font-feature-settings: "tnum"; */
-/* 	color: var(--md-blue-a400); */
-/* } */
-/*  */
-/* .codex-editor ul > li:first-of-type, */
-/* .codex-editor ol > li:first-of-type { */
-/* 	counter-reset: count; */
-/* } */
-/* .codex-editor ol > li:before { */
-/* 	margin-right: 0.5em; */
-/* 	display: inline-block; */
-/* 	counter-increment: count; */
-/* 	content: counter(count) ". "; */
-/* 	font-feature-settings: "tnum"; */
-/* 	color: var(--md-blue-a400); */
-/* } */

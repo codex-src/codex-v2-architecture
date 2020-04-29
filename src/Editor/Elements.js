@@ -158,18 +158,9 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 
 // Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
-	// TODO: Use a computed width when copyNode is working
-	const attrs = {
-		"data-codex-content": syntax[0],
-		// NOTE: Use a CSS variable because attr is not
-		// supported inside of calc
-		"style": {
-			"--content-length": syntax[0].slice(0, syntax[0].length - 2).length,
-			marginLeft: "calc(var(--content-length) * 1ch)",
-		},
-	}
+	const style = { marginLeft: "1ch" }
 	return (
-		<Node tag={tag} id={id} className="my-2" {...attrs}>
+		<Node tag={tag} id={id} className="my-2" style={style}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				{toReact(children) || (
@@ -180,59 +171,21 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	)
 })
 
-// const Todo = ({ className, ...props }) => (
-// 	<input className={`form-checkbox ${className}`} type="checkbox" {...props} />
-// )
-//
-// // Prepares a checked state and functions e.g. {...etc}.
-// function useTodo(initialValue) {
-// 	const [done, setDone] = React.useState(initialValue)
-// 	const etc = {
-// 		checked: done,
-// 		onChange: e => {
-// 			setDone(!done)
-// 		},
-// 	}
-// 	return [done, etc]
-// }
-
-// export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-// 	// const [done, etc] = useTodo(checked.value)
-//
-// 	const style = {
-// 		marginLeft: "-1.5em", // FIXME?
-// 		borderRadius: "0.3125em",
-// 	}
-// 	return (
-// 		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
-// 			<span className="hidden">{tabs}</span>
-// 			<Markdown className="hidden" syntax={syntax}>
-// 				<span className={`-mt-px mr-4 inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
-// 					<svg fill="#fff" viewBox="0 0 16 16">
-// 						<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-// 					</svg>
-// 				</span>
-// 				{toReact(children) || (
-// 					<br />
-// 				)}
-// 			</Markdown>
-// 		</Node>
-// 	)
-// })
-
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-	// const [done, etc] = useTodo(checked.value)
-
-	const style = {
-		marginLeft: "-1.75em",
+	const s1 = {
+		marginLeft: "1ch",
+		...(checked.value && attrs.strike.style),
+	}
+	const s2 = {
+		marginLeft: "calc(-1ch - 1.25em)",
 		borderRadius: "0.3125em",
 	}
 	return (
-		<Node tag={tag} id={id} className="todo relative my-2" style={checked.value && attrs.strike.style}>
+		<Node tag={tag} id={id} className="todo relative my-2" style={s1}>
 			<span className="hidden">{tabs}</span>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
-					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+					<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked.value ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={s2} tabIndex="0">
 						<svg fill="#fff" viewBox="0 0 16 16">
 							<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 						</svg>
