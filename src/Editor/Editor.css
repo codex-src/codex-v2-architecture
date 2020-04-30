@@ -75,6 +75,15 @@
 	content: "• ";
 	color: var(--md-blue-a400);
 }
+/* .codex-editor ul > li:not(.todo):before { */
+/* 	content: "• "; */
+/* } */
+/* .codex-editor ul ul > li:not(.todo):before { */
+/* 	content: "◦ "; */
+/* } */
+/* .codex-editor ul ul ul > li:not(.todo):before { */
+/* 	content: "▪ "; */
+/* } */
 
 .codex-editor ol > li:not(.todo):first-of-type {
 	counter-reset: count;
