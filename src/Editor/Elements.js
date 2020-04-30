@@ -168,17 +168,17 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 })
 
 const Todo = ({ id, checked }) => {
-
-	const handleClick = () => {
-		console.log(`you clicked id=${id}`)
-	}
-
-	const style = {
-		marginLeft: "calc(-1ch - 1.25em)",
-		borderRadius: "0.3125em",
+	const attrs = {
+		style: {
+			marginLeft: "calc(-1ch - 1.25em)",
+			borderRadius: "0.3125em",
+		},
+		tabIndex: "0",
+		"data-codex-todo": id,
 	}
 	return (
-		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} onClick={handleClick} tabIndex="0">
+		// focus:outline-none select-none
+		<span className={`-mt-px inline-block w-4 h-4 align-middle ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded`} {...attrs}>
 			<svg fill="#fff" viewBox="0 0 16 16">
 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 			</svg>

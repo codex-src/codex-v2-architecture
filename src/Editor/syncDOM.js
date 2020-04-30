@@ -1,7 +1,3 @@
-import React from "react"
-import ReactDOM from "react-dom"
-import renderDOM from "renderDOM"
-
 // // Naively syncs two trees.
 // function syncDOM(src, dst) {
 // 	removeRange()
@@ -27,7 +23,7 @@ function removeRange() {
 // are not synced.
 //
 // TODO: Reduce mutations from 2 to 1 for the 90% case
-function syncDOM(src, dst) {
+function syncDOM(src, dst, decorator = null) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
@@ -37,13 +33,11 @@ function syncDOM(src, dst) {
 			if (!mutations) {
 				removeRange()
 			}
-			// const div = document.createElement("div")
-			// document.body.append(div)
-			// ReactDOM.render(reactElements[start], div, () => {
-			// 	console.log(div.children[0])
-			// })
 			const clonedElement = src.children[start].cloneNode(true)
 			dst.children[start].replaceWith(clonedElement)
+			if (decorator) {
+				decorator(clonedElement)
+			}
 			mutations++
 			start++ // Eagerly increment
 			break
@@ -58,12 +52,11 @@ function syncDOM(src, dst) {
 				if (!mutations) {
 					removeRange()
 				}
-				// const div = document.createElement("div")
-				// ReactDOM.render(reactElements[end2 - 1], div, () => {
-				// 	dst.children[end1 - 1].replaceWith(div.children[0])
-				// })
 				const clonedElement = src.children[end2 - 1].cloneNode(true)
 				dst.children[end1 - 1].replaceWith(clonedElement)
+				if (decorator) {
+					decorator(clonedElement)
+				}
 				mutations++
 			}
 		}
@@ -85,6 +78,9 @@ function syncDOM(src, dst) {
 			}
 			const clonedElement = src.children[start].cloneNode(true)
 			dst.insertBefore(clonedElement, dst.children[start])
+			if (decorator) {
+				decorator(clonedElement)
+			}
 			mutations++
 		}
 	}
