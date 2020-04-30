@@ -41,40 +41,41 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
 
-	// Registers props.
-	React.useLayoutEffect(() => {
-		// FIXME: autoFocus overwrites focused
-		dispatch.registerProps({
-			readOnly,
-			autoFocus,
-		})
-	}, [readOnly, autoFocus, dispatch])
+	// // Registers props.
+	// const mountedProps = React.useRef()
+	// React.useLayoutEffect(() => {
+	// 	if (!mountedProps.current) {
+	// 		mountedProps.current = true
+	// 		dispatch.registerProps({
+	// 			readOnly,
+	// 			focused: autoFocus,
+	// 		})
+	// 		return
+	// 	}
+	// 	dispatch.registerProps({ readOnly })
+	// }, [readOnly, autoFocus, dispatch])
 
 	// Renders to the DOM.
-	const mounted = React.useRef()
+	const mountedDOM = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
-				/* const mutations = */ syncDOM(state.reactDOM, ref.current)
-				if (!mounted.current || state.readOnly || !state.focused) {
-					mounted.current = true
+				const mutations = syncDOM(state.reactDOM, ref.current)
+				if (!mountedDOM.current || state.readOnly || !state.focused) {
+					mountedDOM.current = true
 					return
 				}
-
-				// if (mutations) {
-				// 	const s = mutations === 1 ? "" : "s"
-				// 	console.log(`synced dom: ${mutations} mutation${s}`)
-				// }
-
+				if (mutations) {
+					const s = mutations === 1 ? "" : "s"
+					console.log(`synced dom: ${mutations} mutation${s}`)
+				}
 				// Sync DOM cursors:
 				try {
-					/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
-
-					// if (syncedPos) {
-					// 	console.log("synced pos")
-					// }
-
+					const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
+					if (syncedPos) {
+						console.log("synced pos")
+					}
 				} catch (error) {
 					console.error(error)
 					return
