@@ -1,3 +1,4 @@
 import React from "react"
 
-export default React.createContext()
+const EditorContext = React.createContext()
+export default EditorContext

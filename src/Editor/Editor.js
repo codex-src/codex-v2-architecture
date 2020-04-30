@@ -21,17 +21,16 @@ import {
 import "./Editor.css"
 
 // TODO: Add React.memo?
-const ReactEditor = ({ state, dispatch, children }) => {
+const ReactEditor = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
-			{/* {state.reactVDOM.map(({ type: T, ...each }) => ( */}
-			{/* 	React.createElement(typeEnumMap[T], { */}
-			{/* 		key: each.id, */}
-			{/* 		...each, */}
-			{/* 	}) */}
-			{/* ))} */}
-			{children}
+			{state.reactVDOM.map(({ type: T, ...each }) => (
+				React.createElement(typeEnumMap[T], {
+					key: each.id,
+					...each,
+				})
+			))}
 		</Provider>
 	)
 }
@@ -60,46 +59,40 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	const mountedDOM = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
-			const reactElements = state.reactVDOM.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumMap[T], {
-					key: each.id,
-					...each,
-				})
-			))
-			ReactDOM.render(
-				<ReactEditor state={state} dispatch={dispatch}>
-					{reactElements}
-				</ReactEditor>,
-				state.reactDOM,
-				() => {
-					// Sync DOM:
-					/* const mutations = */ syncDOM(state.reactDOM, ref.current, reactElements)
-					if (!mountedDOM.current || state.readOnly || !state.focused) {
-						mountedDOM.current = true
-						return
-					}
+			// const reactElements = state.reactVDOM.map(({ type: T, ...each }) => (
+			// 	React.createElement(typeEnumMap[T], {
+			// 		key: each.id,
+			// 		...each,
+			// 	})
+			// ))
+			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
+				// Sync DOM:
+				/* const mutations = */ syncDOM(state.reactDOM, ref.current)
+				if (!mountedDOM.current || state.readOnly || !state.focused) {
+					mountedDOM.current = true
+					return
+				}
 
-					// if (mutations) {
-					// 	const s = mutations === 1 ? "" : "s"
-					// 	console.log(`synced dom: ${mutations} mutation${s}`)
+				// if (mutations) {
+				// 	const s = mutations === 1 ? "" : "s"
+				// 	console.log(`synced dom: ${mutations} mutation${s}`)
+				// }
+
+				// Sync DOM cursors:
+				try {
+					/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
+					// if (syncedPos) {
+					// 	console.log("synced pos")
 					// }
-
-					// Sync DOM cursors:
-					try {
-						/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
-						// if (syncedPos) {
-						// 	console.log("synced pos")
-						// }
-					} catch (error) {
-						console.error(error)
-						return
-					}
-					// Force select for edge-cases such as forward-
-					// backspace (pos does not change but the DOM does):
-					const [pos1, pos2] = computePosRange(ref.current)
-					dispatch.select(pos1, pos2)
-				},
-			)
+				} catch (error) {
+					console.error(error)
+					return
+				}
+				// Force select for edge-cases such as forward-
+				// backspace (pos does not change but the DOM does):
+				const [pos1, pos2] = computePosRange(ref.current)
+				dispatch.select(pos1, pos2)
+			})
 		}, [state, dispatch]),
 		[state.readOnly, state.reactVDOM],
 	)

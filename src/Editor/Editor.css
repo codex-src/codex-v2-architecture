@@ -14,6 +14,10 @@
 	caret-color: #000;
 }
 
+/* .codex-editor.feature-read-only .syntax { */
+/* 	display: none; */
+/* } */
+
 /* .codex-editor:not(.feature-read-only) [data-codex-root] { */
 /* 	transition-duration: 500ms; */
 /* } */

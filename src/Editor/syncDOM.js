@@ -3,11 +3,11 @@ import ReactDOM from "react-dom"
 import renderDOM from "renderDOM"
 
 // // Naively syncs two trees.
-// function naiveSyncTrees(dst, src) {
+// function syncDOM(src, dst) {
 // 	removeRange()
-// 	;[...dst.childNodes].reverse().map(each => each.remove())
-// 	dst.append(...src.cloneNode(true).childNodes)
-// 	return dst.childNodes.length
+// 	;[...dst.children].reverse().map(each => each.remove())
+// 	dst.append(...src.cloneNode(true).children)
+// 	return true
 // }
 
 // Removes the range (for performance reasons).
@@ -22,65 +22,69 @@ function removeRange() {
 	selection.removeAllRanges()
 }
 
-// Syncs two DOM trees; nodes are cloned and replaced
+// Syncs two DOM trees; elements are cloned and replaced
 // forwards and then backwards. Note that the root elements
 // are not synced.
 //
 // TODO: Reduce mutations from 2 to 1 for the 90% case
-function syncDOM(src, dst, reactElements) {
+function syncDOM(src, dst) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
-	const min = Math.min(dst.childNodes.length, src.childNodes.length)
+	const min = Math.min(dst.children.length, src.children.length)
 	for (; start < min; start++) {
-		if (!dst.childNodes[start].isEqualNode(src.childNodes[start])) {
+		if (!dst.children[start].isEqualNode(src.children[start])) {
 			if (!mutations) {
 				removeRange()
 			}
-			const newNode = src.childNodes[start].cloneNode(true)
-			// console.log(reactElements[start])
-			const Component = reactElements[start]
-			console.log(renderDOM([Component]))
-			dst.childNodes[start].replaceWith(newNode)
-			// ReactDOM.render(reactVDOM[start], dst.childNodes[start])
-			// console.log(renderDOM(React.createElement(reactVDOM[start])))
+			// const div = document.createElement("div")
+			// document.body.append(div)
+			// ReactDOM.render(reactElements[start], div, () => {
+			// 	console.log(div.children[0])
+			// })
+			const clonedElement = src.children[start].cloneNode(true)
+			dst.children[start].replaceWith(clonedElement)
 			mutations++
 			start++ // Eagerly increment
 			break
 		}
 	}
 	// Iterate backwards (after replaceWith):
-	let end1 = dst.childNodes.length
-	let end2 = src.childNodes.length
+	let end1 = dst.children.length
+	let end2 = src.children.length
 	if (mutations) { // Not needed but easier to understand
 		for (; end1 > start && end2 > start; end1--, end2--) {
-			if (!dst.childNodes[end1 - 1].isEqualNode(src.childNodes[end2 - 1])) {
+			if (!dst.children[end1 - 1].isEqualNode(src.children[end2 - 1])) {
 				if (!mutations) {
 					removeRange()
 				}
-				const newNode = src.childNodes[end2 - 1].cloneNode(true)
-				dst.childNodes[end1 - 1].replaceWith(newNode)
+				// const div = document.createElement("div")
+				// ReactDOM.render(reactElements[end2 - 1], div, () => {
+				// 	dst.children[end1 - 1].replaceWith(div.children[0])
+				// })
+				const clonedElement = src.children[end2 - 1].cloneNode(true)
+				dst.children[end1 - 1].replaceWith(clonedElement)
 				mutations++
 			}
 		}
 	}
-	// Drop extraneous nodes:
+	// Drop extraneous elements:
 	if (start < end1) {
 		for (; start < end1; end1--) { // Iterate backwards
 			if (!mutations) {
 				removeRange()
 			}
-			dst.childNodes[end1 - 1].remove()
+			dst.children[end1 - 1].remove()
 			mutations++
 		}
-	// Push extraneous nodes:
+	// Push extraneous elements:
 	} else if (start < end2) {
 		for (; start < end2; start++) {
 			if (!mutations) {
 				removeRange()
 			}
-			const newNode = src.childNodes[start].cloneNode(true)
-			dst.insertBefore(newNode, dst.childNodes[start])
+			const clonedElement = src.children[start].cloneNode(true)
+			dst.insertBefore(clonedElement, dst.children[start])
 			mutations++
 		}
 	}

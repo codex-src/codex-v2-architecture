@@ -158,7 +158,6 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	const style = { marginLeft: "1ch" }
 	return (
 		<Node tag={tag} id={id} className="my-2" style={style}>
-			{/* <span className="hidden">{tabs}</span> */}
 			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
 				{toReact(children) || (
 					<br />
@@ -168,13 +167,18 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	)
 })
 
-const Todo = ({ checked }) => {
+const Todo = ({ id, checked }) => {
+
+	const handleClick = () => {
+		console.log(`you clicked id=${id}`)
+	}
+
 	const style = {
 		marginLeft: "calc(-1ch - 1.25em)",
 		borderRadius: "0.3125em",
 	}
 	return (
-		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} onClick={() => console.log("test")} tabIndex="0">
+		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} onClick={handleClick} tabIndex="0">
 			<svg fill="#fff" viewBox="0 0 16 16">
 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 			</svg>
@@ -189,10 +193,9 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	}
 	return (
 		<Node tag={tag} id={id} className="todo relative my-2" style={style}>
-			{/* <span className="hidden">{tabs}</span> */}
 			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
 				<div className="absolute">
-					<Todo checked={checked} />
+					<Todo id={id} checked={checked} />
 				</div>
 				{toReact(children) || (
 					<br />
