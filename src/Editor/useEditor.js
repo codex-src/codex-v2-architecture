@@ -364,6 +364,12 @@ const methods = state => ({
 	// 	this.write(`\n${synax}`)
 	// },
 
+	// Toggles a todo (checkbox).
+	toggleTodo(id) {
+		const node = state.nodes.find(each => each.id === id)
+		console.log({ ...node })
+	},
+
 	// Cuts character data.
 	cut() {
 		this.write("")

@@ -69,9 +69,11 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
 					const elements = clonedElement.querySelectorAll("[data-codex-todo]")
-					for (const element of elements) {
-						element.onclick = () => {
-							console.log(`id=${element.getAttribute("data-codex-todo")}`)
+					for (const each of elements) {
+						// TODO: Use onpointerdown or equivalent?
+						each.onclick = () => {
+							// console.log(`id=${each.getAttribute("data-codex-todo")}`)
+							dispatch.toggleTodo(each.getAttribute("data-codex-todo"))
 						}
 					}
 				})
