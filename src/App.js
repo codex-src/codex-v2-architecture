@@ -121,15 +121,19 @@ const FixedEditorPreferences = ({
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
 						>
 							<p className="font-medium text-xs">
-								Saving
+								Saved
 							</p>
 							<svg
-								className="ml-1 flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
-								style={{ opacity: saveStatus !== 2 ? "0" : "1" }}
-								fill="currentColor"
-								viewBox="0 0 16 16"
+								className="ml-1 p-px flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+								fill="none"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								// strokeWidth="2"
+								strokeWidth="3"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
 							>
-								<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+								<path d="M5 13l4 4L19 7"></path>
 							</svg>
 						</div>
 					</div>
@@ -372,9 +376,9 @@ const App = () => {
 			mounted1.current = true
 			return
 		}
-		setSaveStatus(1)
 		const ids = []
 		ids.push(setTimeout(() => {
+			// Debounce localStorage 100ms:
 			const json = JSON.stringify({ data: editor.data })
 			localStorage.setItem(LOCALSTORAGE_KEY, json)
 			ids.push(setTimeout(() => {
