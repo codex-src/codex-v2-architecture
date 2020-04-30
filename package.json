@@ -16,8 +16,8 @@
   "scripts": {
     "tailwind-start": "tailwind build src/stylesheets/tailwind.css -o src/stylesheets/tailwind.generated.css",
     "start": "react-scripts start",
-    "tailwind-build": "postcss src/stylesheets/tailwind.css --output src/stylesheets/tailwind.generated.css --env production",
-    "build": "yarn tailwind-build && yarn react-scripts build && osascript -e beep && yarn tailwind-start",
+    "tailwind-build": "NODE_ENV=production yarn tailwind-start",
+    "build": "yarn tailwind-build && yarn react-scripts build && osascript -e 'display notification \"Production build ready\" with title \"yarn build\"' && yarn tailwind-start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -37,10 +37,7 @@
     ]
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^2.1.2",
-    "autoprefixer": "^9.7.6",
     "debug.css": "https://github.com/codex-src/debug.css",
-    "postcss-cli": "^7.1.0",
     "raw.macro": "^0.3.0",
     "serve": "^11.3.0",
     "tailwindcss": "^1.3.5"

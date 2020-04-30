@@ -1,4 +1,8 @@
 module.exports = {
+	purge: [
+		"./public/**/*.html",
+		"./src/**/*.js",
+	],
 	theme: {
 		extend: {},
 		// https://tailwindcss.com/docs/breakpoints
