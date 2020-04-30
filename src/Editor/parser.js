@@ -513,12 +513,14 @@ export function parseElements(nodes) {
 					break
 				}
 				x2++ // Iterate once past end
-				// const infoString = each.data.slice(3)
+				// https://github.github.com/gfm/#info-string
+				const info = each.data.slice(3)
 				parsed.push({
 					type: typeEnum.Preformatted,
 					id: nodes[x1].id,
 					syntax: [nodes[x1].data, nodes[x2 - 1].data],
-					extension: nodes[x1].data.slice(3).split(".").slice(-1)[0].toLowerCase(),
+					info,
+					extension: info.split(".").slice(-1)[0].toLowerCase(),
 					children: nodes.slice(x1, x2),
 				})
 				x = x2 - 1

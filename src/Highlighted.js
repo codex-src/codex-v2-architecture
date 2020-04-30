@@ -1,4 +1,4 @@
-import PrismExtensions from "PrismExtensions"
+import prismExtensions from "prismExtensions"
 import React from "react"
 
 // Performs syntax highlighting.
@@ -9,7 +9,7 @@ const Highlighted = React.memo(({ extension, children }) => {
 			// No-op
 			return
 		}
-		const parser = PrismExtensions[extension]
+		const parser = prismExtensions[extension]
 		if (!parser) {
 			// No-op
 			return

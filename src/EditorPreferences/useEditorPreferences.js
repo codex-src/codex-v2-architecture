@@ -6,19 +6,13 @@ import {
 	toReact_js,
 } from "Editor/cmap"
 
-// Maps renderModesEnum to language extensions.
-const extMap = {
-	[renderModesEnum.JSON]: "json",
-	[renderModesEnum.HTML]: "html",
-}
-
 function initialState(defaultRenderer) {
 	const state = {
 		readOnly: false,
 		showSidebar: false,
 		fontSize: 17,
 		renderMode: renderModesEnum[defaultRenderer],
-		extension: extMap[defaultRenderer] || "",
+		extension: "",
 		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
 		[renderModesEnum.React_js]: "",
@@ -80,7 +74,7 @@ const methods = state => ({
 			state.showSidebar = false
 		}
 		state.renderMode = renderModesEnum.React_js
-		state.extension = "html"
+		state.extension = "jsx"
 	},
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
