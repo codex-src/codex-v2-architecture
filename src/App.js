@@ -340,7 +340,7 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			if (!window.confirm("Do you want to download this file?")) {
+			if (!window.confirm("Save a copy of this file?")) {
 				// No-op
 				return
 			}
