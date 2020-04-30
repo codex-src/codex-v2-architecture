@@ -76,8 +76,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							.parentElement // <li>
 						each.onpointerdown = e => {
 							e.preventDefault()
+							document.activeElement.blur()
 						}
-						each.onclick = e => {
+						each.onclick = () => {
 							// document.getSelection().removeAllRanges()
 							// if (each.classList.contains("todo__checkbox--unchecked")) {
 							// 	each.classList.remove("todo__checkbox--unchecked", "bg-white", "shadow-hero")
@@ -87,7 +88,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							// 	each.classList.add("todo__checkbox--unchecked", "bg-white", "shadow-hero")
 							// }
 							// setTimeout(() => {
-								dispatch.toggleTodo(id)
+							dispatch.toggleTodo(id)
 							// }, 150)
 						}
 					}
