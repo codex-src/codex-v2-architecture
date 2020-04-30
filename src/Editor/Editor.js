@@ -76,7 +76,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							.parentElement // <li>
 						each.onpointerdown = e => {
 							e.preventDefault()
-							document.activeElement.blur()
+							// document.activeElement.blur()
 						}
 						each.onclick = () => {
 							// document.getSelection().removeAllRanges()
@@ -148,7 +148,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				clearTimeout(id)
 			}
 		}, [state, dispatch]),
-		[state.readOnly, state.reactVDOM],
+		[state.readOnly, state.data],
 	)
 
 	return (
