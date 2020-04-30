@@ -96,7 +96,7 @@ function parsePrism(code, extension) {
 	cmapHTML[typeEnum.StrongEmphasis]     = data => `<strong><em>${toInnerString(data.children, cmapHTML)}</em></strong>`
 	cmapHTML[typeEnum.Code]               = data => `<code>${toInnerString(data.children, cmapHTML)}</code>`
 	cmapHTML[typeEnum.Strikethrough]      = data => `<strike>${toInnerString(data.children, cmapHTML)}</strike>`
-	cmapHTML[typeEnum.Anchor]             = data => `<a href="${data.href}">${toInnerString(data.children, cmapHTML)}</a>`
+	cmapHTML[typeEnum.Anchor]             = data => `<a href="${data.href}" target="_blank" rel="noopener noreferrer">${toInnerString(data.children, cmapHTML)}</a>`
 	cmapHTML[typeEnum.Header]             = data => `<a href="#${data.hash}">\n\t<${data.tag} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapHTML)}\n\t</${data.tag}>\n</a>`
 	cmapHTML[typeEnum.Paragraph]          = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.BlockquoteItem]     = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
@@ -136,7 +136,7 @@ function parsePrism(code, extension) {
 	cmapReact_js[typeEnum.StrongEmphasis] = data => `<StrongEm>${toInnerString(data.children, cmapReact_js)}</StrongEm>`
 	cmapReact_js[typeEnum.Code]           = data => `<Code>${toInnerString(data.children, cmapReact_js)}</Code>`
 	cmapReact_js[typeEnum.Strikethrough]  = data => `<Strike>${toInnerString(data.children, cmapReact_js)}</Strike>`
-	cmapReact_js[typeEnum.Anchor]         = data => `<A href="${data.href}">${toInnerString(data.children, cmapReact_js)}</A>`
+	cmapReact_js[typeEnum.Anchor]         = data => `<a href="${data.href}" target="_blank" rel="noopener noreferrer">${toInnerString(data.children, cmapReact_js)}</a>`
 	cmapReact_js[typeEnum.Header]         = data => `<a href="#${data.hash}">\n\t<${data.tag.toUpperCase()} id="${data.hash}">\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</${data.tag.toUpperCase()}>\n</a>`
 	cmapReact_js[typeEnum.Paragraph]      = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
 	cmapReact_js[typeEnum.BlockquoteItem] = data => `<P>\n\t${toInnerString(data.children, cmapReact_js)}\n</P>`
