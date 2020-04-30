@@ -1,5 +1,6 @@
 import Button from "Button"
 import DocumentTitle from "DocumentTitle"
+import download from "download"
 import Editor from "Editor/Editor"
 import Highlighted from "Highlighted"
 import raw from "raw.macro"
@@ -73,11 +74,11 @@ const FixedEditorPreferences = ({
 						>
 							Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
 						</Button>
-			 			<Button
+						<Button
 							className="p-2 flex flex-row items-center font-medium text-xs underline"
-			 				onClick={dispatch.zoomOut}
-			 			>
-			 				Zoom Out
+							onClick={dispatch.zoomOut}
+						>
+							Zoom Out
 							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧-) */}
 							<svg
 								className="ml-1 w-4 h-4"
@@ -90,12 +91,12 @@ const FixedEditorPreferences = ({
 							>
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
 							</svg>
-			 			</Button>
-			 			<Button
+						</Button>
+						<Button
 							className="p-2 flex flex-row items-center font-medium text-xs underline"
-			 				onClick={dispatch.zoomIn}
-			 			>
-			 				Zoom In
+							onClick={dispatch.zoomIn}
+						>
+							Zoom In
 							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧+) */}
 							<svg
 								className="ml-1 w-4 h-4"
@@ -109,13 +110,13 @@ const FixedEditorPreferences = ({
 								{/* <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path> */}
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
 							</svg>
-			 			</Button>
-			 			<Button
+						</Button>
+						<Button
 							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.resetZoom}
-			 			>
-			 				Reset Zoom
-			 			</Button>
+							onClick={dispatch.resetZoom}
+						>
+							Reset Zoom
+						</Button>
 						<div
 							className="p-2 flex flex-row items-center transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
@@ -146,24 +147,24 @@ const FixedEditorPreferences = ({
 						>
 							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
 						</Button>
-			 			<Button
+						<Button
 							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.showReadme}
-			 			>
-			 				Readme (Esc)
-			 			</Button>
-			 			<Button
+							onClick={dispatch.showReadme}
+						>
+							Readme (Esc)
+						</Button>
+						<Button
 							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.showHTML}
-			 			>
-			 				HTML
-			 			</Button>
-			 			<Button
+							onClick={dispatch.showHTML}
+						>
+							HTML
+						</Button>
+						<Button
 							className="p-2 font-medium text-xs underline"
-			 				onClick={dispatch.showReact_js}
-			 			>
-			 				React JSX
-			 			</Button>
+							onClick={dispatch.showReact_js}
+						>
+							React JSX
+						</Button>
 					</div>
 
 				</div>
@@ -317,16 +318,19 @@ const App = () => {
 	const [editorState, editorStateDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
+	const [title, setTitle] = React.useState("")
+	const [statusLHS, setStatusLHS] = React.useState("")
+	const [statusRHS, setStatusRHS] = React.useState("")
+
 	// Save status:
 	//
 	// 0 - Unsaved
 	// 1 - Saving
-	// 2 - Saved (check)
-	// 3 - Saved (check) -- hidden
+	// 2 - Saved
+	// 3 - Saved -- hidden
 	//
 	const [saveStatus, setSaveStatus] = React.useState(0)
 
-	// TODO: Download a copy of editorState.data
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
@@ -334,12 +338,13 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
+			download(`${title}.md`, new Blob([editorState.data, "\n"]))
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [])
+	}, [editorState.data, title])
 
 	// Show table of contents:
 	//
@@ -393,8 +398,6 @@ const App = () => {
 		}
 	}, [editorState.data])
 
-	const [title, setTitle] = React.useState("")
-
 	React.useEffect(() => {
 		const id = setTimeout(() => {
 			const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
@@ -417,14 +420,10 @@ const App = () => {
 		}
 	}, [editorState])
 
-	const [statusLHS, setStatusLHS] = React.useState("")
-
 	React.useEffect(() => {
 		const statusLHS = computeStatusLHS(editorState)
 		setStatusLHS(statusLHS)
 	}, [editorState])
-
-	const [statusRHS, setStatusRHS] = React.useState("")
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
