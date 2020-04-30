@@ -120,8 +120,6 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 		if (!parser) {
 			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
-		// TODO: Move to parser? Moving syntax highlighting to
-		// parser (possibly) breaks cmap
 		const data = range.map(each => each.data).join("\n")
 		const __html = window.Prism.highlight(data, parser, extension)
 		return __html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
@@ -156,13 +154,12 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	)
 })
 
-// Describes a list item; <li>.
 export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	const style = { marginLeft: "1ch" }
 	return (
 		<Node tag={tag} id={id} className="my-2" style={style}>
-			<span className="hidden">{tabs}</span>
-			<Markdown className="hidden" syntax={syntax}>
+			{/* <span className="hidden">{tabs}</span> */}
+			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
 				{toReact(children) || (
 					<br />
 				)}
@@ -177,7 +174,7 @@ const Todo = ({ checked }) => {
 		borderRadius: "0.3125em",
 	}
 	return (
-		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} tabIndex="0">
+		<span className={`-mt-px inline-block align-middle w-4 h-4 ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded focus:outline-none select-none`} style={style} onClick={() => console.log("test")} tabIndex="0">
 			<svg fill="#fff" viewBox="0 0 16 16">
 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 			</svg>
@@ -192,8 +189,8 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	}
 	return (
 		<Node tag={tag} id={id} className="todo relative my-2" style={style}>
-			<span className="hidden">{tabs}</span>
-			<Markdown className="hidden" syntax={syntax}>
+			{/* <span className="hidden">{tabs}</span> */}
+			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
 				<div className="absolute">
 					<Todo checked={checked} />
 				</div>
@@ -205,7 +202,6 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	)
 })
 
-// Describes any list; <ul> or <ol>.
 export const AnyList = React.memo(({ type, tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node
 	return (

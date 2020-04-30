@@ -9,10 +9,9 @@ export const UnorderedListRe = /^(\t*)([\-\*] )/
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
 export function parseAnyList(range) {
-	let tag = UnorderedListRe.test(range[0].data) ? "ul" : "ol"
 	const result = {
 		type: typeEnum.AnyList,
-		tag,
+		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",
 		id: range[0].id,
 		tabs: "",
 		children: [],
@@ -23,10 +22,9 @@ export function parseAnyList(range) {
 		let ref = result.children
 		for (let x = 0; x < tabs.length; x++) {
 			if (!ref.length || ref[ref.length - 1].type !== typeEnum.AnyList) {
-				tag = UnorderedListRe.test(each.data) ? "ul" : "ol"
 				ref.push({
 					type: typeEnum.AnyList,
-					tag,
+					tag: UnorderedListRe.test(each.data) ? "ul" : "ol",
 					id: each.id,
 					tabs: "\t".repeat(x + 1), // Eagerly increment
 					children: [],

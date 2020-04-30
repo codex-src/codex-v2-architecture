@@ -1,3 +1,7 @@
+import React from "react"
+import ReactDOM from "react-dom"
+import renderDOM from "renderDOM"
+
 // // Naively syncs two trees.
 // function naiveSyncTrees(dst, src) {
 // 	removeRange()
@@ -23,7 +27,7 @@ function removeRange() {
 // are not synced.
 //
 // TODO: Reduce mutations from 2 to 1 for the 90% case
-function syncDOM(src, dst) {
+function syncDOM(src, dst, reactElements) {
 	let mutations = 0
 	// Iterate forwards (before replaceWith):
 	let start = 0
@@ -34,7 +38,12 @@ function syncDOM(src, dst) {
 				removeRange()
 			}
 			const newNode = src.childNodes[start].cloneNode(true)
+			// console.log(reactElements[start])
+			const Component = reactElements[start]
+			console.log(renderDOM([Component]))
 			dst.childNodes[start].replaceWith(newNode)
+			// ReactDOM.render(reactVDOM[start], dst.childNodes[start])
+			// console.log(renderDOM(React.createElement(reactVDOM[start])))
 			mutations++
 			start++ // Eagerly increment
 			break
