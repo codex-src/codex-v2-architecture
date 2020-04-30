@@ -129,7 +129,7 @@ function parsePrism(code, extension) {
 	cmapHTML[typeEnum.BlockquoteItem]     = data => `<p>\n\t${toInnerString(data.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.Blockquote]         = data => `<blockquote>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
 	// cmapHTML[typeEnum.Preformatted]    = data => `<pre${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML)}<!--\n--></code></pre>`
-	cmapHTML[typeEnum.Preformatted]       = data => `<pre${!data.extension ? "" : ` class="language-${data.extension.toLowerCase()}"`}><code><!--\n-->${parsePrism(data.children.slice(1, -1).map(each => each.data).join("\n"), data.extension)}<!--\n--></code></pre>`
+	cmapHTML[typeEnum.Preformatted]       = data => `<pre${!data.extension ? "" : ` class="language-${data.extension.toLowerCase().replace("\"", "\\\"")}"`}><code><!--\n-->${parsePrism(data.children.slice(1, -1).map(each => each.data).join("\n"), data.extension)}<!--\n--></code></pre>`
 	cmapHTML[typeEnum.AnyListItem]        = data => `<li>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.TodoItem]           = data => `<li>\n\t<input type="checkbox"${!data.checked.value ? "" : " checked"}>\n\t${toInnerString(data.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.AnyList]            = data => `<${data.tag}>${`\n${toString(data.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${data.tag}>`
