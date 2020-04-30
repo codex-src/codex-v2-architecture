@@ -1,6 +1,7 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "encoding/utf8"
 import useMethods from "use-methods"
+import { AnyListRe } from "./parseAnyList"
 import { parseElements } from "./parser"
 
 import {
@@ -366,8 +367,15 @@ const methods = state => ({
 
 	// Toggles a todo (checkbox).
 	toggleTodo(id) {
+		state.focused = false
 		const node = state.nodes.find(each => each.id === id)
-		console.log({ ...node })
+		const [, tabs, syntax] = node.data.match(AnyListRe)
+		if (syntax === "- [ ] ") {
+			node.data = `${tabs}- [x] ${node.data.slice((tabs + syntax).length)}`
+		} else {
+			node.data = `${tabs}- [ ] ${node.data.slice((tabs + syntax).length)}`
+		}
+		this.render()
 	},
 
 	// Cuts character data.

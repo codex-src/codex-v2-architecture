@@ -104,10 +104,11 @@
 
 .codex-editor ul > li .todo__checkbox:focus,
 .codex-editor ol > li .todo__checkbox:focus {
+  border-color: #a4cafe;
   outline: none;
   box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
-  border-color: #a4cafe;
 }
+/* TODO: Remove :focus? */
 .codex-editor ul > li .todo__checkbox--checked:focus,
 .codex-editor ol > li .todo__checkbox--checked:focus {
   border-color: transparent;

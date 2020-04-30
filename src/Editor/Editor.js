@@ -74,12 +74,21 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						const { id } = each
 							.parentElement // <div class="absolute">
 							.parentElement // <li>
-							.parentElement // <ul>
-						each.onclick = () => {
-							each.focus()
-							console.log(id)
-							// console.log(`id=${each.getAttribute("data-codex-todo")}`)
-							// dispatch.toggleTodo(each.getAttribute("data-codex-todo"))
+						each.onpointerdown = e => {
+							e.preventDefault()
+						}
+						each.onclick = e => {
+							// document.getSelection().removeAllRanges()
+							// if (each.classList.contains("todo__checkbox--unchecked")) {
+							// 	each.classList.remove("todo__checkbox--unchecked", "bg-white", "shadow-hero")
+							// 	each.classList.add("todo__checkbox--checked", "bg-md-blue-a200", "shadow")
+							// } else {
+							// 	each.classList.remove("todo__checkbox--checked", "bg-md-blue-a200", "shadow")
+							// 	each.classList.add("todo__checkbox--unchecked", "bg-white", "shadow-hero")
+							// }
+							// setTimeout(() => {
+								dispatch.toggleTodo(id)
+							// }, 150)
 						}
 					}
 				})
