@@ -80,6 +80,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						}
 						each.onclick = () => {
 							// document.getSelection().removeAllRanges()
+							// each.focus()
 							// if (each.classList.contains("todo__checkbox--unchecked")) {
 							// 	each.classList.remove("todo__checkbox--unchecked", "bg-white", "shadow-hero")
 							// 	each.classList.add("todo__checkbox--checked", "bg-md-blue-a200", "shadow")

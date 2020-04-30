@@ -367,6 +367,7 @@ const methods = state => ({
 
 	// Toggles a todo (checkbox).
 	toggleTodo(id) {
+		this.mutate()
 		// state.focused = false
 		const node = state.nodes.find(each => each.id === id)
 		const [, tabs, syntax] = node.data.match(AnyListRe)

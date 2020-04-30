@@ -178,6 +178,7 @@ const Todo = ({ id, checked }) => {
 	}
 	return (
 		// focus:outline-none select-none
+		// <input className="form-checkbox" type="checkbox" checked={checked} />
 		<span
 			// FIXME: Formatting?
 			className={
