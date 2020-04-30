@@ -256,26 +256,26 @@ function computeContents(reactVDOM) {
 }
 
 // Computes the LHS status string.
-function computeStatusLHS(editor) {
+function computeStatusLHS(editorState) {
 	const lhs = ((chars, lines) => {
-		if (editor.pos1.pos === editor.pos2.pos) {
-			// if (!editor.focused) {
+		if (editorState.pos1.pos === editorState.pos2.pos) {
+			// if (!editorState.focused) {
 			// 	return "" // "No selection"
 			// }
-			return `Line ${format(editor.pos1.y + 1)}, column ${format(editor.pos1.x + 1)}`
+			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
 		} else {
-			// if (!editor.focused) {
+			// if (!editorState.focused) {
 			// 	return "" // "No selection"
 			// }
 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
 		}
-	})(editor.pos2.pos - editor.pos1.pos, editor.pos2.y - editor.pos1.y + 1)
+	})(editorState.pos2.pos - editorState.pos1.pos, editorState.pos2.y - editorState.pos1.y + 1)
 	return lhs
 }
 
 // Computes the RHS status string.
-function computeStatusRHS(editor) {
-	const str = toText(editor.reactVDOM)
+function computeStatusRHS(editorState) {
+	const str = toText(editorState.reactVDOM)
 	const metadata = {
 		words: str.split(/\s+/).filter(Boolean).length,
 		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute
@@ -314,7 +314,7 @@ function format(n) {
 
 const App = () => {
 	// TODO: Use props.children not useEditor?
-	const [editor, editorDispatch] = useEditor(data)
+	const [editorState, editorStateDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
 	// Save status:
@@ -326,6 +326,7 @@ const App = () => {
 	//
 	const [saveStatus, setSaveStatus] = React.useState(0)
 
+	// TODO: Download a copy of editorState.data
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
@@ -333,7 +334,6 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			// setSaveStatus(1) // TODO
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
@@ -379,7 +379,7 @@ const App = () => {
 		const ids = []
 		ids.push(setTimeout(() => {
 			// Debounce localStorage 100ms:
-			const json = JSON.stringify({ data: editor.data })
+			const json = JSON.stringify({ data: editorState.data })
 			localStorage.setItem(LOCALSTORAGE_KEY, json)
 			ids.push(setTimeout(() => {
 				setSaveStatus(2)
@@ -391,44 +391,44 @@ const App = () => {
 		return () => {
 			[...ids].reverse().map(each => clearTimeout(each))
 		}
-	}, [editor.data])
+	}, [editorState.data])
 
 	const [title, setTitle] = React.useState("")
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			const title = toText(editor.reactVDOM.slice(0, 1)).split("\n", 1)[0]
+			const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
 			setTitle(title)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor])
+	}, [editorState])
 
-	const [contents, setContents] = React.useState(() => computeContents(editor.reactVDOM))
+	const [contents, setContents] = React.useState(() => computeContents(editorState.reactVDOM))
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			const contents = computeContents(editor.reactVDOM)
+			const contents = computeContents(editorState.reactVDOM)
 			setContents(contents)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor])
+	}, [editorState])
 
 	const [statusLHS, setStatusLHS] = React.useState("")
 
 	React.useEffect(() => {
-		const statusLHS = computeStatusLHS(editor)
+		const statusLHS = computeStatusLHS(editorState)
 		setStatusLHS(statusLHS)
-	}, [editor])
+	}, [editorState])
 
 	const [statusRHS, setStatusRHS] = React.useState("")
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {
-			const statusRHS = computeStatusRHS(editor)
+			const statusRHS = computeStatusRHS(editorState)
 			setStatusRHS(statusRHS)
 		// NOTE: Do not use more than ~16.67ms -- breaks fade
 		// effect
@@ -436,14 +436,14 @@ const App = () => {
 		return () => {
 			clearTimeout(id)
 		}
-	}, [editor])
+	}, [editorState])
 
 	// Sets renderers (debounced).
 	const mounted2 = React.useRef()
 	React.useEffect(() => {
 		if (!mounted2.current) {
 			mounted2.current = true
-			editorPrefsDispatch.update(editor)
+			editorPrefsDispatch.update(editorState)
 			return
 		}
 		if (!editorPrefs.showSidebar) {
@@ -451,14 +451,14 @@ const App = () => {
 			return
 		}
 		const id = setTimeout(() => {
-			editorPrefsDispatch.update(editor)
+			editorPrefsDispatch.update(editorState)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}
 	}, [
 		// Logically sorted:
-		editor,
+		editorState,
 		editorPrefs.showSidebar,
 		editorPrefsDispatch,
 	])
@@ -471,7 +471,7 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			editorDispatch.toggleReadOnly()
+			editorStateDispatch.toggleReadOnly()
 			editorPrefsDispatch.toggleReadOnly()
 		}
 		document.addEventListener("keydown", handler)
@@ -480,7 +480,7 @@ const App = () => {
 		}
 	}, [
 		// Logically sorted:
-		editorDispatch,
+		editorStateDispatch,
 		editorPrefsDispatch,
 	])
 
@@ -624,8 +624,8 @@ const App = () => {
 							fontSize: editorPrefs.fontSize,
 							// lineHeight: 1.625,
 						}}
-						state={editor}
-						dispatch={editorDispatch}
+						state={editorState}
+						dispatch={editorStateDispatch}
 						readOnly={editorPrefs.readOnly}
 						autoFocus={!data.length}
 					/>
@@ -635,7 +635,7 @@ const App = () => {
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
 					// omit transition-timing-function
-					show={!editor.readOnly}
+					show={!editorState.readOnly}
 					enter="transition duration-200"
 					enterFrom="opacity-0"
 					enterTo="opacity-100"
