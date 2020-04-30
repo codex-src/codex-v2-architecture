@@ -48,8 +48,9 @@ const FixedEditorPreferences = ({
 	}, [])
 
 	return (
-		// NOTE: Use flex flex-col because of the sidebar
-		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
+		// NOTE (1): Use flex flex-col because of the sidebar
+		// NOTE (2): How to use translate-z?
+		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none translate-z">
 
 			{/* Preferences */}
 			<Transition
@@ -64,7 +65,7 @@ const FixedEditorPreferences = ({
 				leaveFrom="bg-white shadow-hero"
 				leaveTo="bg-transparent shadow-none"
 			>
-				<div className="-mx-4 px-2 relative flex-shrink-0 flex flex-row justify-between translate-z">
+				<div className="-mx-4 px-2 relative flex-shrink-0 flex flex-row justify-between">
 
 					{/* LHS */}
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
