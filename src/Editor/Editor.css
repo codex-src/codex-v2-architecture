@@ -101,3 +101,23 @@
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
+
+.codex-editor ul > li .todo__checkbox:focus,
+.codex-editor ol > li .todo__checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
+  border-color: #a4cafe;
+}
+.codex-editor ul > li .todo__checkbox--checked:focus,
+.codex-editor ol > li .todo__checkbox--checked:focus {
+  border-color: transparent;
+}
+/* .codex-editor ul > li .todo--checked, */
+/* .codex-editor ol > li .todo--checked { */
+/*   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z'/%3E%3C/svg%3E"); */
+/*   border-color: transparent; */
+/*   background-color: currentColor; */
+/*   background-size: 100% 100%; */
+/*   background-position: 50%; */
+/*   background-repeat: no-repeat; */
+/* } */

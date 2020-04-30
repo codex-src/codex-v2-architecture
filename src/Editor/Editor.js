@@ -68,12 +68,18 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
-					const elements = clonedElement.querySelectorAll("[data-codex-todo]")
+					const elements = clonedElement.querySelectorAll(".todo__checkbox")
 					for (const each of elements) {
 						// TODO: Use onpointerdown or equivalent?
+						const { id } = each
+							.parentElement // <div class="absolute">
+							.parentElement // <li>
+							.parentElement // <ul>
 						each.onclick = () => {
+							each.focus()
+							console.log(id)
 							// console.log(`id=${each.getAttribute("data-codex-todo")}`)
-							dispatch.toggleTodo(each.getAttribute("data-codex-todo"))
+							// dispatch.toggleTodo(each.getAttribute("data-codex-todo"))
 						}
 					}
 				})

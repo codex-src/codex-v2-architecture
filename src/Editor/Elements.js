@@ -174,11 +174,24 @@ const Todo = ({ id, checked }) => {
 			borderRadius: "0.3125em",
 		},
 		tabIndex: "0",
-		"data-codex-todo": id,
 	}
 	return (
 		// focus:outline-none select-none
-		<span className={`-mt-px inline-block w-4 h-4 align-middle ${!checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"} rounded`} {...attrs}>
+		<span
+			// FIXME: Formatting?
+			className={
+				`todo__checkbox ${
+					!checked
+						? "todo__checkbox--unchecked"
+						: "todo__checkbox--checked"
+				} -mt-px inline-block w-4 h-4 align-middle ${
+					!checked
+						? "bg-white shadow-hero"
+						: "bg-md-blue-a200 shadow"
+				} focus:shadow transition duration-150` // rounded
+			}
+			{...attrs}
+		>
 			<svg fill="#fff" viewBox="0 0 16 16">
 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 			</svg>
