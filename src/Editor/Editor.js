@@ -41,20 +41,20 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
 
-	// // Registers props.
-	// const mountedProps = React.useRef()
-	// React.useLayoutEffect(() => {
-	// 	// console.log({ readOnly, autoFocus })
-	// 	if (!mountedProps.current) {
-	// 		mountedProps.current = true
-	// 		dispatch.registerProps({
-	// 			readOnly,
-	// 			focused: autoFocus,
-	// 		})
-	// 		return
-	// 	}
-	// 	dispatch.registerProps({ readOnly })
-	// }, [readOnly, autoFocus, dispatch])
+	// Registers props.
+	const mountedProps = React.useRef()
+	React.useLayoutEffect(() => {
+		// console.log({ readOnly, autoFocus })
+		if (!mountedProps.current) {
+			mountedProps.current = true
+			dispatch.registerProps({
+				readOnly,
+				focused: autoFocus,
+			})
+			return
+		}
+		dispatch.registerProps({ readOnly })
+	}, [readOnly, autoFocus, dispatch])
 
 	// Renders to the DOM.
 	const mountedDOM = React.useRef()
