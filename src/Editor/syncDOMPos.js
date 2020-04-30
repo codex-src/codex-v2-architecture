@@ -2,6 +2,9 @@ import computePosRange from "./computePosRange"
 import { newRange } from "./constructors"
 
 // Computes a range data strucutre (based on pos.pos).
+//
+// TODO: Can we use document.getElementByID and computeRange
+// off of the data-codex-node or data-codex-root element?
 function computeRange(editorRoot, { pos }) {
 	const range = newRange()
 	const recurse = on => {
@@ -25,13 +28,13 @@ function computeRange(editorRoot, { pos }) {
 		return false
 	}
 	recurse(editorRoot)
-	// TODO: Error on empty ranges?
 	return range
 }
 
 // Synchronizes DOM cursors.
 function syncDOMPos(editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
+	// https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
 	// if (!selection.rangeCount) {
 	// 	// No-op; defer to end
 	// } else {
