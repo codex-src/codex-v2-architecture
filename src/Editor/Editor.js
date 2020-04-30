@@ -76,7 +76,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							.parentElement // <li>
 						each.onpointerdown = e => {
 							e.preventDefault()
-							// document.activeElement.blur()
+							document.activeElement.blur()
 						}
 						each.onclick = () => {
 							// document.getSelection().removeAllRanges()
