@@ -44,6 +44,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	// // Registers props.
 	// const mountedProps = React.useRef()
 	// React.useLayoutEffect(() => {
+	// 	// console.log({ readOnly, autoFocus })
 	// 	if (!mountedProps.current) {
 	// 		mountedProps.current = true
 	// 		dispatch.registerProps({
@@ -61,21 +62,23 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 		React.useCallback(() => {
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
-				const mutations = syncDOM(state.reactDOM, ref.current)
+				/* const mutations = */ syncDOM(state.reactDOM, ref.current)
 				if (!mountedDOM.current || state.readOnly || !state.focused) {
 					mountedDOM.current = true
 					return
 				}
-				if (mutations) {
-					const s = mutations === 1 ? "" : "s"
-					console.log(`synced dom: ${mutations} mutation${s}`)
-				}
+
+				// if (mutations) {
+				// 	const s = mutations === 1 ? "" : "s"
+				// 	console.log(`synced dom: ${mutations} mutation${s}`)
+				// }
+
 				// Sync DOM cursors:
 				try {
-					const syncedPos = syncDOMPos(ref.current, [state.pos1, state.pos2])
-					if (syncedPos) {
-						console.log("synced pos")
-					}
+					/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
+					// if (syncedPos) {
+					// 	console.log("synced pos")
+					// }
 				} catch (error) {
 					console.error(error)
 					return

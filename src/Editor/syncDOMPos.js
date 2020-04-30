@@ -32,14 +32,14 @@ function computeRange(editorRoot, { pos }) {
 // Synchronizes DOM cursors.
 function syncDOMPos(editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
-	if (!selection.rangeCount) {
-		// No-op; defer to end
-	} else {
-		const [domPos1, domPos2] = computePosRange(editorRoot)
-		if (domPos1.pos === pos1.pos && domPos2.pos === pos2.pos) {
-			return false
-		}
-	}
+	// if (!selection.rangeCount) {
+	// 	// No-op; defer to end
+	// } else {
+	// 	const [domPos1, domPos2] = computePosRange(editorRoot)
+	// 	if (domPos1.pos === pos1.pos && domPos2.pos === pos2.pos) {
+	// 		return false
+	// 	}
+	// }
 	const r1 = computeRange(editorRoot, pos1)
 	let r2 = { ...r1 }
 	if (pos2.pos !== pos1.pos) {
