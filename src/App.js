@@ -30,8 +30,8 @@ const FixedEditorPreferences = ({
 	saveStatusState: [saveStatus, setSaveStatus],
 	showContentsState: [showContents, setShowContents],
 	titleState: [title, setTitle],
-	state,
-	dispatch,
+	editorState: [editorState, editorStateDispatch], // TODO: Remove
+	editorPrefs: [editorPrefs, editorPrefsDispatch],
 }) => {
 
 	const [y, setY] = React.useState(window.scrollY)
@@ -76,10 +76,9 @@ const FixedEditorPreferences = ({
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xs underline"
-							onClick={dispatch.zoomOut}
+							onClick={editorPrefsDispatch.zoomOut}
 						>
 							Zoom Out
-							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧-) */}
 							<svg
 								className="ml-1 w-4 h-4"
 								fill="none"
@@ -94,10 +93,9 @@ const FixedEditorPreferences = ({
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xs underline"
-							onClick={dispatch.zoomIn}
+							onClick={editorPrefsDispatch.zoomIn}
 						>
 							Zoom In
-							{/* ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}⇧+) */}
 							<svg
 								className="ml-1 w-4 h-4"
 								fill="none"
@@ -113,7 +111,7 @@ const FixedEditorPreferences = ({
 						</Button>
 						<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.resetZoom}
+							onClick={editorPrefsDispatch.resetZoom}
 						>
 							Reset Zoom
 						</Button>
@@ -143,25 +141,29 @@ const FixedEditorPreferences = ({
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
 						<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.toggleReadOnly}
+							onClick={() => {
+								// FIXME
+								editorStateDispatch.toggleReadOnly()
+								editorPrefsDispatch.toggleReadOnly()
+							}}
 						>
 							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
 						</Button>
 						<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.showReadme}
+							onClick={editorPrefsDispatch.showReadme}
 						>
 							Readme (Esc)
 						</Button>
 						<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.showHTML}
+							onClick={editorPrefsDispatch.showHTML}
 						>
 							HTML
 						</Button>
 						<Button
 							className="p-2 font-medium text-xs underline"
-							onClick={dispatch.showReact_js}
+							onClick={editorPrefsDispatch.showReact_js}
 						>
 							React JSX
 						</Button>
@@ -173,7 +175,7 @@ const FixedEditorPreferences = ({
 			{/* Sidebar */}
 			<div className="flex-shrink-0 h-4" />
 			<Transition
-				show={state.showSidebar}
+				show={editorPrefs.showSidebar}
 				enter="transition ease-out duration-300"
 				enterFrom="transform opacity-0 translate-x-32"
 				enterTo="transform opacity-100 translate-x-0"
@@ -182,13 +184,13 @@ const FixedEditorPreferences = ({
 				leaveTo="transform opacity-0 translate-x-32"
 			>
 				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-					{state.renderMode === renderModesEnum.Readme ? (
-						<ReadmeEditor readOnly={state.readOnly} />
+					{editorPrefs.renderMode === renderModesEnum.Readme ? (
+						<ReadmeEditor readOnly={editorPrefs.readOnly} />
 					) : (
 						<span className="inline-block">
 							<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-								<Highlighted extension={state.extension}>
-									{state[state.renderMode]}
+								<Highlighted extension={editorPrefs.extension}>
+									{editorPrefs[editorPrefs.renderMode]}
 								</Highlighted>
 							</pre>
 						</span>
@@ -512,8 +514,8 @@ const App = () => {
 				saveStatusState={[saveStatus, setSaveStatus]}
 				showContentsState={[showContents, setShowContents]}
 				titleState={[title, setTitle]}
-				state={editorPrefs}
-				dispatch={editorPrefsDispatch}
+				editorState={[editorState, editorStateDispatch]}
+				editorPrefs={[editorPrefs, editorPrefsDispatch]}
 			/>
 
 			{/* LHS */}
