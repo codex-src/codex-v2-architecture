@@ -2,36 +2,27 @@
 
 > 👋 This is an _interactive_ readme; type to make changes!
 
-**Codex is a new WYSIWYG markdown editor for developers.** Codex is based on GFM, that is, [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown) meaning your can format words using special syntax characters. This also means you can copy notes in-and-out of the Codex editor and never loose formatting. ✨
+**Codex is a markdown editor for devs.** Codex is based on GitHub Flavored Markdown, meaning you can format notes using special _syntax_ characters. This also means when you copy text, you _never_ loose formatting. ✨
 
-As you type, your note is saved to localStorage. This means you can refresh the page and your changes will persist. Note that this _doesn’t_ apply to the interactive readme.
+**Your note is saved to localStorage.** This means when you refresh the page, your changes persist. Soon, Codex will be developed into web app that syncs to the cloud. ☁️
 
-## Inline elements:
+### Inline elements
 
-You can format your note using the following syntax characters: `_` or `*` for _italics_ or *italics*, `**` for **bold** and `***` for ***bold and italics***.
+- _Italics_ or *italics*
+- **Bold**
+- ***Bold and italics***
+- `Code` or ~code~
+- ~~Strikethrough~~
+- [Link](https://google.com)
+- https://google.com
 
-You can use ~`~ or `~` for `code` or ~code~, `~~` for ~~strikethrough~~, and `[link](url)` for [links](https://google.com). You can also use `https://` to delimit a naked link. For example: https://google.com.
+### Blockquotes
 
-## Block elements:
+> The Ultimate Answer to Life, The Universe and Everything is...
+>
+> …42!
 
-You can use any of the following to create a **header**:
-
-- `# ` for an H1 header
-- `## ` for an H2 header
-- `### ` for an H3 header
-- `#### ` H4
-- `##### ` H5
-- `###### ` H6
-
-You can use `> ` to create a blockquote. Blockquotes can also be multiline — use `>` (without a space) for empty lines.
-
-For example:
-
-> This is what a blockquote looks like.
-
-You can use ~```~ for code blocks. To add syntax highlighting, simply add a filename or the extension of the language you want to highlight. _Most_ languages are supported.
-
-For example:
+### Code blocks
 
 ```main.go
 package main
@@ -43,33 +34,39 @@ func main() {
 }
 ```
 
-You can add _many_ kinds of lists using the following syntax:
+Syntax highlighting is supported for all of the following languages (you can use a filename, like `main.go`, or just the extension, like `go`):
 
-- `- ` for **unordered** lists.
-- `1. ` (any number works) for **ordered** lists.
+```
+bash c cpp css d diff docker dockerfile git go graphql htm html http js json jsx kotlin php py rb ruby rust sass sh sql svg swift ts tsx wasm xml yaml yml
+```
+
+### Lists
+
+Use `- ` or `* ` for unordered lists:
+
+- Yo, I heard you like unordered lists
+	- So I put an unordered list inside of an unordered list 😎
+
+You can also use `1. ` (or any number) for ordered lists:
+
+1. This is a numbered list
+1. Numbered lists are auto-incremented for you
+1. Internally, ordered list items are as `1. `
 
 You can also use `- ` for unchecked checkboxes and `- [x]` for checked checkboxes.
 
-For example:
-
-- [ ] I’m unchecked.
-- [x] I’m checked!
-
-You can also arbitrarily nest lists (use `tab` to indent and `shift-tab` to detab).
-
-For example:
-
-**How to build a successful startup: 💡**
-
-- [x] ??!??!?
-	- [x] ?!!?
-		- [x] !?!?!
-	- [x] ?!?!
+- [x] ?!?!!?!?
+	- [x] ?!?!!!?!?
+		- [x] ???!?!?!!
+	- [x] !?!?!?!!
 - [ ] **PROFIT!!**
 
-You can add section breaks (think `<hr>`) using `---` or `***` on their own line:
+You can use `tab` and `shift-tab` to tab and detab lists.
+
+### Section breaks
+
+Use `---` or `***` to create section breaks:
 
 ---
-***
 
-Thank you for reading!
+***

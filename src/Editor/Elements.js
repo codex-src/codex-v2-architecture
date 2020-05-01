@@ -79,15 +79,18 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 	</Root>
 ))
 
-export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id} className="text-gray-600">
-		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</Node>
-))
+export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
+	const style = { marginRight: "1ch" }
+	return (
+		<Node id={id} className="text-gray-600">
+			<Markdown className="text-md-blue-a400" style={style} syntax={syntax}>
+				{toReact(children) || (
+					<br />
+				)}
+			</Markdown>
+		</Node>
+	)
+})
 
 export const Blockquote = React.memo(({ id, children: nodes }) => {
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }

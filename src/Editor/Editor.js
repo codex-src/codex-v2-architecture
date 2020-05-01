@@ -283,7 +283,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 						// Returns whether the start cursor is focused
 						// on a list item element e.g. <li>.
-						const isFocusedListItemElement = e => {
+						function isFocusedListItemElement() {
 							const selection = document.getSelection()
 							if (!selection.rangeCount) {
 								return false
@@ -311,8 +311,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						return
 					}
 					// Backspace paragraph:
-					//
-					// NOTE: Ordered by precedence
 					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
 						dispatch.backspaceParagraph()
