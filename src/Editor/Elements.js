@@ -165,40 +165,62 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
 	</Node>
 ))
 
+// // TODO: Add ReactDOM.hydrate
+// const Checkbox = ({ checked }) => {
+// 	const attrs = {
+// 		style: { borderRadius: "0.3125em" },
+// 		tabIndex: "0",
+// 	}
+// 	return (
+// 		<svg
+// 			className={
+// 				`todo__checkbox ${
+// 					!checked
+// 						? "todo__checkbox--unchecked"
+// 						: "todo__checkbox--checked"
+// 				} -mt-px inline-block w-4 h-4 align-middle ${
+// 					!checked
+// 						? "bg-white shadow-hero"
+// 						: "bg-md-blue-a200 shadow"
+// 				} focus:shadow`
+// 			}
+// 			fill="#fff"
+// 			viewBox="0 0 16 16"
+// 			{...attrs}
+// 		>
+// 			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+// 		</svg>
+// 	)
+// }
+
 // TODO: Add ReactDOM.hydrate
-const TodoCheckbox = ({ checked }) => {
-	const attrs = {
-		style: { borderRadius: "0.3125em" }, // Do not use rounded
-		tabIndex: "0",
-	}
-	return (
-		// transition duration-150
-		<svg
-			className={
-				`todo__checkbox ${
-					!checked
-						? "todo__checkbox--unchecked"
-						: "todo__checkbox--checked"
-				} -mt-px inline-block w-4 h-4 align-middle ${
-					!checked
-						? "bg-white shadow-hero"
-						: "bg-md-blue-a200 shadow"
-				} focus:shadow`
-			}
-			fill="#fff"
-			viewBox="0 0 16 16"
-			{...attrs}
-		>
-			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-		</svg>
-	)
-}
+const Checkbox = ({ checked }) => (
+	<svg
+		className={
+			`checkbox ${
+				!checked
+					? "checkbox--unchecked"
+					: "checkbox--checked"
+			} -mt-px inline-block w-4 h-4 align-middle ${
+				!checked
+					? "bg-white shadow-hero"
+					: "bg-md-blue-a200 shadow"
+			} focus:shadow transition duration-150` // rounded
+		}
+		style={{ borderRadius: "0.3125em" }}
+		tabIndex="0"
+		fill="#fff"
+		viewBox="0 0 16 16"
+	>
+		<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+	</svg>
+)
 
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => (
-	<Node tag={tag} id={id} className="todo__item relative my-2" style={checked && attrs.strike.style}>
+	<Node tag={tag} id={id} className="todo relative my-2" style={checked && attrs.strike.style}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
-				<TodoCheckbox checked={checked} />
+				<Checkbox checked={checked} />
 			</div>
 			{toReact(children) || (
 				<br />

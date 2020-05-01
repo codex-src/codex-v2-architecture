@@ -84,7 +84,7 @@
 /*
  * <ul>
  */
-.codex-editor ul > li:not(.todo__item):before  {
+.codex-editor ul > li:not(.todo):before  {
 	/* NOTE: Use -0.5ch not 1ch */
 	margin-left: calc(-0.5ch - 1.25em);
 	position: absolute;
@@ -95,10 +95,10 @@
 /*
  * <ol>
  */
-.codex-editor ol > li:not(.todo__item):first-of-type {
+.codex-editor ol > li:not(.todo):first-of-type {
 	counter-reset: count;
 }
-.codex-editor ol > li:not(.todo__item):before  {
+.codex-editor ol > li:not(.todo):before  {
 	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	counter-increment: count;
@@ -110,18 +110,18 @@
 /*
  * <TodoItem>
  */
-.codex-editor ul > li .todo__checkbox,
-.codex-editor ol > li .todo__checkbox {
+.codex-editor ul > li .checkbox,
+.codex-editor ol > li .checkbox {
 	margin-left: calc(-1ch - 1.25em);
 }
-.codex-editor ul > li .todo__checkbox:focus,
-.codex-editor ol > li .todo__checkbox:focus {
+.codex-editor ul > li .checkbox:focus,
+.codex-editor ol > li .checkbox:focus {
   border-color: #a4cafe;
   outline: none;
   box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
 }
 /* TODO: Remove :focus? */
-.codex-editor ul > li .todo__checkbox--checked:focus,
-.codex-editor ol > li .todo__checkbox--checked:focus {
+.codex-editor ul > li .checkbox--checked:focus,
+.codex-editor ol > li .checkbox--checked:focus {
   border-color: transparent;
 }

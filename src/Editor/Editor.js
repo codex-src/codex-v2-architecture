@@ -68,12 +68,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
-					const elements = clonedElement.querySelectorAll(".todo__checkbox")
-					for (const each of elements) {
-						// TODO: Use onpointerdown or equivalent?
+					const todos = clonedElement.querySelectorAll(".todo")
+					for (const each of todos) {
 						const { id } = each
-							.parentElement // <div class="absolute">
-							.parentElement // <li>
 						each.onpointerdown = e => {
 							e.preventDefault()
 							document.activeElement.blur()
@@ -88,9 +85,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							// 	each.classList.remove("todo__checkbox--checked", "bg-md-blue-a200", "shadow")
 							// 	each.classList.add("todo__checkbox--unchecked", "bg-white", "shadow-hero")
 							// }
-							// setTimeout(() => {
 							dispatch.toggleTodo(id)
-							// }, 150)
 						}
 					}
 				})
