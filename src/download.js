@@ -1,7 +1,6 @@
 import React from "react"
 import renderDOM from "renderDOM"
 
-// Immediately downloads a file (blob).
 function download(filename, blob, options) {
 	const href = window.URL.createObjectURL(blob, options)
 	// eslint-disable-next-line jsx-a11y/anchor-has-content

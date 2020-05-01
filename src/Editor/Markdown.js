@@ -25,7 +25,6 @@ const Syntax = ({ className, ...props }) => {
 	if (!props.children || readOnly) {
 		return null
 	}
-	// NOTE: className does not concatenate
 	return <span className={className === undefined ? "text-md-blue-a400" : className} {...props} />
 }
 

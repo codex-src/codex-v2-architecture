@@ -6,18 +6,18 @@ import Highlighted from "Highlighted"
 import raw from "raw.macro"
 import React from "react"
 import renderModesEnum from "EditorPreferences/renderModesEnum"
+import StatusBars from "./StatusBars"
 import Transition from "Transition"
 import typeEnum from "Editor/typeEnum"
 import useEditor from "Editor/useEditor"
 import useEditorPreferences from "EditorPreferences/useEditorPreferences"
+import useStatusBars from "./useStatusBars"
 import { isMetaOrCtrlKey } from "Editor/detect"
 
 import {
 	toInnerText,
 	toText,
 } from "Editor/cmap"
-
-import "./App.css"
 
 // document.body.classList.toggle("debug-css")
 
@@ -270,36 +270,36 @@ function computeContents(reactVDOM) {
 	return contents
 }
 
-// Computes the LHS status string.
-function computeStatusLHS(editorState) {
-	const lhs = ((chars, lines) => {
-		if (editorState.pos1.pos === editorState.pos2.pos) {
-			// if (!editorState.focused) {
-			// 	return "" // "No selection"
-			// }
-			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
-		} else {
-			// if (!editorState.focused) {
-			// 	return "" // "No selection"
-			// }
-			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
-		}
-	})(editorState.pos2.pos - editorState.pos1.pos, editorState.pos2.y - editorState.pos1.y + 1)
-	return lhs
-}
-
-// Computes the RHS status string.
-function computeStatusRHS(editorState) {
-	const str = toText(editorState.reactVDOM)
-	const metadata = {
-		words: str.split(/\s+/).filter(Boolean).length,
-		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute
-	}
-	const rhs = ((words, minutes) => {
-		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
-	})(metadata.words, metadata.minutes)
-	return rhs
-}
+// // Computes the LHS status string.
+// function computeStatusLHS(editorState) {
+// 	const lhs = ((chars, lines) => {
+// 		if (editorState.pos1.pos === editorState.pos2.pos) {
+// 			// if (!editorState.focused) {
+// 			// 	return "" // "No selection"
+// 			// }
+// 			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
+// 		} else {
+// 			// if (!editorState.focused) {
+// 			// 	return "" // "No selection"
+// 			// }
+// 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
+// 		}
+// 	})(editorState.pos2.pos - editorState.pos1.pos, editorState.pos2.y - editorState.pos1.y + 1)
+// 	return lhs
+// }
+//
+// // Computes the RHS status string.
+// function computeStatusRHS(editorState) {
+// 	const str = toText(editorState.reactVDOM)
+// 	const metadata = {
+// 		words: str.split(/\s+/).filter(Boolean).length,
+// 		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute
+// 	}
+// 	const rhs = ((words, minutes) => {
+// 		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
+// 	})(metadata.words, metadata.minutes)
+// 	return rhs
+// }
 
 // Returns a new scroll handler; scrolls to an ID.
 //
@@ -322,19 +322,14 @@ function newScrollHandler(e, id, hash) {
 	window.scrollTo(0, element.offsetTop - 128)
 }
 
-// Shorthand.
-function format(n) {
-	return n.toLocaleString("en")
-}
-
 const App = () => {
 	// TODO: Use props.children not useEditor?
 	const [editorState, editorStateDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
 	const [title, setTitle] = React.useState("")
-	const [statusLHS, setStatusLHS] = React.useState("")
-	const [statusRHS, setStatusRHS] = React.useState("")
+
+	const [statusLHS, statusRHS] = useStatusBars(editorState)
 
 	// Save status:
 	//
@@ -429,23 +424,6 @@ const App = () => {
 		const id = setTimeout(() => {
 			const contents = computeContents(editorState.reactVDOM)
 			setContents(contents)
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [editorState])
-
-	React.useEffect(() => {
-		const statusLHS = computeStatusLHS(editorState)
-		setStatusLHS(statusLHS)
-	}, [editorState])
-
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const statusRHS = computeStatusRHS(editorState)
-			setStatusRHS(statusRHS)
-		// NOTE: Do not use more than ~16.67ms -- breaks fade
-		// effect
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
@@ -632,10 +610,12 @@ const App = () => {
 				{/* Editor */}
 				<DocumentTitle title={title || "Untitled"}>
 					<Editor
-						className="transition-all duration-75"
+						// className="transition-all duration-75"
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
 							fontSize: editorPrefs.fontSize,
+							transitionProperty: "font-size",
+							// transitionDuration: "50ms",
 						}}
 						state={editorState}
 						dispatch={editorStateDispatch}
@@ -644,29 +624,7 @@ const App = () => {
 					/>
 				</DocumentTitle>
 
-				{/* Status bars */}
-				<Transition
-					// NOTE: Use duration-200 not duration-300 and
-					// omit transition-timing-function
-					show={!editorState.readOnly}
-					enter="transition duration-200"
-					enterFrom="opacity-0"
-					enterTo="opacity-100"
-					leave="transition duration-200"
-					leaveFrom="opacity-100"
-					leaveTo="opacity-0"
-				>
-					<div className="fixed inset-0 hidden xl:flex flex-row items-end pointer-events-none">
-						<div className="px-3 py-2 flex flex-row justify-between w-full">
-							<p className="font-medium text-xxs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
-								{statusLHS}
-							</p>
-							<p className="font-medium text-xxs pointer-events-auto" style={{ fontFeatureSettings: "'tnum'" }}>
-								{statusRHS}
-							</p>
-						</div>
-					</div>
-				</Transition>
+				<StatusBars editorState={[editorState, editorStateDispatch]} statusLHS={statusLHS} statusRHS={statusRHS} />
 
 			</div>
 

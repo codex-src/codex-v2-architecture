@@ -89,14 +89,14 @@ const methods = state => ({
 			// No-op
 			return
 		}
-		state.fontSize--
+		state.fontSize -= 2
 	},
 	zoomIn() {
 		if (state.fontSize >= defaultFontSize + 2) {
 			// No-op
 			return
 		}
-		state.fontSize++
+		state.fontSize += 2
 	},
 	resetZoom() {
 		state.fontSize = defaultFontSize
