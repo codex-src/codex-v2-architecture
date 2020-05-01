@@ -3,8 +3,8 @@ import DocumentTitle from "DocumentTitle"
 import download from "download"
 import Editor from "Editor/Editor"
 import Highlighted from "Highlighted"
-import raw from "raw.macro"
 import React from "react"
+import ReadmeEditor from "./ReadmeEditor"
 import renderModesEnum from "EditorPreferences/renderModesEnum"
 import StatusBars from "./StatusBars"
 import Transition from "Transition"
@@ -16,18 +16,6 @@ import useTitle from "./useTitle"
 import { isMetaOrCtrlKey } from "Editor/detect"
 
 // document.body.classList.toggle("debug-css")
-
-const ReadmeEditor = ({ readOnly }) => {
-	const [state, dispatch] = useEditor(raw("./Readme.md"))
-	return (
-		<Editor
-			style={{ fontSize: 15 }}
-			state={state}
-			dispatch={dispatch}
-			readOnly={readOnly}
-		/>
-	)
-}
 
 const FixedEditorPreferences = ({
 	saveStatusState: [saveStatus, setSaveStatus],
@@ -511,11 +499,10 @@ const App = () => {
 				{/* Editor */}
 				<DocumentTitle title={title || "Untitled"}>
 					<Editor
-						// className="transition-all duration-75"
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
 							fontSize: editorPrefs.fontSize,
-							transitionProperty: "font-size",
+							// transitionProperty: "font-size",
 							// transitionDuration: "50ms",
 						}}
 						state={editorState}
