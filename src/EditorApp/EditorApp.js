@@ -11,6 +11,7 @@ import Transition from "Transition"
 import typeEnum from "Editor/typeEnum"
 import useEditor from "Editor/useEditor"
 import useEditorPreferences from "EditorPreferences/useEditorPreferences"
+import useOutline from "./useOutline"
 import useStatusBars from "./useStatusBars"
 import { isMetaOrCtrlKey } from "Editor/detect"
 
@@ -228,79 +229,6 @@ const data = (() => {
 	return json.data
 })()
 
-// NOTE: h1 and h2 elements are considered primary headers;
-// h3 through h6 are considered secondary headers
-function computeContents(reactVDOM) {
-	const contents = []
-	const headers = reactVDOM.filter(each => each.type === typeEnum.Header)
-	for (const { tag, id, hash, children } of headers.slice(1)) {
-		switch (tag) {
-		case "h1":
-		case "h2":
-			contents.push({
-				id,
-				hash,
-				secondary: [],
-				children: toInnerText(children),
-			})
-			break
-		case "h3":
-		case "h4":
-		case "h5":
-		case "h6":
-			if (!contents.length || !contents[contents.length - 1].secondary) {
-				contents.push({
-					id: "",
-					hash: "",
-					secondary: [],
-					children: "",
-				})
-			}
-			contents[contents.length - 1].secondary.push({
-				id,
-				hash,
-				children: toInnerText(children),
-			})
-			break
-		default:
-			// No-op
-			break
-		}
-	}
-	return contents
-}
-
-// // Computes the LHS status string.
-// function computeStatusLHS(editorState) {
-// 	const lhs = ((chars, lines) => {
-// 		if (editorState.pos1.pos === editorState.pos2.pos) {
-// 			// if (!editorState.focused) {
-// 			// 	return "" // "No selection"
-// 			// }
-// 			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
-// 		} else {
-// 			// if (!editorState.focused) {
-// 			// 	return "" // "No selection"
-// 			// }
-// 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`
-// 		}
-// 	})(editorState.pos2.pos - editorState.pos1.pos, editorState.pos2.y - editorState.pos1.y + 1)
-// 	return lhs
-// }
-//
-// // Computes the RHS status string.
-// function computeStatusRHS(editorState) {
-// 	const str = toText(editorState.reactVDOM)
-// 	const metadata = {
-// 		words: str.split(/\s+/).filter(Boolean).length,
-// 		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute
-// 	}
-// 	const rhs = ((words, minutes) => {
-// 		return `${format(words)} word${words === 1 ? "" : "s"}${!minutes ? "" : `, est. ${format(minutes)} minute read`}`
-// 	})(metadata.words, metadata.minutes)
-// 	return rhs
-// }
-
 // Returns a new scroll handler; scrolls to an ID.
 //
 // ---------------
@@ -329,7 +257,8 @@ const App = () => {
 
 	const [title, setTitle] = React.useState("")
 
-	const [statusLHS, statusRHS] = useStatusBars(editorState)
+	const { statusLHS, statusRHS } = useStatusBars({ editorState })
+	const { outline } = useOutline({ editorState })
 
 	// Save status:
 	//
@@ -361,9 +290,9 @@ const App = () => {
 
 	const [showOutline, setShowOutline] = React.useState(true)
 
-	// Manages table of contents.
+	// Manages table of outline.
 	//
-	// TODO: There is one bug when the table of contents is
+	// TODO: There is one bug when the table of outline is
 	// hidden and then the window is resized; a passive event
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
@@ -381,7 +310,7 @@ const App = () => {
 		}
 	}, [showOutline])
 
-	// Hovering table of contents header:
+	// Hovering table of outline header:
 	const [hoverContents, setHoverContents] = React.useState(false)
 
 	// Saves to localStorage (debounced).
@@ -412,18 +341,6 @@ const App = () => {
 		const id = setTimeout(() => {
 			const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
 			setTitle(title)
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [editorState])
-
-	const [contents, setContents] = React.useState(() => computeContents(editorState.reactVDOM))
-
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const contents = computeContents(editorState.reactVDOM)
-			setContents(contents)
 		}, 16.67)
 		return () => {
 			clearTimeout(id)
@@ -573,7 +490,7 @@ const App = () => {
 						</Button>
 						<div className="h-2" />
 						<ul>
-							{contents.map(({ id, hash, secondary, children }) => (
+							{outline.map(({ id, hash, secondary, children }) => (
 								<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 									{id !== "" && (
 										<a href={`#${hash}`}>

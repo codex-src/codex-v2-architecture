@@ -32,9 +32,9 @@ function computeStatusRHS(editorState) {
 	return rhs
 }
 
-function useStatusBars(editorState) {
-	const [statusLHS, setStatusLHS] = React.useState("") // () => computeStatusLHS(editorState))
-	const [statusRHS, setStatusRHS] = React.useState("") // () => computeStatusRHS(editorState))
+function useStatusBars({ editorState }) {
+	const [statusLHS, setStatusLHS] = React.useState(() => computeStatusLHS(editorState))
+	const [statusRHS, setStatusRHS] = React.useState(() => computeStatusRHS(editorState))
 
 	React.useEffect(() => {
 		const statusLHS = computeStatusLHS(editorState)
@@ -51,7 +51,7 @@ function useStatusBars(editorState) {
 		}
 	}, [editorState])
 
-	return [statusLHS, statusRHS]
+	return { statusLHS, statusRHS }
 }
 
 export default useStatusBars
