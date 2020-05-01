@@ -23,7 +23,7 @@ import { LOCALSTORAGE_KEY } from "./constants"
 
 const FixedEditorPreferences = ({
 	saveStatusState: [saveStatus],
-	showOutlineState: [showOutline, setShowOutline],
+	showOutlineState: [showOutline, setShowOutline], // TODO: Refactor to useEditorPreferences?
 	titleState: [title],
 	editorState: [editorState, editorStateDispatch], // TODO: Remove
 	editorPrefs: [editorPrefs, editorPrefsDispatch],
@@ -226,6 +226,7 @@ const App = () => {
 	const [saveStatus] = useSaveStatus(editorState)
 	const [title] = useTitle(editorState)
 
+	// Shortcut: command-s.
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
@@ -245,11 +246,7 @@ const App = () => {
 		}
 	}, [editorState.data, title])
 
-	// Manages table of contents.
-	//
-	// TODO: There is one bug when the table of contents is
-	// hidden and then the window is resized; a passive event
-	// listener needs to be added to handle this case
+	// Shortcut: command-o.
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 79)) { // 79: O
@@ -290,7 +287,7 @@ const App = () => {
 		editorPrefsDispatch,
 	])
 
-	// Manages read-only mode.
+	// Shortcut: command-p.
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
@@ -305,13 +302,9 @@ const App = () => {
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [
-		// Logically sorted:
-		editorStateDispatch,
-		editorPrefsDispatch,
-	])
+	}, [editorStateDispatch, editorPrefsDispatch])
 
-	// Manages sidebar.
+	// Shortcut: esc.
 	React.useEffect(() => {
 		const handler = e => {
 			if (!(e.keyCode === 27)) { // 27: Escape
