@@ -1,3 +1,4 @@
+import React from "react"
 import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
 
@@ -103,8 +104,23 @@ const methods = state => ({
 	},
 })
 
-function useEditorPreferences(defaultRenderer) {
-	return useMethods(methods, {}, () => initialState(defaultRenderer))
+function useEditorPreferences(editorState, options = { defaultRenderer: renderModesEnum.Readme }) {
+	const [state, dispatch] = useMethods(methods, {}, () => initialState(options.defaultRenderer))
+
+	const mounted = React.useRef()
+	React.useLayoutEffect(
+		React.useCallback(() => {
+			if (mounted.current) {
+				// No-op
+				return
+			}
+			mounted.current = true
+			dispatch.update(editorState)
+		}, [editorState, dispatch]),
+		[],
+	)
+
+	return [state, dispatch]
 }
 
 export default useEditorPreferences

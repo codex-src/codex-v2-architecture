@@ -4,7 +4,6 @@ import Editor from "Editor/Editor"
 import FixedPreferences from "./FixedPreferences"
 import Outline from "./Outline"
 import React from "react"
-import renderModesEnum from "EditorPreferences/renderModesEnum"
 import StatusBars from "./StatusBars"
 import Transition from "Transition"
 import useEditor from "Editor/useEditor"
@@ -33,7 +32,7 @@ const data = (() => {
 
 const App = () => {
 	const [editorState, editorStateDispatch] = useEditor(data)
-	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
+	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(editorState)
 
 	const [showOutline, setShowOutline] = React.useState(true)
 
@@ -42,30 +41,23 @@ const App = () => {
 	const [saveStatus] = useSaveStatus(editorState)
 	const [title] = useTitle(editorState)
 
-	// Sets renderers (debounced).
+	// Updates renderers.
 	const mounted = React.useRef()
-	React.useEffect(() => {
-		if (!mounted.current) {
-			mounted.current = true
-			editorPrefsDispatch.update(editorState)
-			return
-		}
-		if (!editorPrefs.showSidebar) {
-			// No-op
-			return
-		}
-		const id = setTimeout(() => {
-			editorPrefsDispatch.update(editorState)
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [
-		// Logically sorted:
-		editorState,
-		editorPrefs.showSidebar,
-		editorPrefsDispatch,
-	])
+	React.useEffect(
+		React.useCallback(() => {
+			if (!mounted.current || !editorPrefs.showSidebar) {
+				mounted.current = true
+				return
+			}
+			const id = setTimeout(() => {
+				editorPrefsDispatch.update(editorState)
+			}, 16.67)
+			return () => {
+				clearTimeout(id)
+			}
+		}, [editorState, editorPrefs, editorPrefsDispatch]),
+		[editorPrefs.showSidebar],
+	)
 
 	// Shortcut: command-s.
 	React.useEffect(
