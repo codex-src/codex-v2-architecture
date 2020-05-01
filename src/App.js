@@ -341,7 +341,7 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			if (!window.confirm("Save a copy of this file?")) {
+			if (!window.confirm("Download a copy of your note?")) {
 				// No-op
 				return
 			}
