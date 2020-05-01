@@ -46,24 +46,25 @@ bash c cpp css d diff docker dockerfile git go graphql htm html http js json jsx
 
 Use `- ` or `* ` for unordered lists:
 
-- Yo, I heard you like unordered lists
-	- So I put an unordered list inside of an unordered list 😎
+- This is an unordered list item
+- This is _another_ unordered list item
+- This is yet _another_ unordered list item
 
 You can also use `1. ` (or any number) for ordered lists:
 
-1. This is a numbered list
-1. Numbered lists are auto-incremented for you
-1. Internally, ordered list items are as `1. `
+1. This is an ordered list
+1. This is _another_ ordered list item
+1. This is yet _another_ ordered list item
 
-You can also use `- ` for unchecked checkboxes and `- [x]` for checked checkboxes.
+You can also use `- [ ] ` and `- [x] ` for todo items:
 
-- [x] ?!?!!?!?
-	- [x] ?!?!!!?!?
-		- [x] ???!?!?!!
-	- [x] !?!?!?!!
-- [ ] **PROFIT!!**
+- [ ] This is a todo item
+- [ ] This is _another_ todo item
+- [ ] This is yet _another_ todo list item
 
-You can use `tab` and `shift-tab` to tab and detab lists.
+(Psst…try clicking me!)
+
+When you press `enter` inside of a list, a new list item will be created for you. You can also use `tab` and `shift-tab` to tab and detab list items.
 
 ### Section breaks
 

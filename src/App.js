@@ -55,17 +55,6 @@ const FixedEditorPreferences = ({
 	}, [])
 
 	return (
-		// <Transition
-		// 	unmountOnExit={false}
-		// 	show={editorPrefs.showSidebar}
-		// 	enter="transition ease-out duration-300"
-		// 	enterFrom="bg-transparent"
-		// 	enterTo="bg-black bg-opacity-10"
-		// 	leave="transition ease-in duration-300"
-		// 	leaveFrom="bg-black bg-opacity-10"
-		// 	leaveTo="bg-transparent"
-		// >
-
 		// NOTE: Use flex flex-col because of the sidebar
 		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
@@ -130,12 +119,12 @@ const FixedEditorPreferences = ({
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
 							</svg>
 						</Button>
-						<Button
-							className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"
-							onClick={editorPrefsDispatch.resetZoom}
-						>
-							Reset Zoom
-						</Button>
+						{/* <Button */}
+						{/* 	className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300" */}
+						{/* 	onClick={editorPrefsDispatch.resetZoom} */}
+						{/* > */}
+						{/* 	Reset Zoom */}
+						{/* </Button> */}
 						<div
 							className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
@@ -222,8 +211,6 @@ const FixedEditorPreferences = ({
 			</Transition>
 
 		</div>
-
-		// </Transition>
 	)
 }
 
