@@ -13,16 +13,18 @@ import Transition from "Transition"
 import useEditor from "Editor/useEditor"
 import useEditorPreferences from "EditorPreferences/useEditorPreferences"
 import useOutline from "./useOutline"
+import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitle from "./useTitle"
 import { isMetaOrCtrlKey } from "Editor/detect"
+import { LOCALSTORAGE_KEY } from "./constants"
 
 // document.body.classList.toggle("debug-css")
 
 const FixedEditorPreferences = ({
-	saveStatusState: [saveStatus, setSaveStatus],
+	saveStatusState: [saveStatus],
 	showOutlineState: [showOutline, setShowOutline],
-	titleState: [title, setTitle],
+	titleState: [title],
 	editorState: [editorState, editorStateDispatch], // TODO: Remove
 	editorPrefs: [editorPrefs, editorPrefsDispatch],
 }) => {
@@ -200,8 +202,6 @@ const FixedEditorPreferences = ({
 	)
 }
 
-const LOCALSTORAGE_KEY = "codex-app-v2.4.1"
-
 const data = (() => {
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 	if (!cache) {
@@ -223,16 +223,8 @@ const App = () => {
 
 	const [[lhs, rhs]] = useStatusBars(editorState)
 	const [outline] = useOutline(editorState)
-	const [title, setTitle] = useTitle(editorState)
-
-	// Save status:
-	//
-	// 0 - Unsaved
-	// 1 - Saving
-	// 2 - Saved
-	// 3 - Saved -- hidden
-	//
-	const [saveStatus, setSaveStatus] = React.useState(0)
+	const [saveStatus] = useSaveStatus(editorState)
+	const [title] = useTitle(editorState)
 
 	React.useEffect(() => {
 		const handler = e => {
@@ -272,28 +264,6 @@ const App = () => {
 			document.removeEventListener("keydown", handler)
 		}
 	}, [showOutline])
-
-	// Saves to localStorage.
-	const mounted1 = React.useRef()
-	React.useEffect(() => {
-		if (!mounted1.current) {
-			mounted1.current = true
-			return
-		}
-		setSaveStatus(1)
-		const save = async () => {
-			const json = JSON.stringify({ data: editorState.data })
-			localStorage.setItem(LOCALSTORAGE_KEY, json)
-			await timeout(500)
-			setSaveStatus(2)
-			await timeout(100)
-			setSaveStatus(3)
-		}
-		const id = setTimeout(save, 100)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [editorState.data])
 
 	// Sets renderers (debounced).
 	const mounted2 = React.useRef()
@@ -363,7 +333,7 @@ const App = () => {
 
 			{/* Preferences */}
 			<FixedEditorPreferences
-				saveStatusState={[saveStatus, setSaveStatus]}
+				saveStatusState={[saveStatus]}
 				showOutlineState={[showOutline, setShowOutline]}
 				titleState={[title]}
 				editorState={[editorState, editorStateDispatch]}
