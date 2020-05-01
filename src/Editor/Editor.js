@@ -19,6 +19,7 @@ import {
 } from "./detect"
 
 import "./Editor.css"
+import "./tailwind-codex-overrides.css"
 
 // TODO: Add React.memo?
 const ReactEditor = ({ state, dispatch }) => {

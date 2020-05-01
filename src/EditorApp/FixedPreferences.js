@@ -49,7 +49,7 @@ const FixedPreferences = ({
 							className="p-2 flex flex-row items-center font-medium text-xxs"
 							onClick={() => setShowOutline(!showOutline)}
 						>
-							Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
+							Toggle Outline
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"

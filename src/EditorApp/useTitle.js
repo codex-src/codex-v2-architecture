@@ -2,7 +2,7 @@ import React from "react"
 import { toText } from "Editor/cmap"
 
 function useTitle(editorState) {
-	const [title, setTitle] = React.useState("")
+	const [title, setTitle] = React.useState(() => toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0])
 
 	React.useEffect(() => {
 		const id = setTimeout(() => {

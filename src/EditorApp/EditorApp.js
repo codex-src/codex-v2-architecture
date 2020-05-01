@@ -15,6 +15,7 @@ import useStatusBars from "./useStatusBars"
 import useTitle from "./useTitle"
 import { isMetaOrCtrlKey } from "Editor/detect"
 import { LOCALSTORAGE_KEY } from "./constants"
+import { toText } from "Editor/cmap"
 
 // document.body.classList.toggle("debug-css")
 
@@ -34,53 +35,18 @@ const App = () => {
 	const [editorState, editorStateDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
+	const [showOutline, setShowOutline] = React.useState(true)
+
 	const [[lhs, rhs]] = useStatusBars(editorState)
 	const [outline] = useOutline(editorState)
 	const [saveStatus] = useSaveStatus(editorState)
-	const [showOutline, setShowOutline] = React.useState(true)
 	const [title] = useTitle(editorState)
 
-	// Shortcut: command-s.
-	React.useEffect(() => {
-		const handler = e => {
-			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
-				// No-op
-				return
-			}
-			e.preventDefault()
-			if (!window.confirm("Download a copy of your note?")) {
-				// No-op
-				return
-			}
-			download(`${title}.md`, new Blob([editorState.data, "\n"]))
-		}
-		document.addEventListener("keydown", handler)
-		return () => {
-			document.removeEventListener("keydown", handler)
-		}
-	}, [editorState.data, title])
-
-	// Shortcut: command-o.
-	React.useEffect(() => {
-		const handler = e => {
-			if (!(isMetaOrCtrlKey(e) && e.keyCode === 79)) { // 79: O
-				// No-op
-				return
-			}
-			e.preventDefault()
-			setShowOutline(!showOutline)
-		}
-		document.addEventListener("keydown", handler)
-		return () => {
-			document.removeEventListener("keydown", handler)
-		}
-	}, [showOutline])
-
 	// Sets renderers (debounced).
-	const mounted2 = React.useRef()
+	const mounted = React.useRef()
 	React.useEffect(() => {
-		if (!mounted2.current) {
-			mounted2.current = true
+		if (!mounted.current) {
+			mounted.current = true
 			editorPrefsDispatch.update(editorState)
 			return
 		}
@@ -100,6 +66,30 @@ const App = () => {
 		editorPrefs.showSidebar,
 		editorPrefsDispatch,
 	])
+
+	// Shortcut: command-s.
+	React.useEffect(
+		React.useCallback(() => {
+			const handler = e => {
+				if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
+					// No-op
+					return
+				}
+				e.preventDefault()
+				if (!window.confirm("Download a copy of your note?")) {
+					// No-op
+					return
+				}
+				const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
+				download(`${title}.md`, new Blob([editorState.data, "\n"]))
+			}
+			document.addEventListener("keydown", handler)
+			return () => {
+				document.removeEventListener("keydown", handler)
+			}
+		}, [editorState]),
+		[editorState.data],
+	)
 
 	// Shortcut: command-p.
 	React.useEffect(() => {
