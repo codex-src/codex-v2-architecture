@@ -61,18 +61,15 @@ const headerClassNames = {
 //
 // <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 
-export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
-	// const style = { marginTop: "1.25em" }
-	return (
-		<Root id={id} className={headerClassNames[tag]} /* style={style} */>
-			<Markdown syntax={syntax}>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</Root>
-	)
-})
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
+	<Root id={id} className={headerClassNames[tag]}>
+		<Markdown syntax={syntax}>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</Root>
+))
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
 	<Root id={id} className={!emojis ? null : `emojis emojis__${emojis}`}>
