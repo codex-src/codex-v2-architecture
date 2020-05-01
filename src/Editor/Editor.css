@@ -76,8 +76,8 @@
 /*
  * <AnyList>
  */
-.codex-editor ul > ol,
-.codex-editor ul > li {
+.codex-editor ul > li,
+.codex-editor ol > li {
 	margin-left: 1ch;
 }
 
