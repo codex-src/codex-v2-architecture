@@ -8,17 +8,12 @@ import React from "react"
 import renderModesEnum from "EditorPreferences/renderModesEnum"
 import StatusBars from "./StatusBars"
 import Transition from "Transition"
-import typeEnum from "Editor/typeEnum"
 import useEditor from "Editor/useEditor"
 import useEditorPreferences from "EditorPreferences/useEditorPreferences"
 import useOutline from "./useOutline"
 import useStatusBars from "./useStatusBars"
+import useTitle from "./useTitle"
 import { isMetaOrCtrlKey } from "Editor/detect"
-
-import {
-	toInnerText,
-	toText,
-} from "Editor/cmap"
 
 // document.body.classList.toggle("debug-css")
 
@@ -255,10 +250,9 @@ const App = () => {
 	const [editorState, editorStateDispatch] = useEditor(data)
 	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(renderModesEnum.Readme)
 
-	const [title, setTitle] = React.useState("")
-
-	const { statusLHS, statusRHS } = useStatusBars({ editorState })
-	const { outline } = useOutline({ editorState })
+	const [[statusLHS, statusRHS]] = useStatusBars(editorState)
+	const [outline] = useOutline(editorState)
+	const [title] = useTitle(editorState)
 
 	// Save status:
 	//
@@ -290,9 +284,9 @@ const App = () => {
 
 	const [showOutline, setShowOutline] = React.useState(true)
 
-	// Manages table of outline.
+	// Manages table of contents.
 	//
-	// TODO: There is one bug when the table of outline is
+	// TODO: There is one bug when the table of contents is
 	// hidden and then the window is resized; a passive event
 	// listener needs to be added to handle this case
 	React.useEffect(() => {
@@ -310,7 +304,7 @@ const App = () => {
 		}
 	}, [showOutline])
 
-	// Hovering table of outline header:
+	// Hovering table of contents header:
 	const [hoverContents, setHoverContents] = React.useState(false)
 
 	// Saves to localStorage (debounced).
@@ -336,16 +330,6 @@ const App = () => {
 			[...ids].reverse().map(each => clearTimeout(each))
 		}
 	}, [editorState.data])
-
-	React.useEffect(() => {
-		const id = setTimeout(() => {
-			const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
-			setTitle(title)
-		}, 16.67)
-		return () => {
-			clearTimeout(id)
-		}
-	}, [editorState])
 
 	// Sets renderers (debounced).
 	const mounted2 = React.useRef()
@@ -417,7 +401,7 @@ const App = () => {
 			<FixedEditorPreferences
 				saveStatusState={[saveStatus, setSaveStatus]}
 				showOutlineState={[showOutline, setShowOutline]}
-				titleState={[title, setTitle]}
+				titleState={[title]}
 				editorState={[editorState, editorStateDispatch]}
 				editorPrefs={[editorPrefs, editorPrefsDispatch]}
 			/>

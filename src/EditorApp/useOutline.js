@@ -1,10 +1,6 @@
 import React from "react"
 import typeEnum from "Editor/typeEnum"
-
-import {
-	toInnerText,
-	toText,
-} from "Editor/cmap"
+import { toInnerText } from "Editor/cmap"
 
 const FRAME = 16.67
 
@@ -51,7 +47,7 @@ function computeOutline(editorState) {
 	return outline
 }
 
-function useOutline({ editorState }) {
+function useOutline(editorState) {
 	const [outline, setOutline] = React.useState(() => computeOutline(editorState))
 
 	React.useEffect(() => {
@@ -64,7 +60,7 @@ function useOutline({ editorState }) {
 		}
 	}, [editorState])
 
-	return { outline }
+	return [outline, setOutline]
 }
 
 export default useOutline
