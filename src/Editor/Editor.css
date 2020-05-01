@@ -67,32 +67,28 @@
 	font-size: 120%;
 	line-height: 1;
 }
-.codex-editor .emojis.emojis-1,
-.codex-editor .emojis.emojis-2,
-.codex-editor .emojis.emojis-3 {
+.codex-editor .emojis.emojis__1,
+.codex-editor .emojis.emojis__2,
+.codex-editor .emojis.emojis__3 {
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
+/*
+ * <ul>
+ */
 .codex-editor ul > li:not(.todo):before  {
 	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	content: "• ";
 	color: var(--md-blue-a400);
 }
-/* .codex-editor ul > li:not(.todo):before { */
-/* 	content: "• "; */
-/* } */
-/* .codex-editor ul ul > li:not(.todo):before { */
-/* 	content: "◦ "; */
-/* } */
-/* .codex-editor ul ul ul > li:not(.todo):before { */
-/* 	content: "▪ "; */
-/* } */
 
+/*
+ * <ol>
+ */
 .codex-editor ol > li:not(.todo):first-of-type {
 	counter-reset: count;
 }
-/* margin-left: calc(var(--content-length) * -1ch - 1.25em); */
 .codex-editor ol > li:not(.todo):before  {
 	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
@@ -102,6 +98,12 @@
 	color: var(--md-blue-a400);
 }
 
+/*
+ * <Todo>
+ */
+.codex-editor ul > li .todo__checkbox {
+	margin-left: calc(-1ch - 1.25em);
+}
 .codex-editor ul > li .todo__checkbox:focus,
 .codex-editor ol > li .todo__checkbox:focus {
   border-color: #a4cafe;

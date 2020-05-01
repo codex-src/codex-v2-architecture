@@ -71,8 +71,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 ))
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
- 	// style={{ margin: !children && "-0.25em 0" }}
-	<Root id={id} className={!emojis ? null : `emojis emojis-${emojis}`}>
+	<Root id={id} className={emojis && `emojis emojis__${emojis}`}>
 		{toReact(children) || (
 			<br />
 		)}
@@ -168,19 +167,15 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
 	)
 })
 
-const Todo = ({ id, checked }) => {
+// TODO: Add ReactDOM.hydrate
+const Todo = ({ checked }) => {
 	const attrs = {
-		style: {
-			marginLeft: "calc(-1ch - 1.25em)",
-			borderRadius: "0.3125em",
-		},
+		style: { borderRadius: "0.3125em" }, // Do not use rounded
 		tabIndex: "0",
 	}
 	return (
-		// focus:outline-none select-none
-		// <input className="form-checkbox" type="checkbox" checked={checked} />
-		<span
-			// FIXME: Formatting?
+		// transition duration-150
+		<svg
 			className={
 				`todo__checkbox ${
 					!checked
@@ -190,14 +185,14 @@ const Todo = ({ id, checked }) => {
 					!checked
 						? "bg-white shadow-hero"
 						: "bg-md-blue-a200 shadow"
-				} focus:shadow transition duration-150` // rounded
+				} focus:shadow`
 			}
+			fill="#fff"
+			viewBox="0 0 16 16"
 			{...attrs}
 		>
-			<svg fill="#fff" viewBox="0 0 16 16">
-				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-			</svg>
-		</span>
+			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+		</svg>
 	)
 }
 
@@ -210,7 +205,7 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 		<Node tag={tag} id={id} className="todo relative my-2" style={style}>
 			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
 				<div className="absolute">
-					<Todo id={id} checked={checked} />
+					<Todo checked={checked} />
 				</div>
 				{toReact(children) || (
 					<br />
