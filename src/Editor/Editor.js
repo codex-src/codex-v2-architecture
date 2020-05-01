@@ -68,9 +68,11 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
-					const todos = clonedElement.querySelectorAll(".todo")
-					for (const each of todos) {
+					const checkboxes = clonedElement.querySelectorAll(".checkbox")
+					for (const each of checkboxes) {
 						const { id } = each
+							.parentElement // <div class="absolute">
+							.parentElement // <li id="<uuid>">
 						each.onpointerdown = e => {
 							e.preventDefault()
 							document.activeElement.blur()
