@@ -1,5 +1,4 @@
 import React from "react"
-import timeout from "timeout"
 import { LOCALSTORAGE_KEY } from "./constants"
 
 // 0 - Unsaved
@@ -16,18 +15,22 @@ function useSaveStatus(editorState) {
 			mounted.current = true
 			return
 		}
-		setSaveStatus(1)
-		const save = async () => {
+		const ids = []
+		const id = setTimeout(() => {
 			const json = JSON.stringify({ data: editorState.data })
 			localStorage.setItem(LOCALSTORAGE_KEY, json)
-			await timeout(500)
-			setSaveStatus(current => current + 1)
-			await timeout(100)
-			setSaveStatus(current => current + 1)
-		}
-		const id = setTimeout(save, 100)
+			const id = setTimeout(() => {
+				setSaveStatus(2)
+				const id = setTimeout(() => {
+					setSaveStatus(3)
+				}, 1e3)
+				ids.push(id)
+			}, 500)
+			ids.push(id)
+		}, 100)
+		ids.push(id)
 		return () => {
-			clearTimeout(id)
+			[...ids].reverse().map(each => clearTimeout(each))
 		}
 	}, [editorState.data])
 
