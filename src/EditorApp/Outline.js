@@ -1,19 +1,3 @@
-// import DocumentTitle from "DocumentTitle"
-// import download from "download"
-// import Editor from "Editor/Editor"
-// import Highlighted from "Highlighted"
-// import Outline from "./Outline"
-// import React from "react"
-// import ReadmeEditor from "./ReadmeEditor"
-// import renderModesEnum from "EditorPreferences/renderModesEnum"
-// import StatusBars from "./StatusBars"
-// import useEditor from "Editor/useEditor"
-// import useEditorPreferences from "EditorPreferences/useEditorPreferences"
-// import useOutline from "./useOutline"
-// import useStatusBars from "./useStatusBars"
-// import useTitle from "./useTitle"
-// import { isMetaOrCtrlKey } from "Editor/detect"
-
 import Button from "Button"
 import React from "react"
 import Transition from "Transition"
@@ -38,11 +22,11 @@ function newScrollHandler(e, id, hash) {
 }
 
 const Outline = ({
-	titleTuple: [title, setTitle],
 	showOutlineTuple: [showOutline, setShowOutline],
-	children: outline,
+	children,
 }) => {
 	const [hoverOutline, setHoverOutline] = React.useState(false)
+
 	return (
 		<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
 			<Button
@@ -62,8 +46,8 @@ const Outline = ({
 					viewBox="0 0 24 24"
 				>
 					<Transition
-						// NOTE: Use duration-200 not duration-300
-						// and omit transition-timing-function
+						// NOTE: Use duration-200 not duration-300 and
+						// omit transition-timing-function
 						show={!hoverOutline}
 						enter="transition duration-200"
 						enterFrom="opacity-0 transform -translate-x-8"
@@ -75,8 +59,8 @@ const Outline = ({
 						<path d="M4 6h16M4 12h16M4 18h7"></path>
 					</Transition>
 					<Transition
-						// NOTE: Use duration-200 not duration-300
-						// and omit transition-timing-function
+						// NOTE: Use duration-200 not duration-300 and
+						// omit transition-timing-function
 						show={hoverOutline}
 						enter="transition duration-200"
 						enterFrom="opacity-0 transform translate-x-8"
@@ -90,7 +74,7 @@ const Outline = ({
 				</svg>
 				<p className="font-semibold text-xxs tracking-wide uppercase truncate">
 					{!hoverOutline ? (
-						title.trim() || "Untitled"
+						children[0].children.trim() || "Untitled"
 					) : (
 						`Hide Outline (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)`
 					)}
@@ -98,7 +82,7 @@ const Outline = ({
 			</Button>
 			<div className="h-2" />
 			<ul>
-				{outline.map(({ id, hash, secondary, children }) => (
+				{children.slice(1).map(({ id, hash, secondary, children }) => (
 					<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 						{id !== "" && (
 							<a href={`#${hash}`}>

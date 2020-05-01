@@ -289,10 +289,7 @@ const App = () => {
 			await timeout(100)
 			setSaveStatus(3)
 		}
-		// Debounce 100ms:
-		const id = setTimeout(() => {
-			save()
-		}, 100)
+		const id = setTimeout(save, 100)
 		return () => {
 			clearTimeout(id)
 		}
@@ -384,7 +381,7 @@ const App = () => {
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
-				<Outline showOutlineTuple={[showOutline, setShowOutline]} titleTuple={[title, setTitle]}>
+				<Outline showOutlineTuple={[showOutline, setShowOutline]}>
 					{outline}
 				</Outline>
 			</Transition>

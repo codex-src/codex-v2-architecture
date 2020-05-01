@@ -10,7 +10,7 @@ const FRAME = 16.67
 function computeOutline(editorState) {
 	const outline = []
 	const headers = editorState.reactVDOM.filter(each => each.type === typeEnum.Header)
-	for (const { tag, id, hash, children } of headers.slice(1)) {
+	for (const { tag, id, hash, children } of headers) {
 		switch (tag) {
 		case "h1":
 		case "h2":
