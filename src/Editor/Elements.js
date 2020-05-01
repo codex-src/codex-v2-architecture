@@ -58,8 +58,9 @@ const headerClassNames = {
 // const HeaderAnchor = ({ hash, children }) => (
 // 	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
 // )
-
+//
 // <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
@@ -71,7 +72,7 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 ))
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
-	<Root id={id} className={emojis && `emojis emojis__${emojis}`}>
+	<Root id={id} className={!emojis ? null : `emojis emojis__${emojis}`}>
 		{toReact(children) || (
 			<br />
 		)}
@@ -121,8 +122,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
 		const data = range.map(each => each.data).join("\n")
-		const __html = window.Prism.highlight(data, parser, extension)
-		return __html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
+		const html = window.Prism.highlight(data, parser, extension)
+		return html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
 	}, [extension, nodes])
 
 	return (
@@ -154,21 +155,18 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	)
 })
 
-export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => {
-	const style = { marginLeft: "1ch" }
-	return (
-		<Node tag={tag} id={id} className="my-2" style={style}>
-			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</Node>
-	)
-})
+export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
+	<Node tag={tag} id={id} className="my-2">
+		<Markdown className="hidden" syntax={syntax}>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</Node>
+))
 
 // TODO: Add ReactDOM.hydrate
-const Todo = ({ checked }) => {
+const TodoCheckbox = ({ checked }) => {
 	const attrs = {
 		style: { borderRadius: "0.3125em" }, // Do not use rounded
 		tabIndex: "0",
@@ -196,24 +194,18 @@ const Todo = ({ checked }) => {
 	)
 }
 
-export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => {
-	const style = {
-		marginLeft: "1ch",
-		...(checked && attrs.strike.style),
-	}
-	return (
-		<Node tag={tag} id={id} className="todo relative my-2" style={style}>
-			<Markdown className="hidden" syntax={[tabs + syntax[0]]}>
-				<div className="absolute">
-					<Todo checked={checked} />
-				</div>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</Node>
-	)
-})
+export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => (
+	<Node tag={tag} id={id} className="todo__item relative my-2" style={checked && attrs.strike.style}>
+		<Markdown className="hidden" syntax={syntax}>
+			<div className="absolute">
+				<TodoCheckbox checked={checked} />
+			</div>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</Node>
+))
 
 export const AnyList = React.memo(({ type, tag, id, tabs, children: nodes }) => {
 	const HOC = !tabs.length ? Root : Node

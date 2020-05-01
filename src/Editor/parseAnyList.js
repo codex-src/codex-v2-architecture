@@ -41,54 +41,10 @@ export function parseAnyList(range) {
 			tag: "li",
 			id: each.id,
 			tabs,
-			syntax: [syntax],
+			syntax: [tabs + syntax],
 			checked: checked === -1 ? undefined : Boolean(checked),
 			children: parseInlineElements(substr),
 		})
 	}
 	return result
 }
-
-// function parseList(range) {
-// 	let tag = !NumberedListRe.test(range[0]) ? "ul" : "ol"
-// 	const data = {
-// 		type: List,
-// 		tag,
-// 		id: uuidv4(),
-// 		children: [],
-// 	}
-// 	for (const each of range) {
-// 		const [syntax] = each.match(AnyListRe)
-// 		const substr = each.slice(syntax.length)
-// 		let ref = data.children
-// 		let deep = 0
-// 		const depth = syntax.search(/[^\t]/)
-// 		while (deep < depth) {
-// 			if (!ref.length || ref[ref.length - 1].type !== List) {
-// 				tag = !NumberedListRe.test(each) ? "ul" : "ol"
-// 				ref.push({
-// 					type: List,
-// 					tag,
-// 					id: uuidv4(),
-// 					children: [],
-// 				})
-// 			}
-// 			ref = ref[ref.length - 1].children
-// 			deep++
-// 		}
-// 		let checked = null
-// 		if (syntax.endsWith("- [ ] ") || syntax.endsWith("- [x] ")) {
-// 			const value = syntax[syntax.length - 3] === "x"
-// 			checked = { value }
-// 		}
-// 		ref.push({
-// 			type: !checked ? ListItem : TodoItem,
-// 			tag,
-// 			id: uuidv4(),
-// 			syntax: [syntax],
-// 			checked,
-// 			children: parseInnerGFM(substr),
-// 		})
-// 	}
-// 	return data
-// }

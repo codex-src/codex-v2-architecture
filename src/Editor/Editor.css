@@ -74,10 +74,19 @@
 }
 
 /*
+ * <AnyList>
+ */
+.codex-editor ul > ol,
+.codex-editor ul > li {
+	margin-left: 1ch;
+}
+
+/*
  * <ul>
  */
-.codex-editor ul > li:not(.todo):before  {
-	margin-left: calc(-1ch - 1.25em);
+.codex-editor ul > li:not(.todo__item):before  {
+	/* NOTE: Use -0.5ch not 1ch */
+	margin-left: calc(-0.5ch - 1.25em);
 	position: absolute;
 	content: "• ";
 	color: var(--md-blue-a400);
@@ -86,10 +95,10 @@
 /*
  * <ol>
  */
-.codex-editor ol > li:not(.todo):first-of-type {
+.codex-editor ol > li:not(.todo__item):first-of-type {
 	counter-reset: count;
 }
-.codex-editor ol > li:not(.todo):before  {
+.codex-editor ol > li:not(.todo__item):before  {
 	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	counter-increment: count;
@@ -99,9 +108,10 @@
 }
 
 /*
- * <Todo>
+ * <TodoItem>
  */
-.codex-editor ul > li .todo__checkbox {
+.codex-editor ul > li .todo__checkbox,
+.codex-editor ol > li .todo__checkbox {
 	margin-left: calc(-1ch - 1.25em);
 }
 .codex-editor ul > li .todo__checkbox:focus,
@@ -115,12 +125,3 @@
 .codex-editor ol > li .todo__checkbox--checked:focus {
   border-color: transparent;
 }
-/* .codex-editor ul > li .todo--checked, */
-/* .codex-editor ol > li .todo--checked { */
-/*   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z'/%3E%3C/svg%3E"); */
-/*   border-color: transparent; */
-/*   background-color: currentColor; */
-/*   background-size: 100% 100%; */
-/*   background-position: 50%; */
-/*   background-repeat: no-repeat; */
-/* } */

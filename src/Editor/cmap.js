@@ -143,7 +143,7 @@ function parsePrism(code, extension) {
 	cmapReact_js[typeEnum.Blockquote]     = data => `<Blockquote>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
 	cmapReact_js[typeEnum.Preformatted]   = data => `<Pre${!data.info ? "" : ` info="${data.info.replace("\"", "\\\"")}"`}>\n{\`${toInnerString(data.children.slice(1, -1).map(each => each.data).join("\n")).replace(/`/g, "\\`")}\`}\n</Pre>`
 	cmapReact_js[typeEnum.AnyListItem]    = data => `<Item>\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
-	cmapReact_js[typeEnum.TodoItem]       = data => `<Item>\n\t<Todo${!data.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
+	cmapReact_js[typeEnum.TodoItem]       = data => `<Item>\n\t<TodoItem$ta.checked.value ? "" : " done"} />\n\t${toInnerString(data.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.AnyList]        = data => `<List${data.tag === "ul" ? "" : " ordered"}>${`\n${toString(data.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
 	// cmapReact_js[typeEnum.Image]       = data => `<Figure>\n\t<Image src="${data.src}"${!data.alt ? "" : ` alt="${escape(data.alt)}"`} />${!data.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(data.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
 	cmapReact_js[typeEnum.Break]          = data => "<Break />"
