@@ -5,7 +5,7 @@ const renderModesEnum = new Enum(
 	"Text",
 	"JSON",
 	"HTML",
-	"HTML__BEM",
+	// "HTML__BEM",
 	"React_js",
 )
 

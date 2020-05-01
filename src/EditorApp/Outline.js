@@ -29,6 +29,8 @@ const Outline = ({
 
 	return (
 		<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
+
+			{/* Title */}
 			<Button
 				// NOTE: Use w-full text-left because of <Button>
 				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
@@ -76,10 +78,12 @@ const Outline = ({
 					{!hoverOutline ? (
 						children[0].children.trim() || "Untitled"
 					) : (
-						`Hide Outline (${navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)`
+						"Hide Outline"
 					)}
 				</p>
 			</Button>
+
+			{/* Outline */}
 			<div className="h-2" />
 			<ul>
 				{children.slice(1).map(({ id, hash, secondary, children }) => (
@@ -105,6 +109,7 @@ const Outline = ({
 					</li>
 				))}
 			</ul>
+
 		</div>
 	)
 }
