@@ -78,15 +78,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							document.activeElement.blur()
 						}
 						each.onclick = () => {
-							// document.getSelection().removeAllRanges()
-							// each.focus()
-							// if (each.classList.contains("todo__checkbox--unchecked")) {
-							// 	each.classList.remove("todo__checkbox--unchecked", "bg-white", "shadow-hero")
-							// 	each.classList.add("todo__checkbox--checked", "bg-md-blue-a200", "shadow")
-							// } else {
-							// 	each.classList.remove("todo__checkbox--checked", "bg-md-blue-a200", "shadow")
-							// 	each.classList.add("todo__checkbox--unchecked", "bg-white", "shadow-hero")
-							// }
 							dispatch.toggleTodo(id)
 						}
 					}

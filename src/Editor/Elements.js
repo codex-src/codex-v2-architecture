@@ -1,5 +1,5 @@
-// import Button from "Button"
 import attrs from "./attrs"
+import Button from "Button"
 import escape from "lodash/escape"
 import Markdown from "./Markdown"
 import prismExtensions from "prismExtensions"
@@ -167,24 +167,21 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
 
 // TODO: Add ReactDOM.hydrate
 const Checkbox = ({ checked }) => (
-	<div
-		className={
-			`checkbox ${
-				!checked
-					? "checkbox--unchecked"
-					: "checkbox--checked"
-			} -mt-px inline-block w-4 h-4 align-middle ${
-				!checked
-					? "bg-white shadow-hero"
-					: "bg-md-blue-a200 shadow"
-			} focus:shadow rounded-md transform scale-105`
-		}
-		tabIndex="0"
-	>
+	<Button className={
+		`checkbox ${
+			!checked
+				? "checkbox--unchecked"
+				: "checkbox--checked"
+		} -mt-px inline-block w-4 h-4 align-middle ${
+			!checked
+				? "bg-white shadow-hero"
+				: "bg-md-blue-a200 shadow"
+		} focus:shadow rounded-md transform scale-105`
+	}>
 		<svg fill="#fff" viewBox="0 0 16 16">
 			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 		</svg>
-	</div>
+	</Button>
 )
 
 export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => (
