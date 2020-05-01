@@ -8,6 +8,7 @@ import React from "react"
 import ReadmeEditor from "./ReadmeEditor"
 import renderModesEnum from "EditorPreferences/renderModesEnum"
 import StatusBars from "./StatusBars"
+import timeout from "timeout"
 import Transition from "Transition"
 import useEditor from "Editor/useEditor"
 import useEditorPreferences from "EditorPreferences/useEditorPreferences"
@@ -272,27 +273,28 @@ const App = () => {
 		}
 	}, [showOutline])
 
-	// Saves to localStorage (debounced).
+	// Saves to localStorage.
 	const mounted1 = React.useRef()
 	React.useEffect(() => {
 		if (!mounted1.current) {
 			mounted1.current = true
 			return
 		}
-		const ids = []
-		ids.push(setTimeout(() => {
-			// Debounce localStorage 100ms:
+		setSaveStatus(1)
+		const save = async () => {
 			const json = JSON.stringify({ data: editorState.data })
 			localStorage.setItem(LOCALSTORAGE_KEY, json)
-			ids.push(setTimeout(() => {
-				setSaveStatus(2)
-				ids.push(setTimeout(() => {
-					setSaveStatus(3)
-				}, 1e3))
-			}, 500))
-		}, 100))
+			await timeout(500)
+			setSaveStatus(2)
+			await timeout(100)
+			setSaveStatus(3)
+		}
+		// Debounce 100ms:
+		const id = setTimeout(() => {
+			save()
+		}, 100)
 		return () => {
-			[...ids].reverse().map(each => clearTimeout(each))
+			clearTimeout(id)
 		}
 	}, [editorState.data])
 
@@ -382,16 +384,13 @@ const App = () => {
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
-				{/* TODO: Remove <React.Fragment>? */}
-				<React.Fragment>
-					<Outline showOutlineTuple={[showOutline, setShowOutline]} titleTuple={[title, setTitle]}>
-						{outline}
-					</Outline>
-					<div className="flex-shrink-0 hidden lg:block w-16"></div>
-				</React.Fragment>
+				<Outline showOutlineTuple={[showOutline, setShowOutline]} titleTuple={[title, setTitle]}>
+					{outline}
+				</Outline>
 			</Transition>
 
 			{/* RHS */}
+			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
 				<DocumentTitle title={title || "Untitled"}>
 					<Editor
@@ -407,7 +406,6 @@ const App = () => {
 						autoFocus={!data.length}
 					/>
 				</DocumentTitle>
-
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
 					// omit transition-timing-function
