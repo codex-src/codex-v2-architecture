@@ -23,12 +23,12 @@ import "./App.css"
 
 const ReadmeEditor = ({ readOnly }) => {
 	const [state, dispatch] = useEditor(raw("./Readme.md"))
-	return <Editor style={{ fontSize: 15 }} state={state} dispatch={dispatch} readOnly={readOnly} />
+	return <Editor style={{ fontSize: 16 }} state={state} dispatch={dispatch} readOnly={readOnly} />
 }
 
 const FixedEditorPreferences = ({
 	saveStatusState: [saveStatus, setSaveStatus],
-	showContentsState: [showContents, setShowContents],
+	showOutlineState: [showOutline, setShowOutline],
 	titleState: [title, setTitle],
 	editorState: [editorState, editorStateDispatch], // TODO: Remove
 	editorPrefs: [editorPrefs, editorPrefsDispatch],
@@ -47,159 +47,172 @@ const FixedEditorPreferences = ({
 		}
 	}, [])
 
+	// style={{ "--bg-opacity": 0.05 }}
 	return (
-		// NOTE (1): Use flex flex-col because of the sidebar
-		// NOTE (2): How to use translate-z?
-		<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none translate-z">
+		<Transition
+			unmountOnExit={false}
+			show={editorPrefs.showSidebar}
+			enter="transition ease-out duration-300"
+			enterFrom="bg-transparent"
+			enterTo="bg-black bg-opacity-10"
+			leave="transition ease-in duration-300"
+			leaveFrom="bg-black bg-opacity-10"
+			leaveTo="bg-transparent"
+		>
+			{/* NOTE: Use flex flex-col because of the sidebar */}
+			<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
-			{/* Preferences */}
-			<Transition
-				// NOTE: Use duration-200 not duration-300 and omit
-				// transition-timing-function
-				unmountOnExit={false}
-				show={y > 0}
-				enter="transition duration-200"
-				enterFrom="bg-transparent shadow-none"
-				enterTo="bg-white shadow-hero"
-				leave="transition duration-300"
-				leaveFrom="bg-white shadow-hero"
-				leaveTo="bg-transparent shadow-none"
-			>
-				<div className="-mx-4 px-2 relative flex-shrink-0 flex flex-row justify-between">
+				{/* <div className="bg-black">hello</div> */}
 
-					{/* LHS */}
-					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={() => setShowContents(!showContents)}
-						>
-							Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
-						</Button>
-						<Button
-							className="p-2 flex flex-row items-center font-medium text-xs underline"
-							onClick={editorPrefsDispatch.zoomOut}
-						>
-							Zoom Out
-							<svg
-								className="ml-1 w-4 h-4"
-								fill="none"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+				{/* Preferences */}
+				<Transition
+					// NOTE: Use duration-200 not duration-300 and omit
+					// transition-timing-function
+					unmountOnExit={false}
+					show={y > 0}
+					enter="transition duration-200"
+					enterFrom="bg-transparent shadow-none"
+					enterTo="bg-white shadow-hero"
+					leave="transition duration-200"
+					leaveFrom="bg-white shadow-hero"
+					leaveTo="bg-transparent shadow-none"
+				>
+					<div className="-mx-4 px-2 relative flex-shrink-0 flex flex-row justify-between">
+
+						{/* LHS */}
+						<div className="flex-shrink-0 flex flex-row pointer-events-auto">
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={() => setShowOutline(!showOutline)}
 							>
-								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
-							</svg>
-						</Button>
-						<Button
-							className="p-2 flex flex-row items-center font-medium text-xs underline"
-							onClick={editorPrefsDispatch.zoomIn}
-						>
-							Zoom In
-							<svg
-								className="ml-1 w-4 h-4"
-								fill="none"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+								Outline ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Ctrl-" : "⌘"}O)
+							</Button>
+							<Button
+								className="p-2 flex flex-row items-center font-medium text-xs underline"
+								onClick={editorPrefsDispatch.zoomOut}
 							>
-								{/* <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path> */}
-								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-							</svg>
-						</Button>
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={editorPrefsDispatch.resetZoom}
-						>
-							Reset Zoom
-						</Button>
-						<div
-							className="p-2 flex flex-row items-center transition duration-300"
-							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
-						>
-							<p className="font-medium text-xs">
-								Saved
-							</p>
-							<svg
-								className="ml-1 p-px flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
-								fill="none"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								// strokeWidth="2"
-								strokeWidth="3"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+								Zoom Out
+								<svg
+									className="ml-1 w-4 h-4"
+									fill="none"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+								</svg>
+							</Button>
+							<Button
+								className="p-2 flex flex-row items-center font-medium text-xs underline"
+								onClick={editorPrefsDispatch.zoomIn}
 							>
-								<path d="M5 13l4 4L19 7"></path>
-							</svg>
+								Zoom In
+								<svg
+									className="ml-1 w-4 h-4"
+									fill="none"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									{/* <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path> */}
+									<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+								</svg>
+							</Button>
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={editorPrefsDispatch.resetZoom}
+							>
+								Reset Zoom
+							</Button>
+							<div
+								className="p-2 flex flex-row items-center transition duration-300"
+								style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
+							>
+								<p className="font-medium text-xs">
+									Saved
+								</p>
+								<svg
+									className="ml-1 p-px flex-shrink-0 w-4 h-4 text-green-500 transition duration-300"
+									fill="none"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									// strokeWidth="2"
+									strokeWidth="3"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path d="M5 13l4 4L19 7"></path>
+								</svg>
+							</div>
 						</div>
+
+						{/* RHS */}
+						<div className="flex-shrink-0 flex flex-row pointer-events-auto">
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={() => {
+									// FIXME
+									editorStateDispatch.toggleReadOnly()
+									editorPrefsDispatch.toggleReadOnly()
+								}}
+							>
+								Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
+							</Button>
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={editorPrefsDispatch.showReadme}
+							>
+								Readme (Esc)
+							</Button>
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={editorPrefsDispatch.showHTML}
+							>
+								HTML
+							</Button>
+							<Button
+								className="p-2 font-medium text-xs underline"
+								onClick={editorPrefsDispatch.showReact_js}
+							>
+								React JSX
+							</Button>
+						</div>
+
 					</div>
+				</Transition>
 
-					{/* RHS */}
-					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={() => {
-								// FIXME
-								editorStateDispatch.toggleReadOnly()
-								editorPrefsDispatch.toggleReadOnly()
-							}}
-						>
-							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-						</Button>
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={editorPrefsDispatch.showReadme}
-						>
-							Readme (Esc)
-						</Button>
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={editorPrefsDispatch.showHTML}
-						>
-							HTML
-						</Button>
-						<Button
-							className="p-2 font-medium text-xs underline"
-							onClick={editorPrefsDispatch.showReact_js}
-						>
-							React JSX
-						</Button>
+				{/* Sidebar */}
+				<div className="flex-shrink-0 h-4" />
+				<Transition
+					show={editorPrefs.showSidebar}
+					enter="transition ease-out duration-300"
+					enterFrom="transform opacity-0 translate-x-32"
+					enterTo="transform opacity-100 translate-x-0"
+					leave="transition ease-in duration-300"
+					leaveFrom="transform opacity-100 translate-x-0"
+					leaveTo="transform opacity-0 translate-x-32"
+				>
+					<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
+						{editorPrefs.renderMode === renderModesEnum.Readme ? (
+							<ReadmeEditor readOnly={editorPrefs.readOnly} />
+						) : (
+							<span className="inline-block">
+								<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+									<Highlighted extension={editorPrefs.extension}>
+										{editorPrefs[editorPrefs.renderMode]}
+									</Highlighted>
+								</pre>
+							</span>
+						)}
 					</div>
+				</Transition>
 
-				</div>
-			</Transition>
-
-			{/* Sidebar */}
-			<div className="flex-shrink-0 h-4" />
-			<Transition
-				show={editorPrefs.showSidebar}
-				enter="transition ease-out duration-300"
-				enterFrom="transform opacity-0 translate-x-32"
-				enterTo="transform opacity-100 translate-x-0"
-				leave="transition ease-in duration-300"
-				leaveFrom="transform opacity-100 translate-x-0"
-				leaveTo="transform opacity-0 translate-x-32"
-			>
-				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-					{editorPrefs.renderMode === renderModesEnum.Readme ? (
-						<ReadmeEditor readOnly={editorPrefs.readOnly} />
-					) : (
-						<span className="inline-block">
-							<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-								<Highlighted extension={editorPrefs.extension}>
-									{editorPrefs[editorPrefs.renderMode]}
-								</Highlighted>
-							</pre>
-						</span>
-					)}
-				</div>
-			</Transition>
-
-		</div>
+			</div>
+		</Transition>
 	)
 }
 
@@ -353,10 +366,7 @@ const App = () => {
 		}
 	}, [editorState.data, title])
 
-	// Show table of contents:
-	//
-	// TODO: Rename to outline?
-	const [showContents, setShowContents] = React.useState(true)
+	const [showOutline, setShowOutline] = React.useState(true)
 
 	// Manages table of contents.
 	//
@@ -370,13 +380,13 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			setShowContents(!showContents)
+			setShowOutline(!showOutline)
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [showContents])
+	}, [showOutline])
 
 	// Hovering table of contents header:
 	const [hoverContents, setHoverContents] = React.useState(false)
@@ -513,7 +523,7 @@ const App = () => {
 			{/* Preferences */}
 			<FixedEditorPreferences
 				saveStatusState={[saveStatus, setSaveStatus]}
-				showContentsState={[showContents, setShowContents]}
+				showOutlineState={[showOutline, setShowOutline]}
 				titleState={[title, setTitle]}
 				editorState={[editorState, editorStateDispatch]}
 				editorPrefs={[editorPrefs, editorPrefsDispatch]}
@@ -522,7 +532,7 @@ const App = () => {
 			{/* LHS */}
 			<Transition
 				unmountOnExit={window.innerWidth <= 1328}
-				show={showContents}
+				show={showOutline}
 				enter="transition ease-out duration-300"
 				enterFrom="transform -translate-x-32"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
@@ -539,7 +549,7 @@ const App = () => {
 							className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
 							onPointerEnter={() => setHoverContents(true)}
 							onPointerLeave={() => setHoverContents(false)}
-							onClick={() => setShowContents(false)}
+							onClick={() => setShowOutline(false)}
 						>
 							<svg
 								className="mr-2 flex-shrink-0 w-4 h-4"
@@ -623,12 +633,11 @@ const App = () => {
 
 				{/* Editor */}
 				<DocumentTitle title={title || "Untitled"}>
-					{/* TODO: Add React.forwardRef? */}
 					<Editor
+						className="transition-all duration-75"
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
 							fontSize: editorPrefs.fontSize,
-							// lineHeight: 1.625,
 						}}
 						state={editorState}
 						dispatch={editorStateDispatch}

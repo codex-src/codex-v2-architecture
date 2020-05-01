@@ -4,7 +4,7 @@
 
 **Codex is a markdown editor for devs.** Codex is based on GitHub Flavored Markdown, meaning you can format notes using special _syntax_ characters. This also means when you copy text, you _never_ loose formatting. ✨
 
-**Your note is saved to localStorage.** This means when you refresh the page, your changes persist. Soon, Codex will be developed into web app that syncs to the cloud. ☁️
+**Your note is saved to localStorage.** This means when you refresh the page, your changes persist. Soon, Codex will be developed into web app that syncs to the cloud. ☁️ _Note that changes to the interactive editor are not saved._
 
 ### Inline elements
 
@@ -18,9 +18,11 @@
 
 ### Blockquotes
 
-> The Ultimate Answer to Life, The Universe and Everything is...
+> **Yoda: No! No different! Only different in your mind. You must _unlearn_ what you have learned.**
 >
-> …42!
+> _Luke: All right, I'll give it a try._
+>
+> **Yoda: No! Try not. Do. Or do not. There is no try.**
 
 ### Code blocks
 
@@ -34,7 +36,7 @@ func main() {
 }
 ```
 
-Syntax highlighting is supported for all of the following languages (you can use a filename, like `main.go`, or just the extension, like `go`):
+Syntax highlighting is supported for the following languages. You can use a filename like `main.go`, or an extension, like `go`:
 
 ```
 bash c cpp css d diff docker dockerfile git go graphql htm html http js json jsx kotlin php py rb ruby rust sass sh sql svg swift ts tsx wasm xml yaml yml

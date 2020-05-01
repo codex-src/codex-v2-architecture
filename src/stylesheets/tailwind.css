@@ -49,6 +49,10 @@
 	letter-spacing: 0.0125em;
 }
 
+.bg-opacity-10 {
+	--bg-opacity: 0.1;
+}
+
 .shadow-hero-sm {
 	box-shadow:
 		0 0 0 1px rgba(0, 0, 0, 0.05),

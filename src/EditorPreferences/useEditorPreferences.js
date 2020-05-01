@@ -6,11 +6,13 @@ import {
 	toReact_js,
 } from "Editor/cmap"
 
+const defaultFontSize = 17
+
 function initialState(defaultRenderer) {
 	const state = {
 		readOnly: false,
 		showSidebar: false,
-		fontSize: 17,
+		fontSize: defaultFontSize,
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: "",
 		[renderModesEnum.JSON]: "",
@@ -83,21 +85,21 @@ const methods = state => ({
 		state.showSidebar = !state.showSidebar
 	},
 	zoomOut() {
-		if (state.fontSize <= 13) {
+		if (state.fontSize <= defaultFontSize - 2) {
 			// No-op
 			return
 		}
 		state.fontSize--
 	},
 	zoomIn() {
-		if (state.fontSize >= 21) {
+		if (state.fontSize >= defaultFontSize + 2) {
 			// No-op
 			return
 		}
 		state.fontSize++
 	},
 	resetZoom() {
-		state.fontSize = 17
+		state.fontSize = defaultFontSize
 	},
 })
 
