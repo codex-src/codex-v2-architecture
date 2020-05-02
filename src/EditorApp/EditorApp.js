@@ -31,36 +31,38 @@ const data = (() => {
 })()
 
 const App = () => {
-	const [editorState, editorStateDispatch] = useEditor(data)
-	const [editorPrefs, editorPrefsDispatch] = usePreferences(editorState)
+	const [state, dispatch] = useEditor(data)
+	const [prefs, prefsDispatch] = usePreferences(state)
 
+	// The status bar left-hand and right-hand side.
+	const [[lhs, rhs]] = useStatusBars(state)
+
+	// The outline data structure.
 	const [showOutline, setShowOutline] = React.useState(true)
+	const [outline] = useOutline(state)
 
-	const [[lhs, rhs]] = useStatusBars(editorState)
-	const [outline] = useOutline(editorState)
-	const [saveStatus] = useSaveStatus(editorState)
-	const [title] = useTitle(editorState)
+	// The save status (number; 1-4).
+	const [saveStatus] = useSaveStatus(state)
+
+	// The plain text title.
+	const [title] = useTitle(state)
 
 	// Updates renderers.
 	const mounted = React.useRef()
 	React.useEffect(
 		React.useCallback(() => {
-			if (!mounted.current || !editorPrefs.showSidebar) {
+			if (!mounted.current || !prefs.showSidebar) {
 				mounted.current = true
 				return
 			}
 			const id = setTimeout(() => {
-				editorPrefsDispatch.update(editorState)
+				prefsDispatch.update(state)
 			}, 16.67)
 			return () => {
 				clearTimeout(id)
 			}
-		}, [editorState, editorPrefs, editorPrefsDispatch]),
-		[
-			editorState.data,
-			editorState.pos1,
-			editorState.pos2,
-		],
+		}, [state, prefs, prefsDispatch]),
+		[state.data, state.pos1, state.pos2],
 	)
 
 	// Shortcut: command-s.
@@ -76,15 +78,15 @@ const App = () => {
 					// No-op
 					return
 				}
-				const title = toText(editorState.reactVDOM.slice(0, 1)).split("\n", 1)[0]
-				download(`${title}.md`, new Blob([editorState.data, "\n"]))
+				const title = toText(state.reactVDOM.slice(0, 1)).split("\n", 1)[0]
+				download(`${title}.md`, new Blob([state.data, "\n"]))
 			}
 			document.addEventListener("keydown", handler)
 			return () => {
 				document.removeEventListener("keydown", handler)
 			}
-		}, [editorState]),
-		[editorState.data],
+		}, [state]),
+		[state.data],
 	)
 
 	// Shortcut: command-p.
@@ -95,14 +97,14 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			editorStateDispatch.toggleReadOnly()
-			editorPrefsDispatch.toggleReadOnly()
+			dispatch.toggleReadOnly()
+			prefsDispatch.toggleReadOnly()
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [editorStateDispatch, editorPrefsDispatch])
+	}, [dispatch, prefsDispatch])
 
 	// Shortcut: esc.
 	React.useEffect(() => {
@@ -112,13 +114,13 @@ const App = () => {
 				return
 			}
 			e.preventDefault()
-			editorPrefsDispatch.toggleSidebar()
+			prefsDispatch.toggleSidebar()
 		}
 		document.addEventListener("keydown", handler)
 		return () => {
 			document.removeEventListener("keydown", handler)
 		}
-	}, [editorPrefsDispatch])
+	}, [prefsDispatch])
 
 	return (
 		// NOTE: Use items-start for sticky
@@ -126,9 +128,9 @@ const App = () => {
 
 			{/* Preferences */}
 			<FixedPreferences
-				saveStatus={saveStatus}
-				editorPrefsTuple={[editorPrefs, editorPrefsDispatch]}
+				prefsTuple={[prefs, prefsDispatch]}
 				showOutlineTuple={[showOutline, setShowOutline]}
+				saveStatus={saveStatus}
 			/>
 
 			{/* LHS */}
@@ -154,20 +156,20 @@ const App = () => {
 					<Editor
 						style={{
 							paddingBottom: "calc(100vh - 128px)",
-							fontSize: editorPrefs.fontSize,
+							fontSize: prefs.fontSize,
 							// transitionProperty: "font-size",
 							// transitionDuration: "50ms",
 						}}
-						state={editorState}
-						dispatch={editorStateDispatch}
-						readOnly={editorPrefs.readOnly}
+						state={state}
+						dispatch={dispatch}
+						readOnly={prefs.readOnly}
 						autoFocus={!data.length}
 					/>
 				</DocumentTitle>
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
 					// omit transition-timing-function
-					show={!editorState.readOnly}
+					show={!state.readOnly}
 					enter="transition duration-200"
 					enterFrom="opacity-0"
 					enterTo="opacity-100"

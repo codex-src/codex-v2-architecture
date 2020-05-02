@@ -6,9 +6,9 @@ import renderModesEnum from "./Preferences/renderModesEnum"
 import Transition from "lib/Transition"
 
 const FixedPreferences = ({
-	saveStatus,
-	editorPrefsTuple: [editorPrefs, editorPrefsDispatch],
+	prefsTuple: [prefs, prefsDispatch],
 	showOutlineTuple: [showOutline, setShowOutline],
+	saveStatus,
 }) => {
 
 	const [y, setY] = React.useState(() => window.scrollY)
@@ -53,7 +53,7 @@ const FixedPreferences = ({
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.zoomOut}
+							onClick={prefsDispatch.zoomOut}
 						>
 							Zoom Out
 							<svg
@@ -70,7 +70,7 @@ const FixedPreferences = ({
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.zoomIn}
+							onClick={prefsDispatch.zoomIn}
 						>
 							Zoom In
 							<svg
@@ -82,7 +82,6 @@ const FixedPreferences = ({
 								stroke="currentColor"
 								viewBox="0 0 24 24"
 							>
-								{/* <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path> */}
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
 							</svg>
 						</Button>
@@ -110,31 +109,31 @@ const FixedPreferences = ({
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.toggleReadOnly}
+							onClick={prefsDispatch.toggleReadOnly}
 						>
 							Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.showReadme}
+							onClick={prefsDispatch.showReadme}
 						>
 							Readme (Esc)
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.showHTML}
+							onClick={prefsDispatch.showHTML}
 						>
 							HTML
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.showReact_js}
+							onClick={prefsDispatch.showReact_js}
 						>
 							React JSX
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={editorPrefsDispatch.showJSON}
+							onClick={prefsDispatch.showJSON}
 						>
 							JSON
 						</Button>
@@ -146,7 +145,7 @@ const FixedPreferences = ({
 			{/* Sidebar */}
 			<div className="flex-shrink-0 h-4" />
 			<Transition
-				show={editorPrefs.showSidebar}
+				show={prefs.showSidebar}
 				enter="transition ease-out duration-300"
 				enterFrom="transform opacity-0 translate-x-32"
 				enterTo="transform opacity-100 translate-x-0"
@@ -155,13 +154,13 @@ const FixedPreferences = ({
 				leaveTo="transform opacity-0 translate-x-32"
 			>
 				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
-					{editorPrefs.renderMode === renderModesEnum.Readme ? (
-						<ReadmeEditor readOnly={editorPrefs.readOnly} />
+					{prefs.renderMode === renderModesEnum.Readme ? (
+						<ReadmeEditor readOnly={prefs.readOnly} />
 					) : (
 						<span className="inline-block">
 							<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-								<Highlighted extension={editorPrefs.extension}>
-									{editorPrefs[editorPrefs.renderMode]}
+								<Highlighted extension={prefs.extension}>
+									{prefs[prefs.renderMode]}
 								</Highlighted>
 							</pre>
 						</span>
