@@ -4,6 +4,7 @@ import Editor from "Editor/Editor"
 import FixedPreferences from "./FixedPreferences"
 import Outline from "./Outline"
 import React from "react"
+import ReadmeEditor from "./ReadmeEditor"
 import StatusBars from "./StatusBars"
 import Transition from "lib/Transition"
 import useEditor from "Editor/useEditor"
@@ -174,18 +175,33 @@ const App = () => {
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
 				<DocumentTitle title={title || "Untitled"}>
-					<Editor
-						style={{
-							paddingBottom: "calc(100vh - 128px)",
-							fontSize: prefs.fontSize,
-							// transitionProperty: "font-size",
-							// transitionDuration: "50ms",
-						}}
-						state={state}
-						dispatch={dispatch}
-						readOnly={prefs.readOnly}
-						autoFocus={!data.length}
-					/>
+					<div className="relative">
+
+						{/* Placeholder */}
+						{(!state.readOnly && !state.data.length) && (
+							<div className="absolute top-0 left-0 pointer-events-none opacity-50">
+								{/* subpixel-antialiased */}
+								<p className="text-gray-500" style={{ fontSize: prefs.fontSize }}>
+									What’s on your mind?
+								</p>
+							</div>
+						)}
+
+						{/* Editor */}
+						<Editor
+							style={{
+								paddingBottom: "calc(100vh - 128px)",
+								fontSize: prefs.fontSize,
+								// transitionProperty: "font-size",
+								// transitionDuration: "50ms",
+							}}
+							state={state}
+							dispatch={dispatch}
+							readOnly={prefs.readOnly}
+							autoFocus={!data.length}
+						/>
+
+					</div>
 				</DocumentTitle>
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
