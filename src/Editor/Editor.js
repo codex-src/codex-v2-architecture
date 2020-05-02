@@ -172,31 +172,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 				// TODO: Refactor state.readOnly?
 				onFocus: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					dispatch.focus()
 				},
 				onBlur: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					dispatch.blur()
 				},
 
 				onSelect: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					const selection = document.getSelection()
 					if (!selection.rangeCount) {
 						// No-op
@@ -229,21 +211,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				},
 
 				onPointerDown: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					pointerDownRef.current = true
 				},
 				onPointerMove: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					// Editor must be focused and pointer must be down:
 					if (!state.focused || !pointerDownRef.current) {
 						pointerDownRef.current = false // Reset to be safe
@@ -253,22 +223,10 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					dispatch.select(pos1, pos2)
 				},
 				onPointerUp: state.readOnly ? undefined : () => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					pointerDownRef.current = false
 				},
 
 				onKeyDown: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					// NOTE: Safari registers select-all, cut, copy,
 					// and paste as key press events
 					if (navigator.vendor === "Apple Computer, Inc." && (
@@ -367,12 +325,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				},
 
 				onCompositionEnd: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
@@ -381,12 +333,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				},
 				onInput: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					// Force rerender when empty (takes precedence):
 					if (!ref.current.childNodes.length) {
 						dispatch.render()
@@ -452,12 +398,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				},
 
 				onCut: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					e.preventDefault()
 					if (state.pos1.pos === state.pos2.pos) {
 						// No-op
@@ -468,12 +408,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					dispatch.cut()
 				},
 				onCopy: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					e.preventDefault()
 					if (state.pos1.pos === state.pos2.pos) {
 						// No-op
@@ -484,12 +418,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					dispatch.copy()
 				},
 				onPaste: state.readOnly ? undefined : e => {
-
-					// if (state.readOnly) {
-					// 	// No-op
-					// 	return
-					// }
-
 					e.preventDefault()
 					const data = e.clipboardData.getData("text/plain")
 					if (!data) {
