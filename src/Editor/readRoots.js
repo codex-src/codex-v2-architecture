@@ -2,7 +2,10 @@ import dedupeNodes from "./dedupeNodes"
 
 // Reads a data-codex-root element.
 function readRoot(root) {
-	const nodes = [{ id: root.id, data: "" }]
+	const nodes = [{
+		id: root.id,
+		data: "",
+	}]
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
 			nodes[nodes.length - 1].data += on.nodeValue
@@ -12,7 +15,10 @@ function readRoot(root) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
-				nodes.push({ id: next.id, data: "" })
+				nodes.push({
+					id: next.id,
+					data: "",
+				})
 			}
 		}
 	}

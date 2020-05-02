@@ -363,8 +363,8 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					// NOTE: Do not trust Chrome (as of 81) for
 					// e.nativeEvent.inputType:
 					//
-					// backspace-word -> "deleteWordBackward"
-					// backspace-rune -> "deleteWordBackward" ??
+					// backspace-word -> deleteWordBackward
+					// backspace-rune -> deleteWordBackward ??
 					//
 					// https://w3.org/TR/input-events-2/#interface-InputEvent-Attributes
 					switch (navigator.vendor !== "Google Inc." && e.nativeEvent.inputType) {
