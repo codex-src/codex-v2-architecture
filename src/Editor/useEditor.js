@@ -435,7 +435,7 @@ const methods = state => ({
 	// Rerenders the string and VDOM representations.
 	render() {
 
-		console.log(state.nodes.map(each => ({ ...each })))
+		// console.log(state.nodes.map(each => ({ ...each })))
 
 		// let t = Date.now()
 		// const data = state.nodes.map(each => each.data).join("\n")

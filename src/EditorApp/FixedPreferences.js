@@ -110,9 +110,9 @@ const FixedPreferences = ({
 							<svg
 								className="ml-1 w-4 h-4 text-green-500"
 								fill="none"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="3"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="3"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
 							>
