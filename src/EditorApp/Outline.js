@@ -87,8 +87,8 @@ const Outline = ({
 			{/* Outline */}
 			<div className="h-2" />
 			<ul>
-				{outline.slice(1).map(({ id, hash, secondary, children }) => (
-					<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+				{outline.map(({ id, hash, secondary, children }) => (
+					<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
 						{id !== "" && (
 							<a href={`#${hash}`}>
 								<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
@@ -98,7 +98,7 @@ const Outline = ({
 						)}
 						<ul>
 							{secondary.map(({ id, hash, children }) => (
-								<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
+								<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
 									<a href={`#${hash}`}>
 										<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
 											{children.trim() || "Untitled"}

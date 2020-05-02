@@ -7,7 +7,7 @@ import { toInnerText } from "Editor/cmap"
 // considered secondary headers.
 function computeOutline(editorState) {
 	const outline = []
-	const headers = editorState.reactVDOM.filter(each => each.type === typeEnum.Header)
+	const headers = editorState.reactVDOM.slice(1).filter(each => each.type === typeEnum.Header)
 	for (const { tag, id, hash, children } of headers) {
 		switch (tag) {
 		case "h1":
