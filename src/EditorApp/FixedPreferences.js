@@ -5,17 +5,12 @@ import ReadmeEditor from "./ReadmeEditor"
 import renderModesEnum from "./Preferences/renderModesEnum"
 import Transition from "lib/Transition"
 
-const FixedPreferences = ({
-	prefsTuple: [prefs, prefsDispatch],
-	showOutlineTuple: [showOutline, setShowOutline],
-	saveStatus,
-}) => {
+function useScrollY() {
+	const [scrollY, setScrollY] = React.useState(() => window.scrollY)
 
-	const [y, setY] = React.useState(() => window.scrollY)
-
-	React.useLayoutEffect(() => {
+	React.useEffect(() => {
 		const handler = e => {
-			setY(window.scrollY)
+			setScrollY(window.scrollY)
 		}
 		handler()
 		window.addEventListener("scroll", handler, false)
@@ -23,6 +18,17 @@ const FixedPreferences = ({
 			window.removeEventListener("scroll", handler, false)
 		}
 	}, [])
+
+	return [scrollY, setScrollY]
+}
+
+const FixedPreferences = ({
+	prefsTuple: [prefs, prefsDispatch],
+	showOutlineTuple: [showOutline, setShowOutline],
+	saveStatus,
+}) => {
+
+	const [scrollY] = useScrollY()
 
 	return (
 		// NOTE: Use flex flex-col for the sidebar
@@ -33,7 +39,7 @@ const FixedPreferences = ({
 				// NOTE: Use duration-200 not duration-300 and omit
 				// transition-timing-function
 				unmountOnExit={false}
-				show={y > 0}
+				show={scrollY > 0}
 				enter="transition duration-200"
 				enterFrom="bg-transparent shadow-none"
 				enterTo="bg-white shadow-hero"
