@@ -142,6 +142,15 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 		[state.readOnly, state.data],
 	)
 
+	// Exclusively returns a function when the editor is in
+	// read-write mode.
+	const newReadWriteHandler = handler => {
+		if (state.readOnly) {
+			return undefined
+		}
+		return handler
+	}
+
 	return (
 	// <div>
 
@@ -170,15 +179,15 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					wordBreak: "break-word",
 				},
 
-				// TODO: Refactor state.readOnly?
-				onFocus: state.readOnly ? undefined : () => {
+				onFocus: newReadWriteHandler(() => {
 					dispatch.focus()
-				},
-				onBlur: state.readOnly ? undefined : () => {
-					dispatch.blur()
-				},
+				}),
 
-				onSelect: state.readOnly ? undefined : () => {
+				onBlur: newReadWriteHandler(() => {
+					dispatch.blur()
+				}),
+
+				onSelect: newReadWriteHandler(() => {
 					const selection = document.getSelection()
 					if (!selection.rangeCount) {
 						// No-op
@@ -208,12 +217,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					}
 					const [pos1, pos2] = computePosRange(ref.current)
 					dispatch.select(pos1, pos2)
-				},
+				}),
 
-				onPointerDown: state.readOnly ? undefined : () => {
+				onPointerDown: newReadWriteHandler(() => {
 					pointerDownRef.current = true
-				},
-				onPointerMove: state.readOnly ? undefined : () => {
+				}),
+
+				onPointerMove: newReadWriteHandler(() => {
 					// Editor must be focused and pointer must be down:
 					if (!state.focused || !pointerDownRef.current) {
 						pointerDownRef.current = false // Reset to be safe
@@ -221,12 +231,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					}
 					const [pos1, pos2] = computePosRange(ref.current)
 					dispatch.select(pos1, pos2)
-				},
-				onPointerUp: state.readOnly ? undefined : () => {
-					pointerDownRef.current = false
-				},
+				}),
 
-				onKeyDown: state.readOnly ? undefined : e => {
+				onPointerUp: newReadWriteHandler(() => {
+					pointerDownRef.current = false
+				}),
+
+				onKeyDown: newReadWriteHandler(e => {
 					// NOTE: Safari registers select-all, cut, copy,
 					// and paste as key press events
 					if (navigator.vendor === "Apple Computer, Inc." && (
@@ -322,17 +333,18 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						dispatch.redo()
 						return
 					}
-				},
+				}),
 
-				onCompositionEnd: state.readOnly ? undefined : e => {
+				onCompositionEnd: newReadWriteHandler(e => {
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
 					const [pos1, pos2] = computePosRange(ref.current)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
-				},
-				onInput: state.readOnly ? undefined : e => {
+				}),
+
+				onInput: newReadWriteHandler(e => {
 					// Force rerender when empty (takes precedence):
 					if (!ref.current.childNodes.length) {
 						dispatch.render()
@@ -395,9 +407,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					const nodes = readRoots(ref.current, [root1, root2])
 					const [pos1, pos2] = computePosRange(ref.current)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
-				},
+				}),
 
-				onCut: state.readOnly ? undefined : e => {
+				onCut: newReadWriteHandler(e => {
 					e.preventDefault()
 					if (state.pos1.pos === state.pos2.pos) {
 						// No-op
@@ -406,8 +418,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
 					e.clipboardData.setData("text/plain", data)
 					dispatch.cut()
-				},
-				onCopy: state.readOnly ? undefined : e => {
+				}),
+
+				onCopy: newReadWriteHandler(e => {
 					e.preventDefault()
 					if (state.pos1.pos === state.pos2.pos) {
 						// No-op
@@ -416,8 +429,9 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
 					e.clipboardData.setData("text/plain", data)
 					dispatch.copy()
-				},
-				onPaste: state.readOnly ? undefined : e => {
+				}),
+
+				onPaste: newReadWriteHandler(e => {
 					e.preventDefault()
 					const data = e.clipboardData.getData("text/plain")
 					if (!data) {
@@ -425,7 +439,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						return
 					}
 					dispatch.paste(data)
-				},
+				}),
 
 				contentEditable: !state.readOnly,
 				suppressContentEditableWarning: !state.readOnly,
