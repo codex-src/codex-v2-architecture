@@ -1,6 +1,6 @@
-import Button from "Button"
+import Button from "lib/Button"
 import React from "react"
-import Transition from "Transition"
+import Transition from "lib/Transition"
 
 // ---------------
 // |    128px    |

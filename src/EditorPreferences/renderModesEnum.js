@@ -1,4 +1,4 @@
-import Enum from "Enum"
+import Enum from "lib/Enum"
 
 const renderModesEnum = new Enum(
 	"Readme",

@@ -1,9 +1,9 @@
-import Button from "Button"
-import Highlighted from "Highlighted"
+import Button from "lib/Button"
+import Highlighted from "./Highlighted"
 import React from "react"
 import ReadmeEditor from "./ReadmeEditor"
 import renderModesEnum from "EditorPreferences/renderModesEnum"
-import Transition from "Transition"
+import Transition from "lib/Transition"
 
 const FixedPreferences = ({
 	saveStatus,

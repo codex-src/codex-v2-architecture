@@ -1,5 +1,5 @@
 import escape from "lodash/escape"
-import PrismMap from "PrismMap"
+import PrismMap from "lib/PrismMap"
 import typeEnum from "./typeEnum"
 
 // Component maps.

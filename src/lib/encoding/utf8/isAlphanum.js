@@ -1,4 +1,4 @@
-import { isAlphanum as isASCIIAlphanum } from "encoding/ascii"
+import { isAlphanum as isASCIIAlphanum } from "lib/encoding/ascii"
 
 /* eslint-disable no-multi-spaces */
 const ASCIILow                          = 0x000000 //         0

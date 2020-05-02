@@ -1,5 +1,5 @@
 import * as emojiTrie from "emoji-trie"
-import * as utf8 from "encoding/utf8"
+import * as utf8 from "lib/encoding/utf8"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parseAnyList"
 import { parseElements } from "./parser"

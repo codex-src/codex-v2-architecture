@@ -1,5 +1,5 @@
 import React from "react"
-import renderDOM from "renderDOM"
+import renderDOM from "lib/renderDOM"
 import syncDOM from "../syncDOM"
 
 document.getSelection = () => ({

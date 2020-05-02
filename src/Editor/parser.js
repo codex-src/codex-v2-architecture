@@ -1,7 +1,7 @@
 import * as emojiTrie from "emoji-trie"
 import newHashEpoch from "./newHashEpoch"
 import typeEnum from "./typeEnum"
-import { isAlphanum } from "encoding/ascii"
+import { isAlphanum } from "lib/encoding/ascii"
 import { toInnerText } from "./cmap"
 
 import {

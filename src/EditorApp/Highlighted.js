@@ -1,4 +1,4 @@
-import PrismMap from "PrismMap"
+import PrismMap from "lib/PrismMap"
 import React from "react"
 
 const Highlighted = React.memo(({ extension, children }) => {

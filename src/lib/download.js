@@ -1,5 +1,5 @@
 import React from "react"
-import renderDOM from "renderDOM"
+import renderDOM from "lib/renderDOM"
 
 function download(filename, blob, options) {
 	const href = window.URL.createObjectURL(blob, options)
