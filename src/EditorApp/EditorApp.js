@@ -179,21 +179,15 @@ const App = () => {
 						{/* Placeholder */}
 						{(!state.readOnly && !state.data.length) && (
 							<div className="absolute top-0 left-0 pointer-events-none opacity-50">
-								{/* subpixel-antialiased */}
-								<p className="text-gray-500" style={{ fontSize: prefs.fontSize }}>
-									What’s on your mind?
+								<p className="text-gray-500 subpixel-antialiased" style={{ fontSize: prefs.fontSize }}>
+									Hello, world!
 								</p>
 							</div>
 						)}
 
 						{/* Editor */}
 						<Editor
-							style={{
-								paddingBottom: "calc(100vh - 128px)",
-								fontSize: prefs.fontSize,
-								// transitionProperty: "font-size",
-								// transitionDuration: "50ms",
-							}}
+							style={{ paddingBottom: "calc(100vh - 128px)", fontSize: prefs.fontSize }}
 							state={state}
 							dispatch={dispatch}
 							readOnly={prefs.readOnly}

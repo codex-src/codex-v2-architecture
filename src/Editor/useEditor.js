@@ -17,14 +17,14 @@ function newEditorState(data) {
 	const initialState = {
 		readOnly: false,                         // Is read-only?
 		focused: false,                          // Is focused?
-		data,                                    // Data data (string)
+		data,                                    // Document data (string)
 		nodes,                                   // Document nodes
 		pos1,                                    // Start cursor data structure
 		pos2,                                    // End cursor data structure
 		extPosRange: ["", ""],                   // Extended node (ID) range
 		history: {                               // History object
 			correctedPos: false,                   // Corrected pos before first change event?
-			stack: [                               // History state stack
+			stack: [                               // State stack
 				{                                    //
 					data,                              //
 					nodes,                             //
@@ -32,7 +32,7 @@ function newEditorState(data) {
 					pos2: { ...pos1 },                 //
 				},                                   //
 			],                                     //
-			index: 0,                              // History state stack index
+			index: 0,                              // State stack index
 		},                                       //
 		reactVDOM: parseElements(nodes),         // React VDOM
 		reactDOM: document.createElement("div"), // React-managed DOM
@@ -356,14 +356,9 @@ const methods = state => ({
 		this.render()
 	},
 	// Inserts an EOL character.
-	enter(syntax = "") {
-		this.write(`\n${syntax}`)
+	enter(autoCompleteSyntax = "") {
+		this.write(`\n${autoCompleteSyntax}`)
 	},
-
-	// // Inserts an auto-completing EOL.
-	// enterSyntax(synax) {
-	// 	this.write(`\n${synax}`)
-	// },
 
 	// Toggles a todo (checkbox).
 	toggleTodo(id) {
@@ -401,7 +396,6 @@ const methods = state => ({
 			return
 		}
 		const { data, nodes, pos1, pos2 } = state
-		// NOTE: Copy pos1 and pos2 because of correctedPos
 		state.history.stack.push({ data, nodes, pos1: { ...pos1 }, pos2: { ...pos2 } })
 		state.history.index++
 	},
@@ -440,6 +434,8 @@ const methods = state => ({
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
+
+		console.log(state.nodes.map(each => ({ ...each })))
 
 		// let t = Date.now()
 		// const data = state.nodes.map(each => each.data).join("\n")
