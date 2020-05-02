@@ -7,8 +7,8 @@ import React from "react"
 import StatusBars from "./StatusBars"
 import Transition from "lib/Transition"
 import useEditor from "Editor/useEditor"
-import useEditorPreferences from "EditorPreferences/useEditorPreferences"
 import useOutline from "./useOutline"
+import usePreferences from "./Preferences/usePreferences"
 import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitle from "./useTitle"
@@ -32,7 +32,7 @@ const data = (() => {
 
 const App = () => {
 	const [editorState, editorStateDispatch] = useEditor(data)
-	const [editorPrefs, editorPrefsDispatch] = useEditorPreferences(editorState)
+	const [editorPrefs, editorPrefsDispatch] = usePreferences(editorState)
 
 	const [showOutline, setShowOutline] = React.useState(true)
 

@@ -104,7 +104,7 @@ const methods = state => ({
 	},
 })
 
-function useEditorPreferences(editorState, options = { defaultRenderer: renderModesEnum.Readme }) {
+function usePreferences(editorState, options = { defaultRenderer: renderModesEnum.Readme }) {
 	const [state, dispatch] = useMethods(methods, {}, () => initialState(options.defaultRenderer))
 
 	const mounted = React.useRef()
@@ -123,4 +123,4 @@ function useEditorPreferences(editorState, options = { defaultRenderer: renderMo
 	return [state, dispatch]
 }
 
-export default useEditorPreferences
+export default usePreferences

@@ -2,7 +2,7 @@ import Button from "lib/Button"
 import Highlighted from "./Highlighted"
 import React from "react"
 import ReadmeEditor from "./ReadmeEditor"
-import renderModesEnum from "EditorPreferences/renderModesEnum"
+import renderModesEnum from "./Preferences/renderModesEnum"
 import Transition from "lib/Transition"
 
 const FixedPreferences = ({
