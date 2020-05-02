@@ -23,6 +23,21 @@ function initialState(defaultRenderer) {
 	return state
 }
 
+// const text = `<!--
+// You can use Codex *outside* of Codex:
+//
+// <div class="codex-output">
+// 	...
+// </div>
+//
+// .codex-output {
+// 	...
+// }
+//
+// See https://codepen.io/zaydek/pen/VwLoOWK for example.
+// -->
+// `
+
 const methods = state => ({
 	// Updates preferences.
 	update(editorState) {

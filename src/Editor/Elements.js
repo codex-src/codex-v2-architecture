@@ -62,7 +62,7 @@ const headerClassNames = {
 // <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root id={id} className={headerClassNames[tag]}>
+	<Root id={id} className={headerClassNames[tag]} onClick={() => console.log("hello, world!")}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />

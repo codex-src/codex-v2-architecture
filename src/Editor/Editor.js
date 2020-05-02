@@ -66,6 +66,8 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 			// 		...each,
 			// 	})
 			// ))
+
+			// ReactDOM.unmountComponentAtNode(ref.current)
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
