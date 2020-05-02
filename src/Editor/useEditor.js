@@ -155,12 +155,14 @@ const methods = state => ({
 
 		// Get the start offset:
 		const key1 = nodes[0].id
+		// TODO: Can no-op keys before extPosRange[0]
 		const offset1 = state.nodes.findIndex(each => each.id === key1)
 		if (offset1 === -1) {
 			throw new Error("input: offset1 out of bounds")
 		}
 		// Get the end offset:
 		const key2 = nodes[nodes.length - 1].id
+		// TODO: Can no-op keys before extPosRange[0]
 		const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
 		if (offset2 === -1) {
 			throw new Error("input: offset2 out of bounds")
@@ -435,156 +437,168 @@ const methods = state => ({
 	// Rerenders the string and VDOM representations.
 	render() {
 
-		// console.log(state.nodes.map(each => ({ ...each })))
-
-		// <Blockquote>, <Preformatted>, and <AnyList>
-
-		// Tests wherther a character can be fast-tracked.
-		function testFastPass(char) {
-			const ok = (
-				(char >= "a" && char !== "h" && char <= "z") || // Exempt "h" for "https://" and "http://"
-				char === " " ||                                 // Takes precedence
-				(char >= "A" && char <= "Z")
-			)
-			return ok
-		}
-
-		const isBlockquote = node => {
-			const ok = (
-				(node.data.length >= 2 && node.data.slice(0, 2) === "> ") ||
-				(node.data.length === 1 && node.data === ">")
-			)
-			return ok
-		}
-
-		const isPreformattedStart = node => {
-			const ok = (
-				node.data.length >= 3 && (
-					node.data.slice(0, 3) === "```" ||
-					node.data.slice(0, 3) === "~~~"
-				) &&
-				node.data.slice(3).indexOf("`") === -1 // Negate backticks
-				// x + 1 < nodes.length
-			)
-			return ok
-		}
-
-		const isPreformattedEnd = (node, syntax) => {
-			const ok = (
-				node.data.length === 3 &&
-				node.data === syntax
-			)
-			return ok
-		}
-
-		const isAnyList = node => {
-			const ok = (
-				node.data.length >= 2 &&
-				AnyListRe.test(node.data)
-			)
-			return ok
-		}
-
-		const t =  Date.now()
-
-		let pre = []
-		for (let x1 = 0; x1 < state.nodes.length; x1++) {
-			const each = state.nodes[x1]
-
-			// Fast pass:
-			if (!each.data.length || testFastPass(each.data[0])) {
-				pre.push({ x1, x2: x1, type: "Any" })
-				continue
-			}
-
-			switch (each.data[0]) {
-
-			// <Blockquote>
-			case ">":
-				if (isBlockquote(each)) {
-					let x2 = x1
-					x2++
-					for (; x2 < state.nodes.length; x2++) {
-						const each = state.nodes[x2]
-						if (!isBlockquote(each)) {
-							x2-- // One too many; decrement
-							break
-						}
-					}
-					pre.push({ x1, x2, type: "Blockquote" })
-					x1 = x2
-					continue
-				}
-				// No-op
-				break
-
-			// <Preformatted>
-			case "`":
-			case "~":
-				if (isPreformattedStart(each)) {
-					let x2 = x1
-					x2++
-					const syntax = each.data.slice(0, 3)
-					for (; x2 < state.nodes.length; x2++) {
-						const each = state.nodes[x2]
-						if (isPreformattedEnd(each, syntax)) {
-							// No-op; do not decrement
-							break
-						}
-					}
-					// Guard unterminated:
-					if (x2 === state.nodes.length) {
-						// No-op
-						break
-					}
-					pre.push({ x1, x2, type: "Preformatted" })
-					x1 = x2
-					continue
-				}
-				// No-op
-				break
-
-			// <AnyList>
-			case "\t":
-			case "-":
-			case "*":
-			case "0":
-			case "1":
-			case "2":
-			case "3":
-			case "4":
-			case "5":
-			case "6":
-			case "7":
-			case "8":
-			case "9":
-				if (isAnyList(each)) {
-					let x2 = x1
-					x2++
-					for (; x2 < state.nodes.length; x2++) {
-						const each = state.nodes[x2]
-						if (!isAnyList(each)) {
-							x2-- // One too many; decrement
-							break
-						}
-					}
-					pre.push({ x1, x2, type: "AnyList" })
-					x1 = x2
-					continue
-				}
-				// No-op
-				break
-
-			default:
-				// No-op
-				break
-			}
-
-			// Etc.:
-			pre.push({ x1, x2: x1, type: "Any" })
-		}
-		console.log(Date.now() - t)
-		console.log(pre)
+		//		// // Get the start offset:
+		//		// const key1 = nodes[0].id
+		//		// const offset1 = state.nodes.findIndex(each => each.id === key1)
+		//		// if (offset1 === -1) {
+		//		// 	throw new Error("input: offset1 out of bounds")
+		//		// }
+		//		// // Get the end offset:
+		//		// const key2 = nodes[nodes.length - 1].id
+		//		// const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
+		//		// if (offset2 === -1) {
+		//		// 	throw new Error("input: offset2 out of bounds")
+		//		// }
+		//
+		//		// Tests wherther a character can be fast-tracked.
+		//		function testFastPass(char) {
+		//			const ok = (
+		//				(char >= "a" && char !== "h" && char <= "z") || // Exempt "h" for "https://" and "http://"
+		//				char === " " ||                                 // Takes precedence
+		//				(char >= "A" && char <= "Z")
+		//			)
+		//			return ok
+		//		}
+		//
+		//		const isBlockquote = node => {
+		//			const ok = (
+		//				(node.data.length >= 2 && node.data.slice(0, 2) === "> ") ||
+		//				(node.data.length === 1 && node.data === ">")
+		//			)
+		//			return ok
+		//		}
+		//
+		//		const isPreformattedStart = node => {
+		//			const ok = (
+		//				node.data.length >= 3 && (
+		//					node.data.slice(0, 3) === "```" ||
+		//					node.data.slice(0, 3) === "~~~"
+		//				) &&
+		//				node.data.slice(3).indexOf("`") === -1 // Negate backticks
+		//				// x + 1 < nodes.length
+		//			)
+		//			return ok
+		//		}
+		//
+		//		const isPreformattedEnd = (node, syntax) => {
+		//			const ok = (
+		//				node.data.length === 3 &&
+		//				node.data === syntax
+		//			)
+		//			return ok
+		//		}
+		//
+		//		const isAnyList = node => {
+		//			const ok = (
+		//				node.data.length >= 2 &&
+		//				AnyListRe.test(node.data)
+		//			)
+		//			return ok
+		//		}
+		//
+		//		const t =  Date.now()
+		//
+		//		let pre = []
+		//		for (let x1 = 0; x1 < state.nodes.length; x1++) {
+		//			const each = state.nodes[x1]
+		//
+		//			// Fast pass:
+		//			if (!each.data.length || testFastPass(each.data[0])) {
+		//				pre.push({ x1, x2: x1, type: "Any" })
+		//				continue
+		//			}
+		//
+		//			switch (each.data[0]) {
+		//
+		//			// <Blockquote>
+		//			case ">":
+		//				if (isBlockquote(each)) {
+		//					let x2 = x1
+		//					x2++
+		//					for (; x2 < state.nodes.length; x2++) {
+		//						const each = state.nodes[x2]
+		//						if (!isBlockquote(each)) {
+		//							x2-- // One too many; decrement
+		//							break
+		//						}
+		//					}
+		//					pre.push({ x1, x2, type: "Blockquote" })
+		//					x1 = x2
+		//					continue
+		//				}
+		//				// No-op
+		//				break
+		//
+		//			// <Preformatted>
+		//			case "`":
+		//			case "~":
+		//				if (isPreformattedStart(each)) {
+		//					let x2 = x1
+		//					x2++
+		//					const syntax = each.data.slice(0, 3)
+		//					for (; x2 < state.nodes.length; x2++) {
+		//						const each = state.nodes[x2]
+		//						if (isPreformattedEnd(each, syntax)) {
+		//							// No-op; do not decrement
+		//							break
+		//						}
+		//					}
+		//					// Guard unterminated:
+		//					if (x2 === state.nodes.length) {
+		//						// No-op
+		//						break
+		//					}
+		//					pre.push({ x1, x2, type: "Preformatted" })
+		//					x1 = x2
+		//					continue
+		//				}
+		//				// No-op
+		//				break
+		//
+		//			// <AnyList>
+		//			case "\t":
+		//			case "-":
+		//			case "*":
+		//			case "0":
+		//			case "1":
+		//			case "2":
+		//			case "3":
+		//			case "4":
+		//			case "5":
+		//			case "6":
+		//			case "7":
+		//			case "8":
+		//			case "9":
+		//				if (isAnyList(each)) {
+		//					let x2 = x1
+		//					x2++
+		//					for (; x2 < state.nodes.length; x2++) {
+		//						const each = state.nodes[x2]
+		//						if (!isAnyList(each)) {
+		//							x2-- // One too many; decrement
+		//							break
+		//						}
+		//					}
+		//					pre.push({ x1, x2, type: "AnyList" })
+		//					x1 = x2
+		//					continue
+		//				}
+		//				// No-op
+		//				break
+		//
+		//			default:
+		//				// No-op
+		//				break
+		//			}
+		//
+		//			pre.push({ x1, x2: x1, type: "Any" })
+		//		}
+		//
+		//		console.log(Date.now() - t)
+		//
+		//		for (const each of pre) {
+		//			console.log(each)
+		//		}
 
 		// let t = Date.now()
 		// const data = state.nodes.map(each => each.data).join("\n")
