@@ -11,7 +11,7 @@ const FixedPreferences = ({
 	showOutlineTuple: [showOutline, setShowOutline],
 }) => {
 
-	const [y, setY] = React.useState(window.scrollY)
+	const [y, setY] = React.useState(() => window.scrollY)
 
 	React.useLayoutEffect(() => {
 		const handler = e => {
@@ -86,12 +86,6 @@ const FixedPreferences = ({
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
 							</svg>
 						</Button>
-						{/* <Button */}
-						{/* 	className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300" */}
-						{/* 	onClick={editorPrefsDispatch.resetZoom} */}
-						{/* > */}
-						{/* 	Reset Zoom */}
-						{/* </Button> */}
 						<div
 							className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
@@ -137,6 +131,12 @@ const FixedPreferences = ({
 							onClick={editorPrefsDispatch.showReact_js}
 						>
 							React JSX
+						</Button>
+						<Button
+							className="p-2 flex flex-row items-center font-medium text-xxs"
+							onClick={editorPrefsDispatch.showJSON}
+						>
+							JSON
 						</Button>
 					</div>
 

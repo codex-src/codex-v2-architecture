@@ -56,7 +56,11 @@ const App = () => {
 				clearTimeout(id)
 			}
 		}, [editorState, editorPrefs, editorPrefsDispatch]),
-		[editorPrefs.showSidebar],
+		[
+			editorState.data,
+			editorState.pos1,
+			editorState.pos2,
+		],
 	)
 
 	// Shortcut: command-s.

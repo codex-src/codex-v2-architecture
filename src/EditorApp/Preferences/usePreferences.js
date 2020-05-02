@@ -16,9 +16,9 @@ function initialState(defaultRenderer) {
 		fontSize: defaultFontSize,
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: "",
-		[renderModesEnum.JSON]: "",
 		[renderModesEnum.HTML]: "",
 		[renderModesEnum.React_js]: "",
+		[renderModesEnum.JSON]: "",
 	}
 	return state
 }
@@ -27,20 +27,20 @@ const methods = state => ({
 	// Updates preferences.
 	update(editorState) {
 		Object.assign(state, {
+			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
+			[renderModesEnum.React_js]: toReact_js(editorState.reactVDOM),
 			[renderModesEnum.JSON]: JSON.stringify(
 				{
 					...editorState,
-
-					data:      undefined,
-					history:   undefined,
-					reactVDOM: undefined,
-					reactDOM:  undefined,
+					data:        undefined,
+					extPosRange: undefined,
+					history:     undefined,
+					reactVDOM:   undefined,
+					reactDOM:    undefined,
 				},
 				null,
 				"\t",
 			),
-			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
-			[renderModesEnum.React_js]: toReact_js(editorState.reactVDOM),
 		})
 	},
 	showReadme() {
@@ -51,15 +51,6 @@ const methods = state => ({
 		}
 		state.renderMode = renderModesEnum.Readme
 		state.extension = ""
-	},
-	showJSON() {
-		if (!state.showSidebar) {
-			state.showSidebar = true
-		} else if (state.renderMode === renderModesEnum.JSON) {
-			state.showSidebar = false
-		}
-		state.renderMode = renderModesEnum.JSON
-		state.extension = "json"
 	},
 	showHTML() {
 		if (!state.showSidebar) {
@@ -78,6 +69,15 @@ const methods = state => ({
 		}
 		state.renderMode = renderModesEnum.React_js
 		state.extension = "jsx"
+	},
+	showJSON() {
+		if (!state.showSidebar) {
+			state.showSidebar = true
+		} else if (state.renderMode === renderModesEnum.JSON) {
+			state.showSidebar = false
+		}
+		state.renderMode = renderModesEnum.JSON
+		state.extension = "json"
 	},
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
@@ -99,9 +99,9 @@ const methods = state => ({
 		}
 		state.fontSize += 2
 	},
-	resetZoom() {
-		state.fontSize = defaultFontSize
-	},
+	// resetZoom() {
+	// 	state.fontSize = defaultFontSize
+	// },
 })
 
 function usePreferences(editorState, options = { defaultRenderer: renderModesEnum.Readme }) {
