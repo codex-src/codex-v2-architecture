@@ -35,7 +35,7 @@ const App = () => {
 	const [prefs, prefsDispatch] = usePreferences(state)
 
 	// The status bar left-hand and right-hand side.
-	const [[lhs, rhs]] = useStatusBars(state)
+	const [[statusLHS, statusRHS]] = useStatusBars(state)
 
 	// The outline data structure.
 	const [showOutline, setShowOutline] = React.useState(true)
@@ -123,6 +123,27 @@ const App = () => {
 	}, [prefsDispatch])
 
 	return (
+
+	// TODO: Change to Provider API or consolidate to
+	// usePreferences; rename to useEditorApp
+	//
+	// <Provider value={{
+	// 	statusLHS,
+	// 	statusRHS,
+	// 	showOutline,
+	// 	setShowOutline,
+	// 	outline,
+	// 	saveStatus,
+	// 	title,
+	//
+	// 	state,
+	// 	dispatch,
+	// 	prefs,
+	// 	prefsDispatch,
+	// }}>
+	//
+	// </Provider>
+
 		// NOTE: Use items-start for sticky
 		<div className="px-6 py-32 flex flex-row justify-center items-start">
 
@@ -178,7 +199,7 @@ const App = () => {
 					leaveTo="opacity-0"
 				>
 					<StatusBars>
-						{[lhs, rhs]}
+						{[statusLHS, statusRHS]}
 					</StatusBars>
 				</Transition>
 
