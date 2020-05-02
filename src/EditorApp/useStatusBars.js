@@ -1,8 +1,7 @@
 import React from "react"
 import { toText } from "Editor/cmap"
 
-const FRAME = 16.67
-
+// Shorthand.
 function format(n) {
 	return n.toLocaleString("en")
 }
@@ -45,7 +44,7 @@ function useStatusBars(editorState) {
 		const id = setTimeout(() => {
 			const rhs = computeStatusRHS(editorState)
 			setRHS(rhs)
-		}, FRAME)
+		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}

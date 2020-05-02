@@ -142,7 +142,7 @@ const App = () => {
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
-				<Outline showOutlineTuple={[showOutline, setShowOutline]}>
+				<Outline showOutlineTuple={[showOutline, setShowOutline]} title={title}>
 					{outline}
 				</Outline>
 			</Transition>

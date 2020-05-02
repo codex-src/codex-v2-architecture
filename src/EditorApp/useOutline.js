@@ -2,8 +2,6 @@ import React from "react"
 import typeEnum from "Editor/typeEnum"
 import { toInnerText } from "Editor/cmap"
 
-const FRAME = 16.67
-
 // Computes an outline. <h1> and <h2> elements are
 // considered primary headers; <h3> through <h6> are
 // considered secondary headers.
@@ -54,7 +52,7 @@ function useOutline(editorState) {
 		const id = setTimeout(() => {
 			const outline = computeOutline(editorState)
 			setOutline(outline)
-		}, FRAME)
+		}, 16.67)
 		return () => {
 			clearTimeout(id)
 		}

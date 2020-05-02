@@ -23,7 +23,8 @@ function newScrollHandler(e, id, hash) {
 
 const Outline = ({
 	showOutlineTuple: [showOutline, setShowOutline],
-	children,
+	title,
+	children: outline,
 }) => {
 	const [hoverOutline, setHoverOutline] = React.useState(false)
 
@@ -76,7 +77,7 @@ const Outline = ({
 				</svg>
 				<p className="font-semibold text-xxs tracking-wide uppercase truncate">
 					{!hoverOutline ? (
-						children[0].children.trim() || "Untitled"
+						title.trim() || "Untitled"
 					) : (
 						"Hide Outline"
 					)}
@@ -86,7 +87,7 @@ const Outline = ({
 			{/* Outline */}
 			<div className="h-2" />
 			<ul>
-				{children.slice(1).map(({ id, hash, secondary, children }) => (
+				{outline.slice(1).map(({ id, hash, secondary, children }) => (
 					<li key={hash} onClick={e => newScrollHandler(e, id, hash)}>
 						{id !== "" && (
 							<a href={`#${hash}`}>
