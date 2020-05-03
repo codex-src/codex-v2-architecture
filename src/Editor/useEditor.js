@@ -2,7 +2,6 @@ import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRU from "lib/LRU"
 import parseElements from "./parser/parseElements"
-import parseElements2 from "./parser/parseElements"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parser/parseAnyList"
 
@@ -431,7 +430,7 @@ const methods = state => ({
 	// Rerenders the string and VDOM representations.
 	render() {
 
-		console.log(parseElements2(state.nodes))
+		// console.log(parseElements2(state.nodes))
 
 		// let t = Date.now()
 		// const data = state.nodes.map(each => each.data).join("\n")
