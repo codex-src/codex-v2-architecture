@@ -352,8 +352,8 @@ const methods = state => ({
 		this.render()
 	},
 	// Inserts an EOL character.
-	enter(autoCompleteSyntax = "") {
-		this.write(`\n${autoCompleteSyntax}`)
+	enter(autoSyntax = "") {
+		this.write(`\n${autoSyntax}`)
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {

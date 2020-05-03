@@ -19,8 +19,8 @@ import {
 
 import {
 	AnyListRe,
-	OrderedListRe,
 	TaskListRe,
+	UnorderedListRe,
 } from "./parseAnyList"
 
 import "./Editor.css"
@@ -65,14 +65,6 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	const mountedDOM = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
-			// const reactElements = state.reactVDOM.map(({ type: T, ...each }) => (
-			// 	React.createElement(typeEnumMap[T], {
-			// 		key: each.id,
-			// 		...each,
-			// 	})
-			// ))
-
-			// ReactDOM.unmountComponentAtNode(ref.current)
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
@@ -291,10 +283,11 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 								dispatch.backspaceParagraph()
 								return
 							}
-							if (OrderedListRe.test(tabs + syntax)) {
-								autoSyntax = `${tabs}1. `
-							} else if (TaskListRe.test(tabs + syntax)) {
+							autoSyntax = tabs + syntax // E.g. unordered
+							if (TaskListRe.test(autoSyntax)) {
 								autoSyntax = `${tabs}- [ ] `
+							} else if (UnorderedListRe.test(autoSyntax)) {
+								autoSyntax = `${tabs}- `
 							}
 						}
 						dispatch.enter(autoSyntax)
