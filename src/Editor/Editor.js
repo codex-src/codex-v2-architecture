@@ -119,14 +119,15 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				}
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
-				t = Date.now()
 
-				// Force select for edge-cases such as forward-
-				// backspace (pos does not change but the DOM does):
-				const [pos1, pos2] = computePosRange(ref.current)
-				dispatch.select(pos1, pos2)
-
-				console.log(`computePosRange=${Date.now() - t}`)
+				// t = Date.now()
+				//
+				// // Force select for edge-cases such as forward-
+				// // backspace (pos does not change but the DOM does):
+				// const [pos1, pos2] = computePosRange(ref.current)
+				// dispatch.select(pos1, pos2)
+				//
+				// console.log(`computePosRange=${Date.now() - t}`)
 			})
 		}, [state, dispatch]),
 		[state.readOnly, state.reactVDOM],
