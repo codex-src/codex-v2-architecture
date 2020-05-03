@@ -1,5 +1,3 @@
-// TODO: Rename parsed to element, etc.
-
 import * as emojiTrie from "emoji-trie"
 import typeEnum from "../typeEnum"
 import { isAlphanum } from "lib/encoding/ascii"

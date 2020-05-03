@@ -76,7 +76,7 @@ export function parsePreformatted(range) {
 		syntax: [range[0].data, range[range.length - 1].data],
 		info,
 		extension,
-		children: range.slice(1, range.length - 1),
+		children: range, // .slice(1, range.length - 1),
 	}
 	return element
 }

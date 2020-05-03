@@ -39,7 +39,7 @@ function parseAnyList(range) {
 			tag: "li",
 			id: each.id,
 			syntax: [tabs + syntax],
-			checked: checked === -1 ? undefined : Boolean(checked), // TODO: Remove
+			checked: checked === -1 ? undefined : Boolean(checked),
 			children: parseInlineElements(substr),
 		})
 	}
