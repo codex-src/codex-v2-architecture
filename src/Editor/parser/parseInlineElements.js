@@ -1,6 +1,10 @@
 import * as emojiTrie from "emoji-trie"
 import typeEnum from "../typeEnum"
-import { isAlphanum } from "lib/encoding/ascii"
+
+import {
+	isAlphanum,
+	isStrictAlphanum,
+} from "lib/encoding/ascii"
 
 import {
 	ASCIIPunctuationPattern,
@@ -70,7 +74,9 @@ function parseInlineElements(str) {
 	const elements = []
 	for (let x1 = 0; x1 < str.length; x1++) {
 		// Fast pass:
-		if ((isAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") { // Exempt "h" for "https://" and "http://"
+		//
+		// NOTE: Use isStrictAlphanum (because of "_")
+		if ((isStrictAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") { // Exempt "h" for "https://" and "http://"
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(str[x1])
 				continue
@@ -99,7 +105,7 @@ function parseInlineElements(str) {
 		// <Emphasis>
 		case "_":
 			// _Emphasis_
-			if (n >= "_x_".length) {
+			if (n >= "_?_".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
@@ -119,7 +125,7 @@ function parseInlineElements(str) {
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis*** (takes precedence)
-			if (n >= "***x1***".length && str.slice(x1, x1 + 3) === "***") {
+			if (n >= "***?***".length && str.slice(x1, x1 + 3) === "***") {
 				const res = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
@@ -134,7 +140,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// **Strong** (takes precedence)
-			} else if (n >= "**x1**".length && str.slice(x1, x1 + 2) === "**") {
+			} else if (n >= "**?**".length && str.slice(x1, x1 + 2) === "**") {
 				const res = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
@@ -149,7 +155,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// *Emphasis*
-			} else if (n >= "*x1*".length) {
+			} else if (n >= "*?*".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
@@ -169,7 +175,7 @@ function parseInlineElements(str) {
 		// <Code> (1 of 2)
 		case "`":
 			// `Code`
-			if (n >= "`x1`".length) {
+			if (n >= "`?`".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
@@ -189,7 +195,7 @@ function parseInlineElements(str) {
 		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
 			// ~~Strikethrough~~ (takes precedence)
-			if (n >= "~~x1~~".length && str.slice(x1, x1 + 2) === "~~") {
+			if (n >= "~~?~~".length && str.slice(x1, x1 + 2) === "~~") {
 				const res = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
@@ -204,7 +210,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// ~Code~
-			} else if (n >= "~x1~".length) {
+			} else if (n >= "~?~".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
@@ -252,7 +258,7 @@ function parseInlineElements(str) {
 		// <Anchor> (2 of 2)
 		case "[":
 			// [Anchor](href)
-			if (n >= "[x1](x1)".length) {
+			if (n >= "[?](?)".length) {
 				const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
 				if (!lhs) {
 					// No-op

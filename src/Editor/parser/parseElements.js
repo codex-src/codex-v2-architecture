@@ -1,5 +1,5 @@
 import parseAnyList from "./parseAnyList"
-import { isAlphanum } from "lib/encoding/ascii"
+import { isStrictAlphanum } from "lib/encoding/ascii"
 
 import {
 	parseBlockquote,
@@ -50,7 +50,9 @@ function parseElements(nodes /* , cache */) {
 	for (let x1 = 0; x1 < nodes.length; x1++) {
 		const each = nodes[x1]
 		// Fast pass:
-		if (!each.data.length || (isAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
+		//
+		// NOTE: Use isStrictAlphanum (because of "_")
+		if (!each.data.length || (isStrictAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
 			elements.push(parseParagraph(each))
 			continue
 		}
