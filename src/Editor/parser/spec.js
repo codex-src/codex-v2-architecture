@@ -1,13 +1,18 @@
-/* eslint-disable no-multi-spaces */
 export const HTTPS = "https://"
-export const HTTP  = "http://"
-/* eslint-enable no-multi-spaces */
+export const HTTP = "http://"
 
 // Matches a URL terminated by an alphanumeric (word) or
 // forward-slash character.
 //
 // https://tools.ietf.org/html/rfc3986
-export const safeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
+export const SafeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
+
+/* eslint-disable no-multi-spaces */
+export const TaskListRe      = /^(\t*)(- \[(?: |x)\] )/
+export const UnorderedListRe = /^(\t*)([-*] )/
+export const OrderedListRe   = /^(\t*)(\d+\. )/
+export const AnyListRe       = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/ // TaskListRe takes precedence
+/* eslint-enable no-multi-spaces */
 
 // Returns whether a character is an ASCII punctuation
 // character as defined by the GFM spec.

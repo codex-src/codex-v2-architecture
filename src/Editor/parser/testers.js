@@ -1,4 +1,4 @@
-import { AnyListRe } from "./parseAnyList"
+import { AnyListRe } from "./spec"
 
 // Tests whether a node is a header node.
 export function testHeader(node) {

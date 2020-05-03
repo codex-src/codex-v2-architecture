@@ -21,7 +21,7 @@ import {
 	AnyListRe,
 	TaskListRe,
 	UnorderedListRe,
-} from "./parser/parseAnyList"
+} from "./parser/spec"
 
 import "./Editor.css"
 import "./tailwind-codex-overrides.css"

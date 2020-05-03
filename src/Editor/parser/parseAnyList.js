@@ -1,18 +1,14 @@
 import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../typeEnum"
 
-/* eslint-disable no-multi-spaces, no-useless-escape */
-export const TaskListRe      = /^(\t*)(- \[(?: |x)\] )/
-export const UnorderedListRe = /^(\t*)([-*] )/
-export const OrderedListRe   = /^(\t*)(\d+\. )/
-/* eslint-enable no-multi-spaces, no-useless-escape */
-
-// NOTE: TaskListRe takes precedence
-export const AnyListRe = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/
+import {
+	AnyListRe,
+	UnorderedListRe,
+} from "./spec"
 
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
-export function parseAnyList(range) {
+function parseAnyList(range) {
 	const result = {
 		type: typeEnum.AnyList,
 		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",
@@ -52,3 +48,5 @@ export function parseAnyList(range) {
 	}
 	return result
 }
+
+export default parseAnyList

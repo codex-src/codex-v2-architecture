@@ -11,7 +11,7 @@ import {
 	HTTPS,
 	isASCIIPunctuation,
 	isASCIIWhiteSpace,
-	safeURLRe,
+	SafeURLRe,
 } from "./spec"
 
 // Parses a GitHub Flavored Markdown (GFM) type.
@@ -231,7 +231,7 @@ function parseInlineElements(str) {
 				if (str.slice(x, x + syntax.length + 4) === `${syntax}www.`) {
 					syntax += "www."
 				}
-				let [href] = safeURLRe.exec(str.slice(x))
+				let [href] = SafeURLRe.exec(str.slice(x))
 				if (href.length === syntax.length) {
 					// No-op; defer to end
 				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {
