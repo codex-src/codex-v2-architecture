@@ -48,7 +48,7 @@ function parseGFMType({ type, syntax, str, x }) {
 	// Increment start syntax (assumes start and end syntax
 	// are the same):
 	x += syntax.length
-	const parsed = {
+	const element = {
 		type,
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
@@ -57,7 +57,7 @@ function parseGFMType({ type, syntax, str, x }) {
 	}
 	// Increment offset and end syntax:
 	x += offset + syntax.length
-	return { parsed, x2: x }
+	return { element, x2: x }
 }
 
 // TODO: https://github.github.com/gfm/#delimiter-stack
@@ -65,15 +65,15 @@ function parseInlineElements(str) {
 	if (!str.length) {
 		return null
 	}
-	const parsed = []
+	const elements = []
 	for (let x = 0; x < str.length; x++) {
 		// Fast pass:
 		if ((isAlphanum(str[x]) && str[x] !== "h") || str[x] === " ") { // Exempt "h" for "https://" and "http://"
-			if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
-				parsed.push(str[x])
+			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
+				elements.push(str[x])
 				continue
 			}
-			parsed[parsed.length - 1] += str[x]
+			elements[elements.length - 1] += str[x]
 			continue
 		}
 		const nchars = str.length - x
@@ -81,7 +81,7 @@ function parseInlineElements(str) {
 		// <Escape>
 		case "\\":
 	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
-				parsed.push({
+				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
 					children: str[x + 1],
@@ -107,7 +107,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			}
@@ -127,7 +127,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			// **Strong** (takes precedence)
@@ -142,7 +142,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			// *Emphasis*
@@ -157,7 +157,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			}
@@ -177,7 +177,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			}
@@ -197,7 +197,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			// ~Code~
@@ -212,7 +212,7 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push(res.parsed)
+				elements.push(res.element)
 				x = res.x2 - 1
 				continue
 			}
@@ -235,7 +235,7 @@ function parseInlineElements(str) {
 				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {
 					href = href.slice(0, href.length - 1)
 				}
-				parsed.push({
+				elements.push({
 					type: typeEnum.Anchor,
 					syntax: [syntax],
 					href,
@@ -266,12 +266,12 @@ function parseInlineElements(str) {
 					// No-op
 					break
 				}
-				parsed.push({
+				elements.push({
 					type: typeEnum.Anchor,
 					// syntax: ["[", "](…)"],
-					syntax: ["[", `](${rhs.parsed.children})`],
-					href: rhs.parsed.children.trim(), // FIXME: Remove trim?
-					children: lhs.parsed.children,
+					syntax: ["[", `](${rhs.element.children})`],
+					href: rhs.element.children.trim(), // FIXME: Remove trim?
+					children: lhs.element.children,
 				})
 				x = rhs.x2 - 1
 				continue
@@ -283,7 +283,7 @@ function parseInlineElements(str) {
 			// 😀
 			const info = emojiTrie.atStart(str.slice(x))
 			if (info && info.status === "fully-qualified") { // TODO: Add "component"?
-				parsed.push({
+				elements.push({
 					type: typeEnum.Emoji,
 					description: info.description,
 					children: info.emoji,
@@ -294,16 +294,16 @@ function parseInlineElements(str) {
 			// No-op
 			break
 		}
-		if (!parsed.length || typeof parsed[parsed.length - 1] !== "string") {
-			parsed.push(str[x])
+		if (!elements.length || typeof elements[elements.length - 1] !== "string") {
+			elements.push(str[x])
 			continue
 		}
-		parsed[parsed.length - 1] += str[x]
+		elements[elements.length - 1] += str[x]
 	}
-	if (parsed.length === 1 && typeof parsed[0] === "string") {
-		return parsed[0]
+	if (elements.length === 1 && typeof elements[0] === "string") {
+		return elements[0]
 	}
-	return parsed
+	return elements
 }
 
 export default parseInlineElements

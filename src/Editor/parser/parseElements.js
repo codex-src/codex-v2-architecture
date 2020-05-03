@@ -86,9 +86,9 @@ function parseElements(nodes /* , cache */) {
 		case "`":
 		case "~":
 			if (testPreformattedStart(each)) {
+				const syntax = each.data.slice(0, 3)
 				let x2 = x1
 				x2++
-				const syntax = each.data.slice(0, 3)
 				for (; x2 < nodes.length; x2++) {
 					const each = nodes[x2]
 					if (testPreformattedEnd(each, syntax)) {
