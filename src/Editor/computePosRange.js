@@ -6,27 +6,11 @@ function computePos(editorRoot, { ...range }) {
 	if (!range.node || !editorRoot.contains(range.node)) {
 		throw new Error("computePos: no such node or out of bounds")
 	}
-
-	// // NOTE: Gecko/Firefox can select the end element node
-	// if (node.nodeType === Node.ELEMENT_NODE && offset && !(offset < node.childNodes.length)) {
-	// 	node = null
-	// 	offset = 0
-	// }
-
 	// Iterate to the deepest node:
-	//
-	// FIXME: range.offset can be out of bounds
 	while (range.node.nodeType === Node.ELEMENT_NODE && range.offset < range.node.childNodes.length) {
 		range.node = range.node.childNodes[range.offset]
 		range.offset = 0
 	}
-
-	// // Iterate to the deepest node:
-	// while (range.node.nodeType === Node.ELEMENT_NODE && range.node.childNodes.length) {
-	// 	range.node = range.node.childNodes[range.offset]
-	// 	range.offset = 0
-	// }
-
 	const recurse = on => {
 		if (on === range.node) {
 			Object.assign(pos, {
