@@ -1,5 +1,5 @@
+import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../typeEnum"
-import { parseInlineElements } from "../parser" // FIXME
 
 /* eslint-disable no-multi-spaces, no-useless-escape */
 export const TaskListRe      = /^(\t*)(- \[(?: |x)\] )/

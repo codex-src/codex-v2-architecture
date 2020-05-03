@@ -1,10 +1,10 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRU from "lib/LRU"
+import parseElements from "./parser/parseElements"
 import parseElements2 from "./parser/parseElements"
 import useMethods from "use-methods"
-import { AnyListRe } from "./parseAnyList"
-import { parseElements } from "./parser"
+import { AnyListRe } from "./parser/parseAnyList"
 
 import {
 	newNodes,

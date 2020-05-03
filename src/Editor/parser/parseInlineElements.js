@@ -3,12 +3,6 @@
 import * as emojiTrie from "emoji-trie"
 import typeEnum from "../typeEnum"
 import { isAlphanum } from "lib/encoding/ascii"
-import { toInnerText } from "../cmap"
-
-import {
-	AnyListRe,
-	parseAnyList,
-} from "./parseAnyList"
 
 import {
 	ASCIIPunctuationPattern,

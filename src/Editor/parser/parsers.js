@@ -18,19 +18,24 @@ export function parseHeader(node) {
 	return element
 }
 
+// Counts the number of emojis.
+function countEmojis(children) {
+	if (!children || !children.reduce) {
+		return 0
+	}
+	const range = children.slice(0, 3)
+	return range.reduce((count, each) => count + Number(each && each.type && each.type === typeEnum.Emoji), 0)
+}
+
 // Parses a paragraph element.
 export function parseParagraph(node) {
+	const children = parseInlineElements(node.data)
 	const element = {
 		type: typeEnum.Paragraph,
 		id: node.id,
-		// emojis: (
-		// 	children &&
-		// 	children.every &&
-		// 	children.every(each => each && each.type && each.type === typeEnum.Emoji) &&
-		// 	children.length
-		// ),
-		emojis: 0,
-		children: node.data,
+		// TODO: Rename to numberOfEmojis or emojiCount?
+		emojis: countEmojis(children),
+		children,
 	}
 	return element
 }
@@ -44,7 +49,7 @@ export function parseBlockquote(range) {
 			type: typeEnum.BlockquoteItem,
 			id: each.id,
 			syntax: [each.data.slice(0, 2)],
-			children: each.data.slice(2), // parseInlineElements(each.data.slice(2)),
+			children: parseInlineElements(each.data.slice(2)),
 		})),
 	}
 	return element

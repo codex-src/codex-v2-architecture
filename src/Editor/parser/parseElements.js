@@ -1,5 +1,5 @@
-import typeEnum from "../typeEnum"
 import { isAlphanum } from "lib/encoding/ascii"
+import { parseAnyList } from "./parseAnyList"
 
 import {
 	parseBlockquote,
@@ -7,12 +7,7 @@ import {
 	parseHeader,
 	parseParagraph,
 	parsePreformatted,
-} from "./parse"
-
-import {
-	AnyListRe,
-	parseAnyList,
-} from "./parseAnyList"
+} from "./parsers"
 
 import {
 	testAnyList,
@@ -21,7 +16,7 @@ import {
 	testHeader,
 	testPreformattedEnd,
 	testPreformattedStart,
-} from "./test"
+} from "./testers"
 
 // Parses a GitHub Flavored Markdown (GFM) data structure.
 function parseElements(nodes /* , cache */) {
