@@ -430,23 +430,22 @@ const methods = state => ({
 	// Rerenders the string and VDOM representations.
 	render() {
 
-		// console.log(parseElements2(state.nodes))
-
-		// let t = Date.now()
-		// const data = state.nodes.map(each => each.data).join("\n")
-		// console.log(Date.now() - t)
-		// t = Date.now()
-		// const reactVDOM = parseElements(state.nodes)
-		// console.log(Date.now() - t)
-		// Object.assign(state, {
-		// 	data,
-		// 	reactVDOM,
-		// })
+		let t = Date.now()
+		const data = state.nodes.map(each => each.data).join("\n")
+		console.log(`data=${Date.now() - t}`)
+		t = Date.now()
+		const reactVDOM = parseElements(state.nodes)
+		console.log(`reactVDOM=${Date.now() - t}`)
 
 		Object.assign(state, {
-			data: state.nodes.map(each => each.data).join("\n"),
-			reactVDOM: parseElements(state.nodes, state.parserLRUCache),
+			data,
+			reactVDOM,
 		})
+
+		// Object.assign(state, {
+		// 	data: state.nodes.map(each => each.data).join("\n"),
+		// 	reactVDOM: parseElements(state.nodes, state.parserLRUCache),
+		// })
 	},
 })
 

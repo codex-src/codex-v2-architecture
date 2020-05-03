@@ -65,7 +65,14 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	const mountedDOM = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
+
+			let t = Date.now()
+
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
+
+				console.log(`ReactDOM.render=${Date.now() - t}`)
+				t = Date.now()
+
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
 					const checkboxes = clonedElement.querySelectorAll(".checkbox")
@@ -82,6 +89,10 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						}
 					}
 				})
+
+				console.log(`syncDOM=${Date.now() - t}`)
+				t = Date.now()
+
 				if (!mountedDOM.current || state.readOnly || !state.focused) {
 					mountedDOM.current = true
 					return
@@ -102,10 +113,16 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 					console.error(error)
 					return
 				}
+
+				console.log(`syncDOMPos=${Date.now() - t}`)
+				t = Date.now()
+
 				// Force select for edge-cases such as forward-
 				// backspace (pos does not change but the DOM does):
 				const [pos1, pos2] = computePosRange(ref.current)
 				dispatch.select(pos1, pos2)
+
+				console.log(`computePosRange=${Date.now() - t}`)
 			})
 		}, [state, dispatch]),
 		[state.readOnly, state.reactVDOM],
