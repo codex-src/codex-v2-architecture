@@ -45,8 +45,19 @@ function newURLHashEpoch() {
 }
 
 // Parses GitHub Flavored Markdown elements.
-function parseElements(nodes /* , cache */) {
+function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
+
+	const cacheStrategy = (range, parser) => {
+		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
+		let element = cachedElements.get(key)
+		if (!element) {
+			element = parser(range)
+			cachedElements.set(key, element)
+		}
+		const { id } = !Array.isArray(range) ? range : range[0]
+		return { ...element, id }
+	}
 
 	const elements = []
 	for (let x1 = 0; x1 < nodes.length; x1++) {
@@ -55,14 +66,16 @@ function parseElements(nodes /* , cache */) {
 		//
 		// NOTE: Use isStrictAlphanum (because of "_")
 		if (!each.data.length || (isStrictAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
-			elements.push(parseParagraph(each))
+			const element = cacheStrategy(each, parseParagraph)
+			elements.push(element)
 			continue
 		}
 		switch (each.data[0]) {
 		// <Header>
 		case "#":
 			if (testHeader(each)) {
-				elements.push(parseHeader(each, newURLHash))
+				const element = cacheStrategy(each, each => parseHeader(each, newURLHash))
+				elements.push(element)
 				continue
 			}
 			// No-op
@@ -80,7 +93,8 @@ function parseElements(nodes /* , cache */) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				elements.push(parseBlockquote(range))
+				const element = cacheStrategy(range, parseBlockquote)
+				elements.push(element)
 				x1 = x2
 				continue
 			}
@@ -106,7 +120,8 @@ function parseElements(nodes /* , cache */) {
 					break
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				elements.push(parsePreformatted(range))
+				const element = cacheStrategy(range, parsePreformatted)
+				elements.push(element)
 				x1 = x2
 				continue
 			}
@@ -137,11 +152,13 @@ function parseElements(nodes /* , cache */) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				elements.push(parseAnyList(range))
+				const element = cacheStrategy(range, parseAnyList)
+				elements.push(element)
 				x1 = x2
 				continue
 			} else if (testBreak(each)) {
-				elements.push(parseBreak(each))
+				const element = cacheStrategy(each, parseBreak)
+				elements.push(element)
 				continue
 			}
 			// No-op
@@ -151,7 +168,8 @@ function parseElements(nodes /* , cache */) {
 			break
 		}
 		// <Paragraph>
-		elements.push(parseParagraph(each))
+		const element = cacheStrategy(each, parseParagraph)
+		elements.push(element)
 	}
 	return elements
 }

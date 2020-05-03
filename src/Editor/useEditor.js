@@ -15,7 +15,7 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
-	const parserLRUCache = new LRU(100)
+	const cachedElements = new LRU(100)
 	const initialState = {
 		readOnly: false,                                 // Is read-only?
 		focused: false,                                  // Is focused?
@@ -29,8 +29,8 @@ function newEditorState(data) {
 			stack: [{ data, nodes, pos1: { ...pos1 }, pos2: { ...pos1 } }],
 			index: 0,                                      // History state stack index
 		},                                               //
-		parserLRUCache,                                  // LRU cache for parseElements
-		reactVDOM: parseElements(nodes, parserLRUCache), // React VDOM
+		cachedElements,                                  // LRU cached elements (for parseElements)
+		reactVDOM: parseElements(nodes, cachedElements), // React VDOM
 		reactDOM: document.createElement("div"),         // React-managed DOM
 	}
 	return initialState
@@ -433,7 +433,7 @@ const methods = state => ({
 		const data = state.nodes.map(each => each.data).join("\n")
 		console.log(`data=${Date.now() - t}`)
 		t = Date.now()
-		const reactVDOM = parseElements(state.nodes)
+		const reactVDOM = parseElements(state.nodes, state.cachedElements)
 		console.log(`reactVDOM=${Date.now() - t}`)
 
 		Object.assign(state, {
