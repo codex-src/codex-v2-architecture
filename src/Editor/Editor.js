@@ -31,12 +31,16 @@ const ReactEditor = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
-			{state.reactVDOM.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumMap[T], {
-					key: each.id,
-					...each,
-				})
-			))}
+			{(t => {
+				const components = state.reactVDOM.map(({ type: T, ...each }) => (
+					React.createElement(typeEnumMap[T], {
+						key: each.id,
+						...each,
+					})
+				))
+				console.log(`ReactEditor=${Date.now() - t}`)
+				return components
+			})(Date.now())}
 		</Provider>
 	)
 }
