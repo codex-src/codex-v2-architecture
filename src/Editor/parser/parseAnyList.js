@@ -30,16 +30,16 @@ function parseAnyList(range) {
 			}
 			ref = ref[ref.length - 1].children
 		}
-		let checked = -1
+		let checked = undefined
 		if (syntax === "- [ ] " || syntax === "- [x] ") {
-			checked = Number(syntax === "- [x] ")
+			checked = syntax === "- [x] "
 		}
 		ref.push({
-			type: checked === -1 ? typeEnum.AnyListItem : typeEnum.TodoItem,
+			type: checked === undefined ? typeEnum.AnyListItem : typeEnum.TodoItem,
 			tag: "li",
 			id: each.id,
 			syntax: [tabs + syntax],
-			checked: checked === -1 ? undefined : Boolean(checked),
+			checked, // : checked === -1 ? undefined : Boolean(checked),
 			children: parseInlineElements(substr),
 		})
 	}

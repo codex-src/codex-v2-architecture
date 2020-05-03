@@ -1,4 +1,6 @@
+// import { toText } from "../cmap"
 import parseAnyList from "./parseAnyList"
+import typeEnum from "../typeEnum"
 import { isStrictAlphanum } from "lib/encoding/ascii"
 
 import {
@@ -67,7 +69,7 @@ function parseElements(nodes, cachedElements) {
 		// NOTE: Use isStrictAlphanum (because of "_")
 		if (!each.data.length || (isStrictAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
 			const element = cacheStrategy(each, parseParagraph)
-			elements.push(element)
+			elements.push({ ...element, id: each.id })
 			continue
 		}
 		switch (each.data[0]) {
@@ -75,7 +77,7 @@ function parseElements(nodes, cachedElements) {
 		case "#":
 			if (testHeader(each)) {
 				const element = cacheStrategy(each, each => parseHeader(each, newURLHash))
-				elements.push(element)
+				elements.push({ ...element, id: each.id })
 				continue
 			}
 			// No-op
@@ -94,7 +96,14 @@ function parseElements(nodes, cachedElements) {
 				}
 				const range = nodes.slice(x1, x2 + 1)
 				const element = cacheStrategy(range, parseBlockquote)
-				elements.push(element)
+				elements.push({
+					...element,
+					id: each.id,
+					children: element.children.map((each, x) => ({
+						...each,
+						id: range[x].id,
+					})),
+				})
 				x1 = x2
 				continue
 			}
@@ -121,7 +130,14 @@ function parseElements(nodes, cachedElements) {
 				}
 				const range = nodes.slice(x1, x2 + 1)
 				const element = cacheStrategy(range, parsePreformatted)
-				elements.push(element)
+				elements.push({
+					...element,
+					id: each.id,
+					children: element.children.map((each, x) => ({
+						...each,
+						id: range[x].id,
+					})),
+				})
 				x1 = x2
 				continue
 			}
@@ -153,12 +169,28 @@ function parseElements(nodes, cachedElements) {
 				}
 				const range = nodes.slice(x1, x2 + 1)
 				const element = cacheStrategy(range, parseAnyList)
-				elements.push(element)
+
+				// Recursively mutates IDs; does not mutate the root
+				// ID on purpose.
+				let y = 0
+				const recurse = element => {
+					for (let x = 0; x < element.children.length; x++) {
+						// console.log(toText([element.children[x]]), range[y].data)
+						element.children[x].id = range[y].id
+						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
+							y++ // Increment to the next node
+							continue
+						}
+						recurse(element.children[x])
+					}
+				}
+				recurse(element)
+				elements.push({ ...element, id: each.id })
 				x1 = x2
 				continue
 			} else if (testBreak(each)) {
 				const element = cacheStrategy(each, parseBreak)
-				elements.push(element)
+				elements.push({ ...element, id: each.id })
 				continue
 			}
 			// No-op
@@ -169,7 +201,7 @@ function parseElements(nodes, cachedElements) {
 		}
 		// <Paragraph>
 		const element = cacheStrategy(each, parseParagraph)
-		elements.push(element)
+		elements.push({ ...element, id: each.id })
 	}
 	return elements
 }
