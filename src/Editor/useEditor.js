@@ -1,6 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
-import LRU from "lib/LRU"
+import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parser/spec"
@@ -15,7 +15,7 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
-	const cachedElements = new LRU(100)
+	const cachedElements = new LRUCache(100)
 	const initialState = {
 		readOnly: false,                                 // Is read-only?
 		focused: false,                                  // Is focused?
