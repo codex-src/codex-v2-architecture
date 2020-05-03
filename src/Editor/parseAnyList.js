@@ -2,9 +2,13 @@ import typeEnum from "./typeEnum"
 import { parseInlineElements } from "./parser"
 
 /* eslint-disable no-multi-spaces, no-useless-escape */
-export const AnyListRe       = /^(\t*)(- \[(?: |x)\] |[\-\*] |\d+\. )/
-export const UnorderedListRe = /^(\t*)([\-\*] )/
+export const TaskListRe      = /^(\t*)(- \[(?: |x)\] )/
+export const UnorderedListRe = /^(\t*)([-*] )/
+export const OrderedListRe   = /^(\t*)(\d+\. )/
 /* eslint-enable no-multi-spaces, no-useless-escape */
+
+// NOTE: TaskListRe takes precedence
+export const AnyListRe = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/
 
 // Parses a list-based VDOM representation from a range of
 // paragraphs.

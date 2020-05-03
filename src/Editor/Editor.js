@@ -8,7 +8,6 @@ import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumMap from "./typeEnumMap"
-import { AnyListRe } from "./parseAnyList"
 import { ascendNode } from "./ascendNodes"
 import { isListItemElement } from "./listElements"
 
@@ -17,6 +16,12 @@ import {
 	detectUndo,
 	isMetaOrCtrlKey,
 } from "./detect"
+
+import {
+	AnyListRe,
+	OrderedListRe,
+	TaskListRe,
+} from "./parseAnyList"
 
 import "./Editor.css"
 import "./tailwind-codex-overrides.css"
@@ -263,13 +268,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 						}
 						// No-op
 						return
-						// Enter:
+					// Enter:
 					} else if (e.keyCode === keyCodes.Enter) {
 						e.preventDefault()
 
 						// Returns whether the start cursor is focused
 						// on a list item element e.g. <li>.
-						function isFocusedListItemElement() {
+						const isFocusedListItemElement = () => {
 							const selection = document.getSelection()
 							if (!selection.rangeCount) {
 								return false
@@ -278,22 +283,21 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							return isListItemElement(ascendNode(range.startContainer))
 						}
 
-						let enterSyntax = ""
+						let autoSyntax = ""
 						if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
 							const node = state.nodes[state.pos1.y]
 							const [, tabs, syntax] = node.data.match(AnyListRe)
-							if ((tabs + syntax).length === node.data.length) {
+							if (tabs + syntax === node.data) {
 								dispatch.backspaceParagraph()
 								return
 							}
-							enterSyntax = tabs + syntax
-							if (syntax[0] >= "0" && syntax[0] <= "9") {
-								enterSyntax = `${tabs}1. `
-							} else if (syntax === "- [ ] " || syntax === "- [x] ") {
-								enterSyntax = `${tabs}- [ ] `
+							if (OrderedListRe.test(tabs + syntax)) {
+								autoSyntax = `${tabs}1. `
+							} else if (TaskListRe.test(tabs + syntax)) {
+								autoSyntax = `${tabs}- [ ] `
 							}
 						}
-						dispatch.enter(enterSyntax)
+						dispatch.enter(autoSyntax)
 						return
 					}
 					// Backspace paragraph:
