@@ -1,3 +1,5 @@
+// TODO: Rename to parseElements
+
 import * as emojiTrie from "emoji-trie"
 import newHashEpoch from "./newHashEpoch"
 import typeEnum from "./typeEnum"
@@ -330,7 +332,7 @@ export function parseInlineElements(str) {
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-export function parseElements(nodes, lruCache) {
+export function parseElements(nodes, cache) {
 	const newHash = newHashEpoch()
 
 	const parsed = []
@@ -338,7 +340,7 @@ export function parseElements(nodes, lruCache) {
 		// Fast pass:
 		if (!nodes[x].data.length || testFastPass(nodes[x].data[0])) {
 			// if (nodes[x].data.length) {
-			// 	const cached = lruCache.get(nodes[x].data)
+			// 	const cached = cache.get(nodes[x].data)
 			// 	if (cached) {
 			// 		// FIXME: Correct key
 			// 		parsed.push({ ...cached, id: nodes[x].id })
@@ -361,7 +363,7 @@ export function parseElements(nodes, lruCache) {
 			// 	// FIXME: Correct key
 			// 	// TODO: Consider **not** storing the ‘focus’ node;
 			// 	// will lead to excessive writes
-			// 	lruCache.set(nodes[x].data, { ...parsed[parsed.length - 1], id: undefined })
+			// 	cache.set(nodes[x].data, { ...parsed[parsed.length - 1], id: undefined })
 			// }
 			continue
 		}
