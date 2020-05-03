@@ -1,18 +1,15 @@
 import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../typeEnum"
-import { toInnerText } from "../cmap"
 
 // Parses a header element.
-export function parseHeader(node, newURLHash) {
+export function parseHeader(node) {
 	const syntax = node.data.split(" ", 1)[0] + " " // eslint-disable-line prefer-template
-	const children = parseInlineElements(node.data.slice(syntax.length))
 	const element = {
 		type: typeEnum.Header,
 		tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 		id: node.id,
 		syntax: [syntax],
-		hash: newURLHash(toInnerText(children)),
-		children,
+		children: parseInlineElements(node.data.slice(syntax.length)),
 	}
 	return element
 }

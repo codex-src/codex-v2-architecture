@@ -1,7 +1,7 @@
-// import { toText } from "../cmap"
 import parseAnyList from "./parseAnyList"
 import typeEnum from "../typeEnum"
 import { isStrictAlphanum } from "lib/encoding/ascii"
+import { toInnerText } from "../cmap"
 
 import {
 	parseBlockquote,
@@ -57,8 +57,7 @@ function parseElements(nodes, cachedElements) {
 			element = parser(range)
 			cachedElements.set(key, element)
 		}
-		const { id } = !Array.isArray(range) ? range : range[0]
-		return { ...element, id }
+		return element
 	}
 
 	const elements = []
@@ -76,8 +75,12 @@ function parseElements(nodes, cachedElements) {
 		// <Header>
 		case "#":
 			if (testHeader(each)) {
-				const element = cacheStrategy(each, each => parseHeader(each, newURLHash))
-				elements.push({ ...element, id: each.id })
+				const element = cacheStrategy(each, each => parseHeader(each))
+				elements.push({
+					...element,
+					id: each.id,
+					hash: newURLHash(toInnerText(element.children)),
+				})
 				continue
 			}
 			// No-op
@@ -123,7 +126,7 @@ function parseElements(nodes, cachedElements) {
 						break
 					}
 				}
-				// Guard unterminated:
+				// Guard EOF:
 				if (x2 === nodes.length) {
 					// No-op
 					break
@@ -185,6 +188,7 @@ function parseElements(nodes, cachedElements) {
 					}
 				}
 				recurse(element)
+
 				elements.push({ ...element, id: each.id })
 				x1 = x2
 				continue
