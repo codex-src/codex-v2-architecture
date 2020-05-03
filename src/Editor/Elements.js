@@ -158,7 +158,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	)
 })
 
-export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
+export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
 	<Node tag={tag} id={id} className="my-2">
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
@@ -186,7 +186,7 @@ const Checkbox = ({ checked }) => (
 	</Button>
 )
 
-export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }) => (
+export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	<Node tag={tag} id={id} className="todo relative my-2" style={checked && attrs.strike.style}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
@@ -199,13 +199,15 @@ export const TodoItem = React.memo(({ tag, id, tabs, syntax, checked, children }
 	</Node>
 ))
 
-export const AnyList = React.memo(({ type, tag, id, tabs, children: nodes }) => {
-	const HOC = !tabs.length ? Root : Node
+// NOTE: __nested is not parsed
+export const AnyList = React.memo(({ type, tag, id, __nested, children: nodes }) => {
+	const HOC = __nested === undefined ? Root : Node
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumMap[T], {
 					key: each.id,
+					__nested: true,
 					...each,
 				})
 			))}

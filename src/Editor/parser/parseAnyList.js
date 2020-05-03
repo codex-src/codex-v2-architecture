@@ -9,24 +9,22 @@ import {
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
 function parseAnyList(range) {
-	const result = {
+	const element = {
 		type: typeEnum.AnyList,
 		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",
 		id: range[0].id,
-		tabs: "",
 		children: [],
 	}
 	for (const each of range) {
 		const [, tabs, syntax] = each.data.match(AnyListRe)
 		const substr = each.data.slice((tabs + syntax).length)
-		let ref = result.children
+		let ref = element.children
 		for (let x = 0; x < tabs.length; x++) {
 			if (!ref.length || ref[ref.length - 1].type !== typeEnum.AnyList) {
 				ref.push({
 					type: typeEnum.AnyList,
 					tag: UnorderedListRe.test(each.data) ? "ul" : "ol",
 					id: each.id,
-					tabs: "\t".repeat(x + 1), // Eagerly increment
 					children: [],
 				})
 			}
@@ -40,13 +38,12 @@ function parseAnyList(range) {
 			type: checked === -1 ? typeEnum.AnyListItem : typeEnum.TodoItem,
 			tag: "li",
 			id: each.id,
-			tabs,
 			syntax: [tabs + syntax],
-			checked: checked === -1 ? undefined : Boolean(checked),
+			checked: checked === -1 ? undefined : Boolean(checked), // TODO: Remove
 			children: parseInlineElements(substr),
 		})
 	}
-	return result
+	return element
 }
 
 export default parseAnyList
