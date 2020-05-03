@@ -29,7 +29,7 @@ function parseElements(nodes /* , cache */) {
 	for (let x1 = 0; x1 < nodes.length; x1++) {
 		const each = nodes[x1]
 		// Fast pass:
-		if (!each.data.length || (isAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data === " ") {
+		if (!each.data.length || (isAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
 			elements.push(parseParagraph(each))
 			continue
 		}

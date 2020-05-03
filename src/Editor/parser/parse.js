@@ -1,18 +1,19 @@
+import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../typeEnum"
 
 // Parses a header element.
 //
 // TODO: Add hash
 export function parseHeader(node) {
-	const syntax = `${node.data.split(" ", 1)[0]} `
+	const syntax = node.data.split(" ", 1)[0] + " " // eslint-disable-line prefer-template
 	const element = {
 		type: typeEnum.Header,
 		tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
 		id: node.id,
 		syntax: [syntax],
 		// hash: newHash(toInnerText(parseInlineElements(node.data.slice(syntax.length)))),
-		// children: parseInlineElements(node.data.slice(syntax.length)),
-		children: node.data.slice(syntax.length),
+		hash: "TODO",
+		children: parseInlineElements(node.data.slice(syntax.length)),
 	}
 	return element
 }
@@ -28,6 +29,7 @@ export function parseParagraph(node) {
 		// 	children.every(each => each && each.type && each.type === typeEnum.Emoji) &&
 		// 	children.length
 		// ),
+		emojis: 0,
 		children: node.data,
 	}
 	return element
