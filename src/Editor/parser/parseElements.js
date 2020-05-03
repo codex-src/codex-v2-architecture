@@ -44,7 +44,7 @@ import {
 // 	return newHash
 // }
 
-// Parses a GitHub Flavored Markdown (GFM) data structure.
+// Parses GitHub Flavored Markdown elements.
 function parseElements(nodes /* , cache */) {
 	const elements = []
 	for (let x1 = 0; x1 < nodes.length; x1++) {

@@ -12,11 +12,11 @@ import {
 	SafeURLRe,
 } from "./spec"
 
-// Parses a GitHub Flavored Markdown (GFM) type.
-function parseGFMType({ type, syntax, str, x }) {
+// Parses a GitHub Flavored Markdown inline element.
+function parseInlineElement({ type, syntax, str, x1 }) {
 	// Syntax must be preceded by a BOL, space, or ASCII
 	// punctuation character:
-	if (x - 1 >= 0 && !(isASCIIWhiteSpace(str[x - 1]) || isASCIIPunctuation(str[x - 1]))) { // E.g. "·*match*"
+	if (x1 - 1 >= 0 && !(isASCIIWhiteSpace(str[x1 - 1]) || isASCIIPunctuation(str[x1 - 1]))) { // E.g. "·*match*"
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -30,65 +30,68 @@ function parseGFMType({ type, syntax, str, x }) {
 	// punctuation character:
 	pattern += `(${ASCIIWhiteSpacePattern}|${ASCIIPunctuationPattern}|$)`
 	// Match cannot be empty:
-	const offset = str.slice(x + syntax.length).search(pattern) + patternOffset
+	const offset = str.slice(x1 + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
 		return null
 	// Match cannot be surrounded by a space (non-code):
 	} else if (type !== typeEnum.Code && (
-		isASCIIWhiteSpace(str[x + syntax.length]) ||           // E.g. "*·match"
-		isASCIIWhiteSpace(str[x + syntax.length + offset - 1]) // E.g. "match·*"
+		isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "*·match"
+		isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "match·*"
 	)) {
 		return null
 	// Match start or end cannot be redundant:
 	} else if (
-		str[x + syntax.length] === syntax[0] ||                              // E.g. "****match"
-		str[x + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "match****"
+		str[x1 + syntax.length] === syntax[0] ||                              // E.g. "****match"
+		str[x1 + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "match****"
 		return null
 	}
 	// Increment start syntax (assumes start and end syntax
 	// are the same):
-	x += syntax.length
+	x1 += syntax.length
 	const element = {
 		type,
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
-			? parseInlineElements(str.slice(x, x + offset))
-			: str.slice(x, x + offset),
+			? parseInlineElements(str.slice(x1, x1 + offset))
+			: str.slice(x1, x1 + offset),
 	}
 	// Increment offset and end syntax:
-	x += offset + syntax.length
-	return { element, x2: x }
+	const x2 = x1 + offset + syntax.length
+	return { element, x2 }
 }
 
+// Parses GitHub Flavored Markdown inline elements.
+//
 // TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInlineElements(str) {
 	if (!str.length) {
 		return null
 	}
 	const elements = []
-	for (let x = 0; x < str.length; x++) {
+	for (let x1 = 0; x1 < str.length; x1++) {
 		// Fast pass:
-		if ((isAlphanum(str[x]) && str[x] !== "h") || str[x] === " ") { // Exempt "h" for "https://" and "http://"
+		if ((isAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") { // Exempt "h" for "https://" and "http://"
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-				elements.push(str[x])
+				elements.push(str[x1])
 				continue
 			}
-			elements[elements.length - 1] += str[x]
+			elements[elements.length - 1] += str[x1]
 			continue
 		}
-		const nchars = str.length - x
-		switch (str[x]) {
+		const n = str.length - x1
+		switch (str[x1]) {
 		// <Escape>
 		case "\\":
-	 		if (x + 1 < str.length && isASCIIPunctuation(str[x + 1])) {
+			// \*
+	 		if (x1 + 1 < str.length && isASCIIPunctuation(str[x1 + 1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
-					children: str[x + 1],
+					children: str[x1 + 1],
 				})
 				// Increment to the next character; the punctuation
 				// character is auto-incremented:
-				x++
+				x1++
 				continue
 			}
 			// No-op
@@ -96,19 +99,19 @@ function parseInlineElements(str) {
 		// <Emphasis>
 		case "_":
 			// _Emphasis_
-			if (nchars >= "_x_".length) {
-				const res = parseGFMType({
+			if (n >= "_x_".length) {
+				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -116,49 +119,49 @@ function parseInlineElements(str) {
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis*** (takes precedence)
-			if (nchars >= "***x***".length && str.slice(x, x + 3) === "***") {
-				const res = parseGFMType({
+			if (n >= "***x1***".length && str.slice(x1, x1 + 3) === "***") {
+				const res = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			// **Strong** (takes precedence)
-			} else if (nchars >= "**x**".length && str.slice(x, x + 2) === "**") {
-				const res = parseGFMType({
+			} else if (n >= "**x1**".length && str.slice(x1, x1 + 2) === "**") {
+				const res = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			// *Emphasis*
-			} else if (nchars >= "*x*".length) {
-				const res = parseGFMType({
+			} else if (n >= "*x1*".length) {
+				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -166,19 +169,19 @@ function parseInlineElements(str) {
 		// <Code> (1 of 2)
 		case "`":
 			// `Code`
-			if (nchars >= "`x`".length) {
-				const res = parseGFMType({
+			if (n >= "`x1`".length) {
+				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -186,34 +189,34 @@ function parseInlineElements(str) {
 		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
 			// ~~Strikethrough~~ (takes precedence)
-			if (nchars >= "~~x~~".length && str.slice(x, x + 2) === "~~") {
-				const res = parseGFMType({
+			if (n >= "~~x1~~".length && str.slice(x1, x1 + 2) === "~~") {
+				const res = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			// ~Code~
-			} else if (nchars >= "~x~".length) {
-				const res = parseGFMType({
+			} else if (n >= "~x1~".length) {
+				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
 					str,
-					x,
+					x1,
 				})
 				if (!res) {
 					// No-op
 					break
 				}
 				elements.push(res.element)
-				x = res.x2 - 1
+				x1 = res.x2 - 1
 				continue
 			}
 			// No-op
@@ -222,14 +225,14 @@ function parseInlineElements(str) {
 		case "h":
 			// https:// or http://
 			if (
-				(nchars >= HTTPS.length && str.slice(x, x + HTTPS.length) === HTTPS) ||
-				(nchars >= HTTP.length && str.slice(x, x + HTTP.length) === HTTP)
+				(n >= HTTPS.length && str.slice(x1, x1 + HTTPS.length) === HTTPS) ||
+				(n >= HTTP.length && str.slice(x1, x1 + HTTP.length) === HTTP)
 			) {
-				let syntax = `${str.slice(x).split("://", 1)[0]}://`
-				if (str.slice(x, x + syntax.length + 4) === `${syntax}www.`) {
+				let syntax = `${str.slice(x1).split("://", 1)[0]}://`
+				if (str.slice(x1, x1 + syntax.length + 4) === `${syntax}www.`) {
 					syntax += "www."
 				}
-				let [href] = SafeURLRe.exec(str.slice(x))
+				let [href] = SafeURLRe.exec(str.slice(x1))
 				if (href.length === syntax.length) {
 					// No-op; defer to end
 				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {
@@ -241,7 +244,7 @@ function parseInlineElements(str) {
 					href,
 					children: href.slice(syntax.length),
 				})
-				x += href.length - 1
+				x1 += href.length - 1
 				continue
 			}
 			// No-op
@@ -249,19 +252,19 @@ function parseInlineElements(str) {
 		// <Anchor> (2 of 2)
 		case "[":
 			// [Anchor](href)
-			if (nchars >= "[x](x)".length) {
-				const lhs = parseGFMType({ type: typeEnum.Anchor, syntax: "]", str, x })
+			if (n >= "[x1](x1)".length) {
+				const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
 				if (!lhs) {
 					// No-op
 					break
 				}
-				// Check ( syntax:
+				// Check "(" syntax:
 				if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
 					// No-op
 					break
 				}
 				// lhs.x2++
-				const rhs = parseGFMType({ type: typeEnum.Anchor, syntax: ")", str, x: lhs.x2 })
+				const rhs = parseInlineElement({ type: typeEnum.Anchor, syntax: ")", str, x1: lhs.x2 })
 				if (!rhs) {
 					// No-op
 					break
@@ -270,10 +273,10 @@ function parseInlineElements(str) {
 					type: typeEnum.Anchor,
 					// syntax: ["[", "](…)"],
 					syntax: ["[", `](${rhs.element.children})`],
-					href: rhs.element.children.trim(), // FIXME: Remove trim?
+					href: rhs.element.children,
 					children: lhs.element.children,
 				})
-				x = rhs.x2 - 1
+				x1 = rhs.x2 - 1
 				continue
 			}
 			// No-op
@@ -281,24 +284,24 @@ function parseInlineElements(str) {
 		// <Emoji>
 		default:
 			// 😀
-			const info = emojiTrie.atStart(str.slice(x))
+			const info = emojiTrie.atStart(str.slice(x1))
 			if (info && info.status === "fully-qualified") { // TODO: Add "component"?
 				elements.push({
 					type: typeEnum.Emoji,
 					description: info.description,
 					children: info.emoji,
 				})
-				x += info.emoji.length - 1
+				x1 += info.emoji.length - 1
 				continue
 			}
 			// No-op
 			break
 		}
 		if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-			elements.push(str[x])
+			elements.push(str[x1])
 			continue
 		}
-		elements[elements.length - 1] += str[x]
+		elements[elements.length - 1] += str[x1]
 	}
 	if (elements.length === 1 && typeof elements[0] === "string") {
 		return elements[0]
