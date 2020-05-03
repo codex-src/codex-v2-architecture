@@ -15,7 +15,6 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
-	// NOTE: readOnly editors do not need a LRU cache
 	const parserLRUCache = new LRU(100)
 	const initialState = {
 		readOnly: false,                                 // Is read-only?
