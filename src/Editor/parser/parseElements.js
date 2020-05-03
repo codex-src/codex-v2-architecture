@@ -18,34 +18,36 @@ import {
 	testPreformattedStart,
 } from "./testers"
 
-// // Creates a new hash epoch for URL hashes.
-// function newHashEpoch() {
-// 	const hashes = {}
-// 	const newHash = str => {
-// 		// ALPHA / DIGIT / "-" / "." / "_" / "~"
-// 		//
-// 		// https://tools.ietf.org/html/rfc3986
-// 		//
-// 		/* eslint-disable no-useless-escape */
-// 		const hash = str
-// 			.toLowerCase()               // Lowercase
-// 			.replace(/(\s+|\-+)/g, "-")  // Convert spaces to dashes
-// 			.replace(/[^a-z0-9\-]/g, "") // Remove non-alphanumerics (strict)
-// 			.replace(/\-+/g, "-")        // Remove extraneous dashes (1 of 2)
-// 			.replace(/(^\-|\-$)/g, "")   // Remove extraneous dashes (2 of 2)
-// 		/* eslint-enable no-useless-escape */
-// 		const seen = hashes[hash]
-// 		if (!seen) {
-// 			hashes[hash] = 0
-// 		}
-// 		hashes[hash]++
-// 		return hash + (!seen ? "" : `-${hashes[hash]}`)
-// 	}
-// 	return newHash
-// }
+// Creates a new URL hash epoch.
+function newURLHashEpoch() {
+	const hashes = {}
+	const newURLHash = str => {
+		// ALPHA / DIGIT / "-" / "." / "_" / "~"
+		//
+		// https://tools.ietf.org/html/rfc3986
+		//
+		/* eslint-disable no-useless-escape */
+		const hash = str
+			.toLowerCase()               // Lowercase
+			.replace(/(\s+|\-+)/g, "-")  // Convert spaces to dashes
+			.replace(/[^a-z0-9\-]/g, "") // Remove non-alphanumerics (strict)
+			.replace(/\-+/g, "-")        // Remove extraneous dashes (1 of 2)
+			.replace(/(^\-|\-$)/g, "")   // Remove extraneous dashes (2 of 2)
+		/* eslint-enable no-useless-escape */
+		const seen = hashes[hash]
+		if (!seen) {
+			hashes[hash] = 0
+		}
+		hashes[hash]++
+		return hash + (!seen ? "" : `-${hashes[hash]}`)
+	}
+	return newURLHash
+}
 
 // Parses GitHub Flavored Markdown elements.
 function parseElements(nodes /* , cache */) {
+	const newURLHash = newURLHashEpoch()
+
 	const elements = []
 	for (let x1 = 0; x1 < nodes.length; x1++) {
 		const each = nodes[x1]
@@ -60,7 +62,7 @@ function parseElements(nodes /* , cache */) {
 		// <Header>
 		case "#":
 			if (testHeader(each)) {
-				elements.push(parseHeader(each))
+				elements.push(parseHeader(each, newURLHash))
 				continue
 			}
 			// No-op
