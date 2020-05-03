@@ -35,3 +35,5 @@ class LRU {
 		return this.cache.keys().next().value
 	}
 }
+
+export default LRU

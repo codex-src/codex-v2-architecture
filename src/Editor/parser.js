@@ -330,13 +330,23 @@ export function parseInlineElements(str) {
 // Parses a GitHub Flavored Markdown (GFM) data structure
 // from an unparsed data structure. An unparsed data
 // structure just represents keyed paragraphs.
-export function parseElements(nodes) {
+export function parseElements(nodes, lruCache) {
 	const newHash = newHashEpoch()
+
+	console.log(lruCache)
 
 	const parsed = []
 	for (let x = 0; x < nodes.length; x++) {
 		// Fast pass:
 		if (!nodes[x].data.length || testFastPass(nodes[x].data[0])) {
+			if (nodes[x].data.length) {
+				const cached = lruCache.get(nodes[x].data)
+				if (cached) {
+					// FIXME: Correct key
+					parsed.push({ ...cached, id: nodes[x].id })
+					continue
+				}
+			}
 			const children = parseInlineElements(nodes[x].data)
 			parsed.push({
 				type: typeEnum.Paragraph,
@@ -349,6 +359,12 @@ export function parseElements(nodes) {
 				),
 				children,
 			})
+			if (nodes[x].data.length) {
+				// FIXME: Correct key
+				// TODO: Consider **not** storing the ‘focus’ node;
+				// will lead to excessive writes
+				lruCache.set(nodes[x].data, { ...parsed[parsed.length - 1], id: undefined })
+			}
 			continue
 		}
 		const each = nodes[x]

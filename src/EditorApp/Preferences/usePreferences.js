@@ -50,6 +50,7 @@ const methods = state => ({
 					data:        undefined,
 					extPosRange: undefined,
 					history:     undefined,
+					lruCache:    undefined, // New
 					reactVDOM:   undefined,
 					reactDOM:    undefined,
 				},

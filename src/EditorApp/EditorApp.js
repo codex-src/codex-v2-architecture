@@ -12,6 +12,8 @@ import usePreferences from "./Preferences/usePreferences"
 import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitle from "./useTitle"
+import { atStart as emojiAtStart } from "emoji-trie"
+import { atStart as runeAtStart } from "lib/encoding/utf8"
 import { isMetaOrCtrlKey } from "Editor/detect"
 import { LOCALSTORAGE_KEY } from "./constants"
 import { toText } from "Editor/cmap"
@@ -46,6 +48,44 @@ const App = () => {
 
 	// The plain text title.
 	const [title] = useTitle(state)
+
+	// https://css-tricks.com/emojis-as-favicons
+	//
+	// TODO: Extract to useEmojiAsFavicon(title)
+	React.useEffect(() => {
+		let emoji = ""
+		let x = 0
+		while (x < title.length) {
+			const emojiInfo = emojiAtStart(title.slice(x))
+			if (emojiInfo) {
+				emoji = emojiInfo.emoji
+				break
+			}
+			const rune = runeAtStart(title.slice(x))
+			x += rune.length
+		}
+		if (/* !x || */ !emoji.length) {
+			// No-op
+			return
+		}
+		const link = document.querySelector("link[rel='icon']")
+		// if (!link) {
+		// 	// No-op
+		// 	return
+		// }
+		const original = link.href
+		link.href = `
+			data:image/svg+xml,
+				<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
+					<text y=%22.9em%22 font-size=%2290%22>
+						${emoji}
+					</text>
+				</svg>
+		`.split(/[\n\t]+/).join("")
+		return () => {
+			link.href = original
+		}
+	}, [title])
 
 	// Updates renderers.
 	const mounted = React.useRef()

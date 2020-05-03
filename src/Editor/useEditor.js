@@ -1,5 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
+import LRU from "lib/LRU"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parseAnyList"
 import { parseElements } from "./parser"
@@ -14,28 +15,31 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
+	// TODO: Rename to parserCache or parserLRUCache?
+	const lruCache = new LRU(100) // NOTE: readOnly editors do not need a LRU cache
 	const initialState = {
-		readOnly: false,                         // Is read-only?
-		focused: false,                          // Is focused?
-		data,                                    // Document data (string)
-		nodes,                                   // Document nodes
-		pos1,                                    // Start cursor data structure
-		pos2,                                    // End cursor data structure
-		extPosRange: ["", ""],                   // Extended node (ID) range
-		history: {                               // History object
-			correctedPos: false,                   // Corrected pos before first change event?
-			stack: [                               // State stack
-				{                                    //
-					data,                              //
-					nodes,                             //
-					pos1: { ...pos1 },                 //
-					pos2: { ...pos1 },                 //
-				},                                   //
-			],                                     //
-			index: 0,                              // State stack index
-		},                                       //
-		reactVDOM: parseElements(nodes),         // React VDOM
-		reactDOM: document.createElement("div"), // React-managed DOM
+		readOnly: false,                           // Is read-only?
+		focused: false,                            // Is focused?
+		data,                                      // Document data (string)
+		nodes,                                     // Document nodes
+		pos1,                                      // Start cursor data structure
+		pos2,                                      // End cursor data structure
+		extPosRange: ["", ""],                     // Extended node (ID) range
+		history: {                                 // History container
+			correctedPos: false,                     // Corrected pos before first change event?
+			stack: [                                 // History state stack
+				{                                      //
+					data,                                //
+					nodes,                               //
+					pos1: { ...pos1 },                   //
+					pos2: { ...pos1 },                   //
+				},                                     //
+			],                                       //
+			index: 0,                                // History state stack index
+		},                                         //
+		lruCache,                                  // LRU cache for parseElements
+		reactVDOM: parseElements(nodes, lruCache), // React VDOM
+		reactDOM: document.createElement("div"),   // React-managed DOM
 	}
 	return initialState
 }
@@ -613,7 +617,7 @@ const methods = state => ({
 
 		Object.assign(state, {
 			data: state.nodes.map(each => each.data).join("\n"),
-			reactVDOM: parseElements(state.nodes),
+			reactVDOM: parseElements(state.nodes, state.lruCache),
 		})
 	},
 })
