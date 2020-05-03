@@ -81,7 +81,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 							document.activeElement.blur()
 						}
 						each.onclick = () => {
-							dispatch.toggleTodo(id)
+							dispatch.checkTodo(id)
 						}
 					}
 				})

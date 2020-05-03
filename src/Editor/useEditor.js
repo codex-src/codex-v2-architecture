@@ -15,31 +15,24 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
-	// TODO: Rename to parserCache or parserLRUCache?
-	const lruCache = new LRU(100) // NOTE: readOnly editors do not need a LRU cache
+	// NOTE: readOnly editors do not need a LRU cache
+	const parserLRUCache = new LRU(100)
 	const initialState = {
-		readOnly: false,                           // Is read-only?
-		focused: false,                            // Is focused?
-		data,                                      // Document data (string)
-		nodes,                                     // Document nodes
-		pos1,                                      // Start cursor data structure
-		pos2,                                      // End cursor data structure
-		extPosRange: ["", ""],                     // Extended node (ID) range
-		history: {                                 // History container
-			correctedPos: false,                     // Corrected pos before first change event?
-			stack: [                                 // History state stack
-				{                                      //
-					data,                                //
-					nodes,                               //
-					pos1: { ...pos1 },                   //
-					pos2: { ...pos1 },                   //
-				},                                     //
-			],                                       //
-			index: 0,                                // History state stack index
-		},                                         //
-		lruCache,                                  // LRU cache for parseElements
-		reactVDOM: parseElements(nodes, lruCache), // React VDOM
-		reactDOM: document.createElement("div"),   // React-managed DOM
+		readOnly: false,                                 // Is read-only?
+		focused: false,                                  // Is focused?
+		data,                                            // Document data (string)
+		nodes,                                           // Document nodes
+		pos1,                                            // Start cursor data structure
+		pos2,                                            // End cursor data structure
+		extPosRange: ["", ""],                           // Extended node (ID) range
+		history: {                                       // History container
+			correctedPos: false,                           // Corrected pos before first change event?
+			stack: [{ data, nodes, pos1: { ...pos1 }, pos2: { ...pos1 } }],
+			index: 0,                                      // History state stack index
+		},                                               //
+		parserLRUCache,                                  // LRU cache for parseElements
+		reactVDOM: parseElements(nodes, parserLRUCache), // React VDOM
+		reactDOM: document.createElement("div"),         // React-managed DOM
 	}
 	return initialState
 }
@@ -96,7 +89,6 @@ const methods = state => ({
 	// Drops L and R bytes.
 	dropBytes(dropL, dropR) {
 		this.mutate()
-
 		// LHS:
 		state.pos1.pos -= dropL
 		while (dropL) {
@@ -130,7 +122,6 @@ const methods = state => ({
 	// Writes character data.
 	write(data) {
 		this.mutate()
-
 		// Parse new nodes:
 		const nodes = newNodes(data)
 		const node1 = state.nodes[state.pos1.y]
@@ -156,7 +147,6 @@ const methods = state => ({
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
 		this.mutate()
-
 		// Get the start offset:
 		const key1 = nodes[0].id
 		// TODO: Can no-op keys before extPosRange[0]
@@ -365,21 +355,20 @@ const methods = state => ({
 	enter(autoCompleteSyntax = "") {
 		this.write(`\n${autoCompleteSyntax}`)
 	},
-
-	// Toggles a todo (checkbox).
-	toggleTodo(id) {
+	// Checks or unchecks a todo.
+	checkTodo(id) {
 		this.mutate()
 		// state.focused = false
 		const node = state.nodes.find(each => each.id === id)
-		const [, tabs, syntax] = node.data.match(AnyListRe)
+		let [, tabs, syntax] = node.data.match(AnyListRe)
 		if (syntax === "- [ ] ") {
-			node.data = `${tabs}- [x] ${node.data.slice((tabs + syntax).length)}`
+			syntax = "- [x] "
 		} else {
-			node.data = `${tabs}- [ ] ${node.data.slice((tabs + syntax).length)}`
+			syntax = "- [ ] "
 		}
+		node.data = tabs + syntax + node.data.slice((tabs + syntax).length)
 		this.render()
 	},
-
 	// Cuts character data.
 	cut() {
 		this.write("")
@@ -617,7 +606,7 @@ const methods = state => ({
 
 		Object.assign(state, {
 			data: state.nodes.map(each => each.data).join("\n"),
-			reactVDOM: parseElements(state.nodes, state.lruCache),
+			reactVDOM: parseElements(state.nodes, state.parserLRUCache),
 		})
 	},
 })
