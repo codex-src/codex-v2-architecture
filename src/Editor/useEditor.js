@@ -1,7 +1,7 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRU from "lib/LRU"
-import parseElements2 from "./parseElements2"
+import parseElements2 from "./parser/parseElements"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parseAnyList"
 import { parseElements } from "./parser"
