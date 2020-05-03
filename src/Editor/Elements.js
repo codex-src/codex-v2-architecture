@@ -62,7 +62,7 @@ const headerClassNames = {
 // <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root id={id} className={headerClassNames[tag]} onClick={() => console.log("hello, world!")}>
+	<Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -130,7 +130,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 	}, [extension, nodes])
 
 	return (
-		<Root id={id} className="px-6 font-mono text-sm bg-white shadow-hero rounded" {...attrs.code}>
+		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded" {...attrs.code}>
 			<Node id={nodes[0].id} className="leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
@@ -139,7 +139,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 				</Markdown>
 			</Node>
 			{$nodes.map(each => (
-				<Node key={each.id} id={each.id} className="leading-snug">
+				<Node key={each.id} id={each.id}>
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
 							"<br />"
@@ -168,7 +168,6 @@ export const AnyListItem = React.memo(({ tag, id, tabs, syntax, children }) => (
 	</Node>
 ))
 
-// TODO: Add ReactDOM.hydrate
 const Checkbox = ({ checked }) => (
 	<Button className={
 		`checkbox ${
