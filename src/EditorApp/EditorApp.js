@@ -64,15 +64,11 @@ const App = () => {
 			const rune = runeAtStart(title.slice(x))
 			x += rune.length
 		}
-		if (/* !x || */ !emoji.length) {
+		if (!emoji.length) {
 			// No-op
 			return
 		}
 		const link = document.querySelector("link[rel='icon']")
-		// if (!link) {
-		// 	// No-op
-		// 	return
-		// }
 		const original = link.href
 		link.href = `
 			data:image/svg+xml,

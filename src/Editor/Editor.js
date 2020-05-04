@@ -31,16 +31,16 @@ const ReactEditor = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
-			{(t => {
-				const components = state.reactVDOM.map(({ type: T, ...each }) => (
+			{/* {(t => { */}
+				{/* const components = */} {state.reactVDOM.map(({ type: T, ...each }) => (
 					React.createElement(typeEnumMap[T], {
 						key: each.id,
 						...each,
 					})
-				))
-				console.log(`ReactEditor=${Date.now() - t}`)
-				return components
-			})(Date.now())}
+				))}
+				{/* console.log(`ReactEditor=${Date.now() - t}`) */}
+				{/* return components */}
+			{/* })(Date.now())} */}
 		</Provider>
 	)
 }
@@ -50,6 +50,13 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
+
+	// // Defer function (purge the cache).
+	// React.useEffect(() => {
+	// 	return () => {
+	// 		dispatch.defer()
+	// 	}
+	// }, [])
 
 	// Registers props.
 	const mountedProps = React.useRef()
@@ -161,8 +168,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 		[state.readOnly, state.data],
 	)
 
-	// Exclusively returns a function when the editor is in
-	// read-write mode.
+	// Exclusively returns a function for read-write mode.
 	const newReadWriteHandler = handler => {
 		if (state.readOnly) {
 			return undefined

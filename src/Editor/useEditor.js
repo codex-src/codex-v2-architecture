@@ -38,6 +38,11 @@ function newEditorState(data) {
 }
 
 const methods = state => ({
+	// Defer function e.g. unmountComponentAtNode.
+	defer() {
+		this.cachedElements.clear()
+	},
+
 	// Registers props.
 	registerProps({ readOnly, focused }) {
 		if (readOnly !== undefined) {
