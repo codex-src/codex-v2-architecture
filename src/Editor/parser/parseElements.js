@@ -69,7 +69,8 @@ function parseElements(nodes, cachedElements) {
 	}
 
 	const elements = []
-	for (let x1 = 0; x1 < nodes.length; x1++) {
+	// for (let x1 = 0; x1 < nodes.length; x1++) {
+	for (let x1 = 0, len = nodes.length; x1 < len; x1++) {
 		const each = nodes[x1]
 		// Fast pass:
 		if (!each.data.length || testFastPass(each.data[0])) {

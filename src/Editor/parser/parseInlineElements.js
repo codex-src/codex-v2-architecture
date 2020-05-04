@@ -72,7 +72,8 @@ function parseInlineElements(str) {
 		return null
 	}
 	const elements = []
-	for (let x1 = 0; x1 < str.length; x1++) {
+	// for (let x1 = 0; x1 < str.length; x1++) {
+	for (let x1 = 0, len = str.length; x1 < len; x1++) {
 		// Fast pass:
 		//
 		// NOTE: Use isStrictAlphanum because of "_"
