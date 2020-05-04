@@ -7125,6 +7125,13 @@ mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.5"
 
+mnemonist@^0.36.1:
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.36.1.tgz#9d8aa39e7db23ccb3735861d1081fc3faea4f180"
+  integrity sha512-PXrJJ5MRu++lfoZN1z/DjQhlMrrNgmHKb+DVFqGy/lCn9hMTZwXKC6aaKKwtqd6lwwak3HOonqo3D1fhQzfwaQ==
+  dependencies:
+    obliterator "^1.6.1"
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -7476,6 +7483,11 @@ object.values@^1.1.0, object.values@^1.1.1:
     es-abstract "^1.17.0-next.1"
     function-bind "^1.1.1"
     has "^1.0.3"
+
+obliterator@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/obliterator/-/obliterator-1.6.1.tgz#dea03e8ab821f6c4d96a299e17aef6a3af994ef3"
+  integrity sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==
 
 obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"

@@ -1,3 +1,5 @@
+// Naive LRU cache implementation.
+//
 // https://stackoverflow.com/a/46432113
 class LRUCache {
 	constructor(maxKeys) {

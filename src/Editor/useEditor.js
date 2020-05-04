@@ -1,6 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
-import LRUCache from "lib/LRUCache"
+import LRUCache from "mnemonist/lru-cache"
 import parseElements from "./parser/parseElements"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parser/spec"
@@ -15,7 +15,8 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
-	const cachedElements = new LRUCache(100)
+	// https://yomguithereal.github.io/mnemonist/lru-cache
+	const cachedElements = new LRUCache(String, Object, 100)
 	const initialState = {
 		readOnly: false,                                 // Is read-only?
 		focused: false,                                  // Is focused?
