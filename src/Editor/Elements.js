@@ -4,7 +4,7 @@ import escape from "lodash/escape"
 import Markdown from "./Markdown"
 import PrismMap from "lib/PrismMap"
 import React from "react"
-import typeEnumMap from "./typeEnumMap"
+import typeEnumArray from "./typeEnumArray"
 import useEditorState from "./useEditorState"
 
 import {
@@ -25,7 +25,7 @@ function toReact(children) {
 			continue
 		}
 		const { type: T, ...props } = each
-		components.push(React.createElement(typeEnumMap[T], {
+		components.push(React.createElement(typeEnumArray[T], {
 			key: components.length,
 			...props,
 		}, toReact(props.children)))
@@ -97,7 +97,7 @@ export const Blockquote = React.memo(({ id, children: nodes }) => {
 	return (
 		<Root id={id} className="px-6" style={style}>
 			{nodes.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumMap[T], {
+				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					...each,
 				})
@@ -205,7 +205,7 @@ export const AnyList = React.memo(({ type, tag, id, __nested, children: nodes })
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
 			{nodes.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumMap[T], {
+				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					__nested: true,
 					...each,

@@ -7,7 +7,7 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
-import typeEnumMap from "./typeEnumMap"
+import typeEnumArray from "./typeEnumArray"
 import { ascendNode } from "./ascendNodes"
 import { isListItemElement } from "./listElements"
 
@@ -33,7 +33,7 @@ const ReactEditor = ({ state, dispatch }) => {
 		<Provider value={[state, dispatch]}>
 			{/* {(t => { */}
 				{/* const components = */} {state.reactVDOM.map(({ type: T, ...each }) => (
-					React.createElement(typeEnumMap[T], {
+					React.createElement(typeEnumArray[T], {
 						key: each.id,
 						...each,
 					})
