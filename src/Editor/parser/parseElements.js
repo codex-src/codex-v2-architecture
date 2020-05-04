@@ -1,6 +1,5 @@
 import parseAnyList from "./parseAnyList"
 import typeEnum from "../typeEnum"
-import { isStrictAlphanum } from "lib/encoding/ascii"
 import { toInnerText } from "../cmap"
 
 import {
@@ -46,6 +45,15 @@ function newURLHashEpoch() {
 	return newURLHash
 }
 
+function testFastPass(char) {
+	const ok = (
+		(char >= "a" && char <= "z") || /* char !== "h" && */
+		(char >= "A" && char <= "Z") ||
+		char === " "
+	)
+	return ok
+}
+
 // Parses GitHub Flavored Markdown elements.
 function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
@@ -64,9 +72,7 @@ function parseElements(nodes, cachedElements) {
 	for (let x1 = 0; x1 < nodes.length; x1++) {
 		const each = nodes[x1]
 		// Fast pass:
-		//
-		// NOTE: Use isStrictAlphanum (because of "_")
-		if (!each.data.length || (isStrictAlphanum(each.data[0]) /* && each.data[0] !== "h" */) || each.data[0] === " ") {
+		if (!each.data.length || testFastPass(each.data[0])) {
 			const element = cacheStrategy(each, parseParagraph)
 			elements.push({ ...element, id: each.id })
 			continue

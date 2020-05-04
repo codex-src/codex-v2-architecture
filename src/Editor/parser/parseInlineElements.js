@@ -75,7 +75,7 @@ function parseInlineElements(str) {
 	for (let x1 = 0; x1 < str.length; x1++) {
 		// Fast pass:
 		//
-		// NOTE: Use isStrictAlphanum (because of "_")
+		// NOTE: Use isStrictAlphanum because of "_"
 		if ((isStrictAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") { // Exempt "h" for "https://" and "http://"
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(str[x1])
