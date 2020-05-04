@@ -1,6 +1,6 @@
-import Enum from "lib/Enum"
+import { StringEnum } from "lib/Enum"
 
-const renderModesEnum = new Enum(
+const renderModesEnum = new StringEnum(
 	"Readme",
 	"Text",
 	"HTML",

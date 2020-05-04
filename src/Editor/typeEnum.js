@@ -1,6 +1,6 @@
-import Enum from "lib/Enum"
+import { NumberEnum } from "lib/Enum"
 
-const typeEnum = new Enum(
+const typeEnum = new NumberEnum(
 	// Elements:
 	"AnyList",
 	"AnyListItem",

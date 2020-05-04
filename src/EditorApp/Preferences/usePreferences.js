@@ -47,12 +47,12 @@ const methods = state => ({
 			[renderModesEnum.JSON]: JSON.stringify(
 				{
 					...editorState,
-					data:        undefined,
-					extPosRange: undefined,
-					history:     undefined,
-					lruCache:    undefined, // New
-					reactVDOM:   undefined,
-					reactDOM:    undefined,
+					data:           undefined,
+					extPosRange:    undefined,
+					history:        undefined,
+					cachedElements: undefined,
+					reactVDOM:      undefined,
+					reactDOM:       undefined,
 				},
 				null,
 				"\t",
