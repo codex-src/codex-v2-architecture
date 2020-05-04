@@ -435,10 +435,11 @@ const methods = state => ({
 	// Rerenders the string and VDOM representations.
 	render() {
 
-		let t = Date.now()
+		// let t = Date.now()
 		const data = state.nodes.map(each => each.data).join("\n")
-		console.log(`data=${Date.now() - t}`)
-		t = Date.now()
+		// console.log(`data=${Date.now() - t}`)
+
+		const t = Date.now()
 		const reactVDOM = parseElements(state.nodes, state.cachedElements)
 		console.log(`reactVDOM=${Date.now() - t}`)
 
