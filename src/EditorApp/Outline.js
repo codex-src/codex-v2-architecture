@@ -18,7 +18,7 @@ function newScrollHandler(e, id, hash) {
 		return
 	}
 	window.location.hash = hash
-	window.scrollTo(0, element.offsetTop - 128)
+	window.scrollTo(0, element.offsetTop)
 }
 
 const Outline = ({
