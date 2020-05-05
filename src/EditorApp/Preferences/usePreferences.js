@@ -5,7 +5,7 @@ import useMethods from "use-methods"
 import {
 	toHTML,
 	toReact_js,
-} from "Editor/cmap"
+} from "Editor/Elements/cmap"
 
 const defaultFontSize = 17
 

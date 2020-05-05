@@ -16,7 +16,7 @@ import { atStart as emojiAtStart } from "emoji-trie"
 import { atStart as runeAtStart } from "lib/encoding/utf8"
 import { isMetaOrCtrlKey } from "Editor/detect"
 import { LOCALSTORAGE_KEY } from "./constants"
-import { toText } from "Editor/cmap"
+import { toText } from "Editor/Elements/cmap"
 
 // document.body.classList.toggle("debug-css")
 

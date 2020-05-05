@@ -1,6 +1,6 @@
 import React from "react"
-import typeEnum from "Editor/typeEnum"
-import { toInnerText } from "Editor/cmap"
+import typeEnum from "Editor/Elements/typeEnum"
+import { toInnerText } from "Editor/Elements/cmap"
 
 // Computes an outline. <h1> and <h2> elements are
 // considered primary headers; <h3> through <h6> are

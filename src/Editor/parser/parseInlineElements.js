@@ -1,5 +1,5 @@
 import * as emojiTrie from "emoji-trie"
-import typeEnum from "../typeEnum"
+import typeEnum from "../Elements/typeEnum"
 
 import {
 	isAlphanum,

@@ -7,7 +7,7 @@ import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
-import typeEnumArray from "./typeEnumArray"
+import typeEnumArray from "./Elements/typeEnumArray"
 import { ascendNode } from "./ascendNodes"
 import { isListItemElement } from "./listElements"
 

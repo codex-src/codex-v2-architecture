@@ -1,5 +1,5 @@
 import parseInlineElements from "./parseInlineElements"
-import typeEnum from "../typeEnum"
+import typeEnum from "../Elements/typeEnum"
 
 // Parses a header element.
 export function parseHeader(node) {

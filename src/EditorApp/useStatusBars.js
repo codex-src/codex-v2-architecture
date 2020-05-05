@@ -1,5 +1,5 @@
 import React from "react"
-import { toText } from "Editor/cmap"
+import { toText } from "Editor/Elements/cmap"
 
 // Shorthand.
 function format(n) {

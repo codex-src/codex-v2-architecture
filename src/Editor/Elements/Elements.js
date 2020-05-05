@@ -5,7 +5,7 @@ import Markdown from "./Markdown"
 import PrismMap from "lib/PrismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
-import useEditorState from "./useEditorState"
+import useEditorState from "../useEditorState"
 
 import {
 	Node,

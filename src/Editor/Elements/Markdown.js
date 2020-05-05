@@ -1,5 +1,5 @@
 import React from "react"
-import useEditorState from "./useEditorState"
+import useEditorState from "../useEditorState"
 
 // Parses syntax from a string or array of strings to an
 // array of strings.

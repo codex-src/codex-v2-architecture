@@ -1,6 +1,6 @@
 import parseAnyList from "./parseAnyList"
-import typeEnum from "../typeEnum"
-import { toInnerText } from "../cmap"
+import typeEnum from "../Elements/typeEnum"
+import { toInnerText } from "../Elements/cmap"
 
 import {
 	parseBlockquote,
