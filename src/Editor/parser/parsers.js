@@ -19,8 +19,8 @@ function countEmojis(children) {
 	if (!children || !children.reduce) {
 		return 0
 	}
-	const range = children.slice(0, 3)
-	return range.reduce((count, each) => count + Number(each && each.type && each.type === typeEnum.Emoji), 0)
+	const inlineElements = children.slice(0, 3)
+	return inlineElements.reduce((count, each) => count + Number(each && each.type && each.type === typeEnum.Emoji), 0)
 }
 
 // Parses a paragraph element.
@@ -72,7 +72,11 @@ export function parsePreformatted(range) {
 		syntax: [range[0].data, range[range.length - 1].data],
 		info,
 		extension,
-		children: range,
+		// Copy range to prevent Proxy error:
+		//
+		// Uncaught TypeError: Cannot perform 'ownKeys' on a
+		// proxy that has been revoked
+		children: range.map(each => ({ ...each })),
 	}
 	return element
 }

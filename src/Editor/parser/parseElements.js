@@ -58,11 +58,11 @@ function testFastPass(char) {
 function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
 
-	const cacheStrategy = (range, parser) => {
+	const cacheStrategy = (range, parseElement) => {
 		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
 		let element = cachedElements.get(key)
 		if (!element) {
-			element = parser(range)
+			element = parseElement(range)
 			cachedElements.set(key, element)
 		}
 		return element

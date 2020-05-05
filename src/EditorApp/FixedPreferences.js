@@ -226,6 +226,7 @@ const FixedPreferences = ({
 			{/* Sidebar */}
 			<div className="flex-shrink-0 h-4" />
 			<Transition
+				unmountOnExit={false}
 				show={prefs.showSidebar}
 				enter="transition ease-out duration-300"
 				enterFrom="transform opacity-0 translate-x-32"
@@ -234,7 +235,8 @@ const FixedPreferences = ({
 				leaveFrom="transform opacity-100 translate-x-0"
 				leaveTo="transform opacity-0 translate-x-32"
 			>
-				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto">
+				{/* NOTE: leaveTo classes are duplicated at the end */}
+				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto transform opacity-0 translate-x-32">
 					{prefs.renderMode === renderModesEnum.Readme ? (
 						<ReadmeEditor readOnly={prefs.readOnly} />
 					) : (

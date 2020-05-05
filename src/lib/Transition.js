@@ -5,39 +5,18 @@ import { CSSTransition } from "react-transition-group"
 //
 // TODO: Change API to useLayoutEffect
 function Transition({
-	unmountOnExit, //
-	show,          // *Required
-	enter,         // *Required
-	enterFrom,     // *Required
-	enterTo,       // *Required
-	enterActive,   //
-	leave,         // *Required
-	leaveFrom,     // *Required
-	leaveTo,       // *Required
-	leaveActive,   //
-	children,      // *Required
+	unmountOnExit,
+	show,
+	enter,
+	enterFrom,
+	enterTo,
+	enterActive,
+	leave,
+	leaveFrom,
+	leaveTo,
+	leaveActive,
+	children,
 }) {
-	// // Adds many classes to a node.
-	// const add = (node, ...classes) => {
-	// 	for (const className of classes) {
-	// 		if (!className) {
-	// 			// No-op
-	// 			continue
-	// 		}
-	// 		node.classList.add(...className.split(/\s+/))
-	// 	}
-	// }
-	// // Removes many classes from a node.
-	// const remove = (node, classes) => {
-	// 	for (const className of classes) {
-	// 		if (!className) {
-	// 			// No-op
-	// 			continue
-	// 		}
-	// 		node.classList.remove(...className.split(/\s+/))
-	// 	}
-	// }
-
 	const enterClasses = enter.split(/\s+/)
 	const enterFromClasses = enterFrom.split(/\s+/)
 	const enterToClasses = enterTo.split(/\s+/)
@@ -53,7 +32,6 @@ function Transition({
 				node.addEventListener("transitionend", done, false)
 			}}
 			onEnter={node => {
-				// Experimental API:
 				if (!unmountOnExit) {
 					node.classList.remove(...leaveToClasses)
 				}
@@ -64,14 +42,12 @@ function Transition({
 				node.classList.add(...enterToClasses)
 			}}
 			onEntered={node => {
-				// Experimental API:
 				if (unmountOnExit) {
 					node.classList.remove(...enterToClasses)
 				}
 				node.classList.remove(...enterClasses)
 			}}
 			onExit={node => {
-				// Experimental API:
 				if (!unmountOnExit) {
 					node.classList.remove(...enterToClasses)
 				}
@@ -82,7 +58,6 @@ function Transition({
 				node.classList.add(...leaveToClasses)
 			}}
 			onExited={node => {
-				// Experimental API:
 				if (unmountOnExit) {
 					node.classList.remove(...leaveToClasses)
 				}
