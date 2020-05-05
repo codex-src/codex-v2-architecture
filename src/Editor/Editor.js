@@ -134,19 +134,75 @@ const Editor = ({
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
-				const selection = document.getSelection()
-				if (!selection.rangeCount) {
-					// No-op
-					return
+				// // Ascends to the nearest element.
+				// const ascendToElement = node => {
+				// 	let element = node
+				// 	if (node.nodeType !== Node.ELEMENT_NODE) {
+				// 		element = node.parentElement
+				// 	}
+				// 	return element
+				// }
+
+				// Ascends to the nearest scroll element.
+				const ascendToScrollElement = element => {
+					while (element && !(element.scrollHeight > element.offsetHeight)) {
+						element = element.parentElement
+					}
+					// // Guard <div id="root" class="h-full">:
+					// if (element.parentElement && element.parentElement.nodeName === "BODY") {
+					// 	return element.ownerDocument.scrollingElement
+					// }
+					return element
 				}
-				let { startContainer /* , endContainer */ } = selection.getRangeAt(0)
-				if (startContainer.nodeType !== Node.ELEMENT_NODE) {
-					startContainer = startContainer.parentElement
-				}
-				const { top } = startContainer.getBoundingClientRect()
-				if (top <= scrollTopOffset) {
-					console.log("here")
-				}
+
+				// elem.scrollHeight > elem.offsetHeight
+
+				setTimeout(() => {
+
+					const selection = document.getSelection()
+					if (!selection.rangeCount) {
+						// No-op
+						return
+					}
+					const range = selection.getRangeAt(0)
+
+					const scrollElement = ascendToScrollElement(ascendNode(range.commonAncestorContainer))
+					const {
+						top: scrollTop,
+						bottom: scrollBottom,
+					} = scrollElement.getBoundingClientRect()
+
+					const startElement = ascendNode(range.startContainer)
+					const {
+						top,
+						bottom,
+					} = startElement.getBoundingClientRect()
+
+					if (top < scrollTop) {
+						scrollElement.scrollBy(0, -1 * (scrollTop - top))
+						// console.log(`scroll top: ${-1 * (scrollTop - top)}`)
+					} else if (bottom > scrollBottom) {
+						scrollElement.scrollBy(0, -1 * (scrollBottom - bottom))
+						// console.log(`scroll bottom: ${-1 * (scrollBottom - bottom)}`)
+					}
+
+				}, 0)
+
+				// scrollingElement.scrollBy()
+
+
+
+				// startElement.scrollBy(0, 20)
+				// startElement.offsetTop = 20
+
+				// if (startContainer.nodeType !== Node.ELEMENT_NODE) {
+				// 	startContainer = startContainer.parentElement
+				// }
+				// const { top } = startContainer.getBoundingClientRect()
+				// // TODO: Add selection clause
+				// if (top <= scrollTopOffset) {
+				// 	startContainer
+				// }
 
 				// const { bottom } = endContainer.getBoundingClientRect()
 
