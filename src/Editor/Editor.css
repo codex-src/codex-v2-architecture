@@ -230,9 +230,6 @@ html {
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
-/*
- * <AnyList>
- */
 .codex-editor [data-codex-ordered],
 .codex-editor [data-codex-checked] {
 	margin-left: 1ch;
@@ -260,16 +257,14 @@ html {
 }
 
 /* Checked */
-/* FIXME */
 .codex-editor [data-codex-checked] [data-codex-checkbox="false"] {
 	margin-left: calc(-1ch - 1.25em);
 }
 .codex-editor [data-codex-checked] [data-codex-checkbox="false"]:focus {
   border-color: #a4cafe;
-  outline: none;
+  /* outline: none; */
   box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
 }
-/* TODO: Remove :focus? */
 .codex-editor [data-codex-checked] [data-codex-checkbox="true"]:focus {
   border-color: transparent;
 }
