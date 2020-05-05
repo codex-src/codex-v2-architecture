@@ -1,4 +1,5 @@
 import computePosRange from "./computePosRange"
+import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import EditorContext from "./EditorContext"
 import keyCodes from "./keyCodes"
 import queryRoots from "./queryRoots"
@@ -134,59 +135,15 @@ const Editor = ({
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
-				// // Ascends to the nearest element.
-				// const ascendToElement = node => {
-				// 	let element = node
-				// 	if (node.nodeType !== Node.ELEMENT_NODE) {
-				// 		element = node.parentElement
-				// 	}
-				// 	return element
-				// }
-
-				// Ascends to the nearest scrolling element.
-				const ascendToScrollingElement = element => {
-					// NOTE: Use + 2 to guard truncation
-					while (element && !(element.scrollHeight > element.offsetHeight + 2)) {
-						element = element.parentElement
-					}
-					// Guard <div id="root" class="h-full">:
-					if (element.parentElement && element.parentElement.nodeName === "BODY") {
-						return element.ownerDocument.scrollingElement
-					}
-					return element
-				}
-
-				// This is the working behavior for <ReadmeEditor>
 				setTimeout(() => {
-
-					const selection = document.getSelection()
-					if (!selection.rangeCount) {
+					const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
+					if (!computed || !computed.offset) {
 						// No-op
 						return
 					}
-
-					const range = selection.getRangeAt(0)
-					const scrollingElement = ascendToScrollingElement(ascendNode(range.commonAncestorContainer))
-					let { top: scrollTop, bottom: scrollBottom } = scrollingElement.getBoundingClientRect()
-					if (scrollingElement.nodeName === "HTML") {
-						scrollTop = 0
-						scrollBottom = window.innerHeight
-					}
-
-					const startElement = ascendNode(range.startContainer)
-					const { top } = startElement.getBoundingClientRect()
-
-					const endElement = ascendNode(range.endContainer)
-					const { bottom } = endElement.getBoundingClientRect()
-
-					if (top - scrollTopOffset < scrollTop && bottom + scrollBottomOffset > scrollBottom) {
-						// No-op; defer to end
-					} else if (top - scrollTopOffset < scrollTop) {
-						scrollingElement.scrollBy(0, -1 * scrollTop - top + scrollTopOffset)
-					} else if (bottom + scrollBottomOffset > scrollBottom) {
-						scrollingElement.scrollBy(0, -1 * scrollBottom - bottom - scrollBottomOffset)
-					}
-
+					const { scrollingElement, offset } = computed
+					console.log(scrollingElement, offset)
+					scrollingElement.scrollBy(0, offset)
 				}, 0)
 
 				// t = Date.now()
