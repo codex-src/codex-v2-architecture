@@ -257,7 +257,7 @@ html {
 }
 
 /* Checked */
-.codex-editor [data-codex-checked] [data-codex-checkbox="false"] {
+.codex-editor [data-codex-checked] [data-codex-checkbox] {
 	margin-left: calc(-1ch - 1.25em);
 }
 .codex-editor [data-codex-checked] [data-codex-checkbox="false"]:focus {
