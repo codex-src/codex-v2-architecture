@@ -92,11 +92,11 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	)
 })
 
-export const Blockquote = React.memo(({ id, children: nodes }) => {
+export const Blockquote = React.memo(({ id, children: range }) => {
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
 		<Root id={id} className="px-6" style={style}>
-			{nodes.map(({ type: T, ...each }) => (
+			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					...each,
@@ -110,35 +110,35 @@ export const Blockquote = React.memo(({ id, children: nodes }) => {
 // 	<Node style={{ whiteSpace: "pre" }} {...props} />
 // )
 
-export const Preformatted = React.memo(({ id, syntax, extension, children: nodes }) => {
+export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
-	const $nodes = React.useMemo(() => {
-		const range = nodes.slice(1, -1)
-		if (!extension || nodes.length === 2) {
-			return range.map(each => ({ ...each, data: escape(each.data) }))
+	const $range = React.useMemo(() => {
+		const r = range.slice(1, -1)
+		if (!extension || range.length === 2) {
+			return r.map(each => ({ ...each, data: escape(each.data) }))
 		}
 		const parser = PrismMap[extension]
 		if (!parser) {
-			return range.map(each => ({ ...each, data: escape(each.data) }))
+			return r.map(each => ({ ...each, data: escape(each.data) }))
 		}
-		const data = range.map(each => each.data).join("\n")
+		const data = r.map(each => each.data).join("\n")
 		const html = window.Prism.highlight(data, parser, extension)
-		return html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
-	}, [extension, nodes])
+		return html.split("\n").map((each, x) => ({ id: r[x].id, data: each }))
+	}, [extension, range])
 
 	return (
 		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded" {...attrs.code}>
-			<Node id={nodes[0].id} className="leading-none">
+			<Node id={range[0].id} className="leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
 			</Node>
-			{$nodes.map(each => (
+			{$range.map(each => (
 				<Node key={each.id} id={each.id}>
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
@@ -147,7 +147,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: nodes
 					}} />
 				</Node>
 			))}
-			<Node id={nodes[nodes.length - 1].id} className="leading-none">
+			<Node id={range[range.length - 1].id} className="leading-none">
 				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
@@ -198,15 +198,13 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	</Node>
 ))
 
-// NOTE: __nested is not parsed
-export const AnyList = React.memo(({ type, tag, id, __nested, children: nodes }) => {
-	const HOC = __nested === undefined ? Root : Node
+export const AnyList = React.memo(({ root, type, tag, id, children: range }) => {
+	const HOC = root ? Root : Node
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
-			{nodes.map(({ type: T, ...each }) => (
+			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
-					__nested: true,
 					...each,
 				})
 			))}
