@@ -1,4 +1,7 @@
-import { ascendNode } from "./ascendNodes"
+import {
+	ascendNode,
+	ascendRoot,
+} from "./ascendNodes"
 
 // Ascends to the nearest scrolling element.
 //
@@ -21,15 +24,15 @@ const ascendToScrollingElement = element => {
 
 // Computes the scrolling element and offset (y-axis only).
 function computeScrollingElementAndOffset(offsetTop = 0, offsetBottom = 0) {
-	// Increment each offset by one because of ± 1 offset:
-	offsetTop++
-	offsetBottom++
+	// Decrement offsets because of ± 1 offset:
+	offsetTop--
+	offsetBottom--
 	const selection = document.getSelection()
 	if (!selection.rangeCount) {
 		return null
 	}
 	const range = selection.getRangeAt(0)
-	const scrollingElement = ascendToScrollingElement(ascendNode(range.commonAncestorContainer))
+	const scrollingElement = ascendToScrollingElement(ascendRoot(range.commonAncestorContainer))
 	let { top: scrollTop, bottom: scrollBottom } = scrollingElement.getBoundingClientRect()
 	if (scrollingElement.nodeName === "HTML") {
 		scrollTop = 0

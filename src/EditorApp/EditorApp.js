@@ -235,9 +235,9 @@ const App = () => {
 							dispatch={dispatch}
 							readOnly={prefs.readOnly}
 							autoFocus={!data.length}
-							// TOOD: Use a ref to compute scrollTopOffset
-							scrollTopOffset={32}
-							scrollBottomOffset={32}
+							// TOOD: Use a ref to compute scrollTopOffset?
+							scrollTopOffset={64}
+							scrollBottomOffset={64 - 32}
 						/>
 
 					</div>
