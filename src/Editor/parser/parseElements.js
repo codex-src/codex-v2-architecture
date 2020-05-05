@@ -11,7 +11,6 @@ import {
 } from "./parsers"
 
 import {
-	getListRegex,
 	testAnyList,
 	testBlockquote,
 	testBreak,
