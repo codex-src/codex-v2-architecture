@@ -135,16 +135,18 @@ const Editor = ({
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
-				setTimeout(() => {
+				const id = setTimeout(() => {
 					const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
 					if (!computed || !computed.offset) {
 						// No-op
 						return
 					}
 					const { scrollingElement, offset } = computed
-					console.log(scrollingElement, offset)
 					scrollingElement.scrollBy(0, offset)
 				}, 0)
+				return () => {
+					clearTimeout(id)
+				}
 
 				// t = Date.now()
 				//
