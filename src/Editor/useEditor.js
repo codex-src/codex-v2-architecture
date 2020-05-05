@@ -24,7 +24,7 @@ function newEditorState(data) {
 		nodes,                                           // Document nodes
 		pos1,                                            // Start cursor data structure
 		pos2,                                            // End cursor data structure
-		extPosRange: ["", ""],                           // Extended node (ID) range
+		extPosRange: ["", ""],                           // Extended node (root ID) range
 		history: {                                       // History container
 			correctedPos: false,                           // Corrected pos before first change event?
 			stack: [{ data, nodes, pos1: { ...pos1 }, pos2: { ...pos1 } }],

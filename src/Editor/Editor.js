@@ -42,7 +42,17 @@ const ReactEditor = ({ state, dispatch }) => {
 	)
 }
 
-const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) => {
+const Editor = ({
+	id,
+	className,
+	style,
+	state,
+	dispatch,
+	readOnly,
+	autoFocus,
+	scrollTopOffset,
+	scrollBottomOffset,
+}) => {
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef()
@@ -124,6 +134,27 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
+				const selection = document.getSelection()
+				if (!selection.rangeCount) {
+					// No-op
+					return
+				}
+				let { startContainer /* , endContainer */ } = selection.getRangeAt(0)
+				if (startContainer.nodeType !== Node.ELEMENT_NODE) {
+					startContainer = startContainer.parentElement
+				}
+				const { top } = startContainer.getBoundingClientRect()
+				if (top <= scrollTopOffset) {
+					console.log("here")
+				}
+
+				// const { bottom } = endContainer.getBoundingClientRect()
+
+				// const { top, bottom } = ref.current.getBoundingClientRect()
+				// console.log({ top, bottom })
+
+				// console.log({ scrollTopOffset })
+
 				// t = Date.now()
 				//
 				// // Force select for edge-cases such as forward-
@@ -166,6 +197,8 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	)
 
 	// Exclusively returns a function for read-write mode.
+	//
+	// TODO: Move before useEffect use for storeUndo?
 	const newReadWriteHandler = handler => {
 		if (state.readOnly) {
 			return undefined

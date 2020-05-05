@@ -230,13 +230,13 @@ const FixedPreferences = ({
 				show={prefs.showSidebar}
 				enter="transition ease-out duration-300"
 				enterFrom="transform opacity-0 translate-x-32"
-				enterTo="transform opacity-100 translate-x-0"
+				enterTo="transform opacity-100 translate-x-0 pointer-events-auto"
 				leave="transition ease-in duration-300"
 				leaveFrom="transform opacity-100 translate-x-0"
-				leaveTo="transform opacity-0 translate-x-32"
+				leaveTo="transform opacity-0 translate-x-32 pointer-events-none"
 			>
 				{/* NOTE: leaveTo classes are duplicated at the end */}
-				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch pointer-events-auto transform opacity-0 translate-x-32">
+				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch transform opacity-0 translate-x-32 pointer-events-none">
 					{prefs.renderMode === renderModesEnum.Readme ? (
 						<ReadmeEditor readOnly={prefs.readOnly} />
 					) : (
