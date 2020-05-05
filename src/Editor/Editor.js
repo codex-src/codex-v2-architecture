@@ -145,7 +145,8 @@ const Editor = ({
 
 				// Ascends to the nearest scroll element.
 				const ascendToScrollElement = element => {
-					while (element && !(element.scrollHeight > element.offsetHeight)) {
+					// NOTE: Use + 2 because of <Preformatted>
+					while (element && !(element.scrollHeight > element.offsetHeight + 2)) {
 						element = element.parentElement
 					}
 					// // Guard <div id="root" class="h-full">:
@@ -173,17 +174,20 @@ const Editor = ({
 					} = scrollElement.getBoundingClientRect()
 
 					const startElement = ascendNode(range.startContainer)
-					const {
-						top,
-						bottom,
-					} = startElement.getBoundingClientRect()
+					const { top } = startElement.getBoundingClientRect()
 
-					if (top < scrollTop) {
+					const endElement = ascendNode(range.endContainer)
+					const { bottom, height } = endElement.getBoundingClientRect()
+					// bottom += height
+
+					console.log(startElement, endElement, scrollElement)
+
+					if (top < scrollTop && bottom > scrollBottom) {
+						// No-op; defer to end
+					} else if (top < scrollTop) {
 						scrollElement.scrollBy(0, -1 * (scrollTop - top))
-						// console.log(`scroll top: ${-1 * (scrollTop - top)}`)
 					} else if (bottom > scrollBottom) {
 						scrollElement.scrollBy(0, -1 * (scrollBottom - bottom))
-						// console.log(`scroll bottom: ${-1 * (scrollBottom - bottom)}`)
 					}
 
 				}, 0)
