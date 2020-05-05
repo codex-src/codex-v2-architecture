@@ -31,7 +31,7 @@ function newEditorState(data) {
 			index: 0,                                      // History state stack index
 		},                                               //
 		cachedElements,                                  // LRU cached elements (for parseElements)
-		reactVDOM: parseElements(nodes, cachedElements), // React VDOM
+		elements: parseElements(nodes, cachedElements),  // Elements
 		reactDOM: document.createElement("div"),         // React-managed DOM
 	}
 	return initialState
@@ -440,17 +440,17 @@ const methods = state => ({
 		// console.log(`data=${Date.now() - t}`)
 
 		const t = Date.now()
-		const reactVDOM = parseElements(state.nodes, state.cachedElements)
-		console.log(`reactVDOM=${Date.now() - t}`)
+		const elements = parseElements(state.nodes, state.cachedElements)
+		console.log(`parseElements=${Date.now() - t}`)
 
 		Object.assign(state, {
 			data,
-			reactVDOM,
+			elements,
 		})
 
 		// Object.assign(state, {
 		// 	data: state.nodes.map(each => each.data).join("\n"),
-		// 	reactVDOM: parseElements(state.nodes, state.parserLRUCache),
+		// 	elements: parseElements(state.nodes, state.parserLRUCache),
 		// })
 	},
 })

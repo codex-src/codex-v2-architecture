@@ -31,7 +31,7 @@ const ReactEditor = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
-			{state.reactVDOM.map(({ type: T, ...each }) => (
+			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					...each,
@@ -133,7 +133,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 				// console.log(`computePosRange=${Date.now() - t}`)
 			})
 		}, [state, dispatch]),
-		[state.readOnly, state.reactVDOM],
+		[state.readOnly, state.elements],
 	)
 
 	// Rerenders on DOMContentLoaded for syntax highlighting.
@@ -472,7 +472,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 	// 		{
 	// 			...state,
 	// 			history:   undefined,
-	// 			reactVDOM: undefined,
+	// 			elements:  undefined,
 	// 			reactDOM:  undefined,
 	// 		},
 	// 		// state.history.stack.map(each => ({

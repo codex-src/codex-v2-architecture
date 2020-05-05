@@ -42,8 +42,8 @@ const methods = state => ({
 	// Updates preferences.
 	update(editorState) {
 		Object.assign(state, {
-			[renderModesEnum.HTML]: toHTML(editorState.reactVDOM),
-			[renderModesEnum.React_js]: toReact_js(editorState.reactVDOM),
+			[renderModesEnum.HTML]: toHTML(editorState.elements),
+			[renderModesEnum.React_js]: toReact_js(editorState.elements),
 			[renderModesEnum.JSON]: JSON.stringify(
 				{
 					...editorState,
@@ -51,7 +51,7 @@ const methods = state => ({
 					extPosRange:    undefined,
 					history:        undefined,
 					cachedElements: undefined,
-					reactVDOM:      undefined,
+					elements:       undefined,
 					reactDOM:       undefined,
 				},
 				null,

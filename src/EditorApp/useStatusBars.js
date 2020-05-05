@@ -20,7 +20,7 @@ function computeStatusLHS(editorState) {
 
 // Computes the RHS status string.
 function computeStatusRHS(editorState) {
-	const str = toText(editorState.reactVDOM)
+	const str = toText(editorState.elements)
 	const metadata = {
 		words: str.split(/\s+/).filter(Boolean).length,
 		minutes: Math.round([...str].length / 4.7 / 300), // Characters per word / words per minute

@@ -114,7 +114,7 @@ const App = () => {
 					// No-op
 					return
 				}
-				const title = toText(state.reactVDOM.slice(0, 1)).split("\n", 1)[0]
+				const title = toText(state.elements.slice(0, 1)).split("\n", 1)[0]
 				download(`${title}.md`, new Blob([state.data, "\n"]))
 			}
 			document.addEventListener("keydown", handler)
