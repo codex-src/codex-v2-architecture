@@ -24,7 +24,8 @@ import {
 } from "./parser/spec"
 
 import "./Editor.css"
-import "./tailwind-codex-overrides.css"
+import "./tailwind-colors.css"
+import "./tailwind-overrides.css"
 
 // TODO: Add React.memo?
 const ReactEditor = ({ state, dispatch }) => {

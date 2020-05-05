@@ -9,8 +9,8 @@ const attrs = {
 	},
 	strike: {
 		style: {
-			"--red-100": "var(--gray-100)",
-			"--red-600": "currentColor",
+			"--blue-100": "var(--gray-100)",
+			"--blue-500": "currentColor",
 			"--md-blue-a400": "currentColor",
 			"textDecoration": "line-through",
 			"color": "var(--gray-500)",
