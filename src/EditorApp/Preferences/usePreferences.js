@@ -101,19 +101,19 @@ const methods = state => ({
 	toggleSidebar() {
 		state.showSidebar = !state.showSidebar
 	},
-	zoomOut() {
-		if (state.fontSize <= defaultFontSize - 2) { // -1x
-			// No-op
-			return
-		}
-		state.fontSize -= 2
-	},
 	zoomIn() {
-		if (state.fontSize >= defaultFontSize + 6) { // +3x
+		if (state.fontSize >= defaultFontSize + 4) {
 			// No-op
 			return
 		}
 		state.fontSize += 2
+	},
+	zoomOut() {
+		if (state.fontSize <= defaultFontSize - 4) {
+			// No-op
+			return
+		}
+		state.fontSize -= 2
 	},
 	// resetZoom() {
 	// 	state.fontSize = defaultFontSize

@@ -70,23 +70,6 @@ const FixedPreferences = ({
 						</Button>
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={prefsDispatch.zoomOut}
-						>
-							<svg
-								className="mr-2 w-4 h-4 text-gray-500"
-								fill="none"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
-							</svg>
-							Zoom Out
-						</Button>
-						<Button
-							className="p-2 flex flex-row items-center font-medium text-xxs"
 							onClick={prefsDispatch.zoomIn}
 						>
 							<svg
@@ -101,6 +84,23 @@ const FixedPreferences = ({
 								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
 							</svg>
 							Zoom In
+						</Button>
+						<Button
+							className="p-2 flex flex-row items-center font-medium text-xxs"
+							onClick={prefsDispatch.zoomOut}
+						>
+							<svg
+								className="mr-2 w-4 h-4 text-gray-500"
+								fill="none"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+							</svg>
+							Zoom Out
 						</Button>
 						<div
 							className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"

@@ -224,7 +224,12 @@ const App = () => {
 						{/* Editor */}
 						<Editor
 							// style={{ paddingBottom: "calc(100vh - 128px)", fontSize: prefs.fontSize }}
-							style={{ fontSize: prefs.fontSize }}
+							style={{
+								fontSize: prefs.fontSize,
+								transitionProperty: "font-size",
+								transitionDuration: "25ms",
+								transitionTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+							}}
 							state={state}
 							dispatch={dispatch}
 							readOnly={prefs.readOnly}
