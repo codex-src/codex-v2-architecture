@@ -11,6 +11,7 @@ import {
 } from "./parsers"
 
 import {
+	getListRegex,
 	testAnyList,
 	testBlockquote,
 	testBreak,
@@ -69,7 +70,6 @@ function parseElements(nodes, cachedElements) {
 	}
 
 	const elements = []
-	// for (let x1 = 0; x1 < nodes.length; x1++) {
 	for (let x1 = 0, len = nodes.length; x1 < len; x1++) {
 		const each = nodes[x1]
 		// Fast pass:
@@ -98,8 +98,7 @@ function parseElements(nodes, cachedElements) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					const each = nodes[x2]
-					if (!testBlockquote(each)) {
+					if (!testBlockquote(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -127,8 +126,7 @@ function parseElements(nodes, cachedElements) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					const each = nodes[x2]
-					if (testPreformattedEnd(each, syntax)) {
+					if (testPreformattedEnd(nodes[x2], syntax)) {
 						// No-op; do not decrement
 						break
 					}
@@ -171,8 +169,7 @@ function parseElements(nodes, cachedElements) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					const each = nodes[x2]
-					if (!testAnyList(each)) {
+					if (!testAnyList(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -185,7 +182,6 @@ function parseElements(nodes, cachedElements) {
 				let y = 0
 				const recurse = element => {
 					for (let x = 0; x < element.children.length; x++) {
-						// console.log(toText([element.children[x]]), range[y].data)
 						element.children[x].id = range[y].id
 						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
 							y++ // Increment to the next node

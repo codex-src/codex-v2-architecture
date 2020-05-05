@@ -8,7 +8,7 @@ import {
 
 // Parses a list-based VDOM representation from a range of
 // paragraphs.
-function parseAnyList(range) {
+function parseAnyList(range) { // TODO: Add regex parameter
 	const element = {
 		type: typeEnum.AnyList,
 		tag: UnorderedListRe.test(range[0].data) ? "ul" : "ol",

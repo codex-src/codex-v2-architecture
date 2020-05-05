@@ -1,4 +1,9 @@
-import { AnyListRe } from "./spec"
+import {
+	AnyListRe,
+	OrderedListRe,
+	TaskListRe,
+	UnorderedListRe,
+} from "./spec"
 
 // Tests whether a node is a header node.
 export function testHeader(node) {
@@ -37,6 +42,39 @@ export function testPreformattedStart(node) {
 export function testPreformattedEnd(node, syntax) {
 	return node.data === syntax
 }
+
+// // Returns a regex for an <AnyList> node.
+// export function getListRegex(node) {
+// 	const matches = node.data.match(AnyListRe)
+// 	if (!matches) {
+// 		return null
+// 	}
+// 	const [, , syntax] = matches
+// 	switch (syntax[0]) {
+// 	case "-":
+// 	case "*":
+// 		if (syntax === "- [ ] " || syntax === "- [x] ") {
+// 			return TaskListRe
+// 		} else {
+// 			return OrderedListRe
+// 		}
+// 	case "0":
+// 	case "1":
+// 	case "2":
+// 	case "3":
+// 	case "4":
+// 	case "5":
+// 	case "6":
+// 	case "7":
+// 	case "8":
+// 	case "9":
+// 		return UnorderedListRe
+// 	default:
+// 		// No-op
+// 		break
+// 	}
+// 	return null
+// }
 
 // Tests whether a node is an <AnyList> node.
 export function testAnyList(node) {
