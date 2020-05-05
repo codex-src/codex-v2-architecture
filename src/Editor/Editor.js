@@ -143,8 +143,8 @@ const Editor = ({
 				// 	return element
 				// }
 
-				// Ascends to the nearest scroll element.
-				const ascendToScrollElement = element => {
+				// Ascends to the nearest scrolling element.
+				const ascendToScrollingElement = element => {
 					// NOTE: Use + 2 to guard truncation
 					while (element && !(element.scrollHeight > element.offsetHeight + 2)) {
 						element = element.parentElement
@@ -164,13 +164,13 @@ const Editor = ({
 						// No-op
 						return
 					}
-					const range = selection.getRangeAt(0)
 
-					const scrollElement = ascendToScrollElement(ascendNode(range.commonAncestorContainer))
-					let { top: scrollTop, bottom: scrollBottom } = scrollElement.getBoundingClientRect()
-					if (scrollElement.nodeName === "HTML") {
-						scrollTop = -1 * window.scrollY
-						scrollBottom = -1 * (window.scrollY + window.height)
+					const range = selection.getRangeAt(0)
+					const scrollingElement = ascendToScrollingElement(ascendNode(range.commonAncestorContainer))
+					let { top: scrollTop, bottom: scrollBottom } = scrollingElement.getBoundingClientRect()
+					if (scrollingElement.nodeName === "HTML") {
+						scrollTop = 0
+						scrollBottom = window.innerHeight
 					}
 
 					const startElement = ascendNode(range.startContainer)
@@ -179,14 +179,12 @@ const Editor = ({
 					const endElement = ascendNode(range.endContainer)
 					const { bottom } = endElement.getBoundingClientRect()
 
-					// console.log(startElement, endElement, scrollElement)
-
-					if (top < scrollTop && bottom > scrollBottom) {
+					if (top - scrollTopOffset < scrollTop && bottom + scrollBottomOffset > scrollBottom) {
 						// No-op; defer to end
-					} else if (top < scrollTop) {
-						scrollElement.scrollBy(0, -1 * (scrollTop - top))
-					} else if (bottom > scrollBottom) {
-						scrollElement.scrollBy(0, -1 * (scrollBottom - bottom))
+					} else if (top - scrollTopOffset < scrollTop) {
+						scrollingElement.scrollBy(0, -1 * scrollTop - top + scrollTopOffset)
+					} else if (bottom + scrollBottomOffset > scrollBottom) {
+						scrollingElement.scrollBy(0, -1 * scrollBottom - bottom - scrollBottomOffset)
 					}
 
 				}, 0)

@@ -237,6 +237,7 @@ const App = () => {
 							autoFocus={!data.length}
 							// TOOD: Use a ref to compute scrollTopOffset
 							scrollTopOffset={32}
+							scrollBottomOffset={32}
 						/>
 
 					</div>
