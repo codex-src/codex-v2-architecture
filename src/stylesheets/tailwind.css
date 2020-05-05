@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+	scroll-behavior: smooth;
+}
+
 .pb-2\/1 {
 	padding-bottom: 200%;
 }

@@ -145,19 +145,18 @@ const Editor = ({
 
 				// Ascends to the nearest scroll element.
 				const ascendToScrollElement = element => {
-					// NOTE: Use + 2 because of <Preformatted>
+					// NOTE: Use + 2 to guard truncation
 					while (element && !(element.scrollHeight > element.offsetHeight + 2)) {
 						element = element.parentElement
 					}
-					// // Guard <div id="root" class="h-full">:
-					// if (element.parentElement && element.parentElement.nodeName === "BODY") {
-					// 	return element.ownerDocument.scrollingElement
-					// }
+					// Guard <div id="root" class="h-full">:
+					if (element.parentElement && element.parentElement.nodeName === "BODY") {
+						return element.ownerDocument.scrollingElement
+					}
 					return element
 				}
 
-				// elem.scrollHeight > elem.offsetHeight
-
+				// This is the working behavior for <ReadmeEditor>
 				setTimeout(() => {
 
 					const selection = document.getSelection()
@@ -168,19 +167,19 @@ const Editor = ({
 					const range = selection.getRangeAt(0)
 
 					const scrollElement = ascendToScrollElement(ascendNode(range.commonAncestorContainer))
-					const {
-						top: scrollTop,
-						bottom: scrollBottom,
-					} = scrollElement.getBoundingClientRect()
+					let { top: scrollTop, bottom: scrollBottom } = scrollElement.getBoundingClientRect()
+					if (scrollElement.nodeName === "HTML") {
+						scrollTop = -1 * window.scrollY
+						scrollBottom = -1 * (window.scrollY + window.height)
+					}
 
 					const startElement = ascendNode(range.startContainer)
 					const { top } = startElement.getBoundingClientRect()
 
 					const endElement = ascendNode(range.endContainer)
-					const { bottom, height } = endElement.getBoundingClientRect()
-					// bottom += height
+					const { bottom } = endElement.getBoundingClientRect()
 
-					console.log(startElement, endElement, scrollElement)
+					// console.log(startElement, endElement, scrollElement)
 
 					if (top < scrollTop && bottom > scrollBottom) {
 						// No-op; defer to end
@@ -191,29 +190,6 @@ const Editor = ({
 					}
 
 				}, 0)
-
-				// scrollingElement.scrollBy()
-
-
-
-				// startElement.scrollBy(0, 20)
-				// startElement.offsetTop = 20
-
-				// if (startContainer.nodeType !== Node.ELEMENT_NODE) {
-				// 	startContainer = startContainer.parentElement
-				// }
-				// const { top } = startContainer.getBoundingClientRect()
-				// // TODO: Add selection clause
-				// if (top <= scrollTopOffset) {
-				// 	startContainer
-				// }
-
-				// const { bottom } = endContainer.getBoundingClientRect()
-
-				// const { top, bottom } = ref.current.getBoundingClientRect()
-				// console.log({ top, bottom })
-
-				// console.log({ scrollTopOffset })
 
 				// t = Date.now()
 				//
