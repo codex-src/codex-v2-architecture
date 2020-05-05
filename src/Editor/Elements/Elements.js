@@ -92,11 +92,11 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	)
 })
 
-export const Blockquote = React.memo(({ id, children: range }) => {
+export const Blockquote = React.memo(({ id, children: nodes }) => {
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
 		<Root id={id} className="px-6" style={style}>
-			{range.map(({ type: T, ...each }) => (
+			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					...each,
@@ -110,35 +110,35 @@ export const Blockquote = React.memo(({ id, children: range }) => {
 // 	<Node style={{ whiteSpace: "pre" }} {...props} />
 // )
 
-export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
+export const Preformatted = React.memo(({ id, syntax, extension, children: nodes }) => {
 	const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
-	const $range = React.useMemo(() => {
-		const subrange = range.slice(1, -1)
-		if (!extension || range.length === 2) {
-			return subrange.map(each => ({ ...each, data: escape(each.data) }))
+	const $nodes = React.useMemo(() => {
+		const range = nodes.slice(1, -1)
+		if (!extension || nodes.length === 2) {
+			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
 		const parser = PrismMap[extension]
 		if (!parser) {
-			return subrange.map(each => ({ ...each, data: escape(each.data) }))
+			return range.map(each => ({ ...each, data: escape(each.data) }))
 		}
-		const data = subrange.map(each => each.data).join("\n")
+		const data = range.map(each => each.data).join("\n")
 		const html = window.Prism.highlight(data, parser, extension)
-		return html.split("\n").map((each, x) => ({ id: subrange[x].id, data: each }))
-	}, [extension, range])
+		return html.split("\n").map((each, x) => ({ id: range[x].id, data: each }))
+	}, [extension, nodes])
 
 	return (
 		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white shadow-hero rounded" {...attrs.code}>
-			<Node id={range[0].id} className="leading-none">
+			<Node id={nodes[0].id} className="leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
 			</Node>
-			{$range.map(each => (
+			{$nodes.map(each => (
 				<Node key={each.id} id={each.id}>
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
@@ -147,7 +147,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					}} />
 				</Node>
 			))}
-			<Node id={range[range.length - 1].id} className="leading-none">
+			<Node id={nodes[nodes.length - 1].id} className="leading-none">
 				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
@@ -158,8 +158,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	)
 })
 
-export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
-	<Node tag={tag} id={id} className="my-2">
+export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
+	<Node tag={tag} id={id} className="my-2" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -169,17 +169,16 @@ export const AnyListItem = React.memo(({ tag, id, syntax, children }) => (
 ))
 
 const Checkbox = ({ checked }) => (
-	<Button className={
-		`checkbox ${
-			!checked
-				? "checkbox--unchecked"
-				: "checkbox--checked"
-		} -mt-px inline-block w-4 h-4 align-middle ${
-			!checked
-				? "bg-white shadow-hero"
-				: "bg-md-blue-a200 shadow"
-		} focus:shadow rounded-md transform scale-105`
-	}>
+	<Button
+		className={
+			`-mt-px inline-block w-4 h-4 align-middle ${
+				!checked
+					? "bg-white shadow-hero"
+					: "bg-md-blue-a200 shadow"
+			} focus:shadow rounded-md transform scale-105`
+		}
+		data-codex-checkbox={checked}
+	>
 		<svg fill="#fff" viewBox="0 0 16 16">
 			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
 		</svg>
@@ -187,7 +186,7 @@ const Checkbox = ({ checked }) => (
 )
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
-	<Node tag={tag} id={id} className="todo relative my-2" style={checked && attrs.strike.style}>
+	<Node tag={tag} id={id} className="relative my-2" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
 				<Checkbox checked={checked} />
@@ -199,13 +198,15 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	</Node>
 ))
 
-export const AnyList = React.memo(({ root, type, tag, id, children: range }) => {
-	const HOC = root === undefined ? Root : Node
+// NOTE: __nested is not parsed
+export const AnyList = React.memo(({ type, tag, id, __nested, children: nodes }) => {
+	const HOC = __nested === undefined ? Root : Node
 	return (
 		<HOC tag={tag} id={id} className="ml-5">
-			{range.map(({ type: T, ...each }) => (
+			{nodes.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
+					__nested: true,
 					...each,
 				})
 			))}

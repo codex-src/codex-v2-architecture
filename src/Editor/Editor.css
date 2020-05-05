@@ -233,29 +233,24 @@ html {
 /*
  * <AnyList>
  */
-.codex-editor ul > li,
-.codex-editor ol > li {
+.codex-editor [data-codex-ordered],
+.codex-editor [data-codex-checked] {
 	margin-left: 1ch;
 }
 
-/*
- * <ul>
- */
-.codex-editor ul > li:not(.todo):before  {
-	/* NOTE: Use -0.5ch not 1ch */
-	margin-left: calc(-0.5ch - 1.25em);
+/* Unordered */
+.codex-editor [data-codex-ordered="false"]:before  {
+	margin-left: calc(-0.5ch - 1.25em); /* Use -0.5ch not 1ch */
 	position: absolute;
 	content: "• ";
 	color: var(--md-blue-a400);
 }
 
-/*
- * <ol>
- */
-.codex-editor ol > li:not(.todo):first-of-type {
+/* Ordered */
+.codex-editor [data-codex-ordered="true"]:first-of-type {
 	counter-reset: count;
 }
-.codex-editor ol > li:not(.todo):before  {
+.codex-editor [data-codex-ordered="true"]:before  {
 	margin-left: calc(-1ch - 1.25em);
 	position: absolute;
 	counter-increment: count;
@@ -264,21 +259,17 @@ html {
 	color: var(--md-blue-a400);
 }
 
-/*
- * <TodoItem>
- */
-.codex-editor ul > li .checkbox,
-.codex-editor ol > li .checkbox {
+/* Checked */
+/* FIXME */
+.codex-editor [data-codex-checked] [data-codex-checkbox="false"] {
 	margin-left: calc(-1ch - 1.25em);
 }
-.codex-editor ul > li .checkbox:focus,
-.codex-editor ol > li .checkbox:focus {
+.codex-editor [data-codex-checked] [data-codex-checkbox="false"]:focus {
   border-color: #a4cafe;
   outline: none;
   box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
 }
 /* TODO: Remove :focus? */
-.codex-editor ul > li .checkbox--checked:focus,
-.codex-editor ol > li .checkbox--checked:focus {
+.codex-editor [data-codex-checked] [data-codex-checkbox="true"]:focus {
   border-color: transparent;
 }

@@ -82,7 +82,7 @@ const Editor = ({ id, className, style, state, dispatch, readOnly, autoFocus }) 
 
 				// Sync DOM:
 				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
-					const checkboxes = clonedElement.querySelectorAll(".checkbox")
+					const checkboxes = clonedElement.querySelectorAll("[data-codex-checkbox]")
 					for (const each of checkboxes) {
 						const { id } = each
 							.parentElement // <div class="absolute">
