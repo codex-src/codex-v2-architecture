@@ -88,12 +88,9 @@ const Editor = ({
 					for (const each of checkboxes) {
 						const { id } = each
 							.parentElement // <div class="absolute">
-							.parentElement // <li id="<uuid>">
-						each.onpointerdown = e => {
-							e.preventDefault()
-							document.activeElement.blur()
-						}
+							.parentElement // <li id="$uuid">
 						each.onclick = () => {
+							document.activeElement.blur()
 							dispatch.checkTodo(id)
 						}
 					}
