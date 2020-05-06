@@ -1,4 +1,5 @@
 import parseAnyList from "./parseAnyList"
+import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
@@ -74,7 +75,10 @@ function parseElements(nodes, cachedElements) {
 		// Fast pass:
 		if (!each.data.length || testFastPass(each.data[0])) {
 			const element = cacheStrategy(each, parseParagraph)
-			elements.push({ ...element, id: each.id })
+			elements.push({
+					...element,
+					id: each.id,
+				})
 			continue
 		}
 		switch (each.data[0]) {
@@ -191,12 +195,18 @@ function parseElements(nodes, cachedElements) {
 				}
 				recurse(element)
 
-				elements.push({ ...element, id: each.id })
+				elements.push({
+					...element,
+					id: each.id,
+				})
 				x1 = x2
 				continue
 			} else if (testBreak(each)) {
 				const element = cacheStrategy(each, parseBreak)
-				elements.push({ ...element, id: each.id })
+				elements.push({
+					...element,
+					id: each.id,
+				})
 				continue
 			}
 			// No-op
@@ -210,13 +220,17 @@ function parseElements(nodes, cachedElements) {
 			const matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)/)
 			if (matches) {
 				const [, alt, src] = matches
-				elements.push({
+				const element = cacheStrategy(each, node => ({
 					type: typeEnum.Image,
 					id: each.id,
 					syntax: ["![", `](${src})`],
 					src: src,
-					alt, // toInnerString(alt),
-					children: alt, // lhs.data.children,
+					alt: toInnerText(alt),
+					children: parseInlineElements(alt),
+				}))
+				elements.push({
+					...element,
+					id: each.id,
 				})
 				continue
 			}
@@ -262,7 +276,10 @@ function parseElements(nodes, cachedElements) {
 		}
 		// <Paragraph>
 		const element = cacheStrategy(each, parseParagraph)
-		elements.push({ ...element, id: each.id })
+		elements.push({
+			...element,
+			id: each.id,
+		})
 	}
 	return elements
 }
