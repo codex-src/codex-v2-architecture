@@ -135,6 +135,11 @@ const Editor = ({
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
+				// if (!state.data.length) {
+				// 	// No-op
+				// 	return
+				// }
+
 				const id = setTimeout(() => {
 					const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
 					if (!computed || !computed.offset) {

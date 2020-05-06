@@ -12,7 +12,7 @@ import {
 // +---+ ± 1
 //
 const ascendToScrollingElement = element => {
-	while (element && !(element.scrollHeight > element.offsetHeight + 2)) {
+	while (element && element.parentElement && !(element.scrollHeight > element.offsetHeight + 2)) {
 		element = element.parentElement
 	}
 	// Guard <div id="root" class="h-full">:
