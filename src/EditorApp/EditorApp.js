@@ -186,6 +186,7 @@ const App = () => {
 
 			{/* Preferences */}
 			<FixedPreferences
+				stateTuple={[state, dispatch]}
 				prefsTuple={[prefs, prefsDispatch]}
 				showOutlineTuple={[showOutline, setShowOutline]}
 				saveStatus={saveStatus}

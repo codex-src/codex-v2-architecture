@@ -23,6 +23,7 @@ function useScrollY() {
 }
 
 const FixedPreferences = ({
+	stateTuple: [state, dispatch],
 	prefsTuple: [prefs, prefsDispatch],
 	showOutlineTuple: [showOutline, setShowOutline],
 	saveStatus,
@@ -125,7 +126,10 @@ const FixedPreferences = ({
 					<div className="flex-shrink-0 flex flex-row pointer-events-auto">
 						<Button
 							className="p-2 flex flex-row items-center font-medium text-xxs"
-							onClick={prefsDispatch.toggleReadOnly}
+							onClick={() => {
+								dispatch.toggleReadOnly()
+								prefsDispatch.toggleReadOnly()
+							}}
 						>
 							{!prefs.readOnly ? (
 								<svg
