@@ -33,18 +33,18 @@ function toReact(children) {
 	return components
 }
 
-// Trims extraneous spaces.
-function trim(str) {
-	return str.replace(/ +/g, " ")
-}
+// // Trims extraneous spaces.
+// function trim(str) {
+// 	return str.replace(/ +/g, " ")
+// }
 
 const headerClassNames = {
-	h1: trim("font-semibold text-3xl leading-tight text-black antialiased"),
-	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
-	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h4: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h5: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h6: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h1: "font-medium text-4xl leading-tight text-black antialiased",
+	h2: "font-medium text-3xl leading-tight text-black antialiased",
+	h3: "font-medium text-2xl leading-tight text-black antialiased",
+	h4: "font-medium text-2xl leading-tight text-black antialiased",
+	h5: "font-medium text-2xl leading-tight text-black antialiased",
+	h6: "font-medium text-2xl leading-tight text-black antialiased",
 }
 
 // // Conditionally wraps a React element.
@@ -130,7 +130,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-white rounded shadow-hero" {...attrs.code}>
+		<Root id={id} className="px-6 font-mono text-sm leading-snug bg-gray-100 bg-opacity-75 rounded shadow-hero" {...attrs.code}>
 			<Node id={range[0].id} className="leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
