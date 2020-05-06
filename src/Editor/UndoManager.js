@@ -24,14 +24,17 @@ class UndoManager {
 	}
 	// Undos up to one state and returns the n - 1 state.
 	undo(currentState) {
-		if (!this.index) {
-			return null
-		}
+		// if (!this.index) {
+		// 	return null
+		// }
 		const { index } = this
 		if (this.index + 1 === this.stack.length) {
 			this.push(currentState)
 		}
-		this.index = index - 1
+		this.index = index
+		if (this.index) {
+			this.index--
+		}
 		return this.stack[this.index]
 	}
 	// Redos up to one state and returns the n + 1 state.
