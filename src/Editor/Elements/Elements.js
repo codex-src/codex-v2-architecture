@@ -181,7 +181,10 @@ const Checkbox = ({ id, checked }) => {
 				} focus:shadow rounded-md transform scale-105 pointer-events-auto`
 			}
 			data-codex-checkbox={checked}
-			onClick={() => dispatch.checkTodo(id)}
+			onClick={() => {
+				document.activeElement.blur()
+				dispatch.checkTodo(id)
+			}}
 		>
 			<svg fill="#fff" viewBox="0 0 16 16">
 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>

@@ -85,7 +85,7 @@ const Editor = ({
 
 				// Sync DOM:
 				syncDOM(reactDOM.current, ref.current, (originalElement, clonedElement) => {
-					console.log(originalElement)
+					// console.log(originalElement)
 					// const checkboxes = originalElement.querySelectorAll("[data-codex-checkbox]")
 					// for (const each of checkboxes) {
 					// 	console.log(each.onclick)
@@ -329,8 +329,11 @@ const Editor = ({
 									dispatch.backspaceParagraph()
 									return
 								}
-								autoSyntax = tabs + syntax // E.g. unordered
-								if (TaskListRe.test(autoSyntax)) {
+								autoSyntax = tabs + syntax // Unordered
+								if (state.pos1.x === (tabs + syntax).length) {
+									// NOTE: Backspaces a paragraph and enters
+									dispatch.backspaceParagraph()
+								} else if (TaskListRe.test(autoSyntax)) {
 									autoSyntax = `${tabs}- [ ] `
 								} else if (UnorderedListRe.test(autoSyntax)) {
 									autoSyntax = `${tabs}- `
