@@ -175,7 +175,7 @@ const Editor = ({
 				const { data, nodes, pos1, pos2 } = state
 				const currentState = { data, nodes, pos1, pos2 }
 				dispatch.pushUndo(currentState)
-			}, 250)
+			}, 500)
 			return () => {
 				clearTimeout(id)
 			}
@@ -367,7 +367,10 @@ const Editor = ({
 						// Undo:
 						if (detectUndo(e)) {
 							e.preventDefault()
-							dispatch.undo()
+							const { data, nodes, pos1, pos2 } = state
+							// const currentState = { data, nodes, pos1, pos2 }
+							const currentState = { data, nodes, pos1, pos2 }
+							dispatch.undo(currentState)
 							return
 							// Redo:
 						} else if (detectRedo(e)) {
@@ -489,13 +492,7 @@ const Editor = ({
 			)}
 
 			<div className="py-6 whitespace-pre-wrap font-mono text-xs leading-snug" style={{ MozTabSize: 2, tabSize: 2 }}>
-				{JSON.stringify(
-					{
-						history: state.history,
-					},
-					null,
-					"\t",
-				)}
+				{JSON.stringify(state.history, null, "\t")}
 			</div>
 
 		</div>

@@ -13,9 +13,13 @@ import {
 
 // Prepares a new editor state (for useEditor).
 function newEditorState(data) {
+
 	const nodes = newNodes(data)
 	const pos1 = newPos()
 	const pos2 = newPos()
+
+	const undoState = { data, nodes, pos1, pos2 }
+
 	// https://yomguithereal.github.io/mnemonist/lru-cache
 	const cachedElements = new LRUCache(String, Object, 100)
 	const initialState = {
@@ -26,25 +30,18 @@ function newEditorState(data) {
 		pos1,                                            // Start cursor data structure
 		pos2,                                            // End cursor data structure
 		extPosRange: ["", ""],                           // Extended node (root ID) range
-		history: new UndoManager(
-			{
-				data,
-				nodes,
-				pos1: { ...pos1 }, // TODO: Remove ... syntax
-				pos2: { ...pos2 },
-			},
-			(currentState, nextState) => {
-				const ok = (
-					currentState.data.length === nextState.data.length &&
-					currentState.data === nextState.data
-				)
-				return ok
-			},
-		),
+		history: new UndoManager(undoState, (currentState, nextState) => {
+			const ok = (
+				currentState.data.length === nextState.data.length &&
+				currentState.data === nextState.data
+			)
+			return ok
+		}),
 		cachedElements,                                  // LRU cached elements (for parseElements)
 		elements: parseElements(nodes, cachedElements),  // Elements
 		reactDOM: document.createElement("div"),         // React-managed DOM
 	}
+
 	return initialState
 }
 
@@ -121,7 +118,7 @@ const methods = state => ({
  			// Reset to BOL:
 			state.pos2.x = 0
 		}
-		this.write("") // FIXME?
+		this.write("")
 	},
 	// Writes character data.
 	write(data) {
@@ -397,9 +394,7 @@ const methods = state => ({
 		state.history.push(currentState)
 	},
 	// Undos once (stores the current state).
-	undo() {
-		const { data, nodes, pos1, pos2 } = state
-		const currentState = { data, nodes, pos1, pos2 }
+	undo(currentState) {
 		const undoState = state.history.undo(currentState)
 		if (!undoState) {
 			// No-op
