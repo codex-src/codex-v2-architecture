@@ -40,11 +40,11 @@ function toReact(children) {
 
 const headerClassNames = {
 	h1: "font-medium text-4xl leading-tight text-black antialiased",
-	h2: "font-medium text-3xl leading-tight text-black antialiased",
-	h3: "font-medium text-2xl leading-tight text-black antialiased",
-	h4: "font-medium text-2xl leading-tight text-black antialiased",
-	h5: "font-medium text-2xl leading-tight text-black antialiased",
-	h6: "font-medium text-2xl leading-tight text-black antialiased",
+	h2: "font-medium text-2xl leading-tight text-black antialiased",
+	h3: "font-medium text-xl leading-tight text-black antialiased",
+	h4: "font-medium text-xl leading-tight text-black antialiased",
+	h5: "font-medium text-xl leading-tight text-black antialiased",
+	h6: "font-medium text-xl leading-tight text-black antialiased",
 }
 
 // // Conditionally wraps a React element.
