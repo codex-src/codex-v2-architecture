@@ -220,10 +220,10 @@ function parseElements(nodes, cachedElements) {
 			// https://regex101.com/r/FBKxEO/1
 			let matches = null
 			if (each.data[0] === "!") {
-				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)/)
+				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)$/)
 			// https://regex101.com/r/FBKxEO/2
 			} else if (each.data[0] === "[") {
-				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)/)
+				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)$/)
 			}
 			if (matches) {
 				const [, alt, src, href] = matches
