@@ -185,6 +185,7 @@ function parseElements(nodes, cachedElements) {
 				let y = 0
 				const recurse = element => {
 					for (let x = 0; x < element.children.length; x++) {
+						// console.log(element.children[x].id, range[y].id)
 						element.children[x].id = range[y].id
 						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
 							y++ // Increment to the next node

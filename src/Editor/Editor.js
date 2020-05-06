@@ -84,22 +84,13 @@ const Editor = ({
 				t = Date.now()
 
 				// Sync DOM:
-				syncDOM(reactDOM.current, ref.current, (originalElement, clonedElement) => {
-					// console.log(originalElement)
-					// const checkboxes = originalElement.querySelectorAll("[data-codex-checkbox]")
-					// for (const each of checkboxes) {
-					// 	console.log(each.onclick)
-					// 	// const { id } = each
-					// 	// 	.parentElement // <div class="absolute">
-					// 	// 	.parentElement // <li id="<uuid>">
-					// 	// each.onpointerdown = e => {
-					// 	// 	e.preventDefault()
-					// 	// 	document.activeElement.blur()
-					// 	// }
-					// 	// each.onclick = () => {
-					// 	// 	dispatch.checkTodo(id)
-					// 	// }
-					// }
+				syncDOM(reactDOM.current, ref.current, (src, dst) => {
+					const events1 = src.querySelectorAll("[data-codex-event]")
+					const events2 = dst.querySelectorAll("[data-codex-event]")
+					for (let x = 0; x < events1.length; x++) {
+						const eventType = events1[x].getAttribute("data-codex-event")
+						events2[x].addEventListener(eventType, () => events1[x][eventType]())
+					}
 				})
 
 				console.log(`syncDOM=${Date.now() - t}`)
@@ -206,10 +197,6 @@ const Editor = ({
 
 	return (
 		<div className="relative">
-
-			<div className="absolute inset-0 opacity-0 z-10 pointer-events-none">
-				<div ref={reactDOM} className={renderClassName} style={renderStyle} />
-			</div>
 
 			{React.createElement(
 				"div",
@@ -494,6 +481,10 @@ const Editor = ({
 					suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
+
+			<div className="hidden">
+				<div ref={reactDOM} className={renderClassName} style={renderStyle} />
+			</div>
 
 		</div>
 	)

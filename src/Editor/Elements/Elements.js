@@ -181,6 +181,7 @@ const Checkbox = ({ id, checked }) => {
 				} focus:shadow rounded-md transform scale-105 pointer-events-auto`
 			}
 			data-codex-checkbox={checked}
+			data-codex-event="click"
 			onClick={() => {
 				document.activeElement.blur()
 				dispatch.checkTodo(id)
