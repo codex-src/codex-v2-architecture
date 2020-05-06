@@ -30,12 +30,12 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 		pattern = `[^\\\\]${pattern}`
 		patternOffset++
 	}
-	// Syntax must be proceeded by a space, EOL, or ASCII
-	// punctuation character:
+	// Syntax must be proceeded by a space, punctuation
+	// character, or EOL:
 	pattern += `(${ASCIIWhiteSpacePattern}|${ASCIIPunctuationPattern}|$)`
 	// Match cannot be empty:
 	const offset = str.slice(x1 + syntax.length).search(pattern) + patternOffset
-	if (offset <= 0) { // TODO: Compare typeEnum for ![]() syntax?
+	if (offset <= 0) {
 		return null
 	// Match cannot be surrounded by a space (non-code):
 	} else if (type !== typeEnum.Code && (
