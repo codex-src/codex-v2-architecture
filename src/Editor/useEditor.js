@@ -2,6 +2,7 @@ import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRUCache from "mnemonist/lru-cache"
 import parseElements from "./parser/parseElements"
+import UndoManager from "./UndoManager"
 import useMethods from "use-methods"
 import { AnyListRe } from "./parser/spec"
 
@@ -25,11 +26,21 @@ function newEditorState(data) {
 		pos1,                                            // Start cursor data structure
 		pos2,                                            // End cursor data structure
 		extPosRange: ["", ""],                           // Extended node (root ID) range
-		history: {                                       // History container
-			correctedPos: false,                           // Corrected pos before first change event?
-			stack: [{ data, nodes, pos1: { ...pos1 }, pos2: { ...pos1 } }],
-			index: 0,                                      // History state stack index
-		},                                               //
+		history: new UndoManager(
+			{
+				data,
+				nodes,
+				pos1: { ...pos1 }, // TODO: Remove ... syntax
+				pos2: { ...pos2 },
+			},
+			(currentState, nextState) => {
+				const ok = (
+					currentState.data.length === nextState.data.length &&
+					currentState.data === nextState.data
+				)
+				return ok
+			},
+		),
 		cachedElements,                                  // LRU cached elements (for parseElements)
 		elements: parseElements(nodes, cachedElements),  // Elements
 		reactDOM: document.createElement("div"),         // React-managed DOM
@@ -42,7 +53,6 @@ const methods = state => ({
 	defer() {
 		this.cachedElements.clear()
 	},
-
 	// Registers props.
 	registerProps({ readOnly, focused }) {
 		if (readOnly !== undefined) {
@@ -79,21 +89,10 @@ const methods = state => ({
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, { pos1, pos2, extPosRange })
 	},
-	// Mutates the editor; corrects pos on first mutation and
-	// drops redo states.
-	mutate() {
-		if (!state.history.index && !state.history.correctedPos) {
-			Object.assign(state.history.stack[0], {
-				pos1: { ...state.pos1 },
-				pos2: { ...state.pos2 },
-			})
-			state.history.correctedPos = true
-		}
-		this.dropRedos()
-	},
 	// Drops L and R bytes.
 	dropBytes(dropL, dropR) {
-		this.mutate()
+		state.history.mutate()
+
 		// LHS:
 		state.pos1.pos -= dropL
 		while (dropL) {
@@ -126,7 +125,8 @@ const methods = state => ({
 	},
 	// Writes character data.
 	write(data) {
-		this.mutate()
+		state.history.mutate()
+
 		// Parse new nodes:
 		const nodes = newNodes(data)
 		const node1 = state.nodes[state.pos1.y]
@@ -151,7 +151,8 @@ const methods = state => ({
 	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
-		this.mutate()
+		state.history.mutate()
+
 		// Get the start offset:
 		const key1 = nodes[0].id
 		// TODO: Can no-op keys before extPosRange[0]
@@ -324,7 +325,8 @@ const methods = state => ({
 	},
 	// Tabs one-to-many paragraphs.
 	tabMany() {
-		this.mutate()
+		state.history.mutate()
+
 		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
 		for (let x = 0; x < nodes.length; x++) {
 			// if (nodes[x].data.length && nodes[x].data.slice(0, 20) === "\t".repeat(20)) {
@@ -341,7 +343,8 @@ const methods = state => ({
 	},
 	// Detabs one-to-many paragraphs.
 	detabMany() {
-		this.mutate()
+		state.history.mutate()
+
 		const nodes = state.nodes.slice(state.pos1.y, state.pos2.y + 1)
 		for (let x = 0; x < nodes.length; x++) {
 			if (!nodes[x].data.length || nodes[x].data[0] !== "\t") {
@@ -362,7 +365,8 @@ const methods = state => ({
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {
-		this.mutate()
+		state.history.mutate()
+
 		// state.focused = false
 		const node = state.nodes.find(each => each.id === id)
 		let [, tabs, syntax] = node.data.match(AnyListRe)
@@ -388,52 +392,36 @@ const methods = state => ({
 	paste(data) {
 		this.write(data)
 	},
-	// Stores the next undo state.
-	storeUndo() {
-		const undo = state.history.stack[state.history.index]
-		if (undo.data.length === state.data.length && undo.data === state.data) {
+	// Pushes the next undo state.
+	pushUndo(currentState) {
+		state.history.push(currentState)
+	},
+	// Undos once (stores the current state).
+	undo() {
+		const { data, nodes, pos1, pos2 } = state
+		const currentState = { data, nodes, pos1, pos2 }
+		const undoState = state.history.undo(currentState)
+		if (!undoState) {
 			// No-op
 			return
 		}
-		const { data, nodes, pos1, pos2 } = state
-		state.history.stack.push({ data, nodes, pos1: { ...pos1 }, pos2: { ...pos2 } })
-		state.history.index++
-	},
-	// Drops redo states.
-	dropRedos() {
-		state.history.stack.splice(state.history.index + 1)
-	},
-	// Undos once:
-	undo() {
-		// Reset correctedPos on the first or the second-to-
-		// first undo:
-		if (state.history.index <= 1 && state.history.correctedPos) {
-			state.history.correctedPos = false
-		}
-		// Bounds check:
-		if (state.history.index) {
-			state.history.index--
-		}
-		const undo = state.history.stack[state.history.index]
-		Object.assign(state, undo)
-		// TOOD: render does not need to compute state.data
+		Object.assign(state, undoState)
 		this.render()
 	},
-	// Redos once:
+	// Redos once.
 	redo() {
-		// Bounds check:
-		if (state.history.index + 1 === state.history.stack.length) {
+		const redoState = state.history.redo()
+		if (!redoState) {
 			// No-op
 			return
 		}
-		state.history.index++
-		const redo = state.history.stack[state.history.index]
-		Object.assign(state, redo)
-		// TOOD: render does not need to compute state.data
+		Object.assign(state, redoState)
 		this.render()
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
+
+		// TODO: Add state.history.mutate here?
 
 		// let t = Date.now()
 		const data = state.nodes.map(each => each.data).join("\n")
