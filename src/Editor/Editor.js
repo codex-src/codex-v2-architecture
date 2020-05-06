@@ -63,7 +63,9 @@ const Editor = ({
 	const mountedProps = React.useRef()
 	React.useLayoutEffect(() => {
 		if (mountedProps.current) {
-			// No-op
+			// NOTE: Uncomment to focus the editor on read-write
+			// mode
+			dispatch.registerProps({ readOnly })
 			return
 		}
 		mountedProps.current = true
