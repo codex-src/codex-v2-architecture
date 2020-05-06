@@ -223,7 +223,6 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 
-	// NOTE: 1.5em represents to an empty paragraph
 	const style = { minHeight: "1.5em", maxHeight: "24em" }
 	return (
 		<Root id={id} className="-mx-6">
@@ -232,8 +231,10 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
-					<Markdown syntax={syntax}>
-						{toReact(children)}
+					<Markdown className="hidden" syntax={syntax}>
+						{toReact(children) || (
+							<br />
+						)}
 					</Markdown>
 				</div>
 			)}
