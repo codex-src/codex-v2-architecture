@@ -59,13 +59,6 @@ const Editor = ({
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
 
-	// // Defer function (purge the cache).
-	// React.useEffect(() => {
-	// 	return () => {
-	// 		dispatch.defer()
-	// 	}
-	// }, [])
-
 	// Registers props.
 	const mountedProps = React.useRef()
 	React.useLayoutEffect(() => {
@@ -145,6 +138,7 @@ const Editor = ({
 				// dispatch.select(pos1, pos2)
 				//
 				// console.log(`computePosRange=${Date.now() - t}`)
+
 			})
 		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
 		[state.readOnly, state.elements],
@@ -181,13 +175,12 @@ const Editor = ({
 	)
 
 	// Exclusively returns a function for read-write mode.
-	//
-	// TODO: Move before useEffect use for storeUndo?
 	const newReadWriteHandler = handler => {
-		if (state.readOnly) {
-			return undefined
+		// return !state.readOnly ? handler : undefined
+		if (!state.readOnly) {
+			return handler
 		}
-		return handler
+		return undefined
 	}
 
 	return (
