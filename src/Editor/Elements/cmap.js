@@ -86,7 +86,7 @@ function parsePrism(code, extension) {
 	cmapText[typeEnum.AnyListItem]        = element => toInnerString(element.children)
 	cmapText[typeEnum.TodoItem]           = element => toInnerString(element.children)
 	cmapText[typeEnum.AnyList]            = element => toString(element.children)
-	// cmapText[typeEnum.Image]           = element => toInnerString(element.children)
+	cmapText[typeEnum.Image]              = element => toInnerString(element.children)
 	cmapText[typeEnum.Break]              = element => ""
 
 	cmapHTML[typeEnum.Escape]             = element => element.children
@@ -106,7 +106,7 @@ function parsePrism(code, extension) {
 	cmapHTML[typeEnum.AnyListItem]        = element => `<li>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.TodoItem]           = element => `<li>\n\t<input type="checkbox"${!element.checked ? "" : " checked"}>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.AnyList]            = element => `<${element.tag}>${`\n${toString(element.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${element.tag}>`
-	// cmapHTML[typeEnum.Image]           = element => `<figure>\n\t<img src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`}>${!element.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(element.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
+	cmapHTML[typeEnum.Image]              = element => `<figure>\n\t<img src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`}>${!element.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(element.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
 	cmapHTML[typeEnum.Break]              = element => "<hr>"
 
 	cmapReact_js[typeEnum.Escape]         = element => element.children
@@ -125,7 +125,7 @@ function parsePrism(code, extension) {
 	cmapReact_js[typeEnum.AnyListItem]    = element => `<Item>\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.TodoItem]       = element => `<Item>\n\t<Todo${!element.checked ? "" : " done"} />\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.AnyList]        = element => `<List${element.tag === "ul" ? "" : " ordered"}>${`\n${toString(element.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
-	// cmapReact_js[typeEnum.Image]       = element => `<Figure>\n\t<Image src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`} />${!element.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(element.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
+	cmapReact_js[typeEnum.Image]          = element => `<Figure>\n\t<Image src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`} />${!element.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(element.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
 	cmapReact_js[typeEnum.Break]          = element => "<Break />"
 	/* eslint-enable no-multi-spaces */
 })()

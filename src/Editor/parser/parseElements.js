@@ -201,6 +201,61 @@ function parseElements(nodes, cachedElements) {
 			}
 			// No-op
 			break
+
+		// <Image>
+		case "!":
+			// ![Image](href)
+			//
+			// https://regex101.com/r/FBKxEO/1
+			const matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)/)
+			if (matches) {
+				const [, alt, src] = matches
+				elements.push({
+					type: typeEnum.Image,
+					id: each.id,
+					syntax: ["![", `](${src})`],
+					src: src,
+					alt, // toInnerString(alt),
+					children: alt, // lhs.data.children,
+				})
+				continue
+			}
+			// No-op
+			break
+
+		// // <Image>
+		// case char === "!":
+		// 	// ![Image](href)
+		// 	if (nchars >= "![](x)".length) {
+		// 		const lhs = registerType(null, "]")(each, "!".length, { minOffset: 0 })
+		// 		if (!lhs) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		// Check ( syntax:
+		// 		if (lhs.x2 < nchars && each[lhs.x2] !== "(") {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
+		// 		if (!rhs) {
+		// 			// No-op
+		// 			break
+		// 		}
+		// 		data.push({
+		// 			type: Image,
+		// 			id: uuidv4(),
+		// 			// syntax: ["![", "](…)"],
+		// 			syntax: ["![", `](${rhs.data.children})`],
+		// 			src: rhs.data.children,
+		// 			alt: toInnerString(lhs.data.children),
+		// 			children: lhs.data.children,
+		// 		})
+		// 		continue
+		// 	}
+		// 	// No-op
+		// 	break
+
 		default:
 			// No-op
 			break

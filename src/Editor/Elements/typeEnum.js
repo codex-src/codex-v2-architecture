@@ -8,6 +8,7 @@ const typeEnum = new NumberEnum(
 	"BlockquoteItem",
 	"Break",
 	"Header",
+	"Image",
 	"Paragraph",
 	"Preformatted",
 	"TodoItem",

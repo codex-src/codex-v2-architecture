@@ -5,6 +5,7 @@ import {
 	BlockquoteItem,
 	Break,
 	Header,
+	Image,
 	Paragraph,
 	Preformatted,
 	TodoItem,
@@ -23,25 +24,26 @@ import {
 
 const typeEnumArray = [
 	// Elements:
-	AnyList,        // "AnyList",
-	AnyListItem,    // "AnyListItem",
-	Blockquote,     // "Blockquote",
-	BlockquoteItem, // "BlockquoteItem",
-	Break,          // "Break",
-	Header,         // "Header",
-	Paragraph,      // "Paragraph",
-	Preformatted,   // "Preformatted",
-	TodoItem,       // "TodoItem",
+	AnyList,
+	AnyListItem,
+	Blockquote,
+	BlockquoteItem,
+	Break,
+	Header,
+	Image,
+	Paragraph,
+	Preformatted,
+	TodoItem,
 
 	// Inline elements:
-	Anchor,         // "Anchor",
-	Code,           // "Code",
-	Emoji,          // "Emoji",
-	Emphasis,       // "Emphasis",
-	Escape,         // "Escape",
-	Strikethrough,  // "Strikethrough",
-	Strong,         // "Strong",
-	StrongEmphasis, // "StrongEmphasis",
+	Anchor,
+	Code,
+	Emoji,
+	Emphasis,
+	Escape,
+	Strikethrough,
+	Strong,
+	StrongEmphasis,
 ]
 
 export default typeEnumArray

@@ -212,6 +212,24 @@ export const AnyList = React.memo(({ root, type, tag, id, children: range }) => 
 	)
 })
 
+export const Image = React.memo(({ id, syntax, src, alt, children }) => (
+	// className="relative flex flex-row justify-center"
+	<Root id={id}>
+		<img
+			className="mx-auto"
+			src={src}
+			alt={alt}
+		/>
+		<div className="flex flex-row justify-center items-end h-full">
+			<div className="px-2 py-1">
+				<Markdown syntax={syntax}>
+					{toReact(children)}
+				</Markdown>
+			</div>
+		</div>
+	</Root>
+))
+
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
 
