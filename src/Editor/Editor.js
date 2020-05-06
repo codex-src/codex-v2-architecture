@@ -93,7 +93,7 @@ const Editor = ({
 				t = Date.now()
 
 				// Sync DOM:
-				/* const mutations = */ syncDOM(state.reactDOM, ref.current, clonedElement => {
+				syncDOM(state.reactDOM, ref.current, clonedElement => {
 					const checkboxes = clonedElement.querySelectorAll("[data-codex-checkbox]")
 					for (const each of checkboxes) {
 						const { id } = each
@@ -117,17 +117,9 @@ const Editor = ({
 					return
 				}
 
-				// if (mutations) {
-				// 	const s = mutations === 1 ? "" : "s"
-				// 	console.log(`synced dom: ${mutations} mutation${s}`)
-				// }
-
 				// Sync DOM cursors:
 				try {
-					/* const syncedPos = */ syncDOMPos(ref.current, [state.pos1, state.pos2])
-					// if (syncedPos) {
-					// 	console.log("synced pos")
-					// }
+					syncDOMPos(ref.current, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 					return
@@ -157,7 +149,7 @@ const Editor = ({
 				//
 				// console.log(`computePosRange=${Date.now() - t}`)
 			})
-		}, [state, dispatch]),
+		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
 		[state.readOnly, state.elements],
 	)
 
