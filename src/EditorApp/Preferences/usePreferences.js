@@ -102,7 +102,7 @@ const methods = state => ({
 		state.showSidebar = !state.showSidebar
 	},
 	zoomIn() {
-		if (state.fontSize >= defaultFontSize + 4) {
+		if (state.fontSize >= defaultFontSize + 8) {
 			// No-op
 			return
 		}
