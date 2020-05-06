@@ -222,18 +222,13 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
+
+	// NOTE: 1.5em represents to an empty paragraph
+	const style = { minHeight: "1.5em", maxHeight: "24em" }
 	return (
 		<Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				<img
-					className="mx-auto"
-					style={{
-						// minHeight: "12em",
-						maxHeight: "24em",
-					}}
-					src={src}
-					alt={alt}
-				/>
+				<img className="mx-auto" style={style} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">

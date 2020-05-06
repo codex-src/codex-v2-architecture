@@ -101,12 +101,17 @@ function parsePrism(code, extension) {
 	cmapHTML[typeEnum.Paragraph]          = element => `<p>\n\t${toInnerString(element.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.BlockquoteItem]     = element => `<p>\n\t${toInnerString(element.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.Blockquote]         = element => `<blockquote>${`\n${toString(element.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	// cmapHTML[typeEnum.Preformatted]    = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(element.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML)}<!--\n--></code></pre>`
 	cmapHTML[typeEnum.Preformatted]       = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase().replace("\"", "\\\"")}"`}><code><!--\n-->${parsePrism(element.children.slice(1, -1).map(each => each.data).join("\n"), element.extension)}<!--\n--></code></pre>`
 	cmapHTML[typeEnum.AnyListItem]        = element => `<li>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.TodoItem]           = element => `<li>\n\t<input type="checkbox"${!element.checked ? "" : " checked"}>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.AnyList]            = element => `<${element.tag}>${`\n${toString(element.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${element.tag}>`
-	cmapHTML[typeEnum.Image]              = element => `<figure>\n\t<img src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`}>${!element.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(element.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
+	cmapHTML[typeEnum.Image]              = element => (() => {
+		const str = `<figure>\n\t<img src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`}>${!element.alt ? "" : `\n\t<figcaption>\n\t\t${toInnerString(element.children, cmapHTML)}\n\t</figcaption>`}\n</figure>`
+		if (!element.href) {
+			return str
+		}
+		return `<a href="${element.href}" target="_blank" rel="noopener noreferrer">\n${str.split("\n").map(each => `\t${each}`).join("\n")}\n</a>`
+	})()
 	cmapHTML[typeEnum.Break]              = element => "<hr>"
 
 	cmapReact_js[typeEnum.Escape]         = element => element.children
@@ -125,7 +130,13 @@ function parsePrism(code, extension) {
 	cmapReact_js[typeEnum.AnyListItem]    = element => `<Item>\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.TodoItem]       = element => `<Item>\n\t<Todo${!element.checked ? "" : " done"} />\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.AnyList]        = element => `<List${element.tag === "ul" ? "" : " ordered"}>${`\n${toString(element.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
-	cmapReact_js[typeEnum.Image]          = element => `<Figure>\n\t<Image src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`} />${!element.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(element.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
+	cmapReact_js[typeEnum.Image]          = element => (() => {
+		const str = `<Figure>\n\t<Img src="${element.src}"${!element.alt ? "" : ` alt="${escape(element.alt)}"`} />${!element.alt ? "" : `\n\t<Caption>\n\t\t${toInnerString(element.children, cmapReact_js)}\n\t</Caption>`}\n</Figure>`
+		if (!element.href) {
+			return str
+		}
+		return `<a href="${element.href}" target="_blank" rel="noopener noreferrer">\n${str.split("\n").map(each => `\t${each}`).join("\n")}\n</a>`
+	})()
 	cmapReact_js[typeEnum.Break]          = element => "<Break />"
 	/* eslint-enable no-multi-spaces */
 })()
