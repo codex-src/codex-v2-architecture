@@ -48,6 +48,10 @@ function syncDOMPos(editorRoot, [pos1, pos2]) {
 	if (pos2.pos !== pos1.pos) {
 		r2 = computeRange(editorRoot, pos2)
 	}
+	// Guard bounds:
+	if (!r1.node || !r2.node) {
+		return false
+	}
 	const range = document.createRange()
 	range.setStart(r1.node, r1.offset)
 	range.setEnd(r2.node, r2.offset)

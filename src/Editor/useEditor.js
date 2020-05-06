@@ -42,7 +42,7 @@ function newEditorState(data) {
 		history: new UndoManager(undoState, areEqual),   // Undo manager
 		cachedElements,                                  // LRU cached parsed elements
 		elements: parseElements(nodes, cachedElements),  // Parsed elements
-		reactDOM: document.createElement("div"),         // React-managed DOM
+		// reactDOM: document.createElement("div"),      // React-managed DOM
 	}
 
 	return initialState
