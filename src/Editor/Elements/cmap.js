@@ -82,7 +82,7 @@ function parsePrism(code, extension) {
 	cmapText[typeEnum.Paragraph]          = element => toInnerString(element.children)
 	cmapText[typeEnum.BlockquoteItem]     = element => toInnerString(element.children)
 	cmapText[typeEnum.Blockquote]         = element => toString(element.children)
-	cmapText[typeEnum.Preformatted]       = element => toInnerString(element.children.slice(1, -1).map(each => each.element).join("\n"))
+	cmapText[typeEnum.Preformatted]       = element => toInnerString(element.children.slice(1, -1).map(each => each.data).join("\n"))
 	cmapText[typeEnum.AnyListItem]        = element => toInnerString(element.children)
 	cmapText[typeEnum.TodoItem]           = element => toInnerString(element.children)
 	cmapText[typeEnum.AnyList]            = element => toString(element.children)
@@ -101,8 +101,8 @@ function parsePrism(code, extension) {
 	cmapHTML[typeEnum.Paragraph]          = element => `<p>\n\t${toInnerString(element.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.BlockquoteItem]     = element => `<p>\n\t${toInnerString(element.children, cmapHTML)}\n</p>`
 	cmapHTML[typeEnum.Blockquote]         = element => `<blockquote>${`\n${toString(element.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</blockquote>`
-	// cmapHTML[typeEnum.Preformatted]    = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(element.children.slice(1, -1).map(each => each.element).join("\n"), cmapHTML)}<!--\n--></code></pre>`
-	cmapHTML[typeEnum.Preformatted]       = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase().replace("\"", "\\\"")}"`}><code><!--\n-->${parsePrism(element.children.slice(1, -1).map(each => each.element).join("\n"), element.extension)}<!--\n--></code></pre>`
+	// cmapHTML[typeEnum.Preformatted]    = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase()}"`}><code><!--\n-->${toInnerString(element.children.slice(1, -1).map(each => each.data).join("\n"), cmapHTML)}<!--\n--></code></pre>`
+	cmapHTML[typeEnum.Preformatted]       = element => `<pre${!element.extension ? "" : ` class="language-${element.extension.toLowerCase().replace("\"", "\\\"")}"`}><code><!--\n-->${parsePrism(element.children.slice(1, -1).map(each => each.data).join("\n"), element.extension)}<!--\n--></code></pre>`
 	cmapHTML[typeEnum.AnyListItem]        = element => `<li>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.TodoItem]           = element => `<li>\n\t<input type="checkbox"${!element.checked ? "" : " checked"}>\n\t${toInnerString(element.children, cmapHTML)}\n</li>`
 	cmapHTML[typeEnum.AnyList]            = element => `<${element.tag}>${`\n${toString(element.children, cmapHTML).split("\n").map(each => `\t${each}`).join("\n")}\n`}</${element.tag}>`
@@ -121,7 +121,7 @@ function parsePrism(code, extension) {
 	cmapReact_js[typeEnum.Paragraph]      = element => `<P>\n\t${toInnerString(element.children, cmapReact_js)}\n</P>`
 	cmapReact_js[typeEnum.BlockquoteItem] = element => `<P>\n\t${toInnerString(element.children, cmapReact_js)}\n</P>`
 	cmapReact_js[typeEnum.Blockquote]     = element => `<Blockquote>${`\n${toString(element.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</Blockquote>`
-	cmapReact_js[typeEnum.Preformatted]   = element => `<Pre${!element.info ? "" : ` info="${element.info.replace("\"", "\\\"")}"`}>\n{\`${toInnerString(element.children.slice(1, -1).map(each => each.element).join("\n")).replace(/`/g, "\\`")}\`}\n</Pre>`
+	cmapReact_js[typeEnum.Preformatted]   = element => `<Pre${!element.info ? "" : ` info="${element.info.replace("\"", "\\\"")}"`}>\n{\`${toInnerString(element.children.slice(1, -1).map(each => each.data).join("\n")).replace(/`/g, "\\`")}\`}\n</Pre>`
 	cmapReact_js[typeEnum.AnyListItem]    = element => `<Item>\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.TodoItem]       = element => `<Item>\n\t<Todo${!element.checked ? "" : " done"} />\n\t${toInnerString(element.children, cmapReact_js)}\n</Item>`
 	cmapReact_js[typeEnum.AnyList]        = element => `<List${element.tag === "ul" ? "" : " ordered"}>${`\n${toString(element.children, cmapReact_js).split("\n").map(each => `\t${each}`).join("\n")}\n`}</List>`
