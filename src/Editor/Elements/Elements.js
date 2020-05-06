@@ -243,15 +243,20 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 })
 
 export const Break = React.memo(({ id, syntax }) => {
-	const [{ readOnly }] = useEditorState()
+	// const style = {
+	// 	backgroundImage: `linear-gradient(
+	// 		transparent 0,
+	// 		transparent calc(0.75em - 1px),
+	// 		var(--gray-300) calc(0.75em - 1px),
+	// 		transparent calc(0.75em + 1px)
+	// 	)`
+	// }
+	const style = { backgroundImage: `linear-gradient(transparent 0, transparent calc(0.75em - 1px), var(--gray-300) calc(0.75em - 1px), transparent calc(0.75em + 1px))` }
 
-	const style = { verticalAlign: "15%" }
 	return (
-		<Root id={id} className="relative">
-			<Markdown syntax={syntax}>
-				{readOnly && (
-					<hr className="inline-block w-full border-t-2 select-none" style={style} />
-				)}
+		<Root id={id} style={style} dir="rtl">
+			<Markdown className="hidden" syntax={syntax}>
+				<br />
 			</Markdown>
 		</Root>
 	)
