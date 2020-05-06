@@ -231,7 +231,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
-					<Markdown className="hidden" syntax={syntax}>
+					<Markdown /* className="hidden" */ syntax={syntax}>
 						{toReact(children) || (
 							<br />
 						)}
