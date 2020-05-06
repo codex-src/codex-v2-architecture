@@ -214,18 +214,26 @@ function parseElements(nodes, cachedElements) {
 
 		// <Image>
 		case "!":
-			// ![Image](href)
+		case "[":
+			// ![Image](src) or [![Image](src)](href)
 			//
 			// https://regex101.com/r/FBKxEO/1
-			const matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)/)
+			let matches = null
+			if (each.data[0] === "!") {
+				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)/)
+			// https://regex101.com/r/FBKxEO/2
+			} else if (each.data[0] === "[") {
+				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)/)
+			}
 			if (matches) {
-				const [, alt, src] = matches
+				const [, alt, src, href] = matches
 				const element = cacheStrategy(each, node => ({
 					type: typeEnum.Image,
 					id: each.id,
-					syntax: ["![", `](${src})`],
+					syntax: !href ? ["![", `](${src})`] : ["[![", `](${src})](${href})`],
 					src: src,
 					alt: toInnerText(alt),
+					href,
 					children: parseInlineElements(alt),
 				}))
 				elements.push({
@@ -236,40 +244,6 @@ function parseElements(nodes, cachedElements) {
 			}
 			// No-op
 			break
-
-		// // <Image>
-		// case char === "!":
-		// 	// ![Image](href)
-		// 	if (nchars >= "![](x)".length) {
-		// 		const lhs = registerType(null, "]")(each, "!".length, { minOffset: 0 })
-		// 		if (!lhs) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		// Check ( syntax:
-		// 		if (lhs.x2 < nchars && each[lhs.x2] !== "(") {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		const rhs = registerType(null, ")", { recurse: false })(each, lhs.x2)
-		// 		if (!rhs) {
-		// 			// No-op
-		// 			break
-		// 		}
-		// 		data.push({
-		// 			type: Image,
-		// 			id: uuidv4(),
-		// 			// syntax: ["![", "](…)"],
-		// 			syntax: ["![", `](${rhs.data.children})`],
-		// 			src: rhs.data.children,
-		// 			alt: toInnerString(lhs.data.children),
-		// 			children: lhs.data.children,
-		// 		})
-		// 		continue
-		// 	}
-		// 	// No-op
-		// 	break
-
 		default:
 			// No-op
 			break

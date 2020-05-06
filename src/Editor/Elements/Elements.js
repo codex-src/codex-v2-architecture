@@ -212,21 +212,31 @@ export const AnyList = React.memo(({ root, type, tag, id, children: range }) => 
 	)
 })
 
-export const Image = React.memo(({ id, syntax, src, alt, children }) => {
+// Conditionally wraps a React element.
+const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
+	if (!cond) {
+		return children
+	}
+	return <Wrapper>{children}</Wrapper>
+}
+
+export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		<Root id={id} className="-mx-6">
-			<img
-				className="mx-auto"
-				style={{
-					// minHeight: "12em",
-					maxHeight: "24em",
-				}}
-				src={src}
-				alt={alt}
-			/>
+			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
+				<img
+					className="mx-auto"
+					style={{
+						// minHeight: "12em",
+						maxHeight: "24em",
+					}}
+					src={src}
+					alt={alt}
+				/>
+			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
-				<div className="py-2 text-sm text-center text-gray-600">
+				<div className="px-6 py-2 text-sm text-center text-gray-600">
 					<Markdown syntax={syntax}>
 						{toReact(children)}
 					</Markdown>
