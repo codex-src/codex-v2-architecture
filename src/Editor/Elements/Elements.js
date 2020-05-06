@@ -212,24 +212,29 @@ export const AnyList = React.memo(({ root, type, tag, id, children: range }) => 
 	)
 })
 
-export const Image = React.memo(({ id, syntax, src, alt, children }) => (
-	<Root id={id}>
-		<img
-			className="mx-auto"
-			style={{
-				// minHeight: "12em",
-				maxHeight: "24em",
-			}}
-			src={src}
-			alt={alt}
-		/>
-		<div className="py-2 text-sm text-center text-gray-600">
-			<Markdown syntax={syntax}>
-				{toReact(children)}
-			</Markdown>
-		</div>
-	</Root>
-))
+export const Image = React.memo(({ id, syntax, src, alt, children }) => {
+	const [{ readOnly }] = useEditorState()
+	return (
+		<Root id={id} className="-mx-6">
+			<img
+				className="mx-auto"
+				style={{
+					// minHeight: "12em",
+					maxHeight: "24em",
+				}}
+				src={src}
+				alt={alt}
+			/>
+			{(!readOnly || (readOnly && children)) && (
+				<div className="py-2 text-sm text-center text-gray-600">
+					<Markdown syntax={syntax}>
+						{toReact(children)}
+					</Markdown>
+				</div>
+			)}
+		</Root>
+	)
+})
 
 export const Break = React.memo(({ id, syntax }) => {
 	const [{ readOnly }] = useEditorState()
