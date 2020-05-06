@@ -1,10 +1,9 @@
 // Ascends to the nearest element.
 function ascendToElement(node) {
-	let element = node
-	if (node.nodeType !== Node.ELEMENT_NODE) {
-		element = node.parentElement
+	if (node && node.nodeType && node.nodeType !== Node.ELEMENT_NODE && node.parentElement) {
+		return node.parentElement // Node -> Element
 	}
-	return element
+	return node // Element
 }
 
 // Ascends to the nearest data-codex-node or data-codex-root
