@@ -66,6 +66,19 @@ You can also use `- [ ] ` and `- [x] ` for todo items:
 
 When you press `enter` inside of a list, a new list item will be created for you. You can also use `tab` and `shift-tab` to tab and detab list items.
 
+### Images
+
+You can use:
+
+- `![Caption](src)` syntax for images
+- `[![Caption](src)](href)` syntax for linked images
+
+Note that captions are optional.
+
+![You call that code?! KHEEE!! 😾](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)
+
+[![You call that code?! KHEEE!! 😾](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)
+
 ### Section breaks
 
 Use `---` or `***` to create section breaks:
@@ -73,3 +86,4 @@ Use `---` or `***` to create section breaks:
 ---
 
 ***
+
