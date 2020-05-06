@@ -55,7 +55,6 @@ const Editor = ({
 	scrollBottomOffset,
 }) => {
 	const ref = React.useRef()
-	const reactDOM = React.useRef()
 
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
@@ -78,18 +77,25 @@ const Editor = ({
 
 			let t = Date.now()
 
-			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, reactDOM.current, () => {
+			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 
 				console.log(`ReactDOM.render=${Date.now() - t}`)
 				t = Date.now()
 
 				// Sync DOM:
-				syncDOM(reactDOM.current, ref.current, (src, dst) => {
-					const events1 = src.querySelectorAll("[data-codex-event]")
-					const events2 = dst.querySelectorAll("[data-codex-event]")
-					for (let x = 0; x < events1.length; x++) {
-						const eventType = events1[x].getAttribute("data-codex-event")
-						events2[x].addEventListener(eventType, () => events1[x][eventType]())
+				syncDOM(state.reactDOM, ref.current, clonedElement => {
+					const checkboxes = clonedElement.querySelectorAll("[data-codex-checkbox]")
+					for (const each of checkboxes) {
+						const { id } = each
+							.parentElement // <div class="absolute">
+							.parentElement // <li id="<uuid>">
+						each.onpointerdown = e => {
+							e.preventDefault()
+							document.activeElement.blur()
+						}
+						each.onclick = () => {
+							dispatch.checkTodo(id)
+						}
 					}
 				})
 
@@ -482,9 +488,9 @@ const Editor = ({
 				},
 			)}
 
-			<div className="hidden">
-				<div ref={reactDOM} className={renderClassName} style={renderStyle} />
-			</div>
+			{/* <div className="hidden"> */}
+			{/* 	<div ref={reactDOM} className={renderClassName} style={renderStyle} /> */}
+			{/* </div> */}
 
 		</div>
 	)

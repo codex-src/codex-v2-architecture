@@ -33,11 +33,10 @@ function syncDOM(src, dst, decorator = null) {
 			if (!mutations) {
 				removeRange()
 			}
-			const originalElement = src.children[start]
-			const clonedElement = originalElement.cloneNode(true)
+			const clonedElement = src.children[start].cloneNode(true)
 			dst.children[start].replaceWith(clonedElement)
 			if (decorator) {
-				decorator(originalElement, clonedElement)
+				decorator(clonedElement)
 			}
 			mutations++
 			start++ // Eagerly increment
@@ -53,11 +52,10 @@ function syncDOM(src, dst, decorator = null) {
 				if (!mutations) {
 					removeRange()
 				}
-				const originalElement = src.children[end2 - 1]
-				const clonedElement = originalElement.cloneNode(true)
+				const clonedElement = src.children[end2 - 1].cloneNode(true)
 				dst.children[end1 - 1].replaceWith(clonedElement)
 				if (decorator) {
-					decorator(originalElement, clonedElement)
+					decorator(clonedElement)
 				}
 				mutations++
 			}
@@ -78,11 +76,10 @@ function syncDOM(src, dst, decorator = null) {
 			if (!mutations) {
 				removeRange()
 			}
-			const originalElement = src.children[start]
-			const clonedElement = originalElement.cloneNode(true)
+			const clonedElement = src.children[start].cloneNode(true)
 			dst.insertBefore(clonedElement, dst.children[start])
 			if (decorator) {
-				decorator(originalElement, clonedElement)
+				decorator(clonedElement)
 			}
 			mutations++
 		}

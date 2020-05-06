@@ -168,31 +168,22 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</Node>
 ))
 
-const Checkbox = ({ id, checked }) => {
-	const [, dispatch] = useEditorState()
-
-	return (
-		<Button
-			className={
-				`-mt-px inline-block w-4 h-4 align-middle ${
-					!checked
-						? "bg-white shadow-hero"
-						: "bg-md-blue-a200 shadow"
-				} focus:shadow rounded-md transform scale-105 pointer-events-auto`
-			}
-			data-codex-checkbox={checked}
-			data-codex-event="click"
-			onClick={() => {
-				document.activeElement.blur()
-				dispatch.checkTodo(id)
-			}}
-		>
-			<svg fill="#fff" viewBox="0 0 16 16">
-				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-			</svg>
-		</Button>
-	)
-}
+const Checkbox = ({ id, checked }) => (
+	<Button
+		className={
+			`-mt-px inline-block w-4 h-4 align-middle ${
+				!checked
+					? "bg-white shadow-hero"
+					: "bg-md-blue-a200 shadow"
+			} focus:shadow rounded-md transform scale-105 pointer-events-auto`
+		}
+		data-codex-checkbox={checked}
+	>
+		<svg fill="#fff" viewBox="0 0 16 16">
+			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+		</svg>
+	</Button>
+)
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	<Node tag={tag} id={id} className="relative my-2" style={checked && attrs.strike.style} data-codex-checked={checked}>
