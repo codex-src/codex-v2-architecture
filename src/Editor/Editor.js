@@ -71,10 +71,7 @@ const Editor = ({
 	React.useLayoutEffect(() => {
 		if (!mountedProps.current) {
 			mountedProps.current = true
-			dispatch.registerProps({
-				readOnly,
-				focused: autoFocus,
-			})
+			dispatch.registerProps({ readOnly, autoFocus })
 			return
 		}
 		dispatch.registerProps({ readOnly })
@@ -175,7 +172,7 @@ const Editor = ({
 				const { data, nodes, pos1, pos2 } = state
 				const currentState = { data, nodes, pos1, pos2 }
 				dispatch.pushUndo(currentState)
-			}, 500)
+			}, 250)
 			return () => {
 				clearTimeout(id)
 			}

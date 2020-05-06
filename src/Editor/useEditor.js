@@ -15,13 +15,22 @@ import {
 function newEditorState(data) {
 
 	const nodes = newNodes(data)
-	const pos1 = newPos()
-	const pos2 = newPos()
+	const [pos1, pos2] = [newPos(), newPos()]
 
 	const undoState = { data, nodes, pos1, pos2 }
 
+	// Returns whether the current and next state are equal.
+	const areEqual = (currentState, nextState) => {
+		const ok = (
+			currentState.data.length === nextState.data.length &&
+			currentState.data === nextState.data
+		)
+		return ok
+	}
+
 	// https://yomguithereal.github.io/mnemonist/lru-cache
 	const cachedElements = new LRUCache(String, Object, 100)
+
 	const initialState = {
 		readOnly: false,                                 // Is read-only?
 		focused: false,                                  // Is focused?
@@ -30,15 +39,9 @@ function newEditorState(data) {
 		pos1,                                            // Start cursor data structure
 		pos2,                                            // End cursor data structure
 		extPosRange: ["", ""],                           // Extended node (root ID) range
-		history: new UndoManager(undoState, (currentState, nextState) => {
-			const ok = (
-				currentState.data.length === nextState.data.length &&
-				currentState.data === nextState.data
-			)
-			return ok
-		}),
-		cachedElements,                                  // LRU cached elements (for parseElements)
-		elements: parseElements(nodes, cachedElements),  // Elements
+		history: new UndoManager(undoState, areEqual),   // Undo manager
+		cachedElements,                                  // LRU cached parsed elements
+		elements: parseElements(nodes, cachedElements),  // Parsed elements
 		reactDOM: document.createElement("div"),         // React-managed DOM
 	}
 
@@ -46,18 +49,12 @@ function newEditorState(data) {
 }
 
 const methods = state => ({
-	// Defer function e.g. unmountComponentAtNode.
-	defer() {
-		this.cachedElements.clear()
-	},
 	// Registers props.
-	registerProps({ readOnly, focused }) {
-		if (readOnly !== undefined) {
-			state.readOnly = readOnly
-		}
-		if (focused !== undefined) {
-			state.focused = focused
-		}
+	registerProps({ readOnly, autoFocus }) {
+		Object.assign(state, {
+			readOnly: Boolean(readOnly),
+			focused:  Boolean(autoFocus),
+		})
 	},
 	// Toggles read-only mode.
 	toggleReadOnly() {
@@ -73,18 +70,51 @@ const methods = state => ({
 	},
 	// Selects the editor.
 	select(pos1, pos2) {
-		// Decrement by 2:
+		// Decrement 2x:
 		let y1 = pos1.y - 2
 		if (y1 < 0) {
 			y1 = 0
 		}
-		// Increment by 2:
+		// Increment 2x:
 		let y2 = pos2.y + 2
 		if (y2 >= state.nodes.length) {
 			y2 = state.nodes.length - 1
 		}
 		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
-		Object.assign(state, { pos1, pos2, extPosRange })
+		Object.assign(state, {
+			pos1,
+			pos2,
+			extPosRange,
+		})
+	},
+	// Writes character data.
+	write(data) {
+		state.history.mutate()
+
+		// Parse new nodes:
+		const nodes = newNodes(data)
+		const node1 = state.nodes[state.pos1.y]
+		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
+		// Concatenate the end of the start node:
+		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
+		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
+		// Concatenate the start of the end node:
+		//
+		// NOTE: The end node can be the start node or the end
+		// of the new nodes
+		let node = node1
+		if (nodes.length > 1) {
+			node = nodes[nodes.length - 1]
+		}
+		node.data += node2.data.slice(state.pos2.x)
+		// Update and rerender:
+		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
+		const pos2 = { ...pos1 }
+		Object.assign(state, {
+			pos1,
+			pos2,
+		})
+		this.render()
 	},
 	// Drops L and R bytes.
 	dropBytes(dropL, dropR) {
@@ -120,32 +150,6 @@ const methods = state => ({
 		}
 		this.write("")
 	},
-	// Writes character data.
-	write(data) {
-		state.history.mutate()
-
-		// Parse new nodes:
-		const nodes = newNodes(data)
-		const node1 = state.nodes[state.pos1.y]
-		const node2 = { ...state.nodes[state.pos2.y] } // Create a new reference
-		// Concatenate the end of the start node:
-		node1.data = node1.data.slice(0, state.pos1.x) + nodes[0].data
-		state.nodes.splice(state.pos1.y + 1, state.pos2.y - state.pos1.y, ...nodes.slice(1))
-		// Concatenate the start of the end node:
-		//
-		// NOTE: The end node can be the start node or the end
-		// of the new nodes
-		let node = node1
-		if (nodes.length > 1) {
-			node = nodes[nodes.length - 1]
-		}
-		node.data += node2.data.slice(state.pos2.x)
-		// Update and rerender:
-		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
-		const pos2 = { ...pos1 }
-		Object.assign(state, { pos1, pos2 })
-		this.render()
-	},
 	// Input method for onCompositionEnd and onInput.
 	input(nodes, atEnd, [pos1, pos2]) {
 		state.history.mutate()
@@ -166,11 +170,16 @@ const methods = state => ({
 		}
 		// Update and rerender:
 		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
-		Object.assign(state, { pos1, pos2 })
+		Object.assign(state, {
+			pos1,
+			pos2,
+		})
 		this.render()
 	},
 	// Backspaces one rune.
 	backspaceRune() {
+		state.history.mutate()
+
 		let dropL = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) {
 			const substr = state.data.slice(0, state.pos1.pos)
@@ -181,6 +190,8 @@ const methods = state => ({
 	},
 	// Forward-backspaces one rune.
 	forwardBackspaceRune() {
+		state.history.mutate()
+
 		let dropR = 0
 		if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) {
 			const substr = state.data.slice(state.pos1.pos)
@@ -191,6 +202,8 @@ const methods = state => ({
 	},
 	// Backspaces one word.
 	backspaceWord() {
+		state.history.mutate()
+
 		if (state.pos1.pos !== state.pos2.pos) {
 			this.write("")
 			return
@@ -243,6 +256,8 @@ const methods = state => ({
 	},
 	// Forward-backspaces one word.
 	forwardBackspaceWord() {
+		state.history.mutate()
+
 		if (state.pos1.pos !== state.pos2.pos) {
 			this.write("")
 			return
@@ -295,6 +310,8 @@ const methods = state => ({
 	},
 	// Backspaces one paragraph.
 	backspaceParagraph() {
+		state.history.mutate()
+
 		if (state.pos1.pos !== state.pos2.pos) {
 			this.write("")
 			return
@@ -318,6 +335,7 @@ const methods = state => ({
 	},
 	// Inserts a tab character at the insertion point.
 	tab() {
+		state.history.mutate()
 		this.write("\t")
 	},
 	// Tabs one-to-many paragraphs.
@@ -358,6 +376,8 @@ const methods = state => ({
 	},
 	// Inserts an EOL character.
 	enter(autoSyntax = "") {
+		state.history.mutate()
+
 		this.write(`\n${autoSyntax}`)
 	},
 	// Checks or unchecks a todo.
@@ -377,6 +397,7 @@ const methods = state => ({
 	},
 	// Cuts character data.
 	cut() {
+		state.history.mutate()
 		this.write("")
 	},
 	// Copies character data.
@@ -387,6 +408,7 @@ const methods = state => ({
 	//
 	// TODO: Add pasteFromHTML handler
 	paste(data) {
+		state.history.mutate()
 		this.write(data)
 	},
 	// Pushes the next undo state.
@@ -415,9 +437,6 @@ const methods = state => ({
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
-
-		// TODO: Add state.history.mutate here?
-
 		// let t = Date.now()
 		const data = state.nodes.map(each => each.data).join("\n")
 		// console.log(`data=${Date.now() - t}`)
@@ -430,11 +449,6 @@ const methods = state => ({
 			data,
 			elements,
 		})
-
-		// Object.assign(state, {
-		// 	data: state.nodes.map(each => each.data).join("\n"),
-		// 	elements: parseElements(state.nodes, state.parserLRUCache),
-		// })
 	},
 })
 
