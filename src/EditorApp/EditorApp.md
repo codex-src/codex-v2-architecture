@@ -30,7 +30,7 @@ _Try typing something above! 👆_
 
 ## Blockquotes and lists
 
-You can also format:
+You can format:
 - [ ] `> ` for blockquotes (use `>` (without a space) for empty blockquotes)
 - [ ] `- ` or `* ` for lists
 - [ ] `- [ ] ` or `- [x] ` for checklists (you can use `tab` and `shift-tab` to indent lists)
@@ -46,7 +46,7 @@ You can also format:
 
 ## Code blocks
 
-You can also format:
+You can format:
 - [ ] ~```~ or `~~~` for code blocks
 - [ ] ~```lang~ or `~~~lang` for syntax-highlighted code blocks
 
@@ -82,7 +82,7 @@ export default App
 
 ## Inline elements
 
-You can also format:
+You can format:
 - [ ] `_` or `*` for _italics_ or *italics*
 - [ ] `**` for **bold**
 - [ ] `***` for ***bold and italics***
@@ -102,7 +102,7 @@ You can also format:
 
 ## Images
 
-You can also format:
+You can format:
 - [ ] `![Image](src)` for images
 - [ ] `[![Image](src)](href)` for linked images (most of the time you can just use regular images)
 
