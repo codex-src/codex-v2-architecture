@@ -48,7 +48,7 @@ You can also format:
 
 You can also format:
 - [ ] ~```~ or `~~~` for code blocks
-- [ ] ~```lang~ or `~~~` for syntax-highlighted code blocks
+- [ ] ~```lang~ or `~~~lang` for syntax-highlighted code blocks
 
 All of the following language extensions are supported for syntax highlighting:
 
