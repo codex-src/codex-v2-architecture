@@ -91,6 +91,9 @@ const Editor = ({
 						const { id } = each
 							.parentElement // <div class="absolute">
 							.parentElement // <li id="$uuid">
+						each.onpointerdown = e => {
+							e.preventDefault()
+						}
 						each.onclick = () => {
 							document.activeElement.blur()
 							dispatch.checkTodo(id)

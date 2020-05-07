@@ -3,11 +3,11 @@ import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
 
 import {
+	// toReact_js,
 	toHTML,
-	toReact_js,
 } from "Editor/Elements/cmap"
 
-const defaultFontSize = 16
+const defaultFontSize = 17
 
 function initialState(defaultRenderer) {
 	const state = {
@@ -17,8 +17,8 @@ function initialState(defaultRenderer) {
 		renderMode: renderModesEnum[defaultRenderer],
 		extension: "",
 		[renderModesEnum.HTML]: "",
-		[renderModesEnum.React_js]: "",
-		[renderModesEnum.JSON]: "",
+		// [renderModesEnum.React_js]: "",
+		// [renderModesEnum.JSON]: "",
 	}
 	return state
 }
@@ -43,20 +43,20 @@ const methods = state => ({
 	update(editorState) {
 		Object.assign(state, {
 			[renderModesEnum.HTML]: toHTML(editorState.elements),
-			[renderModesEnum.React_js]: toReact_js(editorState.elements),
-			[renderModesEnum.JSON]: JSON.stringify(
-				{
-					...editorState,
-					data:           undefined,
-					extPosRange:    undefined,
-					history:        undefined,
-					cachedElements: undefined,
-					elements:       undefined,
-					reactDOM:       undefined,
-				},
-				null,
-				"\t",
-			),
+			// [renderModesEnum.React_js]: toReact_js(editorState.elements),
+			// [renderModesEnum.JSON]: JSON.stringify(
+			// 	{
+			// 		...editorState,
+			// 		data:           undefined,
+			// 		extPosRange:    undefined,
+			// 		history:        undefined,
+			// 		cachedElements: undefined,
+			// 		elements:       undefined,
+			// 		reactDOM:       undefined,
+			// 	},
+			// 	null,
+			// 	"\t",
+			// ),
 		})
 	},
 	showReadme() {
@@ -77,24 +77,24 @@ const methods = state => ({
 		state.renderMode = renderModesEnum.HTML
 		state.extension = "html"
 	},
-	showReact_js() {
-		if (!state.showSidebar) {
-			state.showSidebar = true
-		} else if (state.renderMode === renderModesEnum.React_js) {
-			state.showSidebar = false
-		}
-		state.renderMode = renderModesEnum.React_js
-		state.extension = "jsx"
-	},
-	showJSON() {
-		if (!state.showSidebar) {
-			state.showSidebar = true
-		} else if (state.renderMode === renderModesEnum.JSON) {
-			state.showSidebar = false
-		}
-		state.renderMode = renderModesEnum.JSON
-		state.extension = "json"
-	},
+	// showReact_js() {
+	// 	if (!state.showSidebar) {
+	// 		state.showSidebar = true
+	// 	} else if (state.renderMode === renderModesEnum.React_js) {
+	// 		state.showSidebar = false
+	// 	}
+	// 	state.renderMode = renderModesEnum.React_js
+	// 	state.extension = "jsx"
+	// },
+	// showJSON() {
+	// 	if (!state.showSidebar) {
+	// 		state.showSidebar = true
+	// 	} else if (state.renderMode === renderModesEnum.JSON) {
+	// 		state.showSidebar = false
+	// 	}
+	// 	state.renderMode = renderModesEnum.JSON
+	// 	state.extension = "json"
+	// },
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
 	},

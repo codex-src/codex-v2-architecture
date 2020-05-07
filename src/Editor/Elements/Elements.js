@@ -39,7 +39,7 @@ function trim(str) {
 }
 
 const headerClassNames = {
-	h1: trim("font-medium   text-3xl leading-tight text-black antialiased"),
+	h1: trim("font-semibold text-3xl leading-tight text-black antialiased"),
 	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
 	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
 	h4: trim("font-semibold text-xl  leading-tight text-black antialiased"),

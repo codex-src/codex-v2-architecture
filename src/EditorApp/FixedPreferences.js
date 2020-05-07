@@ -133,18 +133,12 @@ const FixedPreferences = ({
 						>
 							HTML
 						</Button>
-						<Button
-							className="p-2 font-medium text-xxs underline"
-							onClick={prefsDispatch.showReact_js}
-						>
-							JSX
-						</Button>
-						<Button
-							className="p-2 font-medium text-xxs underline"
-							onClick={prefsDispatch.showJSON}
-						>
-							JSON
-						</Button>
+						{/* <Button */}
+						{/* 	className="p-2 font-medium text-xxs underline" */}
+						{/* 	onClick={prefsDispatch.showReact_js} */}
+						{/* > */}
+						{/* 	JSX */}
+						{/* </Button> */}
 					</div>
 
 				</div>
