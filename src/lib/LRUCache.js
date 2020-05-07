@@ -1,4 +1,4 @@
-// Naive LRU cache implementation.
+// LRU cache implementation.
 //
 // https://stackoverflow.com/a/46432113
 class LRUCache {
@@ -21,7 +21,7 @@ class LRUCache {
 	set(key, value) {
 		if (this.cache.has(key)) {
 			this.cache.delete(key)
-		} else if (this.cache.size === this.maxKeys) {
+		} else if (this.cache.size >= this.maxKeys) {
 			this.cache.delete(this._lru())
 		}
 		this.cache.set(key, value)

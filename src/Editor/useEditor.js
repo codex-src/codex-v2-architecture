@@ -28,7 +28,6 @@ function newEditorState(data) {
 		return ok
 	}
 
-	// https://yomguithereal.github.io/mnemonist/lru-cache
 	const cachedElements = new LRUCache(100)
 
 	const initialState = {
