@@ -18,27 +18,27 @@ export function replaceAttributes(src, dst) {
 	}
 }
 
-// // Syncs two nodes; non-recursive.
-// export function syncNodes(src, dst) {
-// 	// Nodes are the same; do nothing:
-// 	if (isEqualNode(src, dst)) {
-// 		return true
-// 	}
-// 	// Text handling:
-// 	if (src.nodeType === Node.TEXT_NODE && src.nodeType === dst.nodeType) {
-// 		dst.nodeValue = src.nodeValue
-// 		return true
-// 	// Element handling (elements must be of the same type):
-// 	} else if (src.nodeType === Node.ELEMENT_NODE && src.nodeType === dst.nodeType && src.nodeName === dst.nodeName) {
-// 		replaceAttributes(src, dst)
-// 		return false
-// 	}
-// 	// Text-to-element and element-to-text handling:
-// 	const clonedElement = src.cloneNode(true)
-// 	dst.replaceWith(clonedElement)
-// 	return true
-// }
-//
+// Syncs two nodes; non-recursive.
+export function syncNodes(src, dst) {
+	// Nodes are the same; do nothing:
+	if (src.isEqualNode(dst)) {
+		return true
+	}
+	// Text handling:
+	if (src.nodeType === Node.TEXT_NODE && src.nodeType === dst.nodeType) {
+		dst.nodeValue = src.nodeValue
+		return true
+	// Element handling (elements must be of the same type):
+	} else if (src.nodeType === Node.ELEMENT_NODE && src.nodeType === dst.nodeType && src.nodeName === dst.nodeName) {
+		replaceAttributes(src, dst)
+		return false
+	}
+	// Text-to-element and element-to-text handling:
+	const clonedElement = src.cloneNode(true)
+	dst.replaceWith(clonedElement)
+	return true
+}
+
 // // src:
 // // <div>
 // // 	<a />

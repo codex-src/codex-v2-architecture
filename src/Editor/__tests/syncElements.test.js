@@ -3,6 +3,7 @@ import renderDOM from "lib/renderDOM"
 
 import {
 	replaceAttributes,
+	syncNodes,
 } from "../syncElements"
 
 describe("replaceAttributes", () => {
@@ -89,5 +90,122 @@ describe("replaceAttributes", () => {
 		}
 		// NOTE: outerHTML breaks because of order
 		expect(srcMap).toStrictEqual(dstMap)
+	})
+})
+
+describe("syncNodes", () => {
+	// Text nodes:
+	test("", () => {
+		const src = document.createTextNode("")
+		const dst = document.createTextNode("")
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = document.createTextNode("hello")
+		const dst = document.createTextNode("")
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = document.createTextNode("")
+		const dst = document.createTextNode("hello")
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = document.createTextNode("hello")
+		const dst = document.createTextNode("hello")
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	// Elements:
+	test("", () => {
+		const src = renderDOM(<div />)
+		const dst = renderDOM(<div />)
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM(<div className="a b c" />)
+		const dst = renderDOM(<div />)
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM(<div />)
+		const dst = renderDOM(<div className="a b c" />)
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM(<div className="a b c" />)
+		const dst = renderDOM(<div className="a b c" />)
+		syncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	// Elements and text nodes:
+	//
+	// NOTE: Use childNodes[0] so we can compare the new
+	// reference
+	//
+	// const clonedElement = src.cloneNode(true)
+	// dst.replaceWith(clonedElement)
+	//
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				<div />
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				<p />
+			</div>
+		))
+		syncNodes(src.childNodes[0], dst.childNodes[0])
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const dst = renderDOM((
+			<div>
+				<p />
+			</div>
+		))
+		const src = renderDOM((
+			<div>
+				<div />
+			</div>
+		))
+		syncNodes(src.childNodes[0], dst.childNodes[0])
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				<div />
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				hello
+			</div>
+		))
+		syncNodes(src.childNodes[0], dst.childNodes[0])
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				hello
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				<div />
+			</div>
+		))
+		syncNodes(src.childNodes[0], dst.childNodes[0])
+		expect(dst.isEqualNode(src)).toBe(true)
 	})
 })
