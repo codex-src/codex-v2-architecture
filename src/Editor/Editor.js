@@ -100,8 +100,10 @@ const Editor = ({
 							e.preventDefault()
 						}
 						each.onclick = () => {
+							// Blur to prevent auto-scrolling:
 							document.activeElement.blur()
 							dispatch.checkTodo(id)
+							each.focus()
 						}
 					}
 				}

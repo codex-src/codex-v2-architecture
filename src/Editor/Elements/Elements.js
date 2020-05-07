@@ -178,6 +178,22 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</Node>
 ))
 
+// const Checkbox = ({ id, checked }) => (
+// 	<input
+// 		className={
+// 			`form-checkbox flex-shrink-0 w-4 h-4 text-md-blue-a200 ${
+// 				!checked
+// 					? "shadow-hero"
+// 					: "shadow"
+// 			} rounded-md transform scale-105 transition duration-150`
+// 		}
+// 		type="checkbox"
+// 		// contentEditable={false}
+// 		checked={checked}
+// 		data-codex-checkbox={checked}
+// 	/>
+// )
+
 const Checkbox = ({ id, checked }) => (
 	<Button
 		className={
@@ -185,7 +201,7 @@ const Checkbox = ({ id, checked }) => (
 				!checked
 					? "bg-white shadow-hero"
 					: "bg-md-blue-a200 shadow"
-			} focus:shadow rounded-md transform scale-105 pointer-events-auto`
+			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition ease-out duration-150`
 		}
 		data-codex-checkbox={checked}
 	>

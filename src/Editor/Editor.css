@@ -88,10 +88,12 @@
 .codex-editor [data-codex-checked] [data-codex-checkbox] {
 	margin-left: calc(-1ch - 1.25em);
 }
-.codex-editor [data-codex-checked] [data-codex-checkbox="false"]:focus {
+
+/* https://tailwindcss-custom-forms.netlify.com */
+/* https://tailwindui.com/components/application-ui/forms/sign-in-forms */
+.codex-editor [data-codex-checked] [data-codex-checkbox]:focus {
   border-color: #a4cafe;
-  /* outline: none; */
-  box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45);
+  box-shadow: 0 0 0 0.1875em rgba(164, 202, 254, 0.45);
 }
 .codex-editor [data-codex-checked] [data-codex-checkbox="true"]:focus {
   border-color: transparent;
