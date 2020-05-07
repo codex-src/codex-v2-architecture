@@ -109,42 +109,28 @@ html {
 	--md-gray-900:  #212121;
 }
 
-/* TODO: Remove !important */
 .text-md-blue-a100 {
-	color: var(--md-blue-a100) !important;
+	color: var(--md-blue-a100);
 }
 .text-md-blue-a200 {
-	color: var(--md-blue-a200) !important;
+	color: var(--md-blue-a200);
 }
 .text-md-blue-a400 {
-	color: var(--md-blue-a400) !important;
+	color: var(--md-blue-a400);
 }
 .text-md-blue-a700 {
-	color: var(--md-blue-a700) !important;
+	color: var(--md-blue-a700);
 }
 
 .bg-md-blue-a100 {
-	background-color: var(--md-blue-a100) !important;
+	background-color: var(--md-blue-a100);
 }
 .bg-md-blue-a200 {
-	background-color: var(--md-blue-a200) !important;
+	background-color: var(--md-blue-a200);
 }
 .bg-md-blue-a400 {
-	background-color: var(--md-blue-a400) !important;
+	background-color: var(--md-blue-a400);
 }
 .bg-md-blue-a700 {
-	background-color: var(--md-blue-a700) !important;
-}
-
-.text-blue-100 {
-	color: var(--blue-100) !important;
-}
-.text-blue-500 {
-	color: var(--blue-500) !important;
-}
-.bg-blue-100 {
-	background-color: var(--blue-100) !important;
-}
-.bg-blue-500 {
-	background-color: var(--blue-500) !important;
+	background-color: var(--md-blue-a700);
 }

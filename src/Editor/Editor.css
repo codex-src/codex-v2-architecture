@@ -2,17 +2,9 @@
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 	/* https://twitter.com/dan_abramov/status/1214605699625504770 */
 	scroll-behavior: smooth;
-
-	/*-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;*/
-
-	/* font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; */
-
-	/* font-family: "Inter", sans-serif; */
-	/* letter-spacing: -0.01em; */
 }
 .codex-editor .font-mono {
 	font-family: "iA Writer Mono var", monospace;
-	letter-spacing: 0; /* Needed because of .codex-editor */
 }
 .codex-editor * {
 	caret-color: #000;
@@ -21,37 +13,37 @@
 .codex-editor .text-lg .font-medium,
 .codex-editor .text-lg .font-semibold,
 .codex-editor .text-lg .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-xl .font-medium,
 .codex-editor .text-xl .font-semibold,
 .codex-editor .text-xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-2xl .font-medium,
 .codex-editor .text-2xl .font-semibold,
 .codex-editor .text-2xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-3xl .font-medium,
 .codex-editor .text-3xl .font-semibold,
 .codex-editor .text-3xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-4xl .font-medium,
 .codex-editor .text-4xl .font-semibold,
 .codex-editor .text-4xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-5xl .font-medium,
 .codex-editor .text-5xl .font-semibold,
 .codex-editor .text-5xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 .codex-editor .text-6xl .font-medium,
 .codex-editor .text-6xl .font-semibold,
 .codex-editor .text-6xl .font-bold {
-	font-weight: 600;
+	font-weight: 700;
 }
 
 .codex-editor .emoji {

@@ -238,11 +238,13 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	return (
 		<Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				<img className="mx-auto" contentEditable={false} style={style} src={src} alt={alt} />
+				{/* NOTE: Use contentEditable={false} to make
+				unselectable */}
+				<img className="mx-auto" style={style} src={src} alt={alt} contentEditable={false} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
-					<Markdown /* className="hidden" */ syntax={syntax}>
+					<Markdown syntax={syntax}>
 						{toReact(children) || (
 							<br />
 						)}

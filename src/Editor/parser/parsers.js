@@ -14,25 +14,18 @@ export function parseHeader(node) {
 	return element
 }
 
-// Counts the number of emojis.
-//
-// FIXME: NaN
-function countEmojis(children) {
-	if (!children || !children.reduce) {
-		return 0
-	}
-	const inlineElements = children.slice(0, 3)
-	return inlineElements.reduce((count, each) => count + Number(each && each.type && each.type === typeEnum.Emoji), 0)
-}
-
 // Parses a paragraph element.
 export function parseParagraph(node) {
 	const children = parseInlineElements(node.data)
 	const element = {
 		type: typeEnum.Paragraph,
 		id: node.id,
-		// TODO: Rename to numberOfEmojis or emojiCount?
-		emojis: countEmojis(children),
+		emojis: (
+			children &&
+			children.every &&
+			children.every(each => each && each.type && each.type === typeEnum.Emoji) &&
+			children.length // Return the number of emojis
+		),
 		children,
 	}
 	return element

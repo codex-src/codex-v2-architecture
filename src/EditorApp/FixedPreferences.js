@@ -56,7 +56,7 @@ const FixedPreferences = ({
 							className="p-2 font-medium text-xxs underline"
 							onClick={() => setShowOutline(!showOutline)}
 						>
-							Toggle Outline
+							Outline
 						</Button>
 						<Button
 							className="p-2 font-medium text-xxs underline"
