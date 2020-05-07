@@ -329,7 +329,12 @@ const Editor = ({
 						}
 						// Tab:
 						if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+							if (document.activeElement.getAttribute("data-codex-checkbox")) {
+								// No-op
+								return
+							}
 							e.preventDefault()
+							// TODO: Use document.activeElement instead?
 							const selection = document.getSelection()
 							const range = selection.getRangeAt(0)
 							if (state.pos1.pos === state.pos2.pos && !isListItemElement(ascendNode(range.startContainer))) {
