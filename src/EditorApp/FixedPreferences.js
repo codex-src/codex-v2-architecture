@@ -62,13 +62,13 @@ const FixedPreferences = ({
 							className="p-2 font-medium text-xxs underline"
 							onClick={prefsDispatch.zoomIn}
 						>
-							Zoom In
+							Zoom +
 						</Button>
 						<Button
 							className="p-2 font-medium text-xxs underline"
 							onClick={prefsDispatch.zoomOut}
 						>
-							Zoom Out
+							Zoom -
 						</Button>
 						<div
 							className="p-2 flex flex-row items-center font-medium text-xxs underline transition duration-300"
@@ -113,7 +113,7 @@ const FixedPreferences = ({
 								</svg>
 							) : (
 								<svg
-									className="ml-2 w-4 h-4 text-blue-500"
+									className="ml-2 w-4 h-4 text-gray-500"
 									fill="currentColor"
 									viewBox="0 0 20 20"
 								>
@@ -121,17 +121,17 @@ const FixedPreferences = ({
 								</svg>
 							)}
 						</Button>
-						<Button
-							className="p-2 font-medium text-xxs underline"
-							onClick={prefsDispatch.showReadme}
-						>
-							Readme (Esc)
-						</Button>
+						{/* <Button */}
+						{/* 	className="p-2 font-medium text-xxs underline" */}
+						{/* 	onClick={prefsDispatch.showReadme} */}
+						{/* > */}
+						{/* 	Readme (Esc) */}
+						{/* </Button> */}
 						<Button
 							className="p-2 font-medium text-xxs underline"
 							onClick={prefsDispatch.showHTML}
 						>
-							HTML
+							HTML (Esc)
 						</Button>
 						{/* <Button */}
 						{/* 	className="p-2 font-medium text-xxs underline" */}
@@ -158,17 +158,17 @@ const FixedPreferences = ({
 			>
 				{/* NOTE: leaveTo classes are duplicated at the end */}
 				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch transform opacity-0 translate-x-32 pointer-events-none">
-					{prefs.renderMode === renderModesEnum.Readme ? (
-						<ReadmeEditor readOnly={prefs.readOnly} />
-					) : (
-						<span className="inline-block">
-							<pre className="whitespace-pre font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
-								<Highlighted extension={prefs.extension}>
-									{prefs[prefs.renderMode]}
-								</Highlighted>
-							</pre>
-						</span>
-					)}
+					{/* {prefs.renderMode === renderModesEnum.Readme ? ( */}
+					{/* 	<ReadmeEditor readOnly={prefs.readOnly} /> */}
+					{/* ) : ( */}
+					<span className="inline-block">
+						<pre className="font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
+							<Highlighted extension={prefs.extension}>
+								{prefs[prefs.renderMode]}
+							</Highlighted>
+						</pre>
+					</span>
+					{/* )} */}
 				</div>
 			</Transition>
 

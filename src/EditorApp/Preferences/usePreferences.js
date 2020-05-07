@@ -15,7 +15,7 @@ function initialState(defaultRenderer) {
 		showSidebar: false,
 		fontSize: defaultFontSize,
 		renderMode: renderModesEnum[defaultRenderer],
-		extension: "",
+		extension: "html",
 		[renderModesEnum.HTML]: "",
 		// [renderModesEnum.React_js]: "",
 		// [renderModesEnum.JSON]: "",
@@ -24,7 +24,7 @@ function initialState(defaultRenderer) {
 }
 
 // const text = `<!--
-// You can use Codex *outside* of Codex:
+// You can easily export your Codex to use anywhere.
 //
 // <div class="codex-output">
 // 	...
@@ -42,6 +42,7 @@ const methods = state => ({
 	// Updates preferences.
 	update(editorState) {
 		Object.assign(state, {
+			// TODO: Add { highlighted } option
 			[renderModesEnum.HTML]: toHTML(editorState.elements),
 			// [renderModesEnum.React_js]: toReact_js(editorState.elements),
 			// [renderModesEnum.JSON]: JSON.stringify(
@@ -59,15 +60,15 @@ const methods = state => ({
 			// ),
 		})
 	},
-	showReadme() {
-		if (!state.showSidebar) {
-			state.showSidebar = true
-		} else if (state.renderMode === renderModesEnum.Readme) {
-			state.showSidebar = false
-		}
-		state.renderMode = renderModesEnum.Readme
-		state.extension = ""
-	},
+	// showReadme() {
+	// 	if (!state.showSidebar) {
+	// 		state.showSidebar = true
+	// 	} else if (state.renderMode === renderModesEnum.Readme) {
+	// 		state.showSidebar = false
+	// 	}
+	// 	state.renderMode = renderModesEnum.Readme
+	// 	state.extension = ""
+	// },
 	showHTML() {
 		if (!state.showSidebar) {
 			state.showSidebar = true
@@ -120,7 +121,7 @@ const methods = state => ({
 	// },
 })
 
-function usePreferences(editorState, options = { defaultRenderer: renderModesEnum.Readme }) {
+function usePreferences(editorState, options = { defaultRenderer: renderModesEnum.HTML }) {
 	const [state, dispatch] = useMethods(methods, {}, () => initialState(options.defaultRenderer))
 
 	const mounted = React.useRef()
