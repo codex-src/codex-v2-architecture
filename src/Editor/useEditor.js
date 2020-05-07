@@ -1,6 +1,6 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
-import LRUCache from "mnemonist/lru-cache"
+import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import UndoManager from "./UndoManager"
 import useMethods from "use-methods"
@@ -29,7 +29,7 @@ function newEditorState(data) {
 	}
 
 	// https://yomguithereal.github.io/mnemonist/lru-cache
-	const cachedElements = new LRUCache(String, Object, 100)
+	const cachedElements = new LRUCache(100)
 
 	const initialState = {
 		readOnly: false,                                 // Is read-only?

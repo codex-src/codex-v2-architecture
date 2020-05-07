@@ -64,12 +64,11 @@ function parseElements(nodes, cachedElements) {
 		let element = cachedElements.get(key)
 		if (!element) {
 			element = parseElement(range)
-			cachedElements.set(key)
+			cachedElements.set(key, element)
 		}
-		// NOTE: Do **not** return the same reference
-		// return { ...element }
 		return element
 	}
+
 	const elements = []
 	for (let x1 = 0, len = nodes.length; x1 < len; x1++) {
 		const each = nodes[x1]
@@ -82,7 +81,7 @@ function parseElements(nodes, cachedElements) {
 			})
 			continue
 		}
-		switch (each.data.length && each.data[0]) { // FIXME
+		switch (each.data[0]) {
 		// <Header>
 		case "#":
 			if (testHeader(each)) {
@@ -213,6 +212,7 @@ function parseElements(nodes, cachedElements) {
 			}
 			// No-op
 			break
+
 		// <Image>
 		case "!":
 		case "[":
