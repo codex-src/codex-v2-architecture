@@ -323,6 +323,9 @@ const Editor = ({
 								}
 								autoSyntax = tabs + syntax // Unordered
 								if (state.pos1.x === (tabs + syntax).length) {
+									// NOTE: dispatch.backspaceParagraph and
+									// dispatch.enter together seem to cause a
+									// bug
 									// // NOTE: Backspaces a paragraph and enters
 									// dispatch.backspaceParagraph()
 								} else if (TaskListRe.test(autoSyntax)) {
