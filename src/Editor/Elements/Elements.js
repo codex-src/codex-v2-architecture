@@ -71,13 +71,16 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</Root>
 ))
 
-export const Paragraph = React.memo(({ id, emojis, children }) => (
-	<Root id={id} className={!emojis ? null : `emojis emojis__${emojis}`}>
-		{toReact(children) || (
-			<br />
-		)}
-	</Root>
-))
+export const Paragraph = React.memo(({ id, emojis, children }) => {
+	// const style = { margin: !children && "-0.25em 0" }
+	return (
+		<Root id={id} className={!emojis ? null : `emojis emojis__${emojis}`} /* style={style} */>
+			{toReact(children) || (
+				<br />
+			)}
+		</Root>
+	)
+})
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const style = { marginRight: "1ch" }

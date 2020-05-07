@@ -60,13 +60,15 @@ function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
 
 	const cacheStrategy = (range, parseElement) => {
-		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
-		let element = cachedElements.get(key)
-		if (!element) {
-			element = parseElement(range)
-			cachedElements.set(key, element)
-		}
-		return element
+		return parseElement(range)
+
+		// const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
+		// let element = cachedElements.get(key)
+		// if (!element) {
+		// 	element = parseElement(range)
+		// 	cachedElements.set(key, element)
+		// }
+		// return element
 	}
 
 	const elements = []
@@ -76,9 +78,9 @@ function parseElements(nodes, cachedElements) {
 		if (!each.data.length || testFastPass(each.data[0])) {
 			const element = cacheStrategy(each, parseParagraph)
 			elements.push({
-					...element,
-					id: each.id,
-				})
+				...element,
+				id: each.id,
+			})
 			continue
 		}
 		switch (each.data[0]) {

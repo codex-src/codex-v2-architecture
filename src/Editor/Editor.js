@@ -323,8 +323,8 @@ const Editor = ({
 								}
 								autoSyntax = tabs + syntax // Unordered
 								if (state.pos1.x === (tabs + syntax).length) {
-									// NOTE: Backspaces a paragraph and enters
-									dispatch.backspaceParagraph()
+									// // NOTE: Backspaces a paragraph and enters
+									// dispatch.backspaceParagraph()
 								} else if (TaskListRe.test(autoSyntax)) {
 									autoSyntax = `${tabs}- [ ] `
 								} else if (UnorderedListRe.test(autoSyntax)) {
