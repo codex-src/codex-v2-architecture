@@ -223,6 +223,7 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 
+	// NOTE: Assumes line-height is 1.5em
 	const style = { minHeight: "1.5em", maxHeight: "24em" }
 	return (
 		<Root id={id} className="-mx-6">
@@ -243,18 +244,11 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 })
 
 export const Break = React.memo(({ id, syntax }) => {
-	// const style = {
-	// 	backgroundImage: `linear-gradient(
-	// 		transparent 0,
-	// 		transparent calc(0.75em - 1px),
-	// 		var(--gray-300) calc(0.75em - 1px),
-	// 		transparent calc(0.75em + 1px)
-	// 	)`
-	// }
-	const style = { backgroundImage: `linear-gradient(transparent 0, transparent calc(0.75em - 1px), var(--gray-300) calc(0.75em - 1px), transparent calc(0.75em + 1px))` }
+	// NOTE: Assumes line-height is 1.5em
+	const style = { backgroundImage: "linear-gradient(transparent 0, transparent calc(0.75em - 1px), var(--gray-300) calc(0.75em - 1px), transparent calc(0.75em + 1px))" }
 
 	return (
-		<Root id={id} style={style} dir="rtl">
+		<Root id={id} className="text-right" style={style}>
 			<Markdown className="hidden" syntax={syntax}>
 				<br />
 			</Markdown>
