@@ -5,7 +5,7 @@ import {
 	deeplySyncNodes,
 	replaceAttributes,
 	shallowlySyncNodes,
-} from "../syncElements"
+} from "../syncNodes"
 
 describe("replaceAttributes", () => {
 	test("", () => {
@@ -15,12 +15,6 @@ describe("replaceAttributes", () => {
 		expect(dst.outerHTML).toBe(src.outerHTML)
 	})
 	test("", () => {
-		const src = renderDOM(<div className="a" />)
-		const dst = renderDOM(<div />)
-		replaceAttributes(src, dst)
-		expect(dst.outerHTML).toBe(src.outerHTML)
-	})
-	test("", () => {
 		const src = renderDOM(<div />)
 		const dst = renderDOM(<div className="a" />)
 		replaceAttributes(src, dst)
@@ -28,12 +22,12 @@ describe("replaceAttributes", () => {
 	})
 	test("", () => {
 		const src = renderDOM(<div className="a" />)
-		const dst = renderDOM(<div className="a" />)
+		const dst = renderDOM(<div />)
 		replaceAttributes(src, dst)
 		expect(dst.outerHTML).toBe(src.outerHTML)
 	})
 	test("", () => {
-		const src = renderDOM(<div className="a b c" />)
+		const src = renderDOM(<div className="a" />)
 		const dst = renderDOM(<div className="a" />)
 		replaceAttributes(src, dst)
 		expect(dst.outerHTML).toBe(src.outerHTML)
@@ -46,13 +40,19 @@ describe("replaceAttributes", () => {
 	})
 	test("", () => {
 		const src = renderDOM(<div className="a b c" />)
+		const dst = renderDOM(<div className="a" />)
+		replaceAttributes(src, dst)
+		expect(dst.outerHTML).toBe(src.outerHTML)
+	})
+	test("", () => {
+		const src = renderDOM(<div className="a b c" />)
 		const dst = renderDOM(<div className="a b c" />)
 		replaceAttributes(src, dst)
 		expect(dst.outerHTML).toBe(src.outerHTML)
 	})
 	test("", () => {
-		const src = renderDOM(<div id="hello-world" className="a b c" />)
-		const dst = renderDOM(<div className="a b c" tabIndex="0" />)
+		const src = renderDOM(<div className="a b c" tabIndex="0" />)
+		const dst = renderDOM(<div id="hello-world" className="a b c" />)
 		replaceAttributes(src, dst)
 		// NOTE: Use an ES6 map to compare output because
 		// outerHTML breaks because of order and ES6 maps are
@@ -75,8 +75,8 @@ describe("replaceAttributes", () => {
 		expect(srcMap).toStrictEqual(dstMap)
 	})
 	test("", () => {
-		const dst = renderDOM(<div className="a b c" tabIndex="0" />)
-		const src = renderDOM(<div id="hello-world" className="a b c" />)
+		const dst = renderDOM(<div id="hello-world" className="a b c" />)
+		const src = renderDOM(<div className="a b c" tabIndex="0" />)
 		replaceAttributes(src, dst)
 		// NOTE: Use an ES6 map to compare output because
 		// outerHTML breaks because of order and ES6 maps are
@@ -103,14 +103,14 @@ describe("shallowlySyncNodes", () => {
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = document.createTextNode("hello, world!")
-		const dst = document.createTextNode("")
+		const src = document.createTextNode("")
+		const dst = document.createTextNode("hello, world!")
 		shallowlySyncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = document.createTextNode("")
-		const dst = document.createTextNode("hello, world!")
+		const src = document.createTextNode("hello, world!")
+		const dst = document.createTextNode("")
 		shallowlySyncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
@@ -128,14 +128,14 @@ describe("shallowlySyncNodes", () => {
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = renderDOM(<div className="a b c" />)
-		const dst = renderDOM(<div />)
+		const src = renderDOM(<div />)
+		const dst = renderDOM(<div className="a b c" />)
 		shallowlySyncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = renderDOM(<div />)
-		const dst = renderDOM(<div className="a b c" />)
+		const src = renderDOM(<div className="a b c" />)
+		const dst = renderDOM(<div />)
 		shallowlySyncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
@@ -229,20 +229,6 @@ describe("deeplySyncNodes", () => {
 	test("", () => {
 		const src = renderDOM((
 			<div>
-				hello, world!
-			</div>
-		))
-		const dst = renderDOM((
-			<div>
-				{/* ... */}
-			</div>
-		))
-		deeplySyncNodes(src, dst)
-		expect(dst.isEqualNode(src)).toBe(true)
-	})
-	test("", () => {
-		const src = renderDOM((
-			<div>
 				{/* ... */}
 			</div>
 		))
@@ -262,6 +248,20 @@ describe("deeplySyncNodes", () => {
 		))
 		const dst = renderDOM((
 			<div>
+				{/* ... */}
+			</div>
+		))
+		deeplySyncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				hello, world!
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
 				hello, world!
 			</div>
 		))
@@ -271,9 +271,25 @@ describe("deeplySyncNodes", () => {
 	test("", () => {
 		const src = renderDOM((
 			<div>
-				<div>
+				hello, world!
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				<p>
 					hello, world!
-				</div>
+				</p>
+			</div>
+		))
+		deeplySyncNodes(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				<p>
+					hello, world!
+				</p>
 			</div>
 		))
 		const dst = renderDOM((
@@ -288,13 +304,14 @@ describe("deeplySyncNodes", () => {
 		const src = renderDOM((
 			<div>
 				hello, world!
+				hello, world!
 			</div>
 		))
 		const dst = renderDOM((
 			<div>
-				<div>
+				<p>
 					hello, world!
-				</div>
+				</p>
 			</div>
 		))
 		deeplySyncNodes(src, dst)
@@ -303,26 +320,9 @@ describe("deeplySyncNodes", () => {
 	test("", () => {
 		const src = renderDOM((
 			<div>
-				hello, world!
-				hello, world!
-			</div>
-		))
-		const dst = renderDOM((
-			<div>
-				<div>
+				<p>
 					hello, world!
-				</div>
-			</div>
-		))
-		deeplySyncNodes(src, dst)
-		expect(dst.isEqualNode(src)).toBe(true)
-	})
-	test("", () => {
-		const src = renderDOM((
-			<div>
-				<div>
-					hello, world!
-				</div>
+				</p>
 			</div>
 		))
 		const dst = renderDOM((
@@ -335,19 +335,3 @@ describe("deeplySyncNodes", () => {
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 })
-
-// src:
-// <div>
-// 	<a />
-// 	<div>
-// 		<b />
-// 	</div>
-// </div>
-//
-// dst:
-// <div>
-// 	<div>
-// 		<b />
-// 	</div>
-// 	<a />
-// </div>

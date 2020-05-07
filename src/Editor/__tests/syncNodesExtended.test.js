@@ -1,6 +1,6 @@
 import React from "react"
 import renderDOM from "lib/renderDOM"
-import { deeplySyncNodes } from "../syncElements"
+import { deeplySyncNodes } from "../syncNodes"
 
 // group 1
 //
