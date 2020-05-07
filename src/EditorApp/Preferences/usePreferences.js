@@ -7,7 +7,7 @@ import {
 	toReact_js,
 } from "Editor/Elements/cmap"
 
-const defaultFontSize = 17
+const defaultFontSize = 16
 
 function initialState(defaultRenderer) {
 	const state = {
