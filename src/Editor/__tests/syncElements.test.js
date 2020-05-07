@@ -3,6 +3,7 @@ import renderDOM from "lib/renderDOM"
 
 import {
 	replaceAttributes,
+	syncElements,
 	syncNodes,
 } from "../syncElements"
 
@@ -102,20 +103,20 @@ describe("syncNodes", () => {
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = document.createTextNode("hello")
+		const src = document.createTextNode("hello, world!")
 		const dst = document.createTextNode("")
 		syncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
 		const src = document.createTextNode("")
-		const dst = document.createTextNode("hello")
+		const dst = document.createTextNode("hello, world!")
 		syncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 	test("", () => {
-		const src = document.createTextNode("hello")
-		const dst = document.createTextNode("hello")
+		const src = document.createTextNode("hello, world!")
+		const dst = document.createTextNode("hello, world!")
 		syncNodes(src, dst)
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
@@ -188,7 +189,7 @@ describe("syncNodes", () => {
 		))
 		const dst = renderDOM((
 			<div>
-				hello
+				hello, world!
 			</div>
 		))
 		syncNodes(src.childNodes[0], dst.childNodes[0])
@@ -197,7 +198,7 @@ describe("syncNodes", () => {
 	test("", () => {
 		const src = renderDOM((
 			<div>
-				hello
+				hello, world!
 			</div>
 		))
 		const dst = renderDOM((
@@ -209,3 +210,94 @@ describe("syncNodes", () => {
 		expect(dst.isEqualNode(src)).toBe(true)
 	})
 })
+
+describe("syncElements", () => {
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				{/* ... */}
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				{/* ... */}
+			</div>
+		))
+		syncElements(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	test("", () => {
+		const src = renderDOM((
+			<div>
+				hello, world!
+			</div>
+		))
+		const dst = renderDOM((
+			<div>
+				{/* ... */}
+			</div>
+		))
+		syncElements(src, dst)
+		expect(dst.isEqualNode(src)).toBe(true)
+	})
+	// test("", () => {
+	// 	const src = renderDOM((
+	// 		<div>
+	// 			{/* ... */}
+	// 		</div>
+	// 	))
+	// 	const dst = renderDOM((
+	// 		<div>
+	// 			hello, world!
+	// 		</div>
+	// 	))
+	// 	syncElements(src, dst)
+	// 	expect(dst.isEqualNode(src)).toBe(true)
+	// })
+	// test("", () => {
+	// 	const src = renderDOM((
+	// 		<div>
+	// 			hello, world!
+	// 		</div>
+	// 	))
+	// 	const dst = renderDOM((
+	// 		<div>
+	// 			hello, world!
+	// 		</div>
+	// 	))
+	// 	syncElements(src, dst)
+	// 	expect(dst.isEqualNode(src)).toBe(true)
+	// })
+	// test("", () => {
+	// 	const src = renderDOM((
+	// 		<div>
+	// 			<div>
+	// 				hello, world!
+	// 			</div>
+	// 		</div>
+	// 	))
+	// 	const dst = renderDOM((
+	// 		<div>
+	// 			hello, world!
+	// 		</div>
+	// 	))
+	// 	syncElements(src, dst)
+	// 	expect(dst.isEqualNode(src)).toBe(true)
+	// })
+})
+
+// src:
+// <div>
+// 	<a />
+// 	<div>
+// 		<b />
+// 	</div>
+// </div>
+//
+// dst:
+// <div>
+// 	<div>
+// 		<b />
+// 	</div>
+// 	<a />
+// </div>
