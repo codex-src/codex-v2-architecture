@@ -48,43 +48,6 @@ export function syncNodes(src, dst) {
 	return true
 }
 
-// export function syncElements(src, dst) {
-// 	// Iterate forwards (before replaceWith):
-// 	let start = 0
-// 	const min = Math.min(dst.children.length, src.children.length)
-// 	for (; start < min; start++) {
-// 		if (!dst.children[start].isEqualNode(src.children[start])) {
-// 			// syncElements(src.children[start], dst.children[start])
-// 			const clonedElement = src.children[start].cloneNode(true)
-// 			dst.children[start].replaceWith(clonedElement)
-// 			start++ // Eagerly increment
-// 			break
-// 		}
-// 	}
-// 	// Iterate backwards (after replaceWith):
-// 	let end1 = dst.children.length
-// 	let end2 = src.children.length
-// 	for (; end1 > start && end2 > start; end1--, end2--) {
-// 		if (!dst.children[end1 - 1].isEqualNode(src.children[end2 - 1])) {
-// 			// syncElements(src.children[end2 - 1], dst.children[end1 - 1])
-// 			const clonedElement = src.children[end2 - 1].cloneNode(true)
-// 			dst.children[end1 - 1].replaceWith(clonedElement)
-// 		}
-// 	}
-// 	// Drop extraneous elements:
-// 	if (start < end1) {
-// 		for (; start < end1; end1--) { // Iterate backwards
-// 			dst.children[end1 - 1].remove()
-// 		}
-// 	// Push extraneous elements:
-// 	} else if (start < end2) {
-// 		for (; start < end2; start++) {
-// 			const clonedElement = src.children[start].cloneNode(true)
-// 			dst.insertBefore(clonedElement, dst.children[start])
-// 		}
-// 	}
-// }
-
 // Recursively syncs two elements. Note that event listeners
 // are not reattached.
 export function syncElements(src, dst) {
@@ -92,23 +55,54 @@ export function syncElements(src, dst) {
 		// No-op
 		return
 	}
-	// TODO: Add support for syncElements backwards?
-	for (let x = 0; x < src.childNodes.length; x++) {
-		if (x < dst.childNodes.length) {
+	// Iterate forwards:
+	let x = 0
+	const min = Math.min(src.childNodes.length, dst.childNodes.length)
+	for (; x < min; x++) {
+		if (!dst.childNodes[x].isEqualNode(src.childNodes[x])) { // FIXME
 			syncElements(src.childNodes[x], dst.childNodes[x])
-			continue
+			x++ // Eagerly increment (because of break)
+			break
 		}
-		// src has too many nodes:
-		const clonedNode = src.childNodes[x].cloneNode(true)
-		dst.appendChild(clonedNode)
-		// if (!dst.childNodes.length) {
-		// 	dst.appendChild(clonedNode)
-		// 	continue
-		// }
-		// dst.insertBefore(clonedNode, dst.childNodes[x - 1])
 	}
-	for (let x = dst.childNodes.length - 1; x >= src.childNodes.length; x--) {
-		// dst has too many nodes; remove backwards:
-		dst.childNodes[x].remove()
+	// Iterate backwards (after syncElements):
+	let srcEnd = src.childNodes.length
+	let dstEnd = dst.childNodes.length
+	for (; srcEnd > x && dstEnd > x; srcEnd--, dstEnd--) {
+		if (!dst.childNodes[dstEnd - 1].isEqualNode(src.childNodes[srcEnd - 1])) { // FIXME
+			syncElements(src.childNodes[srcEnd - 1], dst.childNodes[dstEnd - 1])
+		}
 	}
+	// Append extraneous nodes:
+	if (x < srcEnd) {
+		for (; x < srcEnd; x++) {
+			const clonedNode = src.childNodes[x].cloneNode(true)
+			dst.insertBefore(clonedNode, dst.childNodes[x])
+		}
+	// Remove extraneous nodes:
+	} else if (x < dstEnd) {
+		for (; x < dstEnd; dstEnd--) { // Iterate backwards
+			dst.childNodes[dstEnd - 1].remove()
+		}
+	}
+
+	// // TODO: Add support for syncElements backwards?
+	// for (let x = 0; x < src.childNodes.length; x++) {
+	// 	if (x < dst.childNodes.length) {
+	// 		syncElements(src.childNodes[x], dst.childNodes[x])
+	// 		continue
+	// 	}
+	// 	// src has too many nodes:
+	// 	const clonedNode = src.childNodes[x].cloneNode(true)
+	// 	dst.appendChild(clonedNode)
+	// 	// if (!dst.childNodes.length) {
+	// 	// 	dst.appendChild(clonedNode)
+	// 	// 	continue
+	// 	// }
+	// 	// dst.insertBefore(clonedNode, dst.childNodes[x - 1])
+	// }
+	// for (let x = dst.childNodes.length - 1; x >= src.childNodes.length; x--) {
+	// 	// dst has too many nodes; remove backwards:
+	// 	dst.childNodes[x].remove()
+	// }
 }
