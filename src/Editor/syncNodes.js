@@ -48,13 +48,12 @@ export function shallowlySyncNodes(src, dst) {
 }
 
 // Deeply syncs two nodes. Note that the ancestor nodes are
-// not synced.
-//
-// TODO: Add decorator pattern
+// not synced. Returns an array of the synced nodes.
 export function deeplySyncNodes(src, dst, __recursion = 0) {
+	const syncedNodes = []
+
 	if (__recursion && shallowlySyncNodes(src, dst)) {
-		// No-op
-		return
+		return syncedNodes
 	}
 	// Iterate forwards:
 	let x = 0
@@ -62,22 +61,25 @@ export function deeplySyncNodes(src, dst, __recursion = 0) {
 	for (; x < min; x++) {
 		if (!dst.childNodes[x].isEqualNode(src.childNodes[x])) { // FIXME?
 			deeplySyncNodes(src.childNodes[x], dst.childNodes[x], __recursion + 1)
+			syncedNodes.push(dst.childNodes[x])
 			x++ // Eagerly increment (because of break)
 			break
 		}
 	}
 	// Iterate backwards:
-	let srcLen = src.childNodes.length
-	let dstLen = dst.childNodes.length
-	for (; srcLen > x && dstLen > x; srcLen--, dstLen--) {
-		if (!dst.childNodes[dstLen - 1].isEqualNode(src.childNodes[srcLen - 1])) { // FIXME?
-			deeplySyncNodes(src.childNodes[srcLen - 1], dst.childNodes[dstLen - 1], __recursion + 1)
+	let srcEnd = src.childNodes.length
+	let dstEnd = dst.childNodes.length
+	for (; srcEnd > x && dstEnd > x; srcEnd--, dstEnd--) {
+		if (!dst.childNodes[dstEnd - 1].isEqualNode(src.childNodes[srcEnd - 1])) { // FIXME?
+			deeplySyncNodes(src.childNodes[srcEnd - 1], dst.childNodes[dstEnd - 1], __recursion + 1)
+			syncedNodes.push(dst.childNodes[dstEnd - 1])
 		}
 	}
 	// Append extraneous nodes (forwards):
-	if (x < srcLen) {
-		for (; x < srcLen; x++) {
+	if (x < srcEnd) {
+		for (; x < srcEnd; x++) {
 			const clonedNode = src.childNodes[x].cloneNode(true)
+			syncedNodes.push(clonedNode)
 			if (x >= dst.childNodes.length) {
 				dst.appendChild(clonedNode)
 				continue
@@ -85,9 +87,10 @@ export function deeplySyncNodes(src, dst, __recursion = 0) {
 			dst.insertBefore(clonedNode, dst.childNodes[x])
 		}
 	// Remove extraneous nodes (backwards):
-	} else if (x < dstLen) {
-		for (; x < dstLen; dstLen--) {
-			dst.childNodes[dstLen - 1].remove()
+	} else if (x < dstEnd) {
+		for (; x < dstEnd; dstEnd--) {
+			dst.childNodes[dstEnd - 1].remove()
 		}
 	}
+	return syncedNodes
 }

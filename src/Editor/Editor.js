@@ -85,7 +85,27 @@ const Editor = ({
 				console.log(`ReactDOM.render=${Date.now() - t}`)
 				t = Date.now()
 
-				deeplySyncNodes(state.reactDOM, ref.current)
+				const syncedNodes = deeplySyncNodes(state.reactDOM, ref.current)
+				for (const each of syncedNodes) {
+					if (each.nodeType !== Node.ELEMENT_NODE || (each.nodeName !== "UL" && each.nodeName !== "OL")) {
+						// No-op
+						continue
+					}
+					const checkboxes = each.querySelectorAll("li > .absolute > [data-codex-checkbox]")
+					for (const each of checkboxes) {
+						const { id } = each
+							.parentElement // <div class="absolute">
+							.parentElement // <li id="...">
+						each.onpointerdown = e => {
+							e.preventDefault()
+						}
+						each.onclick = () => {
+							document.activeElement.blur()
+							dispatch.checkTodo(id)
+						}
+					}
+				}
+				// console.log(syncedNodes)
 
 				// // Sync DOM:
 				// syncDOM(state.reactDOM, ref.current, clonedElement => {
