@@ -49,6 +49,12 @@ export function shallowlySyncNodes(src, dst) {
 
 // Deeply syncs two nodes. Note that the ancestor nodes are
 // not synced. Returns an array of the synced nodes.
+//
+// TODO: Reduce mutations from 2 to 1 for the 90% case
+//
+// Hello, world!<enter>
+// - Hello, world! <- Rerenders
+//
 export function deeplySyncNodes(src, dst, __recursion = 0) {
 	const syncedNodes = []
 
