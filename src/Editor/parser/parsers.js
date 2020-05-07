@@ -15,6 +15,8 @@ export function parseHeader(node) {
 }
 
 // Counts the number of emojis.
+//
+// FIXME: NaN
 function countEmojis(children) {
 	if (!children || !children.reduce) {
 		return 0
