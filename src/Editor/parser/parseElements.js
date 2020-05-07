@@ -60,15 +60,13 @@ function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
 
 	const cacheStrategy = (range, parseElement) => {
-		return parseElement(range)
-
-		// const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
-		// let element = cachedElements.get(key)
-		// if (!element) {
-		// 	element = parseElement(range)
-		// 	cachedElements.set(key, element)
-		// }
-		// return element
+		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
+		let element = cachedElements.get(key)
+		if (!element) {
+			element = parseElement(range)
+			cachedElements.set(key, element)
+		}
+		return element
 	}
 
 	const elements = []
