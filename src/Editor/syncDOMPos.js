@@ -28,6 +28,23 @@ function computeRange(editorRoot, { pos }) {
 		return false
 	}
 	recurse(editorRoot)
+	// Fixes the insertion point for Firefox -- Firefox stops
+	// on <div class="hidden"> instead of <br>
+	//
+	// <ul data-codex-root>
+	//   <li data-codex-node> <- to { node, offset: 2 }
+	//     <div class="hidden">
+	//       ... <- from { node, offset: 0 }
+	//     </div>
+	//     <br>
+	//   </li>
+	// </ul>
+	//
+	const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1
+	if (isFirefox && range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
+		range.node = range.node.parentElement.parentElement
+		range.offset = range.node.children.length - 1
+	}
 	return range
 }
 
