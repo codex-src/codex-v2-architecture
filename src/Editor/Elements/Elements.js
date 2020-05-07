@@ -169,7 +169,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 })
 
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<Node tag={tag} id={id} className="my-2" data-codex-ordered={ordered}>
+	<Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -196,7 +196,7 @@ const Checkbox = ({ id, checked }) => (
 )
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
-	<Node tag={tag} id={id} className="relative my-2" style={checked && attrs.strike.style} data-codex-checked={checked}>
+	<Node tag={tag} id={id} className="relative my-1" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
 				<Checkbox id={id} checked={checked} />
