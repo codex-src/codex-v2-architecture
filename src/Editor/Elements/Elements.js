@@ -47,29 +47,29 @@ const headerClassNames = {
 	h6: "font-medium text-xl leading-tight text-black antialiased",
 }
 
-// // Conditionally wraps a React element.
-// const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
-// 	if (!cond) {
-// 		return children
-// 	}
-// 	return <Wrapper>{children}</Wrapper>
-// }
-//
-// const HeaderAnchor = ({ hash, children }) => (
-// 	<a id={hash} className="block" href={`#${hash}`}>{children}</a>
-// )
-//
-// <IfWrapper cond={tag !== "h1" && readOnly} wrapper={({ children }) => <HeaderAnchor hash={hash}>{children}</HeaderAnchor>}>
+// Conditionally wraps a React element.
+const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
+	if (!cond) {
+		return children
+	}
+	return <Wrapper>{children}</Wrapper>
+}
 
-export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root id={id} className={headerClassNames[tag]}>
-		<Markdown syntax={syntax}>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</Root>
-))
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
+	const [{ readOnly }] = useEditorState()
+	return (
+		<Root id={id} className={headerClassNames[tag]}>
+			{/* NOTE: Use className="block" because <a> is nested */}
+			<IfWrapper cond={readOnly} wrapper={({ children }) => <a id={hash} className="block" href={`#${hash}`}>{children}</a>}>
+				<Markdown syntax={syntax}>
+					{toReact(children) || (
+						<br />
+					)}
+				</Markdown>
+			</IfWrapper>
+		</Root>
+	)
+})
 
 export const Paragraph = React.memo(({ id, emojis, children }) => {
 	// const style = { margin: !children && "-0.25em 0" }
@@ -215,14 +215,6 @@ export const AnyList = React.memo(({ root, type, tag, id, children: range }) => 
 	)
 })
 
-// Conditionally wraps a React element.
-const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
-	if (!cond) {
-		return children
-	}
-	return <Wrapper>{children}</Wrapper>
-}
-
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 
@@ -249,7 +241,6 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 export const Break = React.memo(({ id, syntax }) => {
 	// NOTE: Assumes line-height is 1.5em
 	const style = { backgroundImage: "linear-gradient(transparent 0, transparent calc(0.75em - 1px), var(--gray-300) calc(0.75em - 1px), transparent calc(0.75em + 1px))" }
-
 	return (
 		<Root id={id} className="text-right" style={style}>
 			<Markdown className="hidden" syntax={syntax}>
