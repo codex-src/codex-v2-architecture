@@ -47,8 +47,8 @@ export const StrongEmphasis = ({ syntax, children }) => (
 )
 
 export const Code = ({ syntax, children }) => (
-	<span className="px-1 py-px font-mono text-sm text-blue-500 bg-blue-100 rounded" {...attrs.code}>
-		<Markdown className="text-blue-500" syntax={syntax}>
+	<span className="px-1 py-px font-mono text-sm text-md-blue-a400 border rounded" {...attrs.code}>
+		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
 	</span>
