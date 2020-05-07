@@ -17,7 +17,7 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const [pos1, pos2] = [newPos(), newPos()]
 
-	const undoState = { data, nodes, pos1, pos2 }
+	const initialState = { data, nodes, pos1, pos2 }
 
 	// Returns whether the current and next state are equal.
 	const areEqual = (currentState, nextState) => {
@@ -30,21 +30,21 @@ function newEditorState(data) {
 
 	const cachedElements = new LRUCache(100)
 
-	const initialState = {
-		readOnly: false,                                 // Is read-only?
-		focused: false,                                  // Is focused?
-		data,                                            // Document data (string)
-		nodes,                                           // Document nodes
-		pos1,                                            // Start cursor data structure
-		pos2,                                            // End cursor data structure
-		extPosRange: ["", ""],                           // Extended node (root ID) range
-		history: new UndoManager(undoState, areEqual),   // Undo manager
-		cachedElements,                                  // LRU cached parsed elements
-		elements: parseElements(nodes, cachedElements),  // Parsed elements
-		reactDOM: document.createElement("div"),         // React-managed DOM
+	const editorState = {
+		readOnly: false,                                  // Is read-only?
+		focused: false,                                   // Is focused?
+		data,                                             // Document data (string)
+		nodes,                                            // Document nodes
+		pos1,                                             // Start cursor data structure
+		pos2,                                             // End cursor data structure
+		extPosRange: ["", ""],                            // Extended node (root ID) range
+		history: new UndoManager(initialState, areEqual), // Undo manager
+		cachedElements,                                   // LRU cached parsed elements
+		elements: parseElements(nodes, cachedElements),   // Parsed elements
+		reactDOM: document.createElement("div"),          // React-managed DOM
 	}
 
-	return initialState
+	return editorState
 }
 
 const methods = state => ({
