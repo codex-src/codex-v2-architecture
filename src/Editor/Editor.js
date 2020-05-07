@@ -123,6 +123,7 @@ const Editor = ({
 
 				console.log(`syncDOMPos=${Date.now() - t}`)
 
+				// Defer to useEffect:
 				const id = setTimeout(() => {
 					const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
 					if (!computed || !computed.offset) {
@@ -149,6 +150,16 @@ const Editor = ({
 		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
 		[state.readOnly, state.elements],
 	)
+
+	// React.useEffect(() => {
+	// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
+	// 	if (!computed || !computed.offset) {
+	// 		// No-op
+	// 		return
+	// 	}
+	// 	const { scrollingElement, offset } = computed
+	// 	scrollingElement.scrollBy(0, offset)
+	// }, [state.pos1, state.pos2, scrollTopOffset, scrollBottomOffset])
 
 	// Rerenders on DOMContentLoaded for syntax highlighting.
 	React.useEffect(() => {
