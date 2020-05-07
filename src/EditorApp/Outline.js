@@ -75,7 +75,7 @@ const Outline = ({
 						<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 					</Transition>
 				</svg>
-				<p className="font-semibold text-xxs tracking-wide uppercase truncate">
+				<p className="font-semibold text-xs tracking-wide uppercase truncate">
 					{!hoverOutline ? (
 						title.trim() || "Untitled"
 					) : (

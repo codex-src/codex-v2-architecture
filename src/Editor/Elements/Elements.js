@@ -33,18 +33,18 @@ function toReact(children) {
 	return components
 }
 
-// // Trims extraneous spaces.
-// function trim(str) {
-// 	return str.replace(/ +/g, " ")
-// }
+// Trims extraneous spaces.
+function trim(str) {
+	return str.replace(/ +/g, " ")
+}
 
 const headerClassNames = {
-	h1: "font-medium text-4xl leading-tight text-black antialiased",
-	h2: "font-medium text-2xl leading-tight text-black antialiased",
-	h3: "font-medium text-xl leading-tight text-black antialiased",
-	h4: "font-medium text-xl leading-tight text-black antialiased",
-	h5: "font-medium text-xl leading-tight text-black antialiased",
-	h6: "font-medium text-xl leading-tight text-black antialiased",
+	h1: trim("font-medium   text-3xl leading-tight text-black antialiased"),
+	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
+	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h4: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h5: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h6: trim("font-semibold text-xl  leading-tight text-black antialiased"),
 }
 
 // export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
