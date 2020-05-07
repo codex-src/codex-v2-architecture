@@ -88,6 +88,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => {
 	)
 })
 
+// TODO: Rename to BlockquoteNode?
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const style = { marginRight: "1ch" }
 	return (
@@ -139,7 +140,6 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		// rounded
 		<Root id={id} className="px-6 font-mono text-sm leading-snug border" {...attrs.code}>
 			<Node id={range[0].id}>
 				<Markdown syntax={[syntax[0]]}>

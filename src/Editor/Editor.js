@@ -86,7 +86,11 @@ const Editor = ({
 
 				// Sync DOM:
 				syncDOM(state.reactDOM, ref.current, clonedElement => {
-					const checkboxes = clonedElement.querySelectorAll("[data-codex-checkbox]")
+					if (clonedElement.nodeName !== "UL" && clonedElement.nodeName !== "OL") {
+						// No-op
+						return
+					}
+					const checkboxes = clonedElement.querySelectorAll("li > .absolute > [data-codex-checkbox]")
 					for (const each of checkboxes) {
 						const { id } = each
 							.parentElement // <div class="absolute">
