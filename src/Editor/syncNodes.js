@@ -47,11 +47,12 @@ export function shallowlySyncNodes(src, dst) {
 	return true
 }
 
-// Deeply syncs two nodes.
+// Deeply syncs two nodes. Note that the ancestor nodes are
+// not synced.
 //
 // TODO: Add decorator pattern
-export function deeplySyncNodes(src, dst) {
-	if (shallowlySyncNodes(src, dst)) {
+export function deeplySyncNodes(src, dst, __recursion = 0) {
+	if (__recursion && shallowlySyncNodes(src, dst)) {
 		// No-op
 		return
 	}
@@ -59,8 +60,8 @@ export function deeplySyncNodes(src, dst) {
 	let x = 0
 	const min = Math.min(src.childNodes.length, dst.childNodes.length)
 	for (; x < min; x++) {
-		if (!dst.childNodes[x].isEqualNode(src.childNodes[x])) { // FIXME
-			deeplySyncNodes(src.childNodes[x], dst.childNodes[x])
+		if (!dst.childNodes[x].isEqualNode(src.childNodes[x])) { // FIXME?
+			deeplySyncNodes(src.childNodes[x], dst.childNodes[x], __recursion + 1)
 			x++ // Eagerly increment (because of break)
 			break
 		}
@@ -69,8 +70,8 @@ export function deeplySyncNodes(src, dst) {
 	let srcLen = src.childNodes.length
 	let dstLen = dst.childNodes.length
 	for (; srcLen > x && dstLen > x; srcLen--, dstLen--) {
-		if (!dst.childNodes[dstLen - 1].isEqualNode(src.childNodes[srcLen - 1])) { // FIXME
-			deeplySyncNodes(src.childNodes[srcLen - 1], dst.childNodes[dstLen - 1])
+		if (!dst.childNodes[dstLen - 1].isEqualNode(src.childNodes[srcLen - 1])) { // FIXME?
+			deeplySyncNodes(src.childNodes[srcLen - 1], dst.childNodes[dstLen - 1], __recursion + 1)
 		}
 	}
 	// Append extraneous nodes (forwards):

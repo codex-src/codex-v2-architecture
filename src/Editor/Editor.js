@@ -10,6 +10,7 @@ import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import { ascendNode } from "./ascendNodes"
+import { deeplySyncNodes } from "./syncNodes"
 import { isListItemElement } from "./listElements"
 
 import {
@@ -84,26 +85,28 @@ const Editor = ({
 				console.log(`ReactDOM.render=${Date.now() - t}`)
 				t = Date.now()
 
-				// Sync DOM:
-				syncDOM(state.reactDOM, ref.current, clonedElement => {
-					if (clonedElement.nodeName !== "UL" && clonedElement.nodeName !== "OL") {
-						// No-op
-						return
-					}
-					const checkboxes = clonedElement.querySelectorAll("li > .absolute > [data-codex-checkbox]")
-					for (const each of checkboxes) {
-						const { id } = each
-							.parentElement // <div class="absolute">
-							.parentElement // <li id="$uuid">
-						each.onpointerdown = e => {
-							e.preventDefault()
-						}
-						each.onclick = () => {
-							document.activeElement.blur()
-							dispatch.checkTodo(id)
-						}
-					}
-				})
+				deeplySyncNodes(state.reactDOM, ref.current)
+
+				// // Sync DOM:
+				// syncDOM(state.reactDOM, ref.current, clonedElement => {
+				// 	if (clonedElement.nodeName !== "UL" && clonedElement.nodeName !== "OL") {
+				// 		// No-op
+				// 		return
+				// 	}
+				// 	const checkboxes = clonedElement.querySelectorAll("li > .absolute > [data-codex-checkbox]")
+				// 	for (const each of checkboxes) {
+				// 		const { id } = each
+				// 			.parentElement // <div class="absolute">
+				// 			.parentElement // <li id="$uuid">
+				// 		each.onpointerdown = e => {
+				// 			e.preventDefault()
+				// 		}
+				// 		each.onclick = () => {
+				// 			document.activeElement.blur()
+				// 			dispatch.checkTodo(id)
+				// 		}
+				// 	}
+				// })
 
 				console.log(`syncDOM=${Date.now() - t}`)
 				t = Date.now()
