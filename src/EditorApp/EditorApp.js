@@ -3,6 +3,7 @@ import download from "lib/download"
 import Editor from "Editor/Editor"
 import FixedPreferences from "./FixedPreferences"
 import Outline from "./Outline"
+import raw from "raw.macro"
 import React from "react"
 import StatusBars from "./StatusBars"
 import Transition from "lib/Transition"
@@ -23,11 +24,11 @@ import { toText } from "Editor/Elements/cmap"
 const data = (() => {
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 	if (!cache) {
-		return ""
+		return raw("./EditorApp.md")
 	}
 	const json = JSON.parse(cache)
 	if (!json.data) {
-		return ""
+		return raw("./EditorApp.md")
 	}
 	return json.data
 })()

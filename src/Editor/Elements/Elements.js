@@ -142,7 +142,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	return (
 		<Root id={id} className="px-6 font-mono text-sm leading-snug border" {...attrs.code}>
 			<Node id={range[0].id}>
-				<Markdown className="text-gray-500" syntax={[syntax[0]]}>
+				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
@@ -158,7 +158,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				</Node>
 			))}
 			<Node id={range[range.length - 1].id}>
-				<Markdown className="text-gray-500" syntax={[syntax[1]]}>
+				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
 					)}
