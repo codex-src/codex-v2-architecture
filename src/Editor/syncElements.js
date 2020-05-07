@@ -2,10 +2,7 @@
 // attributes are removed.
 export function replaceAttributes(src, dst) {
 	const attrKeys = new Set()
-	for (const attr of [...src.attributes]) {
-		attrKeys.add(attr.nodeName)
-	}
-	for (const attr of [...dst.attributes]) {
+	for (const attr of [...src.attributes, ...dst.attributes]) {
 		attrKeys.add(attr.nodeName)
 	}
 	for (const key of attrKeys) {
