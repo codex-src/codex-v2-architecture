@@ -61,6 +61,8 @@ bash c cpp css d diff docker dockerfile git go graphql htm html http js json jsx
 ```main.go
 package main
 
+import "fmt"
+
 func main() {
 	fmt.Println("Hello, world!")
 }

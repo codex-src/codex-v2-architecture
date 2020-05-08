@@ -229,7 +229,7 @@ const Editor = ({
 		!state.readOnly ? "" : " feature-read-only"
 	}${
 		!className ? "" : ` ${className}`
-	} text-gray-800 subpixel-antialiased`
+	} subpixel-antialiased`
 
 	const renderStyle = {
 		...style, // Takes precedence
@@ -351,7 +351,18 @@ const Editor = ({
 							e.preventDefault()
 
 							// Returns whether the start cursor is focused
-							// on a list item element e.g. <li>.
+							// on a blockquote item element.
+							const isBlockquoteItemElement = () => {
+								const selection = document.getSelection()
+								if (!selection.rangeCount) {
+									return false
+								}
+								const range = selection.getRangeAt(0)
+								return ascendNode(range.startContainer).getAttribute("data-codex-blockquote-item")
+							}
+
+							// Returns whether the start cursor is focused
+							// on a list item element.
 							const isFocusedListItemElement = () => {
 								const selection = document.getSelection()
 								if (!selection.rangeCount) {
@@ -362,6 +373,13 @@ const Editor = ({
 							}
 
 							let autoSyntax = ""
+							// if (state.pos1.pos === state.pos2.pos && isBlockquoteItemElement()) {
+							// 	const node = state.nodes[state.pos1.y]
+							// 	if (node.data === "> ") {
+							// 		dispatch.backspaceParagraph()
+							// 		return
+							// 	}
+							// 	autoSyntax = "> "
 							if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
 								const node = state.nodes[state.pos1.y]
 								const [, tabs, syntax] = node.data.match(AnyListRe)

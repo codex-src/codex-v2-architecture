@@ -39,12 +39,12 @@ function trim(str) {
 }
 
 const headerClassNames = {
-	h1: trim("font-semibold text-3xl leading-tight text-black antialiased"),
-	h2: trim("font-semibold text-2xl leading-tight text-black antialiased"),
-	h3: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h4: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h5: trim("font-semibold text-xl  leading-tight text-black antialiased"),
-	h6: trim("font-semibold text-xl  leading-tight text-black antialiased"),
+	h1: trim("font-semibold text-3xl leading-tight antialiased"),
+	h2: trim("font-semibold text-2xl leading-tight antialiased"),
+	h3: trim("font-semibold text-xl  leading-tight antialiased"),
+	h4: trim("font-semibold text-xl  leading-tight antialiased"),
+	h5: trim("font-semibold text-xl  leading-tight antialiased"),
+	h6: trim("font-semibold text-xl  leading-tight antialiased"),
 }
 
 // export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
@@ -93,7 +93,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const style = { marginRight: "1ch" }
 	return (
 		<Node id={id} className="text-gray-600">
-			<Markdown className="text-md-blue-a400" style={style} syntax={syntax}>
+			<Markdown style={style} syntax={syntax}>
 				{toReact(children) || (
 					<br />
 				)}
@@ -103,9 +103,11 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 })
 
 export const Blockquote = React.memo(({ id, children: range }) => {
+	const [{ readOnly }] = useEditorState()
+
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
-		<Root id={id} className="px-6" style={style}>
+		<Root id={id} className={!readOnly ? undefined : "pl-6"} style={!readOnly ? undefined : style}>
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
