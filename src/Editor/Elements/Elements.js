@@ -119,7 +119,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
