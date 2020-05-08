@@ -61,7 +61,10 @@ const methods = state => ({
 	},
 	// Toggles read-only mode.
 	toggleReadOnly() {
-		state.readOnly = !state.readOnly
+		Object.assign(state, {
+			readOnly: !state.readOnly,
+			focused:  false,
+		})
 	},
 	// Focuses the editor.
 	focus() {
