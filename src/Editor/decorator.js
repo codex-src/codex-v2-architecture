@@ -19,11 +19,7 @@ function decorator(state, dispatch) {
 					// selection.removeAllRanges do not remove the
 					// selection in Firefox
 					//
-					// document.activeElement.blur()
-					const selection = document.getSelection()
-					if (selection.rangeCount) {
-						selection.removeAllRanges()
-					}
+					document.activeElement.blur()
 					dispatch.checkTodo(id)
 					each.focus()
 				}
