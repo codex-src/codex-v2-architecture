@@ -1,3 +1,5 @@
+const keyCodeSpace = 32
+
 // Returns a new decorator function for the return of
 // deeplySyncNodes.
 function decorator(state, dispatch) {
@@ -10,19 +12,26 @@ function decorator(state, dispatch) {
 			const checkboxes = each.querySelectorAll("[data-codex-node] > .absolute > [data-codex-checkbox]")
 			for (const each of checkboxes) {
 				const { id } = each.parentElement.parentElement
-				each.onpointerdown = e => {
-					e.preventDefault()
-					// Blur to prevent auto-scrolling:
+				const toggleCheck = () => {
+					// TODO: Use selection.removeAllRanges instead?
 					document.activeElement.blur()
 					dispatch.checkTodo(id)
 					each.focus()
 				}
-				// each.onclick = () => {
-				// 	// Blur to prevent auto-scrolling:
-				// 	document.activeElement.blur()
-				// 	dispatch.checkTodo(id)
-				// 	each.focus()
-				// }
+				each.onpointerdown = e => {
+					e.preventDefault()
+					toggleCheck()
+				}
+				// Custom space handler; prevents Firefox from
+				// scrolling.
+				each.onkeydown = e => {
+					if (e.keyCode !== keyCodeSpace) {
+						// No-op
+						return
+					}
+					e.preventDefault()
+					toggleCheck()
+				}
 			}
 		}
 	}
