@@ -89,8 +89,8 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 
 // TODO: Rename to BlockquoteNode?
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id} className="text-gray-600">
-		<Markdown style={{ marginRight: "1ch" }} syntax={syntax}>
+	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"}>
+		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -99,7 +99,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<Root id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -244,13 +244,9 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	return (
 		<Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				<img
-					className="mx-auto"
-					style={{ minHeight: "1.5em", maxHeight: "24em" }}
-					src={src}
-					alt={alt}
-					contentEditable={false}
-				/>
+				{/* NOTE: Use contentEditable={false} to prevent
+				selection */}
+				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} contentEditable={false} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
