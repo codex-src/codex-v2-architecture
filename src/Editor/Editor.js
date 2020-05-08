@@ -93,7 +93,8 @@ const Editor = ({
 				console.log(`ReactDOM.render=${Date.now() - t}`)
 
 				const syncedNodes = deeplySyncNodes(state.reactDOM, ref.current)
-				decorator(state, dispatch)(syncedNodes)
+				const decorate = decorator(state, dispatch)
+				decorate(syncedNodes)
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
@@ -311,7 +312,7 @@ const Editor = ({
 							// 		return false
 							// 	}
 							// 	const range = selection.getRangeAt(0)
-							// 	return ascendNode(range.startContainer).getAttribute("data-codex-blockquote-item")
+							// 	return ascendNode(range.startContainer).parentElement.nodeName === "BLOCKQUOTE"
 							// }
 
 							// Returns whether the start cursor is focused
@@ -327,12 +328,12 @@ const Editor = ({
 
 							let autoSyntax = ""
 							// if (state.pos1.pos === state.pos2.pos && isBlockquoteItemElement()) {
-							// 	// const node = state.nodes[state.pos1.y]
-							// 	// if (node.data === "> ") {
-							// 	// 	dispatch.backspaceParagraph()
-							// 	// 	return
-							// 	// }
-							// 	autoSyntax = ">"
+							// 	const node = state.nodes[state.pos1.y]
+							// 	if (!e.shiftKey && (node.data === "> " || node.data === ">")) {
+							// 		dispatch.backspaceParagraph()
+							// 		return
+							// 	}
+							// 	autoSyntax = "> "
 							if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
 								const node = state.nodes[state.pos1.y]
 								const [, tabs, syntax] = node.data.match(AnyListRe)

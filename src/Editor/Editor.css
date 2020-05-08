@@ -55,12 +55,6 @@
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 
-/* Unordered and ordered */
-.codex-editor [data-codex-ordered],
-.codex-editor [data-codex-checked] {
-	/*margin-left: 1ch;*/
-}
-
 /* Unordered */
 .codex-editor [data-codex-ordered="false"]:before  {
 	margin-left: -1.5em;
