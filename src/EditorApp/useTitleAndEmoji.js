@@ -4,7 +4,8 @@ import { atStart as runeAtStart } from "lib/encoding/utf8"
 import { toText } from "Editor/Elements/cmap"
 
 function useTitleAndEmoji(editorState) {
-	const [title, setTitle] = React.useState("")
+	// NOTE: Eagerly compute title because of <DocumentTitle>
+	const [title, setTitle] = React.useState(() => toText(editorState.elements.slice(0, 1)).split("\n", 1)[0])
 	const [emoji, setEmoji] = React.useState("")
 
 	React.useEffect(() => {
