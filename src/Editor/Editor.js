@@ -22,8 +22,7 @@ import "./Editor.css"
 import "./tailwind-colors.css"
 import "./tailwind-overrides.css"
 
-// TODO: Add React.memo?
-const ReactEditor = ({ state, dispatch }) => {
+const Elements = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
@@ -80,7 +79,7 @@ const Editor = ({
 
 			let t = Date.now()
 
-			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
+			ReactDOM.render(<Elements state={state} dispatch={dispatch} />, state.reactDOM, () => {
 
 				console.log(`ReactDOM.render=${Date.now() - t}`)
 
