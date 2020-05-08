@@ -65,30 +65,9 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 	</Root>
 ))
 
-export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
-		<Markdown className="hidden" syntax={syntax}>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</Node>
-))
-
-export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
-		{range.map(({ type: T, ...each }) => (
-			React.createElement(typeEnumArray[T], {
-				key: each.id,
-				...each,
-			})
-		))}
-	</Root>
-))
-
 // export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-// 	<Node id={id} className="text-gray-600">
-// 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
+// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
+// 		<Markdown className="hidden" syntax={syntax}>
 // 			{toReact(children) || (
 // 				<br />
 // 			)}
@@ -97,8 +76,7 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 // ))
 //
 // export const Blockquote = React.memo(({ id, children: range }) => (
-// 	// -ml-6
-// 	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+// 	<Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 // 		{range.map(({ type: T, ...each }) => (
 // 			React.createElement(typeEnumArray[T], {
 // 				key: each.id,
@@ -107,6 +85,28 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 // 		))}
 // 	</Root>
 // ))
+
+export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
+	<Node id={id} className="text-gray-600">
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</Node>
+))
+
+export const Blockquote = React.memo(({ id, children: range }) => (
+	// -ml-6
+	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+		{range.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumArray[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</Root>
+))
 
 // export const Pre = props => (
 // 	<Node style={{ whiteSpace: "pre" }} {...props} />
@@ -259,10 +259,10 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 
 const hr = "linear-gradient(" +
 	"transparent 0, " +
-	"transparent calc(0.75em - 1px), " +
-	"var(--gray-300) calc(0.75em - 1px), " +
-	"var(--gray-300) calc(0.75em + 1px), " +
-	"transparent calc(0.75em + 1px)" +
+	"transparent calc(0.75em - 2px), " +
+	"var(--gray-300) calc(0.75em - 2px), " +
+	"var(--gray-300) calc(0.75em + 2px), " +
+	"transparent calc(0.75em + 2px)" +
 ")"
 
 export const Break = React.memo(({ id, syntax }) => (
