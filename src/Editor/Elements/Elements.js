@@ -76,7 +76,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root tag="blockquote" id={id} className="my-1" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,

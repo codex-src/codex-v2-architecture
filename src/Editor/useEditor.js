@@ -391,7 +391,7 @@ const methods = state => ({
 	enter() {
 		state.history.mutate()
 
-		// Auto-completion:
+		let autoComplete = ""
 		const node = state.nodes[state.pos1.y]
 		if (state.pos1.pos === state.pos2.pos && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
 			// EOL and empty:
@@ -405,11 +405,8 @@ const methods = state => ({
 			if (TaskListRe.test(autoComplete)) {
 				autoComplete = `${tabs}- [ ] `
 			}
-			this.write(`\n${autoComplete}`)
-			return
 		}
-		// No auto-completion:
-		this.write("\n")
+		this.write(`\n${autoComplete}`)
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {
