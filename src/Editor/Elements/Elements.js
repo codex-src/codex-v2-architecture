@@ -97,8 +97,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	// -ml-6
-	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -132,8 +131,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root id={id} className="px-6 font-mono text-sm leading-snug border" {...attrs.code}>
-			<Node id={range[0].id}>
+		<Root id={id} className="-mx-6 px-6 border" {...attrs.code}>
+			<Node id={range[0].id} className="font-mono text-sm leading-snug">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
@@ -141,7 +140,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				</Markdown>
 			</Node>
 			{$range.map(each => (
-				<Node key={each.id} id={each.id}>
+				<Node key={each.id} id={each.id} className="font-mono text-sm leading-snug">
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
 							"<br />"
@@ -149,7 +148,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					}} />
 				</Node>
 			))}
-			<Node id={range[range.length - 1].id}>
+			<Node id={range[range.length - 1].id} className="font-mono text-sm leading-snug">
 				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
