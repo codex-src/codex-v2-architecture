@@ -137,8 +137,12 @@ const Editor = ({
 	// Rerenders on DOMContentLoaded.
 	React.useEffect(
 		React.useCallback(() => {
+			if (!DOMContentLoaded) {
+				// No-op
+				return
+			}
 			dispatch.render()
-		}, [dispatch]),
+		}, [DOMContentLoaded, dispatch]),
 		[DOMContentLoaded],
 	)
 
