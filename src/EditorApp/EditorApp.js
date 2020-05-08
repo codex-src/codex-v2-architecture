@@ -33,22 +33,27 @@ const data = (() => {
 })()
 
 const App = () => {
-	// TODO: Move showOutline to prefs?
 	const [state, dispatch] = useEditor(data)
 	const [prefs, prefsDispatch] = usePreferences(state)
 
 	const meta = useTitleAndEmoji(state)
-	const saveStatus = useSaveStatus(state)
 	const outline = useOutline(state)
-
-	// The outline data structure.
-	const [showOutline, setShowOutline] = React.useState(true)
-
+	const saveStatus = useSaveStatus(state)
 	const [statusLHS, statusRHS] = useStatusBars(state)
 
 	const DOMContentLoaded = useDOMContentLoaded()
 
 	// Updates renderers.
+	//
+	// (1 of 2)
+	React.useEffect(
+		React.useCallback(() => {
+			prefsDispatch.update(state)
+		}, [state, prefsDispatch]),
+		[],
+	)
+	//
+	// (2 of 2)
 	React.useEffect(
 		React.useCallback(() => {
 			if (!DOMContentLoaded) {
@@ -130,14 +135,13 @@ const App = () => {
 			<FixedPreferences
 				stateTuple={[state, dispatch]}
 				prefsTuple={[prefs, prefsDispatch]}
-				showOutlineTuple={[showOutline, setShowOutline]}
 				saveStatus={saveStatus}
 			/>
 
 			{/* LHS */}
 			<Transition
 				unmountOnExit={window.innerWidth <= 1328}
-				show={showOutline}
+				show={prefs.showOutline}
 				enter="transition ease-out duration-300"
 				enterFrom="transform -translate-x-32"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
@@ -145,7 +149,7 @@ const App = () => {
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
-				<Outline showOutlineTuple={[showOutline, setShowOutline]} title={meta.title}>
+				<Outline title={meta.title} toggleOutline={prefsDispatch.toggleOutline}>
 					{outline}
 				</Outline>
 			</Transition>
@@ -178,8 +182,6 @@ const App = () => {
 							dispatch={dispatch}
 							readOnly={prefs.readOnly}
 							autoFocus={!data.length}
-							scrollTopOffset={64}
-							scrollBottomOffset={64 - 32}
 						/>
 
 					</div>

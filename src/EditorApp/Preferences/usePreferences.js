@@ -1,27 +1,8 @@
-import React from "react"
 import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
-
-import {
-	// toReact_js,
-	toHTML,
-} from "Editor/Elements/cmap"
+import { toHTML } from "Editor/Elements/cmap"
 
 const defaultFontSize = 17
-
-function initialState(defaultRenderer) {
-	const state = {
-		readOnly: false,
-		showSidebar: false,
-		fontSize: defaultFontSize,
-		renderMode: renderModesEnum[defaultRenderer],
-		extension: "html",
-		[renderModesEnum.HTML]: "",
-		// [renderModesEnum.React_js]: "",
-		// [renderModesEnum.JSON]: "",
-	}
-	return state
-}
 
 // const text = `<!--
 // You can easily export your Codex to use anywhere.
@@ -39,69 +20,29 @@ function initialState(defaultRenderer) {
 // `
 
 const methods = state => ({
-	// Updates preferences.
+	// Updates renderers.
 	update(editorState) {
-		Object.assign(state, {
-			// TODO: Add { highlighted } option
-			[renderModesEnum.HTML]: toHTML(editorState.elements),
-			// [renderModesEnum.React_js]: toReact_js(editorState.elements),
-			// [renderModesEnum.JSON]: JSON.stringify(
-			// 	{
-			// 		...editorState,
-			// 		data:           undefined,
-			// 		extPosRange:    undefined,
-			// 		history:        undefined,
-			// 		cachedElements: undefined,
-			// 		elements:       undefined,
-			// 		reactDOM:       undefined,
-			// 	},
-			// 	null,
-			// 	"\t",
-			// ),
-		})
+		state.output[renderModesEnum.HTML] = toHTML(editorState.elements)
 	},
-	// showReadme() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.Readme) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.Readme
-	// 	state.extension = ""
-	// },
-	showHTML() {
-		if (!state.showSidebar) {
-			state.showSidebar = true
-		} else if (state.renderMode === renderModesEnum.HTML) {
-			state.showSidebar = false
-		}
-		state.renderMode = renderModesEnum.HTML
-		state.extension = "html"
-	},
-	// showReact_js() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.React_js) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.React_js
-	// 	state.extension = "jsx"
-	// },
-	// showJSON() {
-	// 	if (!state.showSidebar) {
-	// 		state.showSidebar = true
-	// 	} else if (state.renderMode === renderModesEnum.JSON) {
-	// 		state.showSidebar = false
-	// 	}
-	// 	state.renderMode = renderModesEnum.JSON
-	// 	state.extension = "json"
-	// },
+	// TODO: Remove
 	toggleReadOnly() {
 		state.readOnly = !state.readOnly
+	},
+	toggleOutline() {
+		state.showOutline = !state.showOutline
 	},
 	toggleSidebar() {
 		state.showSidebar = !state.showSidebar
 	},
+	// showHTML() {
+	// 	if (!state.showSidebar) {
+	// 		state.showSidebar = true
+	// 	} else if (state.renderMode === renderModesEnum.HTML) {
+	// 		state.showSidebar = false
+	// 	}
+	// 	state.renderMode = renderModesEnum.HTML
+	// 	state.output.extension = "html"
+	// },
 	zoomIn() {
 		if (state.fontSize >= defaultFontSize + 8) {
 			// No-op
@@ -121,22 +62,19 @@ const methods = state => ({
 	// },
 })
 
-function usePreferences(editorState, options = { defaultRenderer: renderModesEnum.HTML }) {
-	const [state, dispatch] = useMethods(methods, {}, () => initialState(options.defaultRenderer))
+function usePreferences(editorState) {
+	const [state, dispatch] = useMethods(methods, {}, () => ({
+		readOnly: false, // TODO: Remove
 
-	const mounted = React.useRef()
-	React.useLayoutEffect(
-		React.useCallback(() => {
-			if (mounted.current) {
-				// No-op
-				return
-			}
-			mounted.current = true
-			dispatch.update(editorState)
-		}, [editorState, dispatch]),
-		[],
-	)
-
+		showOutline: true,                 // Show outline?
+		showSidebar: false,                // Show sidebar?
+		fontSize: defaultFontSize,         // Editor font-size
+		renderMode: renderModesEnum.HTML,  // Render mode
+		output: {                          //
+			[renderModesEnum.HTML]: "",      // HTML output
+			extension: "html",               // Renderer extension
+		}
+	}))
 	return [state, dispatch]
 }
 

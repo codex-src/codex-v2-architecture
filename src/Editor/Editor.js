@@ -114,7 +114,7 @@ const Editor = ({
 
 				// Defer to useEffect:
 				const id = setTimeout(() => {
-					const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
+					const computed = computeScrollingElementAndOffset((scrollTopOffset || 0), (scrollBottomOffset || 0))
 					if (!computed || !computed.offset) {
 						// No-op
 						return

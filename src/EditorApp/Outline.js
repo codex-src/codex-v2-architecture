@@ -22,8 +22,8 @@ function newScrollHandler(e, id, hash) {
 }
 
 const Outline = ({
-	showOutlineTuple: [showOutline, setShowOutline],
 	title,
+	toggleOutline,
 	children: outline,
 }) => {
 	const [hoverOutline, setHoverOutline] = React.useState(false)
@@ -37,7 +37,7 @@ const Outline = ({
 				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
 				onPointerEnter={() => setHoverOutline(true)}
 				onPointerLeave={() => setHoverOutline(false)}
-				onClick={() => setShowOutline(false)}
+				onClick={toggleOutline}
 			>
 				<svg
 					className="mr-2 flex-shrink-0 w-4 h-4"
