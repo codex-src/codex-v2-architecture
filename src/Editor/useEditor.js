@@ -54,20 +54,10 @@ function newEditorState(data) {
 const methods = state => ({
 	// Registers props.
 	registerProps({ readOnly, autoFocus }) {
-		// Object.assign(state, {
-		// 	readOnly: readOnly === undefined
-		// 		? state.readOnly
-		// 		: readOnly,
-		// 	focused: autoFocus === undefined
-		// 		? state.focused
-		// 		: autoFocus,
-		// })
-		if (readOnly !== undefined) {
-			state.readOnly = readOnly
-		}
-		if (autoFocus !== undefined) {
-			state.focused = autoFocus
-		}
+		Object.assign(state, {
+			readOnly: Boolean(readOnly),
+			focused:  Boolean(autoFocus),
+		})
 	},
 	// Toggles read-only mode.
 	toggleReadOnly() {

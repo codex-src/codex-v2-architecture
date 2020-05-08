@@ -9,6 +9,9 @@ function format(n) {
 // Computes the LHS status string.
 function computeStatusLHS(editorState) {
 	const statusLHS = ((chars, lines) => {
+		if (!editorState.focused) {
+			return "No selection"
+		}
 		if (editorState.pos1.pos === editorState.pos2.pos) {
 			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
 		} else {

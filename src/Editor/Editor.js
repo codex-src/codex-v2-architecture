@@ -52,26 +52,10 @@ const Editor = ({
 	const pointerDownRef = React.useRef()
 	const dedupedCompositionEnd = React.useRef()
 
-	// Registers props (once).
-	const mountedProps = React.useRef()
+	// Registers props.
 	React.useEffect(() => {
-		if (!mountedProps.current) {
-			mountedProps.current = true
-			dispatch.registerProps({ readOnly, autoFocus })
-			return
-		}
-		dispatch.registerProps({ readOnly })
+		dispatch.registerProps({ readOnly, autoFocus })
 	}, [readOnly, autoFocus, dispatch])
-
-	// Removes selection on read-only.
-	React.useEffect(() => {
-		const selection = document.getSelection()
-		if (!selection.rangeCount) {
-			// No-op
-			return
-		}
-		selection.removeAllRanges()
-	}, [readOnly])
 
 	// Renders to the DOM.
 	React.useLayoutEffect(
