@@ -392,13 +392,15 @@ const methods = state => ({
 		state.history.mutate()
 
 		// Auto-completion:
-		const matches = state.nodes[state.pos1.y].data.match(AnyListRe)
-		if (matches) {
-			const [, tabs, syntax] = matches
-			if ((tabs + syntax) === state.nodes[state.pos1.y].data) {
+		const node = state.nodes[state.pos1.y]
+		if (state.pos1.pos === state.pos2.pos && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
+			// EOL and empty:
+			const [, tabs, syntax] = node.data.match(AnyListRe)
+			if ((tabs + syntax) === node.data) {
 				this.backspaceParagraph()
 				return
 			}
+			// EOL and not empty:
 			let autoComplete = tabs + syntax
 			if (TaskListRe.test(autoComplete)) {
 				autoComplete = `${tabs}- [ ] `
