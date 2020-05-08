@@ -303,52 +303,7 @@ const Editor = ({
 						// Enter:
 						} else if (e.keyCode === keyCodes.Enter) {
 							e.preventDefault()
-
-							// // Returns whether the start cursor is focused
-							// // on a blockquote item element.
-							// const isBlockquoteItemElement = () => {
-							// 	const selection = document.getSelection()
-							// 	if (!selection.rangeCount) {
-							// 		return false
-							// 	}
-							// 	const range = selection.getRangeAt(0)
-							// 	return ascendNode(range.startContainer).parentElement.nodeName === "BLOCKQUOTE"
-							// }
-
-							// Returns whether the start cursor is focused
-							// on a list item element.
-							const isFocusedListItemElement = () => {
-								const selection = document.getSelection()
-								if (!selection.rangeCount) {
-									return false
-								}
-								const range = selection.getRangeAt(0)
-								return isListItemElement(ascendNode(range.startContainer))
-							}
-
-							let autoSyntax = ""
-							// if (state.pos1.pos === state.pos2.pos && isBlockquoteItemElement()) {
-							// 	const node = state.nodes[state.pos1.y]
-							// 	if (!e.shiftKey && (node.data === "> " || node.data === ">")) {
-							// 		dispatch.backspaceParagraph()
-							// 		return
-							// 	}
-							// 	autoSyntax = "> "
-							if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
-								const node = state.nodes[state.pos1.y]
-								const [, tabs, syntax] = node.data.match(AnyListRe)
-								if (tabs + syntax === node.data) {
-									dispatch.backspaceParagraph()
-									return
-								}
-								autoSyntax = tabs + syntax // Unordered
-								if (TaskListRe.test(autoSyntax)) {
-									autoSyntax = `${tabs}- [ ] `
-								} else if (UnorderedListRe.test(autoSyntax)) {
-									autoSyntax = `${tabs}- `
-								}
-							}
-							dispatch.enter(autoSyntax)
+							dispatch.enter()
 							return
 						}
 						// Backspace paragraph:

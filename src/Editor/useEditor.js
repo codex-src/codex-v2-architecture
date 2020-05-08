@@ -4,12 +4,16 @@ import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import UndoManager from "./UndoManager"
 import useMethods from "use-methods"
-import { AnyListRe } from "./parser/spec"
 
 import {
 	newNodes,
 	newPos,
 } from "./constructors"
+
+import {
+	AnyListRe,
+	TaskListRe,
+} from "./parser/spec"
 
 // Prepares a new editor state (for useEditor).
 function newEditorState(data) {
@@ -384,10 +388,26 @@ const methods = state => ({
 		this.render()
 	},
 	// Inserts an EOL character.
-	enter(autoSyntax = "") {
+	enter() {
 		state.history.mutate()
 
-		this.write(`\n${autoSyntax}`)
+		// Auto-completion:
+		const matches = state.nodes[state.pos1.y].data.match(AnyListRe)
+		if (matches) {
+			const [, tabs, syntax] = matches
+			if ((tabs + syntax) === state.nodes[state.pos1.y].data) {
+				this.backspaceParagraph()
+				return
+			}
+			let autoComplete = tabs + syntax
+			if (TaskListRe.test(autoComplete)) {
+				autoComplete = `${tabs}- [ ] `
+			}
+			this.write(`\n${autoComplete}`)
+			return
+		}
+		// No auto-completion:
+		this.write("\n")
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {
