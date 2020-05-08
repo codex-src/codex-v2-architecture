@@ -61,7 +61,7 @@ const FixedPreferences = ({
 					onClick={dispatch.toggleReadOnly}
 				>
 					Preview ({navigator.userAgent.indexOf("Mac OS X") === -1 ? "Control-" : "⌘"}P)
-					{!prefs.readOnly ? (
+					{!state.readOnly ? (
 						<svg
 							className="ml-2 w-4 h-4 text-gray-500"
 							fill="none"
