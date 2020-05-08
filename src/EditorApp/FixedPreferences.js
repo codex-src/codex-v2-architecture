@@ -71,7 +71,7 @@ const FixedPreferences = ({
 							Zoom -
 						</Button>
 						<div
-							className="p-2 flex flex-row items-center font-medium text-xxs underline transition duration-300"
+							className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"
 							style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
 						>
 							Saved
@@ -80,6 +80,7 @@ const FixedPreferences = ({
 								fill="none"
 								strokeLinecap="round"
 								strokeLinejoin="round"
+								// strokeWidth="2"
 								strokeWidth="3"
 								stroke="currentColor"
 								viewBox="0 0 24 24"

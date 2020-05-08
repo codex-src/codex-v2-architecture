@@ -1,14 +1,16 @@
 import React from "react"
 import { LOCALSTORAGE_KEY } from "./constants"
+import { NumberEnum } from "lib/Enum"
 
-// 0 - Unsaved
-// 1 - Saving
-// 2 - Saved (before)
-// 3 - Saved (after)
-//
-// TODO: Add NumberEnum pattern
+const saveStatusEnum = new NumberEnum(
+	"Unsaved",
+	"Saving",
+	"Saved_before",
+	"Saved_after",
+)
+
 function useSaveStatus(editorState) {
-	const [saveStatus, setSaveStatus] = React.useState(0)
+	const [saveStatus, setSaveStatus] = React.useState(saveStatusEnum.Unsaved)
 
 	const mounted = React.useRef()
 	React.useEffect(() => {
@@ -21,9 +23,9 @@ function useSaveStatus(editorState) {
 			const json = JSON.stringify({ data: editorState.data })
 			localStorage.setItem(LOCALSTORAGE_KEY, json)
 			const id = setTimeout(() => {
-				setSaveStatus(2)
+				setSaveStatus(saveStatusEnum.Saved_before)
 				const id = setTimeout(() => {
-					setSaveStatus(3)
+					setSaveStatus(saveStatusEnum.Saved_after)
 				}, 1e3)
 				ids.push(id)
 			}, 500)
