@@ -66,7 +66,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 // export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"} data-codex-blockquote-item>
+// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
 // 		<Markdown className="hidden" syntax={syntax}>
 // 			{toReact(children) || (
 // 				<br />
@@ -97,6 +97,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
+	// -ml-6
 	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
