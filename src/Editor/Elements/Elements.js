@@ -87,10 +87,30 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 	</Root>
 ))
 
-// TODO: Rename to BlockquoteNode?
+// export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
+// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"}>
+// 		<Markdown className="hidden" syntax={syntax}>
+// 			{toReact(children) || (
+// 				<br />
+// 			)}
+// 		</Markdown>
+// 	</Node>
+// ))
+//
+// export const Blockquote = React.memo(({ id, children: range }) => (
+// 	<Root id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+// 		{range.map(({ type: T, ...each }) => (
+// 			React.createElement(typeEnumArray[T], {
+// 				key: each.id,
+// 				...each,
+// 			})
+// 		))}
+// 	</Root>
+// ))
+
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"}>
-		<Markdown className="hidden" syntax={syntax}>
+	<Node id={id} className="text-gray-600">
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -99,7 +119,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -220,7 +240,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 export const AnyList = React.memo(({ root, type, tag, id, children: range }) => {
 	const HOC = root ? Root : Node
 	return (
-		<HOC tag={tag} id={id} className="ml-5">
+		<HOC tag={tag} id={id} className="ml-6">
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
@@ -274,18 +294,16 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 // 	)
 // })
 
-const backgroundImage = (
-	"linear-gradient(" +
-		"transparent 0, " +
-		"transparent calc(0.75em - 1px), " +
-		"var(--gray-300) calc(0.75em - 1px), " +
-		"var(--gray-300) calc(0.75em + 1px), " +
-		"transparent calc(0.75em + 1px)" +
-	")"
-)
+const hr = "linear-gradient(" +
+	"transparent 0, " +
+	"transparent calc(0.75em - 1px), " +
+	"var(--gray-300) calc(0.75em - 1px), " +
+	"var(--gray-300) calc(0.75em + 1px), " +
+	"transparent calc(0.75em + 1px)" +
+")"
 
 export const Break = React.memo(({ id, syntax }) => (
-	<Root id={id} className="text-right" style={{ backgroundImage }}>
+	<Root id={id} className="text-right" style={{ backgroundImage: hr }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>
