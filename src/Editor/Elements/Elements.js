@@ -172,11 +172,11 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 const Checkbox = ({ id, checked }) => (
 	<Button
 		className={
-			`-mt-px inline-block w-4 h-4 align-middle ${
+			`-mt-px w-4 h-4 align-middle ${
 				!checked
 					? "bg-white shadow-hero"
 					: "bg-md-blue-a200 shadow"
-			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition ease-out duration-150`
+			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition duration-150`
 		}
 		data-codex-checkbox={checked}
 	>
@@ -187,7 +187,7 @@ const Checkbox = ({ id, checked }) => (
 )
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
-	<Node tag={tag} id={id} className="relative my-1" style={checked && attrs.strike.style} data-codex-checked={checked}>
+	<Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
 				<Checkbox id={id} checked={checked} />
