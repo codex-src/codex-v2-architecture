@@ -88,42 +88,26 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 // TODO: Rename to BlockquoteNode?
-export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
-	const style = { marginRight: "1ch" }
+export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
+	<Node id={id} className="text-gray-600">
+		<Markdown style={{ marginRight: "1ch" }} syntax={syntax}>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</Node>
+))
 
-	// const $syntax = [
-	// 	<React.Fragment>
-	// 		{syntax[0].slice(0, 1)}
-	// 		<span className="font-mono">
-	// 			{syntax[0].slice(1, 2)}
-	// 		</span>
-	// 	</React.Fragment>
-	// ]
-
-	return (
-		<Node id={id} className="text-gray-600">
-			<Markdown style={style} syntax={syntax}>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</Node>
-	)
-})
-
-export const Blockquote = React.memo(({ id, children: range }) => {
-	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
-	return (
-		<Root id={id} className="pl-6" style={style}>
-			{range.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumArray[T], {
-					key: each.id,
-					...each,
-				})
-			))}
-		</Root>
-	)
-})
+export const Blockquote = React.memo(({ id, children: range }) => (
+	<Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+		{range.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumArray[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</Root>
+))
 
 // export const Pre = props => (
 // 	<Node style={{ whiteSpace: "pre" }} {...props} />
@@ -257,15 +241,16 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
-
-	// NOTE: Assumes line-height is 1.5em
-	const style = { minHeight: "1.5em", maxHeight: "24em" }
 	return (
 		<Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				{/* NOTE: Use contentEditable={false} to make
-				unselectable */}
-				<img className="mx-auto" style={style} src={src} alt={alt} contentEditable={false} />
+				<img
+					className="mx-auto"
+					style={{ minHeight: "1.5em", maxHeight: "24em" }}
+					src={src}
+					alt={alt}
+					contentEditable={false}
+				/>
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
@@ -280,14 +265,33 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	)
 })
 
-export const Break = React.memo(({ id, syntax }) => {
-	// NOTE: Assumes line-height is 1.5em
-	const style = { backgroundImage: "linear-gradient(transparent 0, transparent calc(0.75em - 1px), var(--gray-300) calc(0.75em - 1px), transparent calc(0.75em + 1px))" }
-	return (
-		<Root id={id} className="text-right" style={style}>
-			<Markdown className="hidden" syntax={syntax}>
-				<br />
-			</Markdown>
-		</Root>
-	)
-})
+// export const Break = React.memo(({ id, syntax }) => {
+// 	const [{ readOnly }] = useEditorState()
+// 	return (
+// 		<Root id={id} className="relative text-right">
+// 			<Markdown className="text-transparent" syntax={syntax}>
+// 				<div className="absolute inset-0" contentEditable={false}>
+// 					<hr className="inline-block w-full border-t-2 select-none" style={{ verticalAlign: "15%" }} />
+// 				</div>
+// 			</Markdown>
+// 		</Root>
+// 	)
+// })
+
+const backgroundImage = (
+	"linear-gradient(" +
+		"transparent 0, " +
+		"transparent calc(0.75em - 1px), " +
+		"var(--gray-300) calc(0.75em - 1px), " +
+		"var(--gray-300) calc(0.75em + 1px), " +
+		"transparent calc(0.75em + 1px)" +
+	")"
+)
+
+export const Break = React.memo(({ id, syntax }) => (
+	<Root id={id} className="text-right" style={{ backgroundImage }}>
+		<Markdown className="hidden" syntax={syntax}>
+			<br />
+		</Markdown>
+	</Root>
+))
