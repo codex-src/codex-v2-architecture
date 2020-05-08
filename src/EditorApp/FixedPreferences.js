@@ -35,7 +35,7 @@ const FixedPreferences = ({
 					Zoom -
 				</Button>
 				<div
-					className="p-2 flex flex-row items-center font-medium text-xxs transition duration-500"
+					className="p-2 flex flex-row items-center font-medium text-xxs transition ease-out duration-500"
 					style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
 				>
 					Saved
