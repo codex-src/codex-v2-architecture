@@ -19,7 +19,7 @@ const isAlphabeticAstralPlaneRe = /\uD800[\uDC00-\uDC0B\uDC0D-\uDC26\uDC28-\uDC3
 
 // Returns whether a rune is an alphanumeric rune.
 export function isAlphanum(rune) {
-	if (!rune.length) {
+	if (!rune) {
 		return false
 	}
 	const codePoint = rune.codePointAt(0)

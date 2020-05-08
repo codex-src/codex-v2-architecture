@@ -1,6 +1,6 @@
 // Returns the rune at the start of a string.
 export function atStart(str) {
-	if (!str.length) {
+	if (!str) {
 		return ""
 	}
 	const runes = [...str]
@@ -9,7 +9,7 @@ export function atStart(str) {
 
 // Returns the rune at the end of a string.
 export function atEnd(str) {
-	if (!str.length) {
+	if (!str) {
 		return ""
 	}
 	const runes = [...str]

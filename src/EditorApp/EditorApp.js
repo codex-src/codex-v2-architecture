@@ -181,7 +181,7 @@ const App = () => {
 							state={state}
 							dispatch={dispatch}
 							readOnly={prefs.readOnly}
-							autoFocus={!data.length}
+							autoFocus={!data}
 						/>
 
 					</div>

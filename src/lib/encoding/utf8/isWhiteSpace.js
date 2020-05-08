@@ -37,7 +37,7 @@
 
 // Returns whether a rune is a h. white space rune.
 export function isHWhiteSpace(rune) {
-	if (!rune.length) {
+	if (!rune) {
 		return false
 	}
 	// // Fast pass:
@@ -72,7 +72,7 @@ export function isHWhiteSpace(rune) {
 
 // Returns whether a rune is a v. white space rune.
 export function isVWhiteSpace(rune) {
-	if (!rune.length) {
+	if (!rune) {
 		return false
 	}
 	// // Fast pass:

@@ -68,7 +68,7 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 //
 // TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInlineElements(str) {
-	if (!str.length) {
+	if (!str) {
 		return null
 	}
 	const elements = []

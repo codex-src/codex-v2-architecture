@@ -10,9 +10,7 @@ import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
-import { ascendNode } from "./ascendNodes"
 import { deeplySyncNodes } from "./syncNodes"
-import { isListItemElement } from "./listElements"
 
 import {
 	detectRedo,
@@ -317,7 +315,6 @@ const Editor = ({
 					if (detectUndo(e)) {
 						e.preventDefault()
 						const { data, nodes, pos1, pos2 } = state
-						// const currentState = { data, nodes, pos1, pos2 }
 						const currentState = { data, nodes, pos1, pos2 }
 						dispatch.undo(currentState)
 						return

@@ -236,7 +236,7 @@ const methods = state => ({
 		// the next rune:
 		const substr = state.data.slice(0, pos)
 		const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-		if (!rune.length) {
+		if (!rune) {
 			// No-op; defer to end
 		// Iterate alphanumerics:
 		} else if (utf8.isAlphanum(rune)) {
@@ -290,7 +290,7 @@ const methods = state => ({
 		// the next rune:
 		const substr = state.data.slice(pos)
 		const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-		if (!rune.length) {
+		if (!rune) {
 			// No-op; defer to end
 		// Iterate alphanumerics:
 		} else if (utf8.isAlphanum(rune)) {
