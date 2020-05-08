@@ -187,8 +187,6 @@ const App = () => {
 					</div>
 				</DocumentTitleAndEmoji>
 				<Transition
-					// NOTE: Use duration-200 not duration-300 and
-					// omit transition-timing-function
 					show={!state.readOnly}
 					enter="transition duration-200"
 					enterFrom="opacity-0"

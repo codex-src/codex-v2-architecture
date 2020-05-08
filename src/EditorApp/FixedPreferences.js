@@ -35,12 +35,12 @@ const FixedPreferences = ({
 					Zoom -
 				</Button>
 				<div
-					className="p-2 flex flex-row items-center font-medium text-xxs transition duration-300"
+					className="p-2 flex flex-row items-center font-medium text-xxs transition duration-500"
 					style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
 				>
 					Saved
 					<svg
-						className="ml-1 w-4 h-4 text-green-500"
+						className="ml-1 w-4 h-4 text-green-500 transform scale-90"
 						fill="none"
 						strokeLinecap="round"
 						strokeLinejoin="round"

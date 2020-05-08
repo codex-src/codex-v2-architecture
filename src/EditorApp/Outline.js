@@ -33,8 +33,8 @@ const Outline = ({
 
 			{/* Title */}
 			<Button
-				// NOTE: Use w-full text-left because of <Button>
-				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-300"
+				// NOTE: Use w-full because of <Button>
+				className="py-1 flex flex-row items-center w-full text-gray-500 hover:text-blue-500 truncate transition duration-200"
 				onPointerEnter={() => setHoverOutline(true)}
 				onPointerLeave={() => setHoverOutline(false)}
 				onClick={toggleOutline}
@@ -49,8 +49,6 @@ const Outline = ({
 					viewBox="0 0 24 24"
 				>
 					<Transition
-						// NOTE: Use duration-200 not duration-300 and
-						// omit transition-timing-function
 						show={!hoverOutline}
 						enter="transition duration-200"
 						enterFrom="opacity-0 transform -translate-x-8"
@@ -62,8 +60,6 @@ const Outline = ({
 						<path d="M4 6h16M4 12h16M4 18h7"></path>
 					</Transition>
 					<Transition
-						// NOTE: Use duration-200 not duration-300 and
-						// omit transition-timing-function
 						show={hoverOutline}
 						enter="transition duration-200"
 						enterFrom="opacity-0 transform translate-x-8"
@@ -89,9 +85,9 @@ const Outline = ({
 			<ul>
 				{outline.map(({ id, hash, secondary, children }) => (
 					<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
-						{id !== "" && (
+						{id && (
 							<a href={`#${hash}`}>
-								<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+								<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-200">
 									{children.trim() || "Untitled"}
 								</h1>
 							</a>
@@ -100,7 +96,7 @@ const Outline = ({
 							{secondary.map(({ id, hash, children }) => (
 								<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
 									<a href={`#${hash}`}>
-										<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-300">
+										<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-200">
 											{children.trim() || "Untitled"}
 										</h2>
 									</a>

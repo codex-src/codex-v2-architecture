@@ -176,7 +176,7 @@ const Checkbox = ({ id, checked }) => (
 				!checked
 					? "bg-white shadow-hero"
 					: "bg-md-blue-a200 shadow"
-			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition duration-150`
+			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition duration-200`
 		}
 		data-codex-checkbox={checked}
 	>
