@@ -97,11 +97,11 @@ function parseElements(nodes, cachedElements) {
 			break
 		// <Blockquote>
 		case ">":
-			if (each.data.slice(0, 2) === "> " || each.data === ">") {
+			if (testBlockquote(each)) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (nodes[x2].data.slice(0, 2) !== "> " && nodes[x2].data !== ">") {
+					if (!testBlockquote(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}

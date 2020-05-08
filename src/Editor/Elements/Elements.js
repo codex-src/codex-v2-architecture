@@ -38,27 +38,6 @@ function trim(str) {
 	return str.replace(/ +/g, " ")
 }
 
-// const headerClassNames = readOnly => ({
-// 	h1: !readOnly
-// 		? trim("font-semibold text-3xl leading-tight antialiased")
-// 		: trim("font-semibold text-3xl leading-tight antialiased"),
-// 	h2: !readOnly
-// 		? trim("font-semibold text-2xl leading-tight antialiased")
-// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-2xl leading-tight border-b antialiased"),
-// 	h3: !readOnly
-// 		? trim("font-semibold text-xl  leading-tight antialiased")
-// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
-// 	h4: !readOnly
-// 		? trim("font-semibold text-xl  leading-tight antialiased")
-// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
-// 	h5: !readOnly
-// 		? trim("font-semibold text-xl  leading-tight antialiased")
-// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
-// 	h6: !readOnly
-// 		? trim("font-semibold text-xl  leading-tight antialiased")
-// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
-// })
-
 const headerClassNames = {
 	h1: trim("font-semibold text-3xl leading-tight antialiased"),
 	h2: trim("font-semibold text-2xl leading-tight antialiased"),
@@ -69,7 +48,6 @@ const headerClassNames = {
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	// <Root id={id} className={headerClassNames(readOnly)[tag]}>
 	<Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
@@ -248,9 +226,8 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	return (
 		<Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				{/* NOTE: Use contentEditable={false} to prevent
-				selection */}
-				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} contentEditable={false} />
+				{/* contentEditable={false} */}
+				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">

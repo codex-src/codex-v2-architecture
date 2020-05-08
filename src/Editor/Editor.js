@@ -1,12 +1,13 @@
+// import syncDOM from "./syncDOM"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
+import decorator from "./decorator"
 import EditorContext from "./EditorContext"
 import keyCodes from "./keyCodes"
 import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
-import syncDOM from "./syncDOM"
 import syncDOMPos from "./syncDOMPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import { ascendNode } from "./ascendNodes"
@@ -82,7 +83,6 @@ const Editor = ({
 	}, [readOnly])
 
 	// Renders to the DOM.
-	const mountedDOM = React.useRef()
 	React.useLayoutEffect(
 		React.useCallback(() => {
 
@@ -91,60 +91,15 @@ const Editor = ({
 			ReactDOM.render(<ReactEditor state={state} dispatch={dispatch} />, state.reactDOM, () => {
 
 				console.log(`ReactDOM.render=${Date.now() - t}`)
-				t = Date.now()
 
 				const syncedNodes = deeplySyncNodes(state.reactDOM, ref.current)
-				for (const each of syncedNodes) {
-					if (each.nodeType !== Node.ELEMENT_NODE || (each.nodeName !== "UL" && each.nodeName !== "OL")) {
-						// No-op
-						continue
-					}
-					const checkboxes = each.querySelectorAll("li > .absolute > [data-codex-checkbox]")
-					for (const each of checkboxes) {
-						const { id } = each
-							.parentElement // <div class="absolute">
-							.parentElement // <li id="...">
-						each.onpointerdown = e => {
-							e.preventDefault()
-						}
-						each.onclick = () => {
-							// Blur to prevent auto-scrolling:
-							document.activeElement.blur()
-							dispatch.checkTodo(id)
-							each.focus()
-						}
-					}
-				}
-				// console.log(syncedNodes)
-
-				// // Sync DOM:
-				// syncDOM(state.reactDOM, ref.current, clonedElement => {
-				// 	if (clonedElement.nodeName !== "UL" && clonedElement.nodeName !== "OL") {
-				// 		// No-op
-				// 		return
-				// 	}
-				// 	const checkboxes = clonedElement.querySelectorAll("li > .absolute > [data-codex-checkbox]")
-				// 	for (const each of checkboxes) {
-				// 		const { id } = each
-				// 			.parentElement // <div class="absolute">
-				// 			.parentElement // <li id="$uuid">
-				// 		each.onpointerdown = e => {
-				// 			e.preventDefault()
-				// 		}
-				// 		each.onclick = () => {
-				// 			document.activeElement.blur()
-				// 			dispatch.checkTodo(id)
-				// 		}
-				// 	}
-				// })
-
-				console.log(`syncDOM=${Date.now() - t}`)
-				t = Date.now()
-
-				if (!mountedDOM.current || state.readOnly || !state.focused) {
-					mountedDOM.current = true
+				decorator(state, dispatch)(syncedNodes)
+				if (state.readOnly || !state.focused) {
+					// No-op
 					return
 				}
+
+				t = Date.now()
 
 				// Sync DOM cursors:
 				try {
