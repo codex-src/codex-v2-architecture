@@ -393,7 +393,6 @@ const methods = state => ({
 	checkTodo(id) {
 		state.history.mutate()
 
-		// state.focused = false
 		const node = state.nodes.find(each => each.id === id)
 		let [, tabs, syntax] = node.data.match(AnyListRe)
 		if (syntax === "- [ ] ") {

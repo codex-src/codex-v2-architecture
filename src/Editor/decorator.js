@@ -12,15 +12,25 @@ function decorator(state, dispatch) {
 			const checkboxes = each.querySelectorAll("[data-codex-node] > .absolute > [data-codex-checkbox]")
 			for (const each of checkboxes) {
 				const { id } = each.parentElement.parentElement
-				const toggleCheck = () => {
-					// TODO: Use selection.removeAllRanges instead?
-					document.activeElement.blur()
+
+				// Check handler for synthetic checkboxes.
+				const checkTodo = id => {
+					// NOTE: document.activeElement.blur and
+					// selection.removeAllRanges do not remove the
+					// selection in Firefox
+					//
+					// document.activeElement.blur()
+					const selection = document.getSelection()
+					if (selection.rangeCount) {
+						selection.removeAllRanges()
+					}
 					dispatch.checkTodo(id)
 					each.focus()
 				}
+
 				each.onpointerdown = e => {
 					e.preventDefault()
-					toggleCheck()
+					checkTodo(id)
 				}
 				// Custom space handler; prevents Firefox from
 				// scrolling.
@@ -29,8 +39,7 @@ function decorator(state, dispatch) {
 						// No-op
 						return
 					}
-					e.preventDefault()
-					toggleCheck()
+					checkTodo(id)
 				}
 			}
 		}
