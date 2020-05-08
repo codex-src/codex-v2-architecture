@@ -20,12 +20,6 @@ import {
 	isMetaOrCtrlKey,
 } from "./detect"
 
-import {
-	AnyListRe,
-	TaskListRe,
-	UnorderedListRe,
-} from "./parser/spec"
-
 import "./Editor.css"
 import "./tailwind-colors.css"
 import "./tailwind-overrides.css"
@@ -283,22 +277,13 @@ const Editor = ({
 						}
 						// Tab:
 						if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
-							if (document.activeElement.getAttribute("data-codex-checkbox")) {
+							const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
+							if (focusedCheckbox) {
 								// No-op
 								return
 							}
 							e.preventDefault()
-							// TODO: Use document.activeElement instead?
-							const selection = document.getSelection()
-							const range = selection.getRangeAt(0)
-							if (state.pos1.pos === state.pos2.pos && !isListItemElement(ascendNode(range.startContainer))) {
-								dispatch.tab()
-							} else if (!e.shiftKey) {
-								dispatch.tabMany()
-							} else {
-								dispatch.detabMany()
-							}
-							// No-op
+							dispatch.tab(e.shiftKey)
 							return
 						// Enter:
 						} else if (e.keyCode === keyCodes.Enter) {

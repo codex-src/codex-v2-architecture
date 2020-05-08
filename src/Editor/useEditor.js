@@ -346,10 +346,18 @@ const methods = state => ({
 		}
 		this.dropBytes(dropL, 0)
 	},
-	// Inserts a tab character at the insertion point.
-	tab() {
+	// Inserts a tab character.
+	tab(shiftKey) {
 		state.history.mutate()
-		this.write("\t")
+
+		const node = state.nodes[state.pos1.y]
+		if (state.pos1.pos === state.pos2.pos && !AnyListRe.test(node.data)) {
+			this.write("\t")
+		} else if (!shiftKey) {
+			this.tabMany()
+		} else {
+			this.detabMany()
+		}
 	},
 	// Tabs one-to-many paragraphs.
 	tabMany() {
@@ -391,22 +399,21 @@ const methods = state => ({
 	enter() {
 		state.history.mutate()
 
-		let autoComplete = ""
 		const node = state.nodes[state.pos1.y]
 		if (state.pos1.pos === state.pos2.pos && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
-			// EOL and empty:
 			const [, tabs, syntax] = node.data.match(AnyListRe)
 			if ((tabs + syntax) === node.data) {
-				this.backspaceParagraph()
+				this.backspaceParagraph() // Revert to paragraph
 				return
 			}
-			// EOL and not empty:
-			let autoComplete = tabs + syntax
-			if (TaskListRe.test(autoComplete)) {
-				autoComplete = `${tabs}- [ ] `
+			let autoSyntax = tabs + syntax
+			if (TaskListRe.test(autoSyntax)) {
+				autoSyntax = `${tabs}- [ ] ` // Prefer unchecked for added todos
 			}
+			this.write(`\n${autoSyntax}`)
+			return
 		}
-		this.write(`\n${autoComplete}`)
+		this.write("\n")
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {
@@ -432,8 +439,6 @@ const methods = state => ({
 		// No-op
 	},
 	// Pastes character data.
-	//
-	// TODO: Add pasteFromHTML handler
 	paste(data) {
 		state.history.mutate()
 		this.write(data)
