@@ -62,16 +62,24 @@ const Editor = ({
 
 	// Registers props (once).
 	const mountedProps = React.useRef()
-	React.useLayoutEffect(() => {
-		if (mountedProps.current) {
-			// NOTE: Uncomment to focus the editor on read-write
-			// mode
-			dispatch.registerProps({ readOnly })
+	React.useEffect(() => {
+		if (!mountedProps.current) {
+			mountedProps.current = true
+			dispatch.registerProps({ readOnly, autoFocus })
 			return
 		}
-		mountedProps.current = true
-		dispatch.registerProps({ readOnly, autoFocus })
+		dispatch.registerProps({ readOnly })
 	}, [readOnly, autoFocus, dispatch])
+
+	// Removes selection on read-only.
+	React.useEffect(() => {
+		const selection = document.getSelection()
+		if (!selection.rangeCount) {
+			// No-op
+			return
+		}
+		selection.removeAllRanges()
+	}, [readOnly])
 
 	// Renders to the DOM.
 	const mountedDOM = React.useRef()
@@ -374,12 +382,12 @@ const Editor = ({
 
 							let autoSyntax = ""
 							// if (state.pos1.pos === state.pos2.pos && isBlockquoteItemElement()) {
-							// 	const node = state.nodes[state.pos1.y]
-							// 	if (node.data === "> ") {
-							// 		dispatch.backspaceParagraph()
-							// 		return
-							// 	}
-							// 	autoSyntax = "> "
+							// 	// const node = state.nodes[state.pos1.y]
+							// 	// if (node.data === "> ") {
+							// 	// 	dispatch.backspaceParagraph()
+							// 	// 	return
+							// 	// }
+							// 	autoSyntax = ">"
 							if (state.pos1.pos === state.pos2.pos && isFocusedListItemElement()) {
 								const node = state.nodes[state.pos1.y]
 								const [, tabs, syntax] = node.data.match(AnyListRe)

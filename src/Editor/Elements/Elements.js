@@ -88,7 +88,7 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 ))
 
 // export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"}>
+// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-5 text-gray-600"} data-codex-blockquote-item>
 // 		<Markdown className="hidden" syntax={syntax}>
 // 			{toReact(children) || (
 // 				<br />
@@ -191,22 +191,6 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</Node>
 ))
 
-// const Checkbox = ({ id, checked }) => (
-// 	<input
-// 		className={
-// 			`form-checkbox flex-shrink-0 w-4 h-4 text-md-blue-a200 ${
-// 				!checked
-// 					? "shadow-hero"
-// 					: "shadow"
-// 			} rounded-md transform scale-105 transition duration-150`
-// 		}
-// 		type="checkbox"
-// 		// contentEditable={false}
-// 		checked={checked}
-// 		data-codex-checkbox={checked}
-// 	/>
-// )
-
 const Checkbox = ({ id, checked }) => (
 	<Button
 		className={
@@ -284,11 +268,12 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 // export const Break = React.memo(({ id, syntax }) => {
 // 	const [{ readOnly }] = useEditorState()
 // 	return (
-// 		<Root id={id} className="relative text-right">
-// 			<Markdown className="text-transparent" syntax={syntax}>
-// 				<div className="absolute inset-0" contentEditable={false}>
-// 					<hr className="inline-block w-full border-t-2 select-none" style={{ verticalAlign: "15%" }} />
-// 				</div>
+// 		<Root id={id}>
+// 			<Markdown syntax={syntax}>
+// 				{readOnly && (
+// 					<hr className="inline-block w-full border-t-2"
+// 						style={{ verticalAlign: "15%" }} />
+// 				)}
 // 			</Markdown>
 // 		</Root>
 // 	)
