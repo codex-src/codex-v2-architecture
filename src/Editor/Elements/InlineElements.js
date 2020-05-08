@@ -15,7 +15,7 @@ export const Escape = ({ syntax, children }) => (
 )
 
 export const Emoji = ({ description, children }) => (
-	<span className="emoji" aria-label={description} role="img">
+	<span aria-label={description} role="img" data-codex-emoji>
 		<Markdown>
 			{children}
 		</Markdown>

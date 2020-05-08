@@ -46,14 +46,14 @@
 	font-weight: 700;
 }
 
-.codex-editor .emoji {
+.codex-editor [data-codex-emoji] {
 	vertical-align: -10%;
 	font-size: 120%;
 	line-height: 1;
 }
-.codex-editor .emojis.emojis__1,
-.codex-editor .emojis.emojis__2,
-.codex-editor .emojis.emojis__3 {
+.codex-editor [data-codex-emojis="1"],
+.codex-editor [data-codex-emojis="2"],
+.codex-editor [data-codex-emojis="3"] {
 	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
 }
 

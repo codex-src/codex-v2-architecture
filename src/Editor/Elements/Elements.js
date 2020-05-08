@@ -38,6 +38,27 @@ function trim(str) {
 	return str.replace(/ +/g, " ")
 }
 
+// const headerClassNames = readOnly => ({
+// 	h1: !readOnly
+// 		? trim("font-semibold text-3xl leading-tight antialiased")
+// 		: trim("font-semibold text-3xl leading-tight antialiased"),
+// 	h2: !readOnly
+// 		? trim("font-semibold text-2xl leading-tight antialiased")
+// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-2xl leading-tight border-b antialiased"),
+// 	h3: !readOnly
+// 		? trim("font-semibold text-xl  leading-tight antialiased")
+// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
+// 	h4: !readOnly
+// 		? trim("font-semibold text-xl  leading-tight antialiased")
+// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
+// 	h5: !readOnly
+// 		? trim("font-semibold text-xl  leading-tight antialiased")
+// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
+// 	h6: !readOnly
+// 		? trim("font-semibold text-xl  leading-tight antialiased")
+// 		: trim("mt-2 mb-1 pt-2 pb-1 font-semibold text-xl  leading-tight border-b antialiased"),
+// })
+
 const headerClassNames = {
 	h1: trim("font-semibold text-3xl leading-tight antialiased"),
 	h2: trim("font-semibold text-2xl leading-tight antialiased"),
@@ -47,27 +68,8 @@ const headerClassNames = {
 	h6: trim("font-semibold text-xl  leading-tight antialiased"),
 }
 
-// export const Header = React.memo(({ tag, id, syntax, hash, children }) => {
-// 	const [{ readOnly }] = useEditorState()
-//
-// 	return (
-// 		React.createElement(
-// 			!readOnly ? Root : "a",
-// 			{
-// 				id: !readOnly ? id : hash,
-// 				className: headerClassNames[tag],
-// 				href: !readOnly ? undefined : `#${hash}`,
-// 			},
-// 			<Markdown syntax={syntax}>
-// 				{toReact(children) || (
-// 					<br />
-// 				)}
-// 			</Markdown>,
-// 		)
-// 	)
-// })
-
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
+	// <Root id={id} className={headerClassNames(readOnly)[tag]}>
 	<Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
@@ -77,20 +79,27 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</Root>
 ))
 
-export const Paragraph = React.memo(({ id, emojis, children }) => {
-	// const style = { margin: !children && "-0.25em 0" }
-	return (
-		<Root id={id} className={!emojis ? null : `emojis emojis__${emojis}`} /* style={style} */>
-			{toReact(children) || (
-				<br />
-			)}
-		</Root>
-	)
-})
+export const Paragraph = React.memo(({ id, emojis, children }) => (
+	<Root id={id} data-codex-emojis={emojis}>
+		{toReact(children) || (
+			<br />
+		)}
+	</Root>
+))
 
 // TODO: Rename to BlockquoteNode?
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 	const style = { marginRight: "1ch" }
+
+	// const $syntax = [
+	// 	<React.Fragment>
+	// 		{syntax[0].slice(0, 1)}
+	// 		<span className="font-mono">
+	// 			{syntax[0].slice(1, 2)}
+	// 		</span>
+	// 	</React.Fragment>
+	// ]
+
 	return (
 		<Node id={id} className="text-gray-600">
 			<Markdown style={style} syntax={syntax}>
@@ -103,11 +112,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => {
 })
 
 export const Blockquote = React.memo(({ id, children: range }) => {
-	const [{ readOnly }] = useEditorState()
-
 	const style = { boxShadow: "inset 0.25em 0 var(--gray-300)" }
 	return (
-		<Root id={id} className={!readOnly ? undefined : "pl-6"} style={!readOnly ? undefined : style}>
+		<Root id={id} className="pl-6" style={style}>
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
