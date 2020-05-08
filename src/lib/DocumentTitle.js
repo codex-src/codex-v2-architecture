@@ -6,10 +6,12 @@ const DocumentTitle = ({ title, children }) => {
 			// No-op
 			return
 		}
+		const originalTitle = document.title
 		document.title = title
+		return () => {
+			document.title = originalTitle
+		}
 	}, [title])
-	// NOTE: Use children || null so <DocumentTitle> can be
-	// used as an effect
 	return children || null
 }
 

@@ -58,7 +58,7 @@ function useOutline(editorState) {
 		}
 	}, [editorState])
 
-	return [outline, setOutline]
+	return outline
 }
 
 export default useOutline

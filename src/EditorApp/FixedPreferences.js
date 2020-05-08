@@ -40,7 +40,7 @@ const FixedPreferences = ({
 				// NOTE: Use duration-200 not duration-300 and omit
 				// transition-timing-function
 				unmountOnExit={false}
-				show={scrollY > 0}
+				// show={scrollY > 0}
 				enter="transition duration-200"
 				enterFrom="bg-transparent shadow-none"
 				enterTo="bg-white shadow-hero"
@@ -121,24 +121,12 @@ const FixedPreferences = ({
 								</svg>
 							)}
 						</Button>
-						{/* <Button */}
-						{/* 	className="p-2 font-medium text-xxs underline" */}
-						{/* 	onClick={prefsDispatch.showReadme} */}
-						{/* > */}
-						{/* 	Readme (Esc) */}
-						{/* </Button> */}
 						<Button
 							className="p-2 font-medium text-xxs underline"
 							onClick={prefsDispatch.showHTML}
 						>
 							HTML (Esc)
 						</Button>
-						{/* <Button */}
-						{/* 	className="p-2 font-medium text-xxs underline" */}
-						{/* 	onClick={prefsDispatch.showReact_js} */}
-						{/* > */}
-						{/* 	JSX */}
-						{/* </Button> */}
 					</div>
 
 				</div>
@@ -158,9 +146,6 @@ const FixedPreferences = ({
 			>
 				{/* NOTE: leaveTo classes are duplicated at the end */}
 				<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch transform opacity-0 translate-x-32 pointer-events-none">
-					{/* {prefs.renderMode === renderModesEnum.Readme ? ( */}
-					{/* 	<ReadmeEditor readOnly={prefs.readOnly} /> */}
-					{/* ) : ( */}
 					<span className="inline-block">
 						<pre className="font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
 							<Highlighted extension={prefs.extension}>
@@ -168,7 +153,6 @@ const FixedPreferences = ({
 							</Highlighted>
 						</pre>
 					</span>
-					{/* )} */}
 				</div>
 			</Transition>
 

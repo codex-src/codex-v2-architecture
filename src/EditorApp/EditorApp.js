@@ -1,4 +1,4 @@
-import DocumentTitle from "lib/DocumentTitle"
+import DocumentTitleAndEmoji from "lib/DocumentTitleAndEmoji"
 import download from "lib/download"
 import Editor from "Editor/Editor"
 import FixedPreferences from "./FixedPreferences"
@@ -12,12 +12,11 @@ import useOutline from "./useOutline"
 import usePreferences from "./Preferences/usePreferences"
 import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
-import useTitle from "./useTitle"
-import { atStart as emojiAtStart } from "emoji-trie"
-import { atStart as runeAtStart } from "lib/encoding/utf8"
+import useTitleAndEmoji from "./useTitleAndEmoji"
 import { isMetaOrCtrlKey } from "Editor/detect"
 import { LOCALSTORAGE_KEY } from "./constants"
 import { toText } from "Editor/Elements/cmap"
+import { useDOMContentLoaded } from "Editor/hooks/useDOMContentLoaded"
 
 // document.body.classList.toggle("debug-css")
 
@@ -34,63 +33,26 @@ const data = (() => {
 })()
 
 const App = () => {
+	// TODO: Move showOutline to prefs?
 	const [state, dispatch] = useEditor(data)
 	const [prefs, prefsDispatch] = usePreferences(state)
 
-	// The status bar left-hand and right-hand side.
-	const [[statusLHS, statusRHS]] = useStatusBars(state)
+	const meta = useTitleAndEmoji(state)
+	const saveStatus = useSaveStatus(state)
+	const outline = useOutline(state)
 
 	// The outline data structure.
 	const [showOutline, setShowOutline] = React.useState(true)
-	const [outline] = useOutline(state)
 
-	// The save status (number; 1-4).
-	const [saveStatus] = useSaveStatus(state)
+	const [statusLHS, statusRHS] = useStatusBars(state)
 
-	// The plain text title.
-	const [title] = useTitle(state)
-
-	// https://css-tricks.com/emojis-as-favicons
-	//
-	// TODO: Extract to useEmojiAsFavicon(title)
-	React.useEffect(() => {
-		let emoji = ""
-		let x = 0
-		while (x < title.length) {
-			const emojiInfo = emojiAtStart(title.slice(x))
-			if (emojiInfo) {
-				emoji = emojiInfo.emoji
-				break
-			}
-			const rune = runeAtStart(title.slice(x))
-			x += rune.length
-		}
-		if (!emoji.length) {
-			// No-op
-			return
-		}
-		const link = document.querySelector("link[rel='icon']")
-		const original = link.href
-		// <text y=%22.9em%22 font-size=%2290%22>
-		link.href = `
-			data:image/svg+xml,
-				<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>
-					<text y=%220.875em%22 font-size=%22100%22>
-						${emoji}
-					</text>
-				</svg>
-		`.split(/[\n\t]+/).join("")
-		return () => {
-			link.href = original
-		}
-	}, [title])
+	const DOMContentLoaded = useDOMContentLoaded()
 
 	// Updates renderers.
-	const mounted = React.useRef()
 	React.useEffect(
 		React.useCallback(() => {
-			if (!mounted.current || !prefs.showSidebar) {
-				mounted.current = true
+			if (!DOMContentLoaded) {
+				// No-op
 				return
 			}
 			const id = setTimeout(() => {
@@ -99,8 +61,8 @@ const App = () => {
 			return () => {
 				clearTimeout(id)
 			}
-		}, [state, prefs, prefsDispatch]),
-		[state.data, state.pos1, state.pos2],
+		}, [DOMContentLoaded, state, prefsDispatch]),
+		[DOMContentLoaded, state.data],
 	)
 
 	// Shortcut: command-s.
@@ -161,27 +123,6 @@ const App = () => {
 	}, [prefsDispatch])
 
 	return (
-
-	// TODO: Change to Provider API or consolidate to
-	// usePreferences; rename to useEditorApp
-	//
-	// <Provider value={{
-	// 	statusLHS,
-	// 	statusRHS,
-	// 	showOutline,
-	// 	setShowOutline,
-	// 	outline,
-	// 	saveStatus,
-	// 	title,
-	//
-	// 	state,
-	// 	dispatch,
-	// 	prefs,
-	// 	prefsDispatch,
-	// }}>
-	//
-	// </Provider>
-
 		// NOTE: Use items-start for sticky
 		<div className="px-6 py-32 flex flex-row justify-center items-start">
 
@@ -204,7 +145,7 @@ const App = () => {
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>
-				<Outline showOutlineTuple={[showOutline, setShowOutline]} title={title}>
+				<Outline showOutlineTuple={[showOutline, setShowOutline]} title={meta.title}>
 					{outline}
 				</Outline>
 			</Transition>
@@ -212,7 +153,7 @@ const App = () => {
 			{/* RHS */}
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
-				<DocumentTitle title={title || "Untitled"}>
+				<DocumentTitleAndEmoji title={meta.title || "Untitled"} emoji={meta.emoji}>
 					<div className="relative">
 
 						{/* Placeholder */}
@@ -242,7 +183,7 @@ const App = () => {
 						/>
 
 					</div>
-				</DocumentTitle>
+				</DocumentTitleAndEmoji>
 				<Transition
 					// NOTE: Use duration-200 not duration-300 and
 					// omit transition-timing-function

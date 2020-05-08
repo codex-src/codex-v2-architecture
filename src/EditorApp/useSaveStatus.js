@@ -6,6 +6,7 @@ import { LOCALSTORAGE_KEY } from "./constants"
 // 2 - Saved (before)
 // 3 - Saved (after)
 //
+// TODO: Add NumberEnum pattern
 function useSaveStatus(editorState) {
 	const [saveStatus, setSaveStatus] = React.useState(0)
 
@@ -34,7 +35,7 @@ function useSaveStatus(editorState) {
 		}
 	}, [editorState.data])
 
-	return [saveStatus, setSaveStatus]
+	return saveStatus
 }
 
 export default useSaveStatus

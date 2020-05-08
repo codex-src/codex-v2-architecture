@@ -13,6 +13,7 @@ import typeEnumArray from "./Elements/typeEnumArray"
 import { ascendNode } from "./ascendNodes"
 import { deeplySyncNodes } from "./syncNodes"
 import { isListItemElement } from "./listElements"
+import { useDOMContentLoaded } from "./hooks/useDOMContentLoaded"
 
 import {
 	detectRedo,
@@ -139,28 +140,12 @@ const Editor = ({
 		[state.readOnly, state.elements],
 	)
 
-	// React.useEffect(() => {
-	// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
-	// 	if (!computed || !computed.offset) {
-	// 		// No-op
-	// 		return
-	// 	}
-	// 	const { scrollingElement, offset } = computed
-	// 	scrollingElement.scrollBy(0, offset)
-	// }, [state.pos1, state.pos2, scrollTopOffset, scrollBottomOffset])
-
 	// Rerenders on DOMContentLoaded for syntax highlighting.
-	React.useEffect(() => {
-		const handler = () => {
-			dispatch.render()
-		}
-		document.addEventListener("DOMContentLoaded", handler)
-		return () => {
-			document.removeEventListener("DOMContentLoaded", handler)
-		}
-	}, [dispatch])
+	useDOMContentLoaded(dispatch.render)
 
 	// Pushes the next undo (debounced).
+	//
+	// TODO: Extract to useHistory?
 	React.useEffect(
 		React.useCallback(() => {
 			if (state.readOnly) {
@@ -181,7 +166,6 @@ const Editor = ({
 
 	// Exclusively returns a function for read-write mode.
 	const newReadWriteHandler = handler => {
-		// return !state.readOnly ? handler : undefined
 		if (!state.readOnly) {
 			return handler
 		}
