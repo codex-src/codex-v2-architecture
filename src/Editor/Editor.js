@@ -1,4 +1,3 @@
-// import syncDOM from "./syncDOM"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import decorator from "./decorator"
@@ -8,12 +7,12 @@ import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
-import syncDOMPos from "./syncDOMPos"
+import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
+import useDOMContentLoaded from "./hooks/useDOMContentLoaded"
 import { ascendNode } from "./ascendNodes"
 import { deeplySyncNodes } from "./syncNodes"
 import { isListItemElement } from "./listElements"
-import { useDOMContentLoaded } from "./hooks/useDOMContentLoaded"
 
 import {
 	detectRedo,
@@ -104,13 +103,13 @@ const Editor = ({
 
 				// Sync DOM cursors:
 				try {
-					syncDOMPos(ref.current, [state.pos1, state.pos2])
+					syncPos(ref.current, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 					return
 				}
 
-				console.log(`syncDOMPos=${Date.now() - t}`)
+				console.log(`syncPos=${Date.now() - t}`)
 
 				// Defer to useEffect:
 				const id = setTimeout(() => {
@@ -140,8 +139,15 @@ const Editor = ({
 		[state.readOnly, state.elements],
 	)
 
-	// Rerenders on DOMContentLoaded for syntax highlighting.
-	useDOMContentLoaded(dispatch.render)
+	const DOMContentLoaded = useDOMContentLoaded()
+
+	// Rerenders on DOMContentLoaded.
+	React.useEffect(
+		React.useCallback(() => {
+			dispatch.render()
+		}, [dispatch]),
+		[DOMContentLoaded],
+	)
 
 	// Pushes the next undo (debounced).
 	//

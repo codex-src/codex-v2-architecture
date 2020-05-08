@@ -48,8 +48,8 @@ function computeRange(editorRoot, { pos }) {
 	return range
 }
 
-// Synchronizes DOM cursors.
-function syncDOMPos(editorRoot, [pos1, pos2]) {
+// Synchronizes cursors.
+function syncPos(editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
 	// https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
 	// if (!selection.rangeCount) {
@@ -77,4 +77,4 @@ function syncDOMPos(editorRoot, [pos1, pos2]) {
 	return true
 }
 
-export default syncDOMPos
+export default syncPos

@@ -7,6 +7,7 @@ import raw from "raw.macro"
 import React from "react"
 import StatusBars from "./StatusBars"
 import Transition from "lib/Transition"
+import useDOMContentLoaded from "Editor/hooks/useDOMContentLoaded"
 import useEditor from "Editor/useEditor"
 import useOutline from "./useOutline"
 import usePreferences from "./Preferences/usePreferences"
@@ -16,7 +17,6 @@ import useTitleAndEmoji from "./useTitleAndEmoji"
 import { isMetaOrCtrlKey } from "Editor/detect"
 import { LOCALSTORAGE_KEY } from "./constants"
 import { toText } from "Editor/Elements/cmap"
-import { useDOMContentLoaded } from "Editor/hooks/useDOMContentLoaded"
 
 // document.body.classList.toggle("debug-css")
 
