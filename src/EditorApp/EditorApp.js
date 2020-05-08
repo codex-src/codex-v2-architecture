@@ -56,7 +56,7 @@ const App = () => {
 	// (2 of 2)
 	React.useEffect(
 		React.useCallback(() => {
-			if (!DOMContentLoaded) {
+			if (!DOMContentLoaded || !prefs.showSidebar) {
 				// No-op
 				return
 			}
@@ -66,8 +66,8 @@ const App = () => {
 			return () => {
 				clearTimeout(id)
 			}
-		}, [DOMContentLoaded, state, prefsDispatch]),
-		[DOMContentLoaded, state.data],
+		}, [DOMContentLoaded, state, prefs, prefsDispatch]),
+		[DOMContentLoaded, state.data, prefs.showSidebar],
 	)
 
 	// Shortcut: command-s.
