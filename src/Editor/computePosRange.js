@@ -96,6 +96,17 @@ function computePos(editorState, editorRoot, range) {
 	if (extID) {
 		childrenOffset = [...editorRoot.children].findIndex(each => each.id === extID)
 	}
+
+	// // Compares two cursor data structures.
+	// const comparePos = (pos1, pos2) => {
+	// 	const ok = (
+	// 		pos1.x === pos2.x &&
+	// 		pos1.y === pos2.y &&
+	// 		pos1.pos === pos2.pos
+	// 	)
+	// 	return ok
+	// }
+
 	// Compute cursor data structure based on the DOM; use
 	// childrenOffset to offset data-codex-root elements:
 	const domPos = computeDOMPos(editorRoot, childrenOffset, range)

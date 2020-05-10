@@ -53,24 +53,38 @@ function computeRange(editorState, editorRoot, { pos }) {
 
 	// NOTE: pos.x and pos.y are out of sync because of
 	// dispatch.write; use pos.pos e.g. { pos }
-	let p = pos // TODO: Use pos instead
+	let posCopy = pos // TODO: Use pos instead
 
 	let id = ""
 	for (let x = 0; x < nodes.length; x++) {
-		if (p - nodes[x].data.length <= 0) {
+		if (posCopy - nodes[x].data.length <= 0) {
 			id = nodes[x].id
 			break
 		}
-		p -= nodes[x].data.length
+		posCopy -= nodes[x].data.length
 		if (x + 1 < nodes.length) {
-			p--
+			posCopy--
 		}
 	}
-	// console.log(p, id, document.getElementById(id))
-	console.log(
-		computeDOMRange(document.getElementById(id), { pos: p }),
-		computeDOMRange(editorRoot, { pos }),
-	)
+
+	// Compares two range data structures.
+	const compareRange = (range1, range2) => {
+		const ok = (
+			range1.node === range2.node &&
+			range1.offset === range2.offset
+		)
+		return ok
+	}
+
+	if (!(
+		compareRange(
+			computeDOMRange(document.getElementById(id), { pos: posCopy }),
+			computeDOMRange(editorRoot, { pos }),
+		)
+	)) {
+		alert("no")
+	}
+
 	return computeDOMRange(editorRoot, { pos })
 }
 
