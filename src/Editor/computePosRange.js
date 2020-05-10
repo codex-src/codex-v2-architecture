@@ -1,31 +1,6 @@
 // import { ascendRoot } from "./ascendNodes"
 import { newPos } from "./constructors"
 
-// // Precomputes a data structure fragment (sans pos.x) based
-// // on the VDOM.
-// function precomputePosFragment()
-//
-// // // Computes a cursor data structure based on the VDOM.
-// // //
-// // // NOTE: Does not compute pos.x; see computeDOMPos.
-// // function computeVDOMPos(editorState) {
-// // 	const { extPosRange: [id], nodes } = editorState
-// // 	// Extended pos range not computed:
-// // 	const pos = newPos()
-// // 	if (!id) {
-// // 		return pos
-// // 	}
-// // 	// Extended pos range computed:
-// // 	for (let y = 0; y < nodes.length; y++) {
-// // 		if (id === nodes[y].id) {
-// // 			pos.y = y
-// // 			break
-// // 		}
-// // 		pos.pos += nodes[y].data.length
-// // 	}
-// // 	return pos
-// // }
-
 // Computes a cursor data structure based on the DOM.
 // childrenOffset offsets data-codex-root elements.
 function computeDOMPos(editorRoot, childrenOffset, { node, offset }) {
@@ -80,6 +55,19 @@ function mergePos(pos1, pos2) {
 	})
 }
 
+// if (extID) {
+// 	for (let y = 0; y < nodes.length; y++) {
+// 		if (extID === nodes[y].id) {
+// 			pos.y = y
+// 			break
+// 		}
+// 		pos.pos += nodes[y].data.length
+// 		if (y + 1 < nodes.length) {
+// 			pos.pos++
+// 		}
+// 	}
+// }
+
 // Computes a cursor data structure based on merging the
 // VDOM and DOM computations.
 function computePos(editorState, editorRoot, range) {
@@ -90,11 +78,16 @@ function computePos(editorState, editorRoot, range) {
 	if (extID) {
 		for (let y = 0; y < nodes.length; y++) {
 			if (extID === nodes[y].id) {
-				pos.y = y
+				// No-op
 				break
 			}
 			pos.pos += nodes[y].data.length
-			pos.pos++
+			if (y + 1 < nodes.length) {
+				Object.assign(pos, { // Based on computeDOMPos
+					y: pos.y + 1,
+					pos: pos.pos + 1,
+				})
+			}
 		}
 	}
 	// Compute offset computeDOMPos (based on extID):
