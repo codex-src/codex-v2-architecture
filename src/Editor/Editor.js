@@ -105,7 +105,7 @@ const Editor = ({
 				//
 				// // Force select for edge-cases such as forward-
 				// // backspace (pos does not change but the DOM does):
-				// const [pos1, pos2] = computePosRange(ref.current)
+				// const [pos1, pos2] = computePosRange(state.nodes)
 				// dispatch.select(pos1, pos2)
 				//
 				// console.log(`computePosRange=${Date.now() - t}`)
@@ -220,7 +220,7 @@ const Editor = ({
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
-					const [pos1, pos2] = computePosRange(ref.current)
+					const [pos1, pos2] = computePosRange(state.nodes)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -234,7 +234,7 @@ const Editor = ({
 						pointerDownRef.current = false // Reset to be safe
 						return
 					}
-					const [pos1, pos2] = computePosRange(ref.current)
+					const [pos1, pos2] = computePosRange(state.nodes)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -305,7 +305,7 @@ const Editor = ({
 						const currentState = { data, nodes, pos1, pos2 }
 						dispatch.undo(currentState)
 						return
-						// Redo:
+					// Redo:
 					} else if (detectRedo(e)) {
 						e.preventDefault()
 						dispatch.redo()
@@ -318,7 +318,7 @@ const Editor = ({
 					dedupedCompositionEnd.current = true
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(ref.current)
+					const [pos1, pos2] = computePosRange(state.nodes)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				}),
 
@@ -335,55 +335,58 @@ const Editor = ({
 						dedupedCompositionEnd.current = false
 						return
 					}
-					// Intercept data-codex-node or data-codex-root
-					// events:
-					//
-					// NOTE: Do not trust Chrome (as of 81) for
-					// e.nativeEvent.inputType:
-					//
-					// backspace-word -> deleteWordBackward
-					// backspace-rune -> deleteWordBackward ??
-					//
-					// https://w3.org/TR/input-events-2/#interface-InputEvent-Attributes
-					switch (navigator.vendor !== "Google Inc." && e.nativeEvent.inputType) {
-					// Backspace (any):
-					case "deleteHardLineBackward":
-					case "deleteSoftLineBackward":
-						dispatch.backspaceParagraph()
-						return
-					case "deleteWordBackward":
-						dispatch.backspaceWord()
-						return
-					case "deleteContentBackward":
-						dispatch.backspaceRune()
-						return
-					case "deleteWordForward":
-						dispatch.forwardBackspaceWord()
-						return
-					// Forward-backspace (any):
-					case "deleteContentForward":
-						dispatch.forwardBackspaceRune()
-						return
-					// Enter:
-					case "insertLineBreak":
-					case "insertParagraph":
-						dispatch.enter()
-						return
-					// Undo:
-					case "historyUndo":
-						dispatch.undo()
-						return
-					// Redo:
-					case "historyRedo":
-						dispatch.redo()
-						return
-					default:
-						// No-op
-						break
-					}
+					// // Intercept data-codex-node or data-codex-root
+					// // events:
+					// //
+					// // NOTE: Do not trust Chrome (as of 81) for
+					// // e.nativeEvent.inputType:
+					// //
+					// // backspace-word -> deleteWordBackward
+					// // backspace-rune -> deleteWordBackward ??
+					// //
+					// // https://w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+					// //
+					// // TODO: Add "insertCompositionText" and
+					// // "deleteCompositionText"?
+					// switch (navigator.vendor !== "Google Inc." && e.nativeEvent.inputType) {
+					// // Backspace (any):
+					// case "deleteHardLineBackward":
+					// case "deleteSoftLineBackward":
+					// 	dispatch.backspaceParagraph()
+					// 	return
+					// case "deleteWordBackward":
+					// 	dispatch.backspaceWord()
+					// 	return
+					// case "deleteContentBackward":
+					// 	dispatch.backspaceRune()
+					// 	return
+					// case "deleteWordForward":
+					// 	dispatch.forwardBackspaceWord()
+					// 	return
+					// // Forward-backspace (any):
+					// case "deleteContentForward":
+					// 	dispatch.forwardBackspaceRune()
+					// 	return
+					// // Enter:
+					// case "insertLineBreak":
+					// case "insertParagraph":
+					// 	dispatch.enter()
+					// 	return
+					// // Undo:
+					// case "historyUndo":
+					// 	dispatch.undo()
+					// 	return
+					// // Redo:
+					// case "historyRedo":
+					// 	dispatch.redo()
+					// 	return
+					// default:
+					// 	// No-op
+					// 	break
+					// }
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(ref.current)
+					const [pos1, pos2] = computePosRange(state.nodes)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				}),
 

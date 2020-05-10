@@ -1,21 +1,36 @@
+import { ascendRoot } from "./ascendNodes"
 import { newPos } from "./constructors"
 
-// Computes a cursor data structure.
-function computePos(editorRoot, { ...range }) {
+// Computes a cursor data structure based on the VDOM.
+//
+// NOTE: Does not compute pos.x; see computeDOMPos.
+function computeVDOMPos(id, nodes) {
 	const pos = newPos()
-	if (!range.node || !editorRoot.contains(range.node)) {
-		throw new Error("computePos: no such node or out of bounds")
+	for (let y = 0; y < nodes.length; y++) {
+		if (id === nodes[y].id) {
+			pos.y = y
+			break
+		}
+		pos.pos += nodes[y].data.length
 	}
+	return pos
+}
+
+// Computes a cursor data structure based on the DOM.
+function computeDOMPos(root, { node, offset }) {
+	console.log({ node, offset })
+
 	// Iterate to the deepest node:
-	while (range.node.nodeType === Node.ELEMENT_NODE && range.offset < range.node.childNodes.length) {
-		range.node = range.node.childNodes[range.offset]
-		range.offset = 0
+	const pos = newPos()
+	while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
+		node = node.childNodes[offset]
+		offset = 0
 	}
 	const recurse = on => {
-		if (on === range.node) {
+		if (on === node) {
 			Object.assign(pos, {
-				x: pos.x + range.offset,
-				pos: pos.pos + range.offset,
+				x: pos.x + offset,
+				pos: pos.pos + offset,
 			})
 			return true
 		}
@@ -39,19 +54,48 @@ function computePos(editorRoot, { ...range }) {
 		}
 		return false
 	}
-	recurse(editorRoot)
+	recurse(root)
+
+	console.log(pos)
+	return pos
+}
+
+// Merges two cursor data structures.
+function mergePos(pos1, pos2) {
+	Object.assign(pos1, {
+		x: pos1.x + pos2.x,
+		y: pos1.y + pos2.y,
+		pos: pos1.pos + pos2.pos,
+	})
+}
+
+// Computes a cursor data structure based on merging the
+// VDOM and DOM computations.
+function computePos(nodes, element, range) {
+	const pos = computeVDOMPos(element.id, nodes)
+	const extPos = computeDOMPos(element, range)
+	mergePos(pos, extPos)
 	return pos
 }
 
 // Computes cursor data structures.
-function computePosRange(editorRoot) {
-	const range = document.getSelection().getRangeAt(0)
-	const range1 = { node: range.startContainer, offset: range.startOffset }
-	const pos1 = computePos(editorRoot, range1)
+function computePosRange(nodes) {
+	const selection = document.getSelection()
+	if (!selection.rangeCount) {
+		throw new Error("computePosRange: no such selection")
+	}
+	// Compute data-codex-root elements:
+	const range = selection.getRangeAt(0)
+	const root1 = ascendRoot(range.startContainer)
+	let root2 = root1
+	if (!range.collapsed) {
+		root2 = ascendRoot(range.endContainer)
+	}
+	// Compute cursor data structures:
+	const pos1 = computePos(nodes, root1, { node: range.startContainer, offset: range.startOffset })
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
-		const range2 = { node: range.endContainer, offset: range.endOffset }
-		pos2 = computePos(editorRoot, range2)
+		pos2 = computePos(nodes, root2, { node: range.endContainer, offset: range.endOffset })
 	}
 	return [pos1, pos2]
 }
