@@ -94,6 +94,8 @@ const methods = state => ({
 		})
 	},
 	// Writes character data.
+	//
+	// FIXME: write does **not** update pos.x and pos.y
 	write(data) {
 		state.history.mutate()
 

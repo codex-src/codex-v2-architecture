@@ -79,7 +79,7 @@ const Editor = ({
 
 				// Sync DOM cursors:
 				try {
-					syncPos(ref.current, [state.pos1, state.pos2])
+					syncPos(state, ref.current, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 					return

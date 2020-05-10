@@ -58,6 +58,8 @@ function mergePos(src, dst) {
 // Computes a cursor data structure by merging the returns
 // computeVDOMPos and computeDOMPos
 function computePos(editorState, editorRoot, range) {
+	const { nodes } = editorState
+
 	// Compute extended ID; extend up to two data-codex-root
 	// elements backwards:
 	let rootElement = ascendRoot(range.node)
@@ -74,13 +76,13 @@ function computePos(editorState, editorRoot, range) {
 	// VDOM nodes:
 	const pos = newPos()
 	if (extID) {
-		for (let y = 0; y < editorState.nodes.length; y++) {
-			if (extID === editorState.nodes[y].id) {
+		for (let y = 0; y < nodes.length; y++) {
+			if (extID === nodes[y].id) {
 				// No-op
 				break
 			}
-			pos.pos += editorState.nodes[y].data.length
-			if (y + 1 < editorState.nodes.length) {
+			pos.pos += nodes[y].data.length
+			if (y + 1 < nodes.length) {
 				Object.assign(pos, { // Based on computeDOMPos
 					y: pos.y + 1,
 					pos: pos.pos + 1,
