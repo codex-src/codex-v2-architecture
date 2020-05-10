@@ -101,7 +101,7 @@ function syncPos(editorState, editorRoot, [pos1, pos2]) {
 	const range = document.createRange()
 	range.setStart(range1.node, range1.offset)
 	range.setEnd(range2.node, range2.offset)
-	selection.removeAllRanges()
+	// selection.removeAllRanges()
 	selection.addRange(range)
 	return true
 }
