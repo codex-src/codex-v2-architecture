@@ -82,11 +82,9 @@ function computeRange(editorState, editorRoot, pos) {
 // Synchronizes cursors.
 function syncPos(editorState, editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
-	// https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
-	// if (!selection.rangeCount) {
-	// 	// No-op; defer to end
-	// } else {
-	// 	const [domPos1, domPos2] = computePosRange(editorRoot) // FIXME: If uncommented, computePosRange expects editorState
+	// // https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
+	// if (selection.rangeCount) {
+	// 	const [domPos1, domPos2] = computePosRange(editorState, editorRoot)
 	// 	if (domPos1.pos === pos1.pos && domPos2.pos === pos2.pos) {
 	// 		return false
 	// 	}
