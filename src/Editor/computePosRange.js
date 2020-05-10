@@ -1,4 +1,4 @@
-// import { ascendRoot } from "./ascendNodes"
+import { ascendRoot } from "./ascendNodes"
 import { newPos } from "./constructors"
 
 // Computes a cursor data structure based on the DOM.
@@ -71,18 +71,31 @@ function mergePos(pos1, pos2) {
 // Computes a cursor data structure based on merging the
 // VDOM and DOM computations.
 function computePos(editorState, editorRoot, range) {
-	const { extPosRange: [extID], nodes } = editorState
 
-	// Precompute pos based on VDOM:
+	// Compute extended ID; extend up to two data-codex-root
+	// elements backwards:
+	let rootElement = ascendRoot(range.node)
+	let prev = rootElement.previousElementSibling
+	if (prev && prev.getAttribute("data-codex-root")) {
+		rootElement = prev
+		prev = rootElement.previousElementSibling
+		if (prev && prev.getAttribute("data-codex-root")) {
+			rootElement = prev
+		}
+	}
+	const extID = rootElement.id
+
+	// Attempt to precompute a cursor data structure based on
+	// VDOM nodes:
 	const pos = newPos()
 	if (extID) {
-		for (let y = 0; y < nodes.length; y++) {
-			if (extID === nodes[y].id) {
+		for (let y = 0; y < editorState.nodes.length; y++) {
+			if (extID === editorState.nodes[y].id) {
 				// No-op
 				break
 			}
-			pos.pos += nodes[y].data.length
-			if (y + 1 < nodes.length) {
+			pos.pos += editorState.nodes[y].data.length
+			if (y + 1 < editorState.nodes.length) {
 				Object.assign(pos, { // Based on computeDOMPos
 					y: pos.y + 1,
 					pos: pos.pos + 1,
@@ -90,7 +103,9 @@ function computePos(editorState, editorRoot, range) {
 			}
 		}
 	}
-	// Compute offset computeDOMPos (based on extID):
+
+	// Compute data-codex-root element offset for
+	// computeDOMPos (based on extID):
 	let childrenOffset = 0
 	if (extID) {
 		childrenOffset = [...editorRoot.children].findIndex(each => each.id === extID)
