@@ -63,14 +63,15 @@ const Editor = ({
 
 			let t = Date.now()
 
-			// Eagerly drop selection for performance reasons:
-			//
-			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
-			const selection = document.getSelection()
-			if (selection.rangeCount) {
-				// TODO: Can we just use document.activeElement.blur()?
-				selection.removeAllRanges()
-			}
+			// // Eagerly drop selection for performance reasons:
+			// //
+			// // https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
+			// const selection = document.getSelection()
+			// if (selection.rangeCount) {
+			// 	// TODO: Can we just use document.activeElement.blur()?
+			// 	selection.removeAllRanges()
+			// }
+
 			ReactDOM.render(<Elements state={state} dispatch={dispatch} />, state.reactDOM, () => {
 
 				console.log(`ReactDOM.render=${Date.now() - t}`)
