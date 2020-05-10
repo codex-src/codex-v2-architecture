@@ -94,6 +94,7 @@ function computePos(editorState, editorRoot, range) {
 				break
 			}
 			pos.pos += nodes[y].data.length
+			pos.pos++
 		}
 	}
 	// Compute offset computeDOMPos (based on extID):
@@ -104,9 +105,19 @@ function computePos(editorState, editorRoot, range) {
 
 	const domPos = computeDOMPos(editorRoot, childrenOffset, range)
 	mergePos(pos, domPos)
-	console.log(pos, computeDOMPos(editorRoot, 0, range))
 
-	return computeDOMPos(editorRoot, 0, range)
+	const cmpPos = computeDOMPos(editorRoot, 0, range)
+
+	const ok = (
+		pos.x === cmpPos.x &&
+		pos.y === cmpPos.y &&
+		pos.pos === cmpPos.pos
+	)
+	console.log(ok, pos, cmpPos)
+
+	return cmpPos
+
+	// return computeDOMPos(editorRoot, 0, range)
 }
 
 // Computes cursor data structures.
