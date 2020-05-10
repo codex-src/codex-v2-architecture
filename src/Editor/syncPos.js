@@ -67,6 +67,10 @@ function computeRange(editorState, editorRoot, { pos }) {
 		}
 	}
 
+	if (!id) {
+		throw new Error("computeRange: no such id")
+	}
+
 	// Compares two range data structures.
 	const compareRange = (range1, range2) => {
 		const ok = (
@@ -76,14 +80,14 @@ function computeRange(editorState, editorRoot, { pos }) {
 		return ok
 	}
 
-	if (!(
-		compareRange(
+	// console.log({ id })
+
+	console.log(
+		// compareRange(
 			computeDOMRange(document.getElementById(id), { pos: posCopy }),
 			computeDOMRange(editorRoot, { pos }),
-		)
-	)) {
-		alert("no")
-	}
+		// )
+	)
 
 	return computeDOMRange(editorRoot, { pos })
 }

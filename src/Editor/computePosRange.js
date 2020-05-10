@@ -72,6 +72,11 @@ function computePos(editorState, editorRoot, range) {
 		}
 	}
 	const extID = rootElement.id
+
+	if (!extID) {
+		throw new Error("computePos: no such extID")
+	}
+
 	// Attempt to precompute a cursor data structure based on
 	// VDOM nodes:
 	const pos = newPos()
