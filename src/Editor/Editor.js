@@ -105,7 +105,7 @@ const Editor = ({
 				//
 				// // Force select for edge-cases such as forward-
 				// // backspace (pos does not change but the DOM does):
-				// const [pos1, pos2] = computePosRange(state.nodes)
+				// const [pos1, pos2] = computePosRange(state, ref.current)
 				// dispatch.select(pos1, pos2)
 				//
 				// console.log(`computePosRange=${Date.now() - t}`)
@@ -220,7 +220,7 @@ const Editor = ({
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
-					const [pos1, pos2] = computePosRange(state.nodes)
+					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -234,7 +234,7 @@ const Editor = ({
 						pointerDownRef.current = false // Reset to be safe
 						return
 					}
-					const [pos1, pos2] = computePosRange(state.nodes)
+					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -318,7 +318,7 @@ const Editor = ({
 					dedupedCompositionEnd.current = true
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(state.nodes)
+					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				}),
 
@@ -386,7 +386,7 @@ const Editor = ({
 					// }
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
-					const [pos1, pos2] = computePosRange(state.nodes)
+					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.input(nodes, atEnd, [pos1, pos2])
 				}),
 
