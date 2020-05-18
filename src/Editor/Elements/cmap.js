@@ -1,5 +1,5 @@
 import escape from "lodash/escape"
-import PrismMap from "lib/PrismMap"
+import prismMap from "lib/prismMap"
 import typeEnum from "./typeEnum"
 
 // Component maps.
@@ -60,7 +60,7 @@ function toString(elements, cmap = cmapText) {
 
 // Prism-parses code.
 function parsePrism(code, extension) {
-	const parser = PrismMap[extension]
+	const parser = prismMap[extension]
 	if (!parser) {
 		// No-op
 		return escape(code)

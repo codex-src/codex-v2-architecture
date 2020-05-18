@@ -1,6 +1,6 @@
 import React from "react"
 
-// Updates on DOMContentLoaded.
+// Rerenders on "DOMContentLoaded" event.
 function useDOMContentLoaded() {
 	const [DOMContentLoaded, setDOMContentLoaded] = React.useState(false)
 	React.useEffect(() => {

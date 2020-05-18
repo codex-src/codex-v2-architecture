@@ -1,6 +1,6 @@
-// Maps user-perceived language extensions to Prism
+// Maps user-perceived language extensions to PrismJS
 // languages.
-const PrismMap = {}
+const prismMap = {}
 
 document.addEventListener("DOMContentLoaded", e => {
 	const extensions = {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", e => {
 		yaml:       window.Prism.languages.yaml,
 		yml:        window.Prism.languages.yml,
 	}
-	Object.assign(PrismMap, extensions)
+	Object.assign(prismMap, extensions)
 })
 
-export default PrismMap
+export default prismMap

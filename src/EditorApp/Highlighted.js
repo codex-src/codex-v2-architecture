@@ -1,4 +1,4 @@
-import PrismMap from "lib/PrismMap"
+import prismMap from "lib/prismMap"
 import React from "react"
 
 const Highlighted = React.memo(({ extension, children }) => {
@@ -9,7 +9,7 @@ const Highlighted = React.memo(({ extension, children }) => {
 			// No-op
 			return
 		}
-		const parser = PrismMap[extension]
+		const parser = prismMap[extension]
 		if (!parser) {
 			// No-op
 			return

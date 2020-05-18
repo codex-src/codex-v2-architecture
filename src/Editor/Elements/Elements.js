@@ -2,7 +2,7 @@ import attrs from "./attrs"
 import Button from "lib/Button"
 import escape from "lodash/escape"
 import Markdown from "./Markdown"
-import PrismMap from "lib/PrismMap"
+import prismMap from "lib/prismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
@@ -121,7 +121,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 		if (!extension || range.length === 2) {
 			return r.map(each => ({ ...each, data: escape(each.data) }))
 		}
-		const parser = PrismMap[extension]
+		const parser = prismMap[extension]
 		if (!parser) {
 			return r.map(each => ({ ...each, data: escape(each.data) }))
 		}
