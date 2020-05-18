@@ -3,9 +3,11 @@ import Markdown from "./Markdown"
 import React from "react"
 
 export const Escape = ({ syntax, children }) => (
+	// <span>
 	<Markdown syntax={syntax}>
 		{children}
 	</Markdown>
+	// </span>
 )
 
 export const Emoji = ({ description, children }) => (
@@ -63,38 +65,3 @@ export const Anchor = ({ syntax, href, children }) => (
 		</Markdown>
 	</a>
 )
-
-// export const Anchor = ({ syntax, href, children }) => {
-// 	const [showURL, setShowURL] = React.useState(true)
-// 	return (
-// 		<a
-// 			className="underline text-md-blue-a400"
-// 			href={href}
-// 			onMouseEnter={() => setShowURL(false)}
-// 			onMouseLeave={() => setShowURL(true)}
-// 			{...attrs.a}
-// 		>
-// 			<Markdown syntax={[syntax[0]]} />
-// 			{children}
-// 			<Markdown syntax={[syntax[1].slice(0, 2)]} />
-// 			<Markdown
-// 				syntax={[syntax[1].slice(2, -1)]}
-// 				style={{ display: !showURL ? null : "none" }}
-// 			/>
-// 			{showURL && (
-// 				<svg
-// 					className="inline-block w-4 h-4"
-// 					fill="none"
-// 					strokeLinecap="round"
-// 					strokeLinejoin="round"
-// 					strokeWidth="2"
-// 					stroke="currentColor"
-// 					viewBox="0 0 24 24"
-// 				>
-// 					<path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-// 				</svg>
-// 			)}
-// 			<Markdown syntax={[syntax[1].slice(-1)]} />
-// 		</a>
-// 	)
-// }
