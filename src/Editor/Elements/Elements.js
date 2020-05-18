@@ -79,17 +79,17 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 // ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<HOC.Root id={id} className="text-gray-600">
+	<HOC.Node id={id} className="text-gray-600">
 		<Markdown className="text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</HOC.Root>
+	</HOC.Node>
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<HOC.Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<HOC.Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -123,7 +123,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root id={id} className="-mx-6 px-6 rounded shadow-hero" {...attrs.code}>
+		<HOC.Root id={id} className="px-6 rounded shadow-hero" {...attrs.code}>
 			<HOC.Node id={range[0].id} className="font-mono text-sm leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
@@ -223,6 +223,7 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
+		// TODO: Remove -mx-6?
 		<HOC.Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* contentEditable={false} */}

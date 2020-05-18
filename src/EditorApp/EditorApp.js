@@ -1,15 +1,15 @@
-// import { LOCALSTORAGE_KEY } from "./constants"
 // import { isMetaOrCtrlKey } from "Editor/detect"
+// import { LOCALSTORAGE_KEY } from "./constants"
 // import { toText } from "Editor/Elements/cmap"
 import DocumentTitleAndEmoji from "lib/DocumentTitleAndEmoji"
+import download from "lib/download"
 import Editor from "Editor/Editor"
 import FixedPreferences from "./FixedPreferences"
 import Outline from "./Outline"
+import raw from "raw.macro"
 import React from "react"
 import StatusBars from "./StatusBars"
 import Transition from "lib/Transition"
-import download from "lib/download"
-import raw from "raw.macro"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import useEditor from "Editor/useEditor"
 import useOutline from "./useOutline"
@@ -18,7 +18,7 @@ import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitleAndEmoji from "./useTitleAndEmoji"
 
-// document.body.classList.toggle("debug-css")
+document.body.classList.toggle("debug-css")
 
 const data = (() => {
 	return "Hello, `world`!"
