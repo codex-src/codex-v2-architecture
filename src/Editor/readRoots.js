@@ -1,9 +1,9 @@
 import { newNodes } from "./constructors"
 
 // Reads a data-codex-root element.
-function readRoot(rootElement) {
+function readRoot(root) {
 	const nodes = newNodes("")
-	nodes[0].id = rootElement.id
+	nodes[0].id = root.id
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
 			// Concatenate the end node:
@@ -22,7 +22,7 @@ function readRoot(rootElement) {
 			}
 		}
 	}
-	recurse(rootElement)
+	recurse(root)
 	return nodes
 }
 

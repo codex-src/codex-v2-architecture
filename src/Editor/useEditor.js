@@ -122,6 +122,7 @@ const methods = state => ({
 			node = nodes[nodes.length - 1]
 		}
 		node.data += node2.data.slice(state.pos2.x)
+
 		// Update and rerender:
 		const pos1 = { ...state.pos1, pos: state.pos1.pos + data.length }
 		const pos2 = { ...pos1 }
@@ -166,22 +167,21 @@ const methods = state => ({
 		this.write("")
 	},
 	// Input method for onCompositionEnd and onInput.
-	input(nodes, atEnd, [pos1, pos2]) {
+	input(nodes, [pos1, pos2]) {
 		state.history.mutate()
 
-		// Get the start offset:
+		// Get the start and end keys:
 		const key1 = nodes[0].id
-		// TODO: Can no-op keys before extPosRange[0]
+		const key2 = nodes[nodes.length - 1].id
+
+		// Get the start and end offsets:
 		const offset1 = state.nodes.findIndex(each => each.id === key1)
 		if (offset1 === -1) {
-			throw new Error("input: offset1 out of bounds")
+			throw new Error("dispatch.input: offset1 out of bounds")
 		}
-		// Get the end offset:
-		const key2 = nodes[nodes.length - 1].id
-		// TODO: Can no-op keys before extPosRange[0]
-		const offset2 = !atEnd ? state.nodes.findIndex(each => each.id === key2) : state.nodes.length - 1
+		const offset2 = state.nodes.findIndex(each => each.id === key2)
 		if (offset2 === -1) {
-			throw new Error("input: offset2 out of bounds")
+			throw new Error("dispatch.input: offset2 out of bounds")
 		}
 
 		// Update and rerender:

@@ -268,12 +268,10 @@ const Editor = ({
 
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
-					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
+					const [root1, root2] = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
 					const [pos1, pos2] = computePosRange(state, ref.current)
-					dispatch.input(nodes, atEnd, [pos1, pos2])
-
-					console.log(nodes)
+					dispatch.input(nodes, [pos1, pos2])
 				}),
 
 				onInput: newReadWriteHandler(e => {
@@ -290,10 +288,10 @@ const Editor = ({
 						// dedupedCompositionEnd.current = false
 						return
 					}
-					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
+					const [root1, root2] = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
 					const [pos1, pos2] = computePosRange(state, ref.current)
-					dispatch.input(nodes, false, [pos1, pos2])
+					dispatch.input(nodes, [pos1, pos2])
 				}),
 
 				onCut: newReadWriteHandler(e => {
