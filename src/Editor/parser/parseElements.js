@@ -18,6 +18,10 @@ function testFastPass(char) {
 function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
 
+	// Gets and or caches an element. Uses range (text) as the
+	// key. emitElement emits and caches new elements.
+	//
+	// NOTE: Parameter range can be a node or a range of nodes
 	const cacheStrategy = (range, emitElement) => {
 		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
 		let element = cachedElements.get(key)
@@ -140,14 +144,17 @@ function parseElements(nodes, cachedElements) {
 				const element = cacheStrategy(range, emitElements.AnyList)
 
 				// Recursively mutates IDs; does not mutate the root
-				// ID on purpose.
+				// ID because elements.push does.
+				//
+				// TODO: Extract?
 				let y = 0
 				const recurse = element => {
 					for (let x = 0; x < element.children.length; x++) {
 						// console.log(element.children[x].id, range[y].id)
 						element.children[x].id = range[y].id
 						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
-							y++ // Increment to the next node
+							// Increment to the next node:
+							y++
 							continue
 						}
 						recurse(element.children[x])
@@ -191,7 +198,7 @@ function parseElements(nodes, cachedElements) {
 					type: typeEnum.Image,
 					id: each.id,
 					syntax: !href ? ["![", `](${src})`] : ["[![", `](${src})](${href})`],
-					src: src,
+					src,
 					alt: toInnerText(alt),
 					href,
 					children: parseInlineElements(alt),
