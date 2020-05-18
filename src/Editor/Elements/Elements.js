@@ -164,7 +164,7 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 const Checkbox = ({ id, checked, handleClick }) => (
 	<Button
 		className={
-			`-mt-px w-4 h-4 align-middle ${
+			`-mt-1 w-4 h-4 align-middle ${
 				!checked
 					? "bg-white shadow-hero"
 					: "bg-md-blue-a200 shadow"
@@ -255,6 +255,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 // 	)
 // })
 
+// FIXME
 const hr = "linear-gradient(" +
 	"transparent 0, " +
 	"transparent calc(0.75em - 2px), " +

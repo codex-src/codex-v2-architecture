@@ -229,6 +229,7 @@ const Editor = ({
 						// }
 
 						// if (state.focused && state.collapsed && )
+						console.log(document.activeElement)
 						e.preventDefault()
 						dispatch.tab(e.shiftKey)
 						return
