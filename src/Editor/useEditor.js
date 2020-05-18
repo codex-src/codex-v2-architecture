@@ -89,16 +89,16 @@ const methods = state => ({
 		})
 	},
 
-	// Resets character data.
-	reset(data) {
-		Object.assign(state, {
-			focused: false,
-			nodes: newNodes(data),
-			pos1: newPos(),
-			pos2: newPos(),
-		})
-		this.render()
-	},
+	// // Resets character data.
+	// reset(data) {
+	// 	Object.assign(state, {
+	// 		focused: false,
+	// 		nodes: newNodes(data),
+	// 		pos1: newPos(),
+	// 		pos2: newPos(),
+	// 	})
+	// 	this.render()
+	// },
 
 	// Writes character data.
 	//
@@ -420,6 +420,8 @@ const methods = state => ({
 	},
 	// Checks or unchecks a todo.
 	checkTodo(id) {
+		this.blur()
+
 		state.history.mutate()
 
 		const node = state.nodes.find(each => each.id === id)

@@ -141,42 +141,39 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</HOC.Node>
 ))
 
-const Checkbox = ({ id, checked, handleClick }) => (
-	<Button
-		className={
-			`-mt-1 w-4 h-4 align-middle ${
-				!checked
-					? "bg-white shadow-hero"
-					: "bg-md-blue-a200 shadow"
-			} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition ease-out duration-75`
-		}
-		data-codex-checkbox={checked}
-		onClick={handleClick}
-	>
-		<svg fill="#fff" viewBox="0 0 16 16">
-			<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-		</svg>
-	</Button>
-)
-
-export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
+const Checkbox = ({ id, checked }) => {
 	const [, { checkTodo }] = useEditorState()
-
 	return (
-		<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
-			<Markdown className="hidden" syntax={syntax}>
-				<div className="absolute">
-					<Checkbox id={id} checked={checked} handleClick={() => {
-						document.activeElement.blur(); checkTodo(id)
-					}} />
-				</div>
-				{toReact(children) || (
-					<br />
-				)}
-			</Markdown>
-		</HOC.Node>
+		<Button
+			className={
+				`-mt-1 w-4 h-4 align-middle ${
+					!checked
+						? "bg-white shadow-hero"
+						: "bg-md-blue-a200 shadow"
+				} rounded-md focus:outline-none transform scale-105 pointer-events-auto transition ease-out duration-75`
+			}
+			onClick={() => checkTodo(id)}
+			data-codex-checkbox={checked}
+		>
+			<svg fill="#fff" viewBox="0 0 16 16">
+				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+			</svg>
+		</Button>
 	)
-})
+}
+
+export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
+	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
+		<Markdown className="hidden" syntax={syntax}>
+			<div className="absolute">
+				<Checkbox id={id} checked={checked} />
+			</div>
+			{toReact(children) || (
+				<br />
+			)}
+		</Markdown>
+	</HOC.Node>
+))
 
 // NOTE: <AnyList> computes __nested
 export const AnyList = React.memo(({ type, tag, id, children: range, __nested }) => {
