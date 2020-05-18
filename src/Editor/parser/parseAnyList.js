@@ -79,7 +79,7 @@ function parseAnyList(range) {
 	const { parent } = parseMetadata(range[0])
 	const element = {
 		...parent,
-		root: true,
+		atRoot: true,
 		children: [],
 	}
 	for (const each of range) {
@@ -90,7 +90,7 @@ function parseAnyList(range) {
 			if (!ref.length || ref[ref.length - 1].type !== typeEnum.AnyList) {
 				ref.push({
 					...parent,
-					root: false,
+					atRoot: false,
 					children: [],
 				})
 			}

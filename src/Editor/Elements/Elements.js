@@ -1,16 +1,13 @@
-import attrs from "./attrs"
+import * as HOC from "./HOC"
 import Button from "lib/Button"
-import escape from "lodash/escape"
 import Markdown from "./Markdown"
-import prismMap from "lib/prismMap"
 import React from "react"
+import attrs from "./attrs"
+import escape from "lodash/escape"
+import prismMap from "lib/prismMap"
+import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
-
-import {
-	Node,
-	Root,
-} from "./HOC"
 
 // Converts a parsed data structure (children) to renderable
 // React components.
@@ -33,82 +30,77 @@ function toReact(children) {
 	return components
 }
 
-// Trims extraneous spaces.
-function trim(str) {
-	return str.replace(/ +/g, " ")
-}
-
 const headerClassNames = {
-	h1: trim("font-semibold text-3xl leading-tight antialiased"),
-	h2: trim("font-semibold text-2xl leading-tight antialiased"),
-	h3: trim("font-semibold text-xl  leading-tight antialiased"),
-	h4: trim("font-semibold text-xl  leading-tight antialiased"),
-	h5: trim("font-semibold text-xl  leading-tight antialiased"),
-	h6: trim("font-semibold text-xl  leading-tight antialiased"),
+	h1: trimWhiteSpace("font-semibold text-3xl leading-tight antialiased"),
+	h2: trimWhiteSpace("font-semibold text-2xl leading-tight antialiased"),
+	h3: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
+	h4: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
+	h5: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
+	h6: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root id={id} className={headerClassNames[tag]}>
+	<HOC.Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Root>
+	</HOC.Root>
 ))
 
 export const Paragraph = React.memo(({ id, emojis, children }) => (
-	<Root id={id} data-codex-emojis={emojis}>
+	<HOC.Root id={id} data-codex-emojis={emojis}>
 		{toReact(children) || (
 			<br />
 		)}
-	</Root>
+	</HOC.Root>
 ))
 
 // export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-// 	<Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
+// 	<HOC.Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
 // 		<Markdown className="hidden" syntax={syntax}>
 // 			{toReact(children) || (
 // 				<br />
 // 			)}
 // 		</Markdown>
-// 	</Node>
+// 	</HOC.Node>
 // ))
 //
 // export const Blockquote = React.memo(({ id, children: range }) => (
-// 	<Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+// 	<HOC.Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 // 		{range.map(({ type: T, ...each }) => (
 // 			React.createElement(typeEnumArray[T], {
 // 				key: each.id,
 // 				...each,
 // 			})
 // 		))}
-// 	</Root>
+// 	</HOC.Root>
 // ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Root id={id} className="text-gray-600">
+	<HOC.Root id={id} className="text-gray-600">
 		<Markdown className="text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Root>
+	</HOC.Root>
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<HOC.Root id={id} className="-ml-6 pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
 				...each,
 			})
 		))}
-	</Root>
+	</HOC.Root>
 ))
 
 // export const Pre = props => (
-// 	<Node style={{ whiteSpace: "pre" }} {...props} />
+// 	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
 // )
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
@@ -131,42 +123,42 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root id={id} className="-mx-6 px-6 rounded shadow-hero" {...attrs.code}>
-			<Node id={range[0].id} className="font-mono text-sm leading-none">
+		<HOC.Root id={id} className="-mx-6 px-6 rounded shadow-hero" {...attrs.code}>
+			<HOC.Node id={range[0].id} className="font-mono text-sm leading-none">
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
-			</Node>
+			</HOC.Node>
 			{$range.map(each => (
-				<Node key={each.id} id={each.id} className="font-mono text-sm leading-snug">
+				<HOC.Node key={each.id} id={each.id} className="font-mono text-sm leading-snug">
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
 							"<br />"
 						),
 					}} />
-				</Node>
+				</HOC.Node>
 			))}
-			<Node id={range[range.length - 1].id} className="font-mono text-sm leading-none">
+			<HOC.Node id={range[range.length - 1].id} className="font-mono text-sm leading-none">
 				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
-			</Node>
-		</Root>
+			</HOC.Node>
+		</HOC.Root>
 	)
 })
 
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
+	<HOC.Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Node>
+	</HOC.Node>
 ))
 
 const Checkbox = ({ id, checked, handleClick }) => (
@@ -191,30 +183,32 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
 
 	return (
-		<Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
+		<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
-					<Checkbox id={id} checked={checked} handleClick={() => { document.activeElement.blur(); checkTodo(id) }} />
+					<Checkbox id={id} checked={checked} handleClick={() => {
+						document.activeElement.blur(); checkTodo(id)
+					}} />
 				</div>
 				{toReact(children) || (
 					<br />
 				)}
 			</Markdown>
-		</Node>
+		</HOC.Node>
 	)
 })
 
-export const AnyList = React.memo(({ root, type, tag, id, children: range }) => {
-	const HOC = root ? Root : Node
+export const AnyList = React.memo(({ atRoot, type, tag, id, children: range }) => {
+	const Parent = atRoot ? HOC.Root : HOC.Node
 	return (
-		<HOC tag={tag} id={id} className="ml-6">
+		<Parent tag={tag} id={id} className="ml-6">
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
 					...each,
 				})
 			))}
-		</HOC>
+		</Parent>
 	)
 })
 
@@ -229,7 +223,7 @@ const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
-		<Root id={id} className="-mx-6">
+		<HOC.Root id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* contentEditable={false} */}
 				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
@@ -243,21 +237,21 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 					</Markdown>
 				</div>
 			)}
-		</Root>
+		</HOC.Root>
 	)
 })
 
 // export const Break = React.memo(({ id, syntax }) => {
 // 	const [{ readOnly }] = useEditorState()
 // 	return (
-// 		<Root id={id}>
+// 		<HOC.Root id={id}>
 // 			<Markdown syntax={syntax}>
 // 				{readOnly && (
 // 					<hr className="inline-block w-full border-t-2"
 // 						style={{ verticalAlign: "15%" }} />
 // 				)}
 // 			</Markdown>
-// 		</Root>
+// 		</HOC.Root>
 // 	)
 // })
 
@@ -270,9 +264,9 @@ const hr = "linear-gradient(" +
 ")"
 
 export const Break = React.memo(({ id, syntax }) => (
-	<Root id={id} className="text-right" style={{ backgroundImage: hr }}>
+	<HOC.Root id={id} className="text-right" style={{ backgroundImage: hr }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>
-	</Root>
+	</HOC.Root>
 ))
