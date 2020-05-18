@@ -1,4 +1,6 @@
 .codex-editor {
+	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
+
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 
 	-moz-tab-size: 4;

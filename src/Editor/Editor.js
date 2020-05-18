@@ -221,7 +221,7 @@ const Editor = ({
 
 				onKeyDown: newReadWriteHandler(e => {
 					// Tab:
-					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
+					if (keyDownEvents.tab(e)) {
 						const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
 						if (focusedCheckbox) {
 							// No-op
@@ -231,39 +231,41 @@ const Editor = ({
 						dispatch.tab(e.shiftKey)
 						return
 					// Enter:
-					} else if (e.keyCode === keyCodes.Enter) {
+					} if (keyDownEvents.enter(e)) {
 						e.preventDefault()
 						dispatch.enter()
 						return
 					}
+
 					// Backspace paragraph:
-					if (usesMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
+					if (keyDownEvents.backspaceParagraph(e)) {
 						e.preventDefault()
 						dispatch.backspaceParagraph()
 						return
 					// Backspace word:
-					//
-					// FIXME: e.altKey for non-macOS?
-					} else if (e.altKey && e.keyCode === keyCodes.Backspace) {
+					} else if (keyDownEvents.backspaceWord(e)) {
 						e.preventDefault()
 						dispatch.backspaceWord()
 						return
 					// Backspace rune:
-					} else if (e.keyCode === keyCodes.Backspace) {
+					} else if (keyDownEvents.backspaceRune(e)) {
 						e.preventDefault()
 						dispatch.backspaceRune()
 						return
+					}
+
 					// Forward-backspace word:
-					} else if (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.altKey && e.keyCode === keyCodes.Delete) {
+					if (keyDownEvents.forwardBackspaceWord(e)) {
 						e.preventDefault()
 						dispatch.forwardBackspaceWord()
 						return
 					// Forward-backspace rune:
-					} else if (e.keyCode === keyCodes.Delete || (navigator.userAgent.indexOf("Mac OS X") !== -1 && e.ctrlKey && e.keyCode === keyCodes.D)) {
+					} else if (keyDownEvents.forwardBackspaceRune(e)) {
 						e.preventDefault()
 						dispatch.forwardBackspaceRune()
 						return
 					}
+
 					// Undo:
 					if (keyDownEvents.undo(e)) {
 						e.preventDefault()
