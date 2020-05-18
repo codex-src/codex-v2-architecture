@@ -178,13 +178,15 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	)
 })
 
-export const AnyList = React.memo(({ atRoot, type, tag, id, children: range }) => {
-	const Parent = atRoot ? HOC.Root : HOC.Node
+// NOTE: <AnyList> computes __nested
+export const AnyList = React.memo(({ type, tag, id, children: range, __nested }) => {
+	const Parent = !__nested ? HOC.Root : HOC.Node
 	return (
 		<Parent tag={tag} id={id} className="ml-6">
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
+					__nested: true,
 					...each,
 				})
 			))}
