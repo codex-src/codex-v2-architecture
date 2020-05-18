@@ -3,7 +3,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-import decorator from "./decorator"
 import keyCodes from "./keyCodes"
 import queryRoots from "./queryRoots"
 import readRoots from "./readRoots"
@@ -11,7 +10,6 @@ import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import uuidv4 from "uuid/v4"
-import { deeplySyncNodes } from "./syncNodes"
 
 import {
 	detectRedo,
@@ -113,14 +111,14 @@ const Editor = ({
 					clearTimeout(id)
 				}
 
-				t = Date.now()
-
-				// Force select for edge-cases such as forward-
-				// backspace (pos does not change but the DOM does):
-				const [pos1, pos2] = computePosRange(state, ref.current)
-				dispatch.select(pos1, pos2)
-
-				console.log(`computePosRange=${Date.now() - t}`)
+				// t = Date.now()
+				//
+				// // Force select for edge-cases such as forward-
+				// // backspace (pos does not change but the DOM does):
+				// const [pos1, pos2] = computePosRange(state, ref.current)
+				// dispatch.select(pos1, pos2)
+				//
+				// console.log(`computePosRange=${Date.now() - t}`)
 
 			})
 		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
