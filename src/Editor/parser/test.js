@@ -1,7 +1,6 @@
 import { AnyListRe } from "./spec"
 
-// Tests whether a node is a header node.
-export function testHeader(node) {
+export function Header(node) {
 	const ok = (
 		node.data.slice(0, 2) === "# " ||
 		node.data.slice(0, 3) === "## " ||
@@ -13,8 +12,7 @@ export function testHeader(node) {
 	return ok
 }
 
-// Tests whether a node is a blockquote node.
-export function testBlockquote(node) {
+export function Blockquote(node) {
 	const syntax = node.data.slice(0, 2)
 	const ok = (
 		syntax === "> " ||
@@ -23,8 +21,7 @@ export function testBlockquote(node) {
 	return ok
 }
 
-// Tests whether a node is a preformatted (start) node.
-export function testPreformattedStart(node) {
+export function PreformattedStart(node) {
 	const syntax = node.data.slice(0, 3)
 	const ok = (
 		syntax === "```" ||
@@ -33,17 +30,14 @@ export function testPreformattedStart(node) {
 	return ok
 }
 
-// Tests whether a node is a preformatted (end) node.
-export function testPreformattedEnd(node, syntax) {
+export function PreformattedEnd(node, syntax) {
 	return node.data === syntax
 }
 
-// Tests whether a node is an <AnyList> node.
-export function testAnyList(node) {
+export function AnyList(node) {
 	return AnyListRe.test(node.data)
 }
 
-// Tests whether a node is a break node.
-export function testBreak(node) {
+export function Break(node) {
 	return node.data === "---" || node.data === "***" /* || node.data === "___" */
 }

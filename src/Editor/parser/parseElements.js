@@ -1,3 +1,4 @@
+import * as test from "./test"
 import newURLHashEpoch from "./newURLHashEpoch"
 import parseAnyList from "./parseAnyList"
 import parseInlineElements from "./parseInlineElements"
@@ -12,18 +13,9 @@ import {
 	parsePreformatted,
 } from "./parsers"
 
-import {
-	testAnyList,
-	testBlockquote,
-	testBreak,
-	testHeader,
-	testPreformattedEnd,
-	testPreformattedStart,
-} from "./testers"
-
 function testFastPass(char) {
 	const ok = (
-		(char >= "a" && char <= "z") || /* char !== "h" && */
+		(char >= "a" && char <= "z") || // char !== "h" &&
 		(char >= "A" && char <= "Z") ||
 		char === " "
 	)
@@ -59,7 +51,7 @@ function parseElements(nodes, cachedElements) {
 		switch (each.data[0]) {
 		// <Header>
 		case "#":
-			if (testHeader(each)) {
+			if (test.Header(each)) {
 				const element = cacheStrategy(each, each => parseHeader(each))
 				elements.push({
 					...element,
@@ -72,11 +64,11 @@ function parseElements(nodes, cachedElements) {
 			break
 		// <Blockquote>
 		case ">":
-			if (testBlockquote(each)) {
+			if (test.Blockquote(each)) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (!testBlockquote(nodes[x2])) {
+					if (!test.Blockquote(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -99,12 +91,12 @@ function parseElements(nodes, cachedElements) {
 		// <Preformatted>
 		case "`":
 		case "~":
-			if (testPreformattedStart(each)) {
+			if (test.PreformattedStart(each)) {
 				const syntax = each.data.slice(0, 3)
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (testPreformattedEnd(nodes[x2], syntax)) {
+					if (test.PreformattedEnd(nodes[x2], syntax)) {
 						// No-op; do not decrement
 						break
 					}
@@ -143,11 +135,11 @@ function parseElements(nodes, cachedElements) {
 		case "7":
 		case "8":
 		case "9":
-			if (testAnyList(each)) {
+			if (test.AnyList(each)) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (!testAnyList(nodes[x2])) {
+					if (!test.AnyList(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -177,7 +169,7 @@ function parseElements(nodes, cachedElements) {
 				})
 				x1 = x2
 				continue
-			} else if (testBreak(each)) {
+			} else if (test.Break(each)) {
 				const element = cacheStrategy(each, parseBreak)
 				elements.push({
 					...element,

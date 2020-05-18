@@ -145,8 +145,6 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 
 const TodoItemCheckbox = ({ id, checked }) => {
 	const [, { checkTodo }] = useEditorState()
-
-	const computed = !checked ? "bg-white shadow-hero" : "bg-md-blue-a200 shadow"
 	return (
 		<Button
 			className={
@@ -216,21 +214,18 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	)
 })
 
-export const Break = React.memo(({ id, syntax }) => {
-	const [{ readOnly }] = useEditorState()
+const backgroundImage = "linear-gradient(" +
+	"transparent 0, " +
+	"transparent calc(0.75em - 2px), " +
+	"var(--gray-300) calc(0.75em - 2px), " +
+	"var(--gray-300) calc(0.75em + 2px), " +
+	"transparent calc(0.75em + 2px)" +
+")"
 
-	const backgroundImage = "linear-gradient(" +
-		"transparent 0, " +
-		"transparent calc(0.75em - 2px), " +
-		"var(--gray-300) calc(0.75em - 2px), " +
-		"var(--gray-300) calc(0.75em + 2px), " +
-		"transparent calc(0.75em + 2px)" +
-	")"
-	return (
-		<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
-			<Markdown className="hidden" syntax={syntax}>
-				<br />
-			</Markdown>
-		</HOC.Root>
-	)
-})
+export const Break = React.memo(({ id, syntax }) => (
+	<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
+		<Markdown className="hidden" syntax={syntax}>
+			<br />
+		</Markdown>
+	</HOC.Root>
+))
