@@ -184,12 +184,13 @@ function parseElements(nodes, cachedElements) {
 		case "!":
 		case "[":
 			// ![Image](src) or [![Image](src)](href)
+			//
+			// https://regex101.com/r/FBKxEO/1
+			// https://regex101.com/r/FBKxEO/2
 			let matches = null
 			if (each.data[0] === "!") {
-				// https://regex101.com/r/FBKxEO/1
 				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)$/)
 			} else if (each.data[0] === "[") {
-				// https://regex101.com/r/FBKxEO/2
 				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)$/)
 			}
 			if (matches) {
