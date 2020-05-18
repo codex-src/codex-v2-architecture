@@ -1,11 +1,11 @@
-import * as keyDownEvents from "./keyDownEvents"
-import EditorContext from "./EditorContext"
-import React from "react"
-import ReactDOM from "react-dom"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-import keyCodes from "./keyCodes" // TODO: Remove
+import detectKeyDownType from "./detectKeyDownType"
+import EditorContext from "./EditorContext"
+import keyDownTypeEnum from "./keyDownTypeEnum"
 import queryRoots from "./queryRoots"
+import React from "react"
+import ReactDOM from "react-dom"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import trimWhiteSpace from "lib/trimWhiteSpace"
@@ -220,65 +220,58 @@ const Editor = ({
 				}),
 
 				onKeyDown: newReadWriteHandler(e => {
-					// Tab:
-					if (keyDownEvents.tab(e)) {
-						const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
-						if (focusedCheckbox) {
-							// No-op
-							return
-						}
+
+					switch (detectKeyDownType(e)) {
+					case keyDownTypeEnum.tab:
+						// FIXME
+						// const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
+						// if (focusedCheckbox) {
+						// 	// No-op
+						// 	return
+						// }
 						e.preventDefault()
 						dispatch.tab(e.shiftKey)
 						return
-					// Enter:
-					} if (keyDownEvents.enter(e)) {
+					case keyDownTypeEnum.enter:
 						e.preventDefault()
 						dispatch.enter()
 						return
-					}
-
-					// Backspace paragraph:
-					if (keyDownEvents.backspaceParagraph(e)) {
+					case keyDownTypeEnum.backspaceParagraph:
 						e.preventDefault()
 						dispatch.backspaceParagraph()
 						return
-					// Backspace word:
-					} else if (keyDownEvents.backspaceWord(e)) {
+					case keyDownTypeEnum.backspaceWord:
 						e.preventDefault()
 						dispatch.backspaceWord()
 						return
-					// Backspace rune:
-					} else if (keyDownEvents.backspaceRune(e)) {
+					case keyDownTypeEnum.backspaceRune:
 						e.preventDefault()
 						dispatch.backspaceRune()
 						return
-					}
-
-					// Forward-backspace word:
-					if (keyDownEvents.forwardBackspaceWord(e)) {
-						e.preventDefault()
+					case keyDownTypeEnum.forwardBackspaceWord:
 						dispatch.forwardBackspaceWord()
+						e.preventDefault()
 						return
-					// Forward-backspace rune:
-					} else if (keyDownEvents.forwardBackspaceRune(e)) {
+					case keyDownTypeEnum.forwardBackspaceRune:
 						e.preventDefault()
 						dispatch.forwardBackspaceRune()
 						return
-					}
-
-					// Undo:
-					if (keyDownEvents.undo(e)) {
+					case keyDownTypeEnum.undo:
 						e.preventDefault()
+						// FIXME
 						const { data, nodes, pos1, pos2 } = state
 						const currentState = { data, nodes, pos1, pos2 }
 						dispatch.undo(currentState)
 						return
-					// Redo:
-					} else if (keyDownEvents.redo(e)) {
+					case keyDownTypeEnum.redo:
 						e.preventDefault()
 						dispatch.redo()
 						return
+					default:
+						// No-op
+						break
 					}
+					return ""
 
 					// TODO: Cut, copy, paste need to passthrough
 					if (state.pos1.pos !== state.pos2.pos && ((!e.ctrlKey && !e.altKey && !e.metaKey && [...e.key].length === 1) || e.key === "Dead")) {

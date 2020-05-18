@@ -1,6 +1,6 @@
 import React from "react"
 import { LOCALSTORAGE_KEY } from "./constants"
-import { NumberEnum } from "lib/Enum"
+import { NumberEnum } from "lib/Enums"
 
 const saveStatusEnum = new NumberEnum(
 	"Unsaved",

@@ -1,4 +1,6 @@
+import keyDownTypeEnum from "./keyDownTypeEnum"
 import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
+import { StringEnum } from "lib/Enums"
 
 const keyCodes = {
 	Tab: 9,
@@ -12,12 +14,9 @@ const keyCodes = {
 	Z: 90,
 }
 
-// export function detect() {
-// }
-
 // NOTE: Negates control because of control-tab and shift-
 // control-tab shortcuts
-export function tab(e) {
+function tab(e) {
 	const ok = (
 		!e.ctrlKey &&
 		e.keyCode === keyCodes.Tab
@@ -25,12 +24,12 @@ export function tab(e) {
 	return ok
 }
 
-export function enter(e) {
+function enter(e) {
 	return e.keyCode === keyCodes.Enter
 }
 
 // NOTE: backspace* are ordered by precedence
-export function backspaceParagraph(e) {
+function backspaceParagraph(e) {
 	const ok = (
 		usesMetaOrCtrlKey(e) &&
 		e.keyCode === keyCodes.Backspace
@@ -38,7 +37,7 @@ export function backspaceParagraph(e) {
 	return ok
 }
 // TODO: e.altKey for non-macOS?
-export function backspaceWord(e) {
+function backspaceWord(e) {
 	const ok = (
 		e.altKey &&
 		e.keyCode === keyCodes.Backspace
@@ -46,12 +45,12 @@ export function backspaceWord(e) {
 	return ok
 }
 
-export function backspaceRune(e) {
+function backspaceRune(e) {
 	return e.keyCode === keyCodes.Backspace
 }
 
 // NOTE: forwardBackspace* are ordered by precedence
-export function forwardBackspaceWord(e) {
+function forwardBackspaceWord(e) {
 	// macOS:
 	const ok = (
 		navigator.userAgent.indexOf("Mac OS X") !== -1 &&
@@ -61,7 +60,7 @@ export function forwardBackspaceWord(e) {
 	return ok
 }
 
-export function forwardBackspaceRune(e) {
+function forwardBackspaceRune(e) {
 	const ok1 = (
 		e.keyCode === keyCodes.Delete
 	)
@@ -74,7 +73,7 @@ export function forwardBackspaceRune(e) {
 	return ok1 || ok2
 }
 
-export function undo(e) {
+function undo(e) {
 	const ok = (
 		!e.shiftKey &&
 		!e.altKey &&
@@ -84,7 +83,7 @@ export function undo(e) {
 	return ok
 }
 
-export function redo(e) {
+function redo(e) {
 	// macOS:
 	const ok1 = (
 		e.shiftKey &&
@@ -100,3 +99,34 @@ export function redo(e) {
 	)
 	return ok1 || ok2
 }
+
+// Detects a key down type.
+function detectKeyDownType(e) {
+	switch (true) {
+	case tab(e):
+		return keyDownTypeEnum.tab
+	case enter(e):
+		return keyDownTypeEnum.enter
+	case backspaceParagraph(e):
+		return keyDownTypeEnum.backspaceParagraph
+	case backspaceWord(e):
+		return keyDownTypeEnum.backspaceWord
+	case backspaceRune(e):
+		return keyDownTypeEnum.backspaceRune
+	case forwardBackspaceWord(e):
+		return keyDownTypeEnum.forwardBackspaceWord
+	case forwardBackspaceRune(e):
+		return keyDownTypeEnum.forwardBackspaceRune
+	case undo(e):
+		return keyDownTypeEnum.undo
+	case redo(e):
+		return keyDownTypeEnum.redo
+	default:
+		// No-op
+		break
+	}
+	return ""
+}
+
+export default detectKeyDownType
+

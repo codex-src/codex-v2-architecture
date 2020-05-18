@@ -1,4 +1,4 @@
-import { NumberEnum } from "lib/Enum"
+import { NumberEnum } from "lib/Enums"
 
 const typeEnum = new NumberEnum(
 	"AnyList",

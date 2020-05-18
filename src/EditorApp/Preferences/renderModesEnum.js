@@ -1,4 +1,4 @@
-import { StringEnum } from "lib/Enum"
+import { StringEnum } from "lib/Enums"
 
 const renderModesEnum = new StringEnum(
 	"Readme",
