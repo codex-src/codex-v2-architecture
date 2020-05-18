@@ -13,125 +13,131 @@ const keyCodes = {
 	Z: 90,
 }
 
-// NOTE: Negates control because of control-tab and shift-
-// control-tab shortcuts
-function tab(e) {
-	const ok = (
-		!e.ctrlKey &&
-		e.keyCode === keyCodes.Tab
-	)
-	return ok
-}
-
-function enter(e) {
-	return e.keyCode === keyCodes.Enter
-}
-
-// NOTE: backspace* are ordered by precedence
-function backspaceParagraph(e) {
-	const ok = (
-		usesMetaOrCtrlKey(e) &&
-		e.keyCode === keyCodes.Backspace
-	)
-	return ok
-}
-// TODO: e.altKey for non-macOS?
-function backspaceWord(e) {
-	const ok = (
-		e.altKey &&
-		e.keyCode === keyCodes.Backspace
-	)
-	return ok
-}
-
-function backspaceRune(e) {
-	return e.keyCode === keyCodes.Backspace
-}
-
-// NOTE: forwardBackspace* are ordered by precedence
-function forwardBackspaceWord(e) {
-	// macOS:
-	const ok = (
-		navigator.userAgent.indexOf("Mac OS X") !== -1 &&
-		e.altKey &&
-		e.keyCode === keyCodes.Delete
-	)
-	return ok
-}
-
-function forwardBackspaceRune(e) {
-	const ok1 = e.keyCode === keyCodes.Delete
-	// macOS:
-	const ok2 = (
-		navigator.userAgent.indexOf("Mac OS X") !== -1 &&
-		e.ctrlKey &&
-		e.keyCode === keyCodes.D
-	)
-	return ok1 || ok2
-}
-
-function undo(e) {
-	const ok = (
-		!e.shiftKey &&
-		!e.altKey &&
-		usesMetaOrCtrlKey(e) &&
-		e.keyCode === keyCodes.Z
-	)
-	return ok
-}
-
-function redo(e) {
-	// macOS:
-	const ok1 = (
-		e.shiftKey &&
-		!e.altKey &&
-		usesMetaOrCtrlKey(e) &&
-		e.keyCode === keyCodes.Z
-	)
-	const ok2 = (
-		!e.shiftKey &&
-		!e.altKey &&
-		usesMetaOrCtrlKey(e) &&
-		e.keyCode === keyCodes.Y
-	)
-	return ok1 || ok2
-}
-
-function characterData(e) {
-	const ok1 = (
-		!e.ctrlKey &&
-		!e.altKey && // FIXME?
-		!e.metaKey &&
-		[...e.key].length === 1 // Negates macros such as "ArrowLeft", etc.
-	)
-	// NOTE: e.key === "Dead" on "compositionstart",
-	// "compositionupdate", and "compositionend"
-	const ok2 = e.key === "Dead"
-	return ok1 || ok2
+const detect = {
+	tab(e) {
+		const ok = (
+			!e.ctrlKey && // Negates control-tab and shift-control-tab shortcuts
+			e.keyCode === keyCodes.Tab
+		)
+		return ok
+	},
+	enter(e) {
+		return e.keyCode === keyCodes.Enter
+	},
+	// NOTE: detect.backspace* are ordered by precedence
+	backspaceParagraph(e) {
+		const ok = (
+			usesMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.Backspace
+		)
+		return ok
+	},
+	// TODO: Do non-macOS systems support backspace word?
+	backspaceWord(e) {
+		const ok = (
+			e.altKey &&
+			e.keyCode === keyCodes.Backspace
+		)
+		return ok
+	},
+	backspaceRune(e) {
+		return e.keyCode === keyCodes.Backspace
+	},
+	// NOTE: detect.forwardBackspace* are ordered by
+	// precedence
+	forwardBackspaceWord(e) {
+		// macOS:
+		const ok = (
+			navigator.userAgent.indexOf("Mac OS X") !== -1 &&
+			e.altKey &&
+			e.keyCode === keyCodes.Delete
+		)
+		return ok
+	},
+	forwardBackspaceRune(e) {
+		return e.keyCode === keyCodes.Delete
+	},
+	forwardBackspaceRuneMacOS(e) {
+		const ok = (
+			navigator.userAgent.indexOf("Mac OS X") !== -1 &&
+			e.ctrlKey &&
+			e.keyCode === keyCodes.D
+		)
+		return ok
+	},
+	undo(e) {
+		const ok = (
+			!e.shiftKey &&
+			!e.altKey &&
+			usesMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.Z
+		)
+		return ok
+	},
+	redo(e) {
+		const ok = (
+			e.shiftKey &&
+			!e.altKey &&
+			usesMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.Z
+		)
+		return ok
+	},
+	redoNonMacOS(e) {
+		const ok = (
+			!e.shiftKey &&
+			!e.altKey &&
+			usesMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.Y
+		)
+		return ok
+	},
+	// Character data must be:
+	//
+	// - A non-macro (such as "ArrowLeft") or command e.key OR
+	// - A "Dead" e.key
+	//
+	characterData(e) {
+		const ok = (
+			!usesMetaOrCtrlKey(e) &&
+			[...e.key].length === 1
+		)
+		console.log(!usesMetaOrCtrlKey(e), e.key)
+		return ok
+	},
+	characterDataCompose(e) {
+		return e.key === "Dead"
+	},
 }
 
 // Detects a key down type.
 function detectKeyDownType(e) {
 	switch (true) {
-	case tab(e):
+	case detect.tab(e):
 		return keyDownTypeEnum.tab
-	case enter(e):
+	case detect.enter(e):
 		return keyDownTypeEnum.enter
-	case backspaceParagraph(e):
+	// NOTE: detect.backspace* are ordered by precedence
+	case detect.backspaceParagraph(e):
 		return keyDownTypeEnum.backspaceParagraph
-	case backspaceWord(e):
+	case detect.backspaceWord(e):
 		return keyDownTypeEnum.backspaceWord
-	case backspaceRune(e):
+	case detect.backspaceRune(e):
 		return keyDownTypeEnum.backspaceRune
-	case forwardBackspaceWord(e):
+	// NOTE: detect.forwardBackspace* are ordered by
+	// precedence
+	case detect.forwardBackspaceWord(e):
 		return keyDownTypeEnum.forwardBackspaceWord
-	case forwardBackspaceRune(e):
+	case detect.forwardBackspaceRune(e):
+	case detect.forwardBackspaceRuneMacOS(e):
 		return keyDownTypeEnum.forwardBackspaceRune
-	case undo(e):
+	case detect.undo(e):
 		return keyDownTypeEnum.undo
-	case redo(e):
+	case detect.redo(e):
+	case detect.redoNonMacOS(e):
 		return keyDownTypeEnum.redo
-	case characterData(e):
+	case detect.characterData(e):
+	case detect.characterDataCompose(e):
 		return keyDownTypeEnum.characterData
 	default:
 		// No-op
