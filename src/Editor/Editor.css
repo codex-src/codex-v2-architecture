@@ -2,15 +2,12 @@
 	-moz-osx-font-smoothing: auto; -webkit-font-smoothing: auto;
 
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-
 	-moz-tab-size: 4;
 	tab-size: 4;
-
 	font-feature-settings: "tnum";
 }
 .codex-editor .font-mono {
 	font-family: "iA Writer Mono var", monospace;
-
 	-moz-tab-size: 2;
 	tab-size: 2;
 }

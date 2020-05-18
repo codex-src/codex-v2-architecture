@@ -20,6 +20,7 @@ const Elements = ({ state, dispatch }) => {
 		<Provider value={[state, dispatch]}>
 			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
+					// FIXME
 					key: uuidv4(),
 					// key: each.id,
 					...each,
