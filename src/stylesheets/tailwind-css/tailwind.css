@@ -18,6 +18,32 @@ html {
 	letter-spacing: 0.0125em;
 }
 
+.text-md-blue-a100 {
+	color: var(--md-blue-a100);
+}
+.text-md-blue-a200 {
+	color: var(--md-blue-a200);
+}
+.text-md-blue-a400 {
+	color: var(--md-blue-a400);
+}
+.text-md-blue-a700 {
+	color: var(--md-blue-a700);
+}
+
+.bg-md-blue-a100 {
+	background-color: var(--md-blue-a100);
+}
+.bg-md-blue-a200 {
+	background-color: var(--md-blue-a200);
+}
+.bg-md-blue-a400 {
+	background-color: var(--md-blue-a400);
+}
+.bg-md-blue-a700 {
+	background-color: var(--md-blue-a700);
+}
+
 .shadow-hero-sm {
 	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
 		0 1px 2px 0 rgba(0, 0, 0, 0.05);
