@@ -184,31 +184,6 @@ const methods = state => ({
 			throw new Error("input: offset2 out of bounds")
 		}
 
-		// const a = state.nodes.slice(offset1, offset2 - offset1 + 1).map(each => each.data).join("\n")
-		// const b = nodes.map(each => each.data).join("\n")
-		//
-		// if (a !== b) {
-		//
-		// 	try {
-		//
-		// 		// https://github.com/google/diff-match-patch/wiki/Language:-JavaScript
-		// 		const dmp = new window.diff_match_patch()
-		// 		const diff = dmp.diff_main(a, b)
-		// 		dmp.diff_cleanupSemantic(diff)
-		// 		console.log(diff)
-		//
-		// 		const from = state.pos1.pos - state.pos1.x + (diff[0][0] !== 0 ? 0 : diff[0][1].length)
-		// 		const to = from + (diff[0][0] === 1 ? diff[0][1].length : diff[1][1].length)
-		// 		const newText = diff[1][1]
-		//
-		// 		console.log({ from, to, newText })
-		//
-		// 	} catch (e) {
-		//
-		// 	}
-		//
-		// }
-
 		// Update and rerender:
 		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
 		Object.assign(state, {

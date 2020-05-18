@@ -293,7 +293,7 @@ const Editor = ({
 					const { roots: [root1, root2], atEnd } = queryRoots(ref.current, state.extPosRange)
 					const nodes = readRoots(ref.current, [root1, root2])
 					const [pos1, pos2] = computePosRange(state, ref.current)
-					dispatch.input(nodes, atEnd, [pos1, pos2])
+					dispatch.input(nodes, false, [pos1, pos2])
 				}),
 
 				onCut: newReadWriteHandler(e => {

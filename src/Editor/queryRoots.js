@@ -6,11 +6,16 @@ import { ascendRoot } from "./ascendNodes"
 // NOTE: atEnd records whether the end node (root) changed
 // because of an enter or backspace event
 function queryRoots(editorRoot, [extPos1ID, extPos2ID]) {
+	// Get node1 and node2:
 	const node1 = ascendRoot(document.getElementById(extPos1ID))
 	if (!node1 || !editorRoot.contains(node1)) {
 		throw new Error("queryRoots: no such node1 or out of bounds")
 	}
 	let node2 = ascendRoot(document.getElementById(extPos2ID))
+	if (!node2 || !editorRoot.contains(node2)) {
+		throw new Error("queryRoots: no such node2 or out of bounds")
+	}
+	// TODO: Remove node2AtEnd
 	let node2AtEnd = false
 	// Guard enter pressed on node2:
 	const next = node2 && node2.nextElementSibling
