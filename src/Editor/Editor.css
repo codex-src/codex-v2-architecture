@@ -16,6 +16,7 @@
 	caret-color: #000;
 }
 
+/* TODO: data-codex-element="..." and data-codex-inline-element="..."? */
 .codex-editor .text-lg .font-medium,
 .codex-editor .text-lg .font-semibold,
 .codex-editor .text-lg .font-bold {

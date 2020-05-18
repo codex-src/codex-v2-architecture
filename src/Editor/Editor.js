@@ -10,12 +10,12 @@ import syncPos from "./syncPos"
 import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
+import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
 import uuidv4 from "uuid/v4"
 
 import {
 	detectRedo,
 	detectUndo,
-	isMetaOrCtrlKey,
 } from "./detect"
 
 import "./Editor.css"
@@ -252,7 +252,7 @@ const Editor = ({
 						return
 					}
 					// Backspace paragraph:
-					if (isMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
+					if (usesMetaOrCtrlKey(e) && e.keyCode === keyCodes.Backspace) {
 						e.preventDefault()
 						dispatch.backspaceParagraph()
 						return
