@@ -1,5 +1,6 @@
 export const HTTPS = "https://"
 export const HTTP = "http://"
+export const WWW = "www."
 
 // Matches a URL terminated by an alphanumeric (word) or
 // forward-slash character.
@@ -19,6 +20,8 @@ export const AnyListRe       = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/ // TaskList
 //
 // https://github.github.com/gfm/#ascii-punctuation-character
 // https://github.github.com/gfm/#example-308
+//
+// TODO: Change to regex
 export const ASCIIPunctuationPattern = "[\\u0021-\\u002f\\u003a-\\u0040\\u005b-\\u0060\\u007b-\\u007e]"
 
 export function isASCIIPunctuation(char) {
@@ -35,6 +38,8 @@ export function isASCIIPunctuation(char) {
 // character as defined by the GFM spec.
 //
 // https://github.github.com/gfm/#whitespace-character
+//
+// TODO: Change to regex
 export const ASCIIWhiteSpacePattern = "[\\u0020\\u0009\\u000a\\u000b\\u000c\\u000d]"
 
 export function isASCIIWhiteSpace(char) {

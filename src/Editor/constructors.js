@@ -20,6 +20,8 @@ export function newRange() {
 }
 
 // Creates a new nodes data structure.
+//
+// TODO: Add version property?
 export function newNodes(data) {
 	const nodes = data.split("\n").map(each => ({
 		id: uuidv4(),
