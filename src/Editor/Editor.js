@@ -253,17 +253,15 @@ const Editor = ({
 							e.preventDefault()
 							dispatch.redo()
 							return
-						// NOTE (1): Character data must be synthetic when
+						// NOTE: Character data must be synthetic when
 						// focused and **not** collapsed
-						// NOTE (2): Breaks "compositionstart"
 						case keyDownTypeEnum.characterData:
 							if (state.focused && !state.collapsed) {
 								e.preventDefault()
+								// FIXME: e.key === "Dead" causes
+								// computePosRange to throw:
+								// "computePosRange: no such selection"
 								dispatch.write(e.key !== "Dead" ? e.key : "")
-
-								// const nodes = computeNodes(ref.current, state.extPosRange)
-								// const [pos1, pos2] = computePosRange(state, ref.current)
-								// dispatch.input(nodes, [pos1, pos2])
 								return
 							}
 							// No-op
@@ -274,18 +272,7 @@ const Editor = ({
 						}
 					}),
 
-					// onCompositionUpdate: newReadWriteHandler(e => {
-					// 	console.log("onCompositionUpdate")
-					//
-					// 	const nodes = computeNodes(ref.current, state.extPosRange)
-					// 	console.log({ data: nodes.map(each => each.data).join("\n") })
-					// 	// const [pos1, pos2] = computePosRange(state, ref.current)
-					// 	// dispatch.input(nodes, [pos1, pos2])
-					// }),
-
 					onCompositionEnd: newReadWriteHandler(e => {
-						console.log("onCompositionEnd")
-
 						// https://github.com/w3c/uievents/issues/202#issue-316461024
 						dedupedCompositionEnd.current = true
 						const nodes = computeNodes(ref.current, state.extPosRange)
