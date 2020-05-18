@@ -1,4 +1,4 @@
-// LRU cache implementation.
+// Least-recently-used (LRU) cache implementation.
 //
 // https://stackoverflow.com/a/46432113
 class LRUCache {
@@ -26,7 +26,7 @@ class LRUCache {
 		}
 		this.cache.set(key, value)
 	}
-	// Returns the least-recently-used key; LRU.
+	// Returns the least-recently-used key.
 	_lru() {
 		return this.cache.keys().next().value
 	}
