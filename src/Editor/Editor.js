@@ -166,28 +166,24 @@ const Editor = ({
 							// No-op
 							return
 						}
-						// // Guard out of bounds range:
-						// const range = selection.getRangeAt(0)
-						// if (range.startContainer === ref.current || range.endContainer === ref.current) {
-						// 	// Iterate to the deepest start node:
-						// 	let node1 = ref.current.childNodes[0]
-						// 	while (node1.childNodes.length) {
-						// 		node1 = node1.childNodes[0]
-						// 	}
-						//
-						// 	// // Iterate to the deepest end node:
-						// 	// let node2 = ref.current.childNodes[ref.current.childNodes.length - 1]
-						// 	// while (node2.childNodes.length) {
-						// 	// 	node2 = node2.childNodes[node2.childNodes.length - 1]
-						// 	// }
-						//
-						// 	// Correct range:
-						// 	range.setStart(node1, 0)
-						// 	// range.setEnd(node2, (node2.nodeValue || "").length)
-						// 	range.collapse()
-						// 	selection.removeAllRanges()
-						// 	selection.addRange(range)
-						// }
+						// Guard document-range:
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current && range.endContainer === ref.current) {
+							// Iterate to the deepest start node:
+							let node1 = ref.current.children[0]
+							while (node1.childNodes.length) {
+								node1 = node1.childNodes[0]
+							}
+							// Iterate to the deepest end node:
+							let node2 = ref.current.children[ref.current.children.length - 1]
+							while (node2.childNodes.length) {
+								node2 = node2.childNodes[node2.childNodes.length - 1]
+							}
+							range.setStart(node1, 0)
+							range.setEnd(node2, (node2.nodeValue || "").length)
+							selection.removeAllRanges()
+							selection.addRange(range)
+						}
 						const [pos1, pos2] = computePosRange(state, ref.current)
 						dispatch.select(pos1, pos2)
 					}),
@@ -197,7 +193,6 @@ const Editor = ({
 					}),
 
 					onPointerMove: newReadWriteHandler(() => {
-						// Must be focused and pointer must be down:
 						if (!state.focused || !pointerDownRef.current) {
 							pointerDownRef.current = false
 							return
@@ -282,7 +277,7 @@ const Editor = ({
 
 					onInput: newReadWriteHandler(e => {
 						// Force rerender when empty (takes precedence):
-						if (!ref.current.childNodes.length) {
+						if (!ref.current.children.length) {
 							dispatch.render()
 							return
 						}
