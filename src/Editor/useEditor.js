@@ -1,8 +1,8 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRUCache from "lib/LRUCache"
+import UndoManager from "lib/UndoManager"
 import parseElements from "./parser/parseElements"
-import UndoManager from "./UndoManager"
 import useMethods from "use-methods"
 
 import {

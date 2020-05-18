@@ -79,7 +79,7 @@ module.exports = {
 		"padding-line-between-statements":  0, // require or disallow padding lines between statements
 		"prefer-arrow-callback":            0, // require using arrow functions for callbacks
 		"prefer-const":                     [1, { destructuring: "all" }], // require `const` declarations for variables that are never reassigned after declared
-		"prefer-destructuring":             [1, { object: true, array: false }], // require destructuring from arrays and/or objects
+		"prefer-destructuring":             0, // require destructuring from arrays and/or objects
 		"prefer-exponentiation-operator":   1, // disallow the use of `Math.pow` in favor of the `**` operator
 		"prefer-numeric-literals":          1, // disallow `parseInt()` and `Number.parseInt()` in favor of binary, octal, and hexadecimal literals
 		"prefer-object-spread":             1, // disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead.

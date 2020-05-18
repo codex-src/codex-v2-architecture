@@ -3,7 +3,7 @@ import typeEnum from "../Elements/typeEnum"
 
 // Parses a header element.
 export function parseHeader(node) {
-	const syntax = node.data.split(" ", 1)[0] + " " // eslint-disable-line prefer-template
+	const syntax = node.data.split(" ", 1)[0] + " "
 	const element = {
 		type: typeEnum.Header,
 		tag: ["h1", "h2", "h3", "h4", "h5", "h6"][syntax.length - 2],
