@@ -257,8 +257,8 @@ const EditorApp = () => {
 						{/* Editor */}
 						<ErrorBoundary>
 							<Editor
-								// style={{ paddingBottom: "calc(100vh - 128px)", fontSize: prefs.fontSize }}
 								style={{
+									paddingBottom: `calc(100vh - 128px - ${prefs.fontSize * 1.5}px)`,
 									fontSize: prefs.fontSize,
 									transitionProperty: "font-size",
 									transitionDuration: "25ms",

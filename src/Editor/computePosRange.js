@@ -56,7 +56,7 @@ function mergePos(src, dst) {
 }
 
 // Computes a cursor data structure by merging the returns
-// computeVDOMPos and computeDOMPos
+// computeVDOMPos and computeDOMPos.
 function computePos(editorState, editorRoot, range) {
 	const { nodes } = editorState
 
