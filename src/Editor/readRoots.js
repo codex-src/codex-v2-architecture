@@ -37,8 +37,6 @@ function readRoots(editorRoot, [rootElement1, rootElement2]) {
 		}
 		rootElement1 = rootElement1.nextElementSibling
 	}
-	// const deduped = dedupeNodes(nodes)
-	// return deduped
 	return nodes
 }
 

@@ -73,7 +73,7 @@ const Editor = ({
 					console.error(error)
 					return
 				}
-				// Defer to useEffect:
+				// Mocks scrollIntoViewIfNeeded.
 				const id = setTimeout(() => {
 					const computed = computeScrollingElementAndOffset((scrollTopOffset || 0), (scrollBottomOffset || 0))
 					if (!computed || !computed.offset) {
@@ -216,7 +216,6 @@ const Editor = ({
 						return
 					case keyDownTypeEnum.enter:
 						e.preventDefault()
-						console.log("detected and prevented enter")
 						dispatch.enter()
 						return
 					case keyDownTypeEnum.backspaceParagraph:
