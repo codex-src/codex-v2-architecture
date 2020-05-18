@@ -1,10 +1,10 @@
 import emitElements from "./emitElements"
 import newURLHashEpoch from "./newURLHashEpoch"
-import parseInlineElements from "./parseInlineElements"
 import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
+// TODO: Add "h" for naked embeds
 function testFastPass(char) {
 	const ok = (
 		(char >= "a" && char <= "z") || // char !== "h" &&
@@ -178,31 +178,23 @@ function parseElements(nodes, cachedElements) {
 			}
 			// No-op
 			break
-
 		// <Image>
+		//
+		// NOTE: Uses regex
 		case "!":
 		case "[":
 			// ![Image](src) or [![Image](src)](href)
-			//
-			// https://regex101.com/r/FBKxEO/1
 			let matches = null
 			if (each.data[0] === "!") {
+				// https://regex101.com/r/FBKxEO/1
 				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)$/)
-			// https://regex101.com/r/FBKxEO/2
 			} else if (each.data[0] === "[") {
+				// https://regex101.com/r/FBKxEO/2
 				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)$/)
 			}
 			if (matches) {
 				const [, alt, src, href] = matches
-				const element = cacheStrategy(each, node => ({
-					type: typeEnum.Image,
-					id: each.id,
-					syntax: !href ? ["![", `](${src})`] : ["[![", `](${src})](${href})`],
-					src,
-					alt: toInnerText(alt),
-					href,
-					children: parseInlineElements(alt),
-				}))
+				const element = cacheStrategy(each, node => emitElements.Image(node, { alt, src, href }))
 				elements.push({
 					...element,
 					id: each.id,

@@ -1,6 +1,7 @@
 import emitAnyList from "./emitAnyList"
 import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../Elements/typeEnum"
+import { toInnerText } from "../Elements/cmap"
 
 // Gets header metadata.
 function getHeaderInfo(node) {
@@ -28,8 +29,6 @@ function getPreformattedMetadata(node) {
 // *type
 // *id
 // *children
-//
-// TODO: Add emitElements.Image
 const emitElements = {
 	// +tag (needed for cmap)
 	// +syntax
@@ -87,6 +86,22 @@ const emitElements = {
 	},
 	AnyList(range) {
 		return emitAnyList(range)
+	},
+	// +syntax
+	// +src
+	// +alt
+	// +href
+	Image(node, { alt, src, href }) {
+		const element = {
+			type: typeEnum.Image,
+			id: node.id,
+			syntax: !href ? ["![", `](${src})`] : ["[![", `](${src})](${href})`],
+			src,
+			alt: toInnerText(alt),
+			href,
+			children: parseInlineElements(alt),
+		}
+		return element
 	},
 	// +syntax
 	// -children
