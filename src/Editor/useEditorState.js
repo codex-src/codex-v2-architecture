@@ -1,4 +1,8 @@
 import EditorContext from "./EditorContext"
 import React from "react"
 
-export default () => React.useContext(EditorContext)
+function useEditorState() {
+	return React.useContext(EditorContext)
+}
+
+export default useEditorState
