@@ -202,6 +202,7 @@ const Editor = ({
 					pointerDownRef.current = false
 				}),
 
+				// TODO: Prevent browser-formatting shortcuts?
 				onKeyDown: newReadWriteHandler(e => {
 					switch (detectKeyDownType(e)) {
 					case keyDownTypeEnum.tab:

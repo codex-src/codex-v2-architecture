@@ -4,12 +4,17 @@ import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
-// TODO: Add "h" for naked embeds
+const A = 0x41
+const Z = 0x5a
+const a = 0x61
+const z = 0x71
+
 function testFastPass(char) {
+	const code = char.codePointAt(0)
 	const ok = (
-		(char >= "a" && char <= "z") || // char !== "h" &&
-		(char >= "A" && char <= "Z") ||
-		char === " "
+		(code >= A && code <= Z) || // Takes precedence
+		(code >= a && code <= z) ||
+		(code > 0x7f)
 	)
 	return ok
 }
