@@ -245,7 +245,7 @@ const methods = state => ({
 	backspaceWord() {
 		state.history.mutate()
 
-		if (state.pos1.pos !== state.pos2.pos) {
+		if (!state.collapsed) {
 			this.write("")
 			return
 		}
@@ -299,7 +299,7 @@ const methods = state => ({
 	forwardBackspaceWord() {
 		state.history.mutate()
 
-		if (state.pos1.pos !== state.pos2.pos) {
+		if (!state.collapsed) {
 			this.write("")
 			return
 		}
@@ -353,7 +353,7 @@ const methods = state => ({
 	backspaceParagraph() {
 		state.history.mutate()
 
-		if (state.pos1.pos !== state.pos2.pos) {
+		if (!state.collapsed) {
 			this.write("")
 			return
 		}

@@ -60,9 +60,7 @@ function forwardBackspaceWord(e) {
 }
 
 function forwardBackspaceRune(e) {
-	const ok1 = (
-		e.keyCode === keyCodes.Delete
-	)
+	const ok1 = e.keyCode === keyCodes.Delete
 	// macOS:
 	const ok2 = (
 		navigator.userAgent.indexOf("Mac OS X") !== -1 &&
@@ -99,6 +97,19 @@ function redo(e) {
 	return ok1 || ok2
 }
 
+function characterData(e) {
+	const ok1 = (
+		!e.ctrlKey &&
+		!e.altKey && // FIXME?
+		!e.metaKey &&
+		[...e.key].length === 1 // Negates macros such as "ArrowLeft", etc.
+	)
+	// NOTE: e.key === "Dead" on "compositionstart",
+	// "compositionupdate", and "compositionend"
+	const ok2 = e.key === "Dead"
+	return ok1 || ok2
+}
+
 // Detects a key down type.
 function detectKeyDownType(e) {
 	switch (true) {
@@ -120,6 +131,8 @@ function detectKeyDownType(e) {
 		return keyDownTypeEnum.undo
 	case redo(e):
 		return keyDownTypeEnum.redo
+	case characterData(e):
+		return keyDownTypeEnum.characterData
 	default:
 		// No-op
 		break
@@ -128,4 +141,3 @@ function detectKeyDownType(e) {
 }
 
 export default detectKeyDownType
-

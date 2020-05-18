@@ -261,16 +261,20 @@ const Editor = ({
 						e.preventDefault()
 						dispatch.redo()
 						return
+					// NOTE: Character data must be synthetic when
+					// focused and **not** collapsed
+					case keyDownTypeEnum.characterData:
+						if (state.focused && !state.collapsed) {
+							e.preventDefault()
+							// NOTE: Breaks "compositionstart"
+							dispatch.write(e.key !== "Dead" ? e.key : "")
+							return
+						}
+						// No-op
+						break
 					default:
 						// No-op
 						break
-					}
-
-					// TODO: Cut, copy, paste need to passthrough
-					if (state.pos1.pos !== state.pos2.pos && ((!e.ctrlKey && !e.altKey && !e.metaKey && [...e.key].length === 1) || e.key === "Dead")) {
-						e.preventDefault()
-						dispatch.write(e.key !== "Dead" ? e.key : "")
-						return
 					}
 				}),
 

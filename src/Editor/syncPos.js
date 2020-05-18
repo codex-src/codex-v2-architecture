@@ -93,7 +93,7 @@ function syncPos(editorState, editorRoot, [pos1, pos2]) {
 	// }
 	const range1 = computeRange(editorState, editorRoot, pos1.pos)
 	let range2 = { ...range1 }
-	if (pos2.pos !== pos1.pos) {
+	if (pos2.pos !== pos1.pos) { // TODO: Use !editorState.collapsed?
 		range2 = computeRange(editorState, editorRoot, pos2.pos)
 	}
 	// Guard bounds:
