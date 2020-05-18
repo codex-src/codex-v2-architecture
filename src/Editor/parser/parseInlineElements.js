@@ -84,7 +84,7 @@ function parseInlineElements(str) {
 			elements[elements.length - 1] += str[x1]
 			continue
 		}
-		const n = str.length - x1
+		const nchars = str.length - x1
 		switch (str[x1]) {
 		// <Escape>
 		case "\\":
@@ -105,7 +105,7 @@ function parseInlineElements(str) {
 		// <Emphasis>
 		case "_":
 			// _Emphasis_
-			if (n >= "_?_".length) {
+			if (nchars >= "_?_".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
@@ -125,7 +125,7 @@ function parseInlineElements(str) {
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis*** (takes precedence)
-			if (n >= "***?***".length && str.slice(x1, x1 + 3) === "***") {
+			if (nchars >= "***?***".length && str.slice(x1, x1 + 3) === "***") {
 				const res = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
@@ -140,7 +140,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// **Strong** (takes precedence)
-			} else if (n >= "**?**".length && str.slice(x1, x1 + 2) === "**") {
+			} else if (nchars >= "**?**".length && str.slice(x1, x1 + 2) === "**") {
 				const res = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
@@ -155,7 +155,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// *Emphasis*
-			} else if (n >= "*?*".length) {
+			} else if (nchars >= "*?*".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
@@ -175,7 +175,7 @@ function parseInlineElements(str) {
 		// <Code> (1 of 2)
 		case "`":
 			// `Code`
-			if (n >= "`?`".length) {
+			if (nchars >= "`?`".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
@@ -195,7 +195,7 @@ function parseInlineElements(str) {
 		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
 			// ~~Strikethrough~~ (takes precedence)
-			if (n >= "~~?~~".length && str.slice(x1, x1 + 2) === "~~") {
+			if (nchars >= "~~?~~".length && str.slice(x1, x1 + 2) === "~~") {
 				const res = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
@@ -210,7 +210,7 @@ function parseInlineElements(str) {
 				x1 = res.x2 - 1
 				continue
 			// ~Code~
-			} else if (n >= "~?~".length) {
+			} else if (nchars >= "~?~".length) {
 				const res = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
@@ -231,8 +231,8 @@ function parseInlineElements(str) {
 		case "h":
 			// https:// or http://
 			if (
-				(n >= HTTPS.length && str.slice(x1, x1 + HTTPS.length) === HTTPS) ||
-				(n >= HTTP.length && str.slice(x1, x1 + HTTP.length) === HTTP)
+				(nchars >= HTTPS.length && str.slice(x1, x1 + HTTPS.length) === HTTPS) ||
+				(nchars >= HTTP.length && str.slice(x1, x1 + HTTP.length) === HTTP)
 			) {
 				let syntax = `${str.slice(x1).split("://", 1)[0]}://`
 				if (str.slice(x1, x1 + syntax.length + 4) === `${syntax}www.`) {
@@ -258,7 +258,7 @@ function parseInlineElements(str) {
 		// <Anchor> (2 of 2)
 		case "[":
 			// [Anchor](href)
-			if (n >= "[?](?)".length) {
+			if (nchars >= "[?](?)".length) {
 				const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
 				if (!lhs) {
 					// No-op
