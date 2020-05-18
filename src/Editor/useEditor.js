@@ -474,7 +474,14 @@ const methods = state => ({
 		state.history.push(currentState)
 	},
 	// Undos once (stores the current state).
-	undo(currentState) {
+	undo() {
+		// Copy the current state -- deep copy references types:
+		const currentState = {
+			data: state.data,
+			nodes: state.nodes.map(each => ({ ...each })),
+			pos1: { ...state.pos1 },
+			pos2: { ...state.pos2 },
+		}
 		const undoState = state.history.undo(currentState)
 		if (!undoState) {
 			// No-op

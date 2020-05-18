@@ -11,7 +11,6 @@ import syncPos from "./syncPos"
 import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
-import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
 import uuidv4 from "uuid/v4"
 
 import "./Editor.css"
@@ -258,10 +257,7 @@ const Editor = ({
 						return
 					case keyDownTypeEnum.undo:
 						e.preventDefault()
-						// FIXME
-						const { data, nodes, pos1, pos2 } = state
-						const currentState = { data, nodes, pos1, pos2 }
-						dispatch.undo(currentState)
+						dispatch.undo()
 						return
 					case keyDownTypeEnum.redo:
 						e.preventDefault()
@@ -271,7 +267,6 @@ const Editor = ({
 						// No-op
 						break
 					}
-					return ""
 
 					// TODO: Cut, copy, paste need to passthrough
 					if (state.pos1.pos !== state.pos2.pos && ((!e.ctrlKey && !e.altKey && !e.metaKey && [...e.key].length === 1) || e.key === "Dead")) {

@@ -1,6 +1,5 @@
 import keyDownTypeEnum from "./keyDownTypeEnum"
 import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
-import { StringEnum } from "lib/Enums"
 
 const keyCodes = {
 	Tab: 9,
