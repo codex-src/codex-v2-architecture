@@ -94,7 +94,7 @@ const detect = {
 	},
 	// Character data must be:
 	//
-	// - A non-macro (such as "ArrowLeft") or command e.key OR
+	// - A non-macro (such as "Enter") or command e.key OR
 	// - A "Dead" e.key
 	//
 	characterData(e) {
@@ -102,7 +102,6 @@ const detect = {
 			!usesMetaOrCtrlKey(e) &&
 			[...e.key].length === 1
 		)
-		console.log(!usesMetaOrCtrlKey(e), e.key)
 		return ok
 	},
 	characterDataCompose(e) {
