@@ -1,9 +1,10 @@
+import * as keyDownEvents from "./keyDownEvents"
 import EditorContext from "./EditorContext"
 import React from "react"
 import ReactDOM from "react-dom"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-import keyCodes from "./keyCodes"
+import keyCodes from "./keyCodes" // TODO: Remove
 import queryRoots from "./queryRoots"
 import readRoots from "./readRoots"
 import syncPos from "./syncPos"
@@ -12,11 +13,6 @@ import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
 import uuidv4 from "uuid/v4"
-
-import {
-	detectRedo,
-	detectUndo,
-} from "./detect"
 
 import "./Editor.css"
 
@@ -224,17 +220,6 @@ const Editor = ({
 				}),
 
 				onKeyDown: newReadWriteHandler(e => {
-					// NOTE: Safari registers select-all, cut, copy,
-					// and paste as key press events
-					if (navigator.vendor === "Apple Computer, Inc." && (
-						e.keyCode === keyCodes.A ||
-						e.keyCode === keyCodes.X ||
-						e.keyCode === keyCodes.C ||
-						e.keyCode === keyCodes.V
-					)) {
-						// No-op
-						return
-					}
 					// Tab:
 					if (!e.ctrlKey && e.keyCode === keyCodes.Tab) {
 						const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
@@ -280,14 +265,14 @@ const Editor = ({
 						return
 					}
 					// Undo:
-					if (detectUndo(e)) {
+					if (keyDownEvents.undo(e)) {
 						e.preventDefault()
 						const { data, nodes, pos1, pos2 } = state
 						const currentState = { data, nodes, pos1, pos2 }
 						dispatch.undo(currentState)
 						return
 					// Redo:
-					} else if (detectRedo(e)) {
+					} else if (keyDownEvents.redo(e)) {
 						e.preventDefault()
 						dispatch.redo()
 						return
