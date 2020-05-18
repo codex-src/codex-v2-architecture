@@ -181,12 +181,6 @@ const Editor = ({
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
-					// try {
-					// 	const [pos1, pos2] = computePosRange(state, ref.current)
-					// 	dispatch.select(pos1, pos2)
-					// } catch (error) {
-					// 	console.error(error)
-					// }
 					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.select(pos1, pos2)
 				}),
@@ -251,8 +245,8 @@ const Editor = ({
 						e.preventDefault()
 						dispatch.redo()
 						return
-						// NOTE: Character data must be synthetic when
-						// focused and **not** collapsed
+					// NOTE: Character data must be synthetic when
+					// focused and **not** collapsed
 					case keyDownTypeEnum.characterData:
 						if (state.focused && !state.collapsed) {
 							e.preventDefault()
@@ -279,7 +273,6 @@ const Editor = ({
 				}),
 
 				onInput: newReadWriteHandler(e => {
-					// Force rerender when empty (takes precedence):
 					if (!ref.current.children.length) {
 						dispatch.render()
 						return

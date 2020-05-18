@@ -123,6 +123,8 @@ function computePos(editorState, editorRoot, range) {
 }
 
 // Computes cursor data structures.
+//
+// TODO: Do not throw -- reuse editorState.pos?
 function computePosRange(editorState, editorRoot) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
