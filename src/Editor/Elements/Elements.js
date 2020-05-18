@@ -79,9 +79,9 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</HOC.Root>
 ))
 
-// export const Pre = props => (
-// 	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
-// )
+const HOCPre = props => (
+	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
+)
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
@@ -103,30 +103,32 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root id={id} className="px-6 rounded shadow-hero" {...attrs.code}>
-			<HOC.Node id={range[0].id} className="font-mono text-sm leading-none">
-				<Markdown syntax={[syntax[0]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</HOC.Node>
-			{$range.map(each => (
-				<HOC.Node key={each.id} id={each.id} className="font-mono text-sm leading-snug">
-					<span dangerouslySetInnerHTML={{
-						__html: each.data || (
-							"<br />"
-						),
-					}} />
-				</HOC.Node>
-			))}
-			<HOC.Node id={range[range.length - 1].id} className="font-mono text-sm leading-none">
-				<Markdown syntax={[syntax[1]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</HOC.Node>
+		<HOC.Root id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.code}>
+			<span className="inline-block">
+				<HOCPre id={range[0].id} className="font-mono text-sm leading-none">
+					<Markdown syntax={[syntax[0]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</HOCPre>
+				{$range.map(each => (
+					<HOCPre key={each.id} id={each.id} className="font-mono text-sm leading-snug">
+						<span dangerouslySetInnerHTML={{
+							__html: each.data || (
+								"<br />"
+							),
+						}} />
+					</HOCPre>
+				))}
+				<HOCPre id={range[range.length - 1].id} className="font-mono text-sm leading-none">
+					<Markdown syntax={[syntax[1]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</HOCPre>
+			</span>
 		</HOC.Root>
 	)
 })

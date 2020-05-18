@@ -6,7 +6,7 @@ export const Node = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 		ref,
 		id,
 		"style": {
-			// NOTE: white-space: pre-wrap is needed because of
+			// NOTE: Use white-space: pre-wrap because of
 			// contenteditable
 			whiteSpace: "pre-wrap", // Takes precedence (because of <Pre>)
 			...style,
@@ -21,7 +21,7 @@ export const Root = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 		ref,
 		id,
 		"style": {
-			// NOTE: white-space: pre-wrap is needed because of
+			// NOTE: Use white-space: pre-wrap because of
 			// contenteditable
 			whiteSpace: "pre-wrap", // Takes precedence (because of <Pre>)
 			...style,
