@@ -151,7 +151,7 @@ const Editor = ({
 
 				id,
 
-				className: trimWhiteSpace(`em-context codex-editor ${!state.readOnly ? "" : "feature-read-only"} ${className}`),
+				className: trimWhiteSpace(`em-context codex-editor ${!state.readOnly ? "" : "feature-read-only"} ${className || ""}`),
 
 				style: {
 					...style, // Takes precedence
@@ -219,17 +219,13 @@ const Editor = ({
 				}),
 
 				onKeyDown: newReadWriteHandler(e => {
-
 					switch (detectKeyDownType(e)) {
 					case keyDownTypeEnum.tab:
-						// const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
-						// if (focusedCheckbox) {
-						// 	// No-op
-						// 	return
-						// }
-
-						// if (state.focused && state.collapsed && )
-						console.log(document.activeElement)
+						const focusedCheckbox = state.focused && state.collapsed && document.activeElement?.getAttribute("data-codex-checkbox")
+						if (focusedCheckbox) {
+							// No-op
+							return
+						}
 						e.preventDefault()
 						dispatch.tab(e.shiftKey)
 						return
