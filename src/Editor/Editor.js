@@ -206,8 +206,8 @@ const Editor = ({
 				onKeyDown: newReadWriteHandler(e => {
 					switch (detectKeyDownType(e)) {
 					case keyDownTypeEnum.tab:
-						const focusedCheckbox = state.focused && state.collapsed && document.activeElement?.getAttribute("data-codex-checkbox")
-						if (focusedCheckbox) {
+						const focusedTodoCheckbox = state.focused && state.collapsed && document.activeElement?.getAttribute("data-codex-checkbox")
+						if (focusedTodoCheckbox) {
 							// No-op
 							return
 						}

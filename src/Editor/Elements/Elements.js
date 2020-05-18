@@ -141,7 +141,7 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</HOC.Node>
 ))
 
-const Checkbox = ({ id, checked }) => {
+const TodoCheckbox = ({ id, checked }) => {
 	const [, { checkTodo }] = useEditorState()
 	return (
 		<Button
@@ -166,7 +166,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
-				<Checkbox id={id} checked={checked} />
+				<TodoCheckbox id={id} checked={checked} />
 			</div>
 			{toReact(children) || (
 				<br />
