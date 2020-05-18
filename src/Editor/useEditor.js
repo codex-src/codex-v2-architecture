@@ -17,12 +17,9 @@ import {
 
 // Prepares a new editor state (for useEditor).
 function newEditorState(data) {
-
 	const nodes = newNodes(data)
 	const [pos1, pos2] = [newPos(), newPos()]
-
 	const initialState = { data, nodes, pos1, pos2 }
-
 	// Returns whether the current and next state are equal.
 	const areEqual = (currentState, nextState) => {
 		const ok = (
@@ -31,9 +28,7 @@ function newEditorState(data) {
 		)
 		return ok
 	}
-
 	const cachedElements = new LRUCache(100)
-
 	const editorState = {
 		readOnly: false,                                  // Is read-only?
 		focused: false,                                   // Is focused?
@@ -45,9 +40,7 @@ function newEditorState(data) {
 		history: new UndoManager(initialState, areEqual), // Undo manager
 		cachedElements,                                   // LRU cached parsed elements
 		elements: parseElements(nodes, cachedElements),   // Parsed elements
-		reactDOM: document.createElement("div"),          // React-managed DOM
 	}
-
 	return editorState
 }
 
