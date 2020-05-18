@@ -36,6 +36,7 @@ function newEditorState(data) {
 		nodes,                                            // Document nodes
 		pos1,                                             // Start cursor data structure
 		pos2,                                             // End cursor data structure
+		collapsed: true,                                  // Are the cursors collapsed?
 		extPosRange: ["", ""],                            // Extended node (root ID) range
 		history: new UndoManager(initialState, areEqual), // Undo manager
 		cachedElements,                                   // LRU cached parsed elements
@@ -83,6 +84,7 @@ const methods = state => ({
 		Object.assign(state, {
 			pos1,
 			pos2,
+			collapsed: pos1.pos === pos2.pos,
 			extPosRange,
 		})
 	},
@@ -220,7 +222,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		let dropL = 0
-		if (state.pos1.pos === state.pos2.pos && state.pos1.pos) {
+		if (state.collapsed && state.pos1.pos) {
 			const substr = state.data.slice(0, state.pos1.pos)
 			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
 			dropL = rune.length
@@ -232,7 +234,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		let dropR = 0
-		if (state.pos1.pos === state.pos2.pos && state.pos1.pos < state.data.length) {
+		if (state.collapsed && state.pos1.pos < state.data.length) {
 			const substr = state.data.slice(state.pos1.pos)
 			const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
 			dropR = rune.length
@@ -377,7 +379,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
-		if (state.pos1.pos === state.pos2.pos && !AnyListRe.test(node.data)) {
+		if (state.collapsed && !AnyListRe.test(node.data)) {
 			this.write("\t")
 		} else if (!shiftKey) {
 			this.tabMany()
@@ -426,7 +428,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
-		if (state.pos1.pos === state.pos2.pos && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
+		if (state.collapsed && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
 			const [, tabs, syntax] = node.data.match(AnyListRe)
 			if ((tabs + syntax) === node.data) {
 				this.backspaceParagraph() // Revert to paragraph

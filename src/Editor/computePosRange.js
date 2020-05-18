@@ -102,6 +102,8 @@ function computePos(editorState, editorRoot, range) {
 		childrenOffset = [...editorRoot.children].findIndex(each => each.id === extID)
 	}
 
+	// TODO: Use editorState.collapsed?
+	//
 	// // Compares two cursor data structures.
 	// const comparePos = (pos1, pos2) => {
 	// 	const ok = (

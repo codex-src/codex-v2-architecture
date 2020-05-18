@@ -222,12 +222,13 @@ const Editor = ({
 
 					switch (detectKeyDownType(e)) {
 					case keyDownTypeEnum.tab:
-						// FIXME
 						// const focusedCheckbox = document.activeElement.getAttribute("data-codex-checkbox")
 						// if (focusedCheckbox) {
 						// 	// No-op
 						// 	return
 						// }
+
+						// if (state.focused && state.collapsed && )
 						e.preventDefault()
 						dispatch.tab(e.shiftKey)
 						return
@@ -311,7 +312,7 @@ const Editor = ({
 
 				onCut: newReadWriteHandler(e => {
 					e.preventDefault()
-					if (state.pos1.pos === state.pos2.pos) {
+					if (state.collapsed) {
 						// No-op
 						return
 					}
@@ -322,7 +323,7 @@ const Editor = ({
 
 				onCopy: newReadWriteHandler(e => {
 					e.preventDefault()
-					if (state.pos1.pos === state.pos2.pos) {
+					if (state.collapsed) {
 						// No-op
 						return
 					}

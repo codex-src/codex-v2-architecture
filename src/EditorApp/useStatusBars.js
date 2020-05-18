@@ -12,7 +12,7 @@ function computeStatusLHS(editorState) {
 		if (!editorState.focused) {
 			return "No selection"
 		}
-		if (editorState.pos1.pos === editorState.pos2.pos) {
+		if (editorState.collapsed) {
 			return `Line ${format(editorState.pos1.y + 1)}, column ${format(editorState.pos1.x + 1)}`
 		} else {
 			return `Selected ${lines < 2 ? "" : `${format(lines)} lines, `}${format(chars)} character${chars === 1 ? "" : "s"}`

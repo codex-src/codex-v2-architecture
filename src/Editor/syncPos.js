@@ -82,6 +82,8 @@ function computeRange(editorState, editorRoot, pos) {
 // Synchronizes cursors.
 function syncPos(editorState, editorRoot, [pos1, pos2]) {
 	const selection = document.getSelection()
+	// TODO: Use editorState.collapsed?
+	//
 	// // https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
 	// if (selection.rangeCount) {
 	// 	const [domPos1, domPos2] = computePosRange(editorState, editorRoot)
