@@ -33,8 +33,8 @@ const Outline = ({
 
 			{/* Title */}
 			<Button
-				// NOTE: Use w-full because of <Button>
-				className="py-1 flex flex-row items-center w-full text-gray-500 hover:text-blue-500 truncate transition duration-200"
+				// NOTE: Use w-full text-left because of <Button>
+				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-200"
 				onPointerEnter={() => setHoverOutline(true)}
 				onPointerLeave={() => setHoverOutline(false)}
 				onClick={toggleOutline}
