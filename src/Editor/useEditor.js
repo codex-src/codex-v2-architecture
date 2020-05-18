@@ -93,6 +93,18 @@ const methods = state => ({
 			extPosRange,
 		})
 	},
+
+	// Resets character data.
+	reset(data) {
+		Object.assign(state, {
+			focused: false,
+			nodes: newNodes(data),
+			pos1: newPos(),
+			pos2: newPos(),
+		})
+		this.render()
+	},
+
 	// Writes character data.
 	//
 	// FIXME: write does **not** update pos.x and pos.y
@@ -176,6 +188,37 @@ const methods = state => ({
 		if (offset2 === -1) {
 			throw new Error("input: offset2 out of bounds")
 		}
+
+		// console.log(
+		// 	state.nodes.slice(offset1, offset2 - offset1 + 1).map(each => each.data).join("\n"),
+		// 	nodes.map(each => each.data).join("\n"),
+		// )
+
+		const a = state.nodes.slice(offset1, offset2 - offset1 + 1).map(each => each.data).join("\n")
+		const b = nodes.map(each => each.data).join("\n")
+
+		if (a !== b) {
+
+			try {
+
+				// https://github.com/google/diff-match-patch/wiki/Language:-JavaScript
+				const dmp = new window.diff_match_patch()
+				const diff = dmp.diff_main(a, b)
+				dmp.diff_cleanupSemantic(diff)
+				console.log(diff)
+
+				const from = state.pos1.pos - state.pos1.x + (diff[0][0] !== 0 ? 0 : diff[0][1].length)
+				const to = from + (diff[0][0] === 1 ? diff[0][1].length : diff[1][1].length)
+				const newText = diff[1][1]
+
+				console.log({ from, to, newText })
+
+			} catch (e) {
+
+			}
+
+		}
+
 		// Update and rerender:
 		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
 		Object.assign(state, {
@@ -466,6 +509,14 @@ const methods = state => ({
 	render() {
 		// let t = Date.now()
 		const data = state.nodes.map(each => each.data).join("\n")
+
+		//		// "Hello, world!"
+		//		// 				x   y
+		//
+		//		state.data     -> String
+		//		state.pos1.pos -> Number
+		//		state.pos2.pos -> Number
+
 		// console.log(`data=${Date.now() - t}`)
 
 		const t = Date.now()

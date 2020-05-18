@@ -21,9 +21,9 @@ export function newRange() {
 
 // Creates a new nodes data structure.
 export function newNodes(str) {
-	const doc = str.split("\n").map(each => ({
+	const nodes = str.split("\n").map(each => ({
 		id: uuidv4(),
 		data: each,
 	}))
-	return doc
+	return nodes
 }

@@ -21,20 +21,39 @@ import { toText } from "Editor/Elements/cmap"
 // document.body.classList.toggle("debug-css")
 
 const data = (() => {
-	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
-	if (!cache) {
-		return raw("./EditorApp.md")
-	}
-	const json = JSON.parse(cache)
-	if (!json.data) {
-		return raw("./EditorApp.md")
-	}
-	return json.data
+	return "# Hello, Henning `hediet`!"
+	// const cache = localStorage.getItem(LOCALSTORAGE_KEY)
+	// if (!cache) {
+	// 	return raw("./EditorApp.md")
+	// }
+	// const json = JSON.parse(cache)
+	// if (!json.data) {
+	// 	return raw("./EditorApp.md")
+	// }
+	// return json.data
 })()
 
-const App = () => {
+const EditorApp = () => {
 	const [state, dispatch] = useEditor(data)
 	const [prefs, prefsDispatch] = usePreferences(state)
+
+	// // Sends to parent context.
+	// const sendToParent = payload => {
+	// 	window.parent.postMessage(payload, "*")
+	// }
+	// React.useEffect(() => {
+	// 	sendToParent({
+	// 		kind: "init",
+	// 	})
+	// 	// document.body.style.background = "yellow"
+	// 	window.addEventListener("message", e => {
+	// 		// document.body.style.background = "green"
+	// 		if (e.data.kind === "load") {
+	// 			// document.body.style.background = "blue"
+	// 			dispatch.reset(e.data.markdown)
+	// 		}
+	// 	}, "*")
+	// }, [dispatch])
 
 	const meta = useTitleAndEmoji(state)
 	const outline = useOutline(state)
@@ -70,46 +89,88 @@ const App = () => {
 		[DOMContentLoaded, state.data, prefs.showSidebar],
 	)
 
-	// Shortcut: command-s.
-	React.useEffect(
-		React.useCallback(() => {
-			const handler = e => {
-				if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
-					// No-op
-					return
-				}
-				e.preventDefault()
-				if (!window.confirm("Download a copy of your note?")) {
-					// No-op
-					return
-				}
-				const title = toText(state.elements.slice(0, 1)).split("\n", 1)[0]
-				download(`${title}.md`, new Blob([state.data, "\n"]))
-			}
-			document.addEventListener("keydown", handler)
-			return () => {
-				document.removeEventListener("keydown", handler)
-			}
-		}, [state]),
-		[state.data],
-	)
-
-	// Shortcut: command-p.
-	React.useEffect(() => {
-		const handler = e => {
-			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
-				// No-op
-				return
-			}
-			e.preventDefault()
-			dispatch.toggleReadOnly()
-			prefsDispatch.toggleReadOnly()
-		}
-		document.addEventListener("keydown", handler)
-		return () => {
-			document.removeEventListener("keydown", handler)
-		}
-	}, [dispatch, prefsDispatch])
+	//	React.useEffect(() => {
+	//		const handleOpen = e => {
+	//			if (!window.go_open) {
+	//				// No-op
+	//				return
+	//			}
+	//
+	//			if (!(e.metaKey && e.keyCode === 79)) { // "o"
+	//				// No-op
+	//				return
+	//			}
+	//			e.preventDefault()
+	//			window.go_open().then(content => {
+	//				console.log("dispatch.reset(content)")
+	//				dispatch.reset(content)
+	//			})
+	//		}
+	//		document.addEventListener("keydown", handleOpen)
+	//
+	//		const handleSave = e => {
+	//			if (!window.go_save) {
+	//				// No-op
+	//				return
+	//			}
+	//
+	//			if (!(e.metaKey && e.keyCode === 83)) { // "s"
+	//				// No-op
+	//				return
+	//			}
+	//			e.preventDefault()
+	//			console.log("window.go_save(state.data)")
+	//			window.go_save(state.data)
+	//		}
+	//		document.addEventListener("keydown", handleSave)
+	//
+	//		return () => {
+	//			document.removeEventListener("keydown", handleOpen)
+	//			document.removeEventListener("keydown", handleSave)
+	//		}
+	//	}, [state.data, dispatch])
+	//
+	//
+	//	// // Shortcut: command-s.
+	//	// React.useEffect(
+	//	// 	React.useCallback(() => {
+	//	// 		const handler = e => {
+	//	// 			if (!(isMetaOrCtrlKey(e) && e.keyCode === 83)) { // 83: S
+	//	// 				// No-op
+	//	// 				return
+	//	// 			}
+	//	// 			e.preventDefault()
+	//	// 			if (!window.confirm("Download a copy of your note?")) {
+	//	// 				// No-op
+	//	// 				return
+	//	// 			}
+	//	// 			const title = toText(state.elements.slice(0, 1)).split("\n", 1)[0]
+	//	// 			download(`${title}.md`, new Blob([state.data, "\n"]))
+	//	// 		}
+	//	// 		document.addEventListener("keydown", handler)
+	//	// 		return () => {
+	//	// 			document.removeEventListener("keydown", handler)
+	//	// 		}
+	//	// 	}, [state]),
+	//	// 	[state.data],
+	//	// )
+	//
+	//	// Shortcut: command-p.
+	//	React.useEffect(() => {
+	//		const handler = e => {
+	//			if (!(isMetaOrCtrlKey(e) && e.keyCode === 80)) { // 80: P
+	//				// No-op
+	//				return
+	//			}
+	//			e.preventDefault()
+	//			dispatch.toggleReadOnly()
+	//			prefsDispatch.toggleReadOnly()
+	//		}
+	//		document.addEventListener("keydown", handler)
+	//		return () => {
+	//			document.removeEventListener("keydown", handler)
+	//		}
+	//	}, [dispatch, prefsDispatch])
 
 	// Shortcut: esc.
 	React.useEffect(() => {
@@ -157,7 +218,7 @@ const App = () => {
 			{/* RHS */}
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
-				<DocumentTitleAndEmoji title={meta.title || "Untitled"} emoji={meta.emoji}>
+				<DocumentTitleAndEmoji title={(meta.title || "Untitled") + ` (v0.6)`} emoji={meta.emoji}>
 					<div className="relative">
 
 						{/* Placeholder */}
@@ -209,4 +270,4 @@ const App = () => {
 	)
 }
 
-export default App
+export default EditorApp
