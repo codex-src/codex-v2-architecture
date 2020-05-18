@@ -1,5 +1,6 @@
 import React from "react"
 
+// Renders to document.title. Can be used as an effect.
 const DocumentTitle = ({ title, children }) => {
 	React.useEffect(() => {
 		if (!title) {

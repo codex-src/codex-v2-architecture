@@ -1,5 +1,8 @@
 import React from "react"
 
+// Renders to document.title and <link rel="icon">. Can be
+// used as an effect.
+//
 // https://css-tricks.com/emojis-as-favicons
 const DocumentTitleAndEmoji = ({ title, emoji, children }) => {
 
@@ -27,7 +30,6 @@ const DocumentTitleAndEmoji = ({ title, emoji, children }) => {
 		}
 		const originalHref = element
 		element.href = (
-			// eslint-disable-next-line prefer-template
 			"data:image/svg+xml," +
 				"<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>" +
 					"<text y=%220.875em%22 font-size=%22100%22>" +
