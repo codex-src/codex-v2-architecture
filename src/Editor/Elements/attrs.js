@@ -1,6 +1,10 @@
 // Extraneous shared attributes.
 const attrs = {
 	code: {
+		// https://davidwalsh.name/disable-autocorrect
+		autoCapitalize: "off",
+		autoComplete: "off",
+		autoCorrect: "off",
 		spellCheck: false,
 	},
 	strike: {
