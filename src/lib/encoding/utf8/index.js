@@ -1,3 +1,3 @@
 export * from "./isAlphanum"
 export * from "./isWhiteSpace"
-export * from "./rune"
+export * from "./runes"

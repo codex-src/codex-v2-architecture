@@ -1,17 +1,9 @@
+import emitElements from "./emitElements"
 import newURLHashEpoch from "./newURLHashEpoch"
-import parseAnyList from "./parseAnyList"
 import parseInlineElements from "./parseInlineElements"
 import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
-
-import {
-	parseBlockquote,
-	parseBreak,
-	parseHeader,
-	parseParagraph,
-	parsePreformatted,
-} from "./parsers"
 
 function testFastPass(char) {
 	const ok = (
@@ -26,11 +18,11 @@ function testFastPass(char) {
 function parseElements(nodes, cachedElements) {
 	const newURLHash = newURLHashEpoch()
 
-	const cacheStrategy = (range, parseElement) => {
+	const cacheStrategy = (range, emitElement) => {
 		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
 		let element = cachedElements.get(key)
 		if (!element) {
-			element = parseElement(range)
+			element = emitElement(range)
 			cachedElements.set(key, element)
 		}
 		return element
@@ -41,7 +33,7 @@ function parseElements(nodes, cachedElements) {
 		const each = nodes[x1]
 		// Fast pass:
 		if (!each.data.length || testFastPass(each.data[0])) {
-			const element = cacheStrategy(each, parseParagraph)
+			const element = cacheStrategy(each, emitElements.Paragraph)
 			elements.push({
 				...element,
 				id: each.id,
@@ -52,7 +44,7 @@ function parseElements(nodes, cachedElements) {
 		// <Header>
 		case "#":
 			if (testElements.Header(each)) {
-				const element = cacheStrategy(each, each => parseHeader(each))
+				const element = cacheStrategy(each, each => emitElements.Header(each))
 				elements.push({
 					...element,
 					id: each.id,
@@ -74,7 +66,7 @@ function parseElements(nodes, cachedElements) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, parseBlockquote)
+				const element = cacheStrategy(range, emitElements.Blockquote)
 				elements.push({
 					...element,
 					id: each.id,
@@ -107,7 +99,7 @@ function parseElements(nodes, cachedElements) {
 					break
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, parsePreformatted)
+				const element = cacheStrategy(range, emitElements.Preformatted)
 				elements.push({
 					...element,
 					id: each.id,
@@ -145,7 +137,7 @@ function parseElements(nodes, cachedElements) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, parseAnyList)
+				const element = cacheStrategy(range, emitElements.AnyList)
 
 				// Recursively mutates IDs; does not mutate the root
 				// ID on purpose.
@@ -170,7 +162,7 @@ function parseElements(nodes, cachedElements) {
 				x1 = x2
 				continue
 			} else if (testElements.Break(each)) {
-				const element = cacheStrategy(each, parseBreak)
+				const element = cacheStrategy(each, emitElements.Break)
 				elements.push({
 					...element,
 					id: each.id,
@@ -217,7 +209,7 @@ function parseElements(nodes, cachedElements) {
 			break
 		}
 		// <Paragraph>
-		const element = cacheStrategy(each, parseParagraph)
+		const element = cacheStrategy(each, emitElements.Paragraph)
 		elements.push({
 			...element,
 			id: each.id,

@@ -74,8 +74,8 @@ function parseMetadata(node) {
 	return null
 }
 
-// Parses an <AnyList> element.
-function parseAnyList(range) {
+// Emits an <AnyList> element.
+function emitAnyList(range) {
 	const { parent } = parseMetadata(range[0])
 	const element = {
 		...parent,
@@ -103,4 +103,4 @@ function parseAnyList(range) {
 	return element
 }
 
-export default parseAnyList
+export default emitAnyList
