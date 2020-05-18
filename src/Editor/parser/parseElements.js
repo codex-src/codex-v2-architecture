@@ -1,7 +1,7 @@
-import * as test from "./test"
 import newURLHashEpoch from "./newURLHashEpoch"
 import parseAnyList from "./parseAnyList"
 import parseInlineElements from "./parseInlineElements"
+import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
@@ -51,7 +51,7 @@ function parseElements(nodes, cachedElements) {
 		switch (each.data[0]) {
 		// <Header>
 		case "#":
-			if (test.Header(each)) {
+			if (testElements.Header(each)) {
 				const element = cacheStrategy(each, each => parseHeader(each))
 				elements.push({
 					...element,
@@ -64,11 +64,11 @@ function parseElements(nodes, cachedElements) {
 			break
 		// <Blockquote>
 		case ">":
-			if (test.Blockquote(each)) {
+			if (testElements.Blockquote(each)) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (!test.Blockquote(nodes[x2])) {
+					if (!testElements.Blockquote(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -91,12 +91,12 @@ function parseElements(nodes, cachedElements) {
 		// <Preformatted>
 		case "`":
 		case "~":
-			if (test.PreformattedStart(each)) {
+			if (testElements.PreformattedStart(each)) {
 				const syntax = each.data.slice(0, 3)
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (test.PreformattedEnd(nodes[x2], syntax)) {
+					if (testElements.PreformattedEnd(nodes[x2], syntax)) {
 						// No-op; do not decrement
 						break
 					}
@@ -135,11 +135,11 @@ function parseElements(nodes, cachedElements) {
 		case "7":
 		case "8":
 		case "9":
-			if (test.AnyList(each)) {
+			if (testElements.AnyList(each)) {
 				let x2 = x1
 				x2++
 				for (; x2 < nodes.length; x2++) {
-					if (!test.AnyList(nodes[x2])) {
+					if (!testElements.AnyList(nodes[x2])) {
 						x2-- // One too many; decrement
 						break
 					}
@@ -169,7 +169,7 @@ function parseElements(nodes, cachedElements) {
 				})
 				x1 = x2
 				continue
-			} else if (test.Break(each)) {
+			} else if (testElements.Break(each)) {
 				const element = cacheStrategy(each, parseBreak)
 				elements.push({
 					...element,
