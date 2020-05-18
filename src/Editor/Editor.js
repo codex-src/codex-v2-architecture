@@ -76,7 +76,6 @@ const Editor = ({
 					syncPos(state, ref.current, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
-					return
 				}
 				// Mocks scrollIntoViewIfNeeded.
 				const id = setTimeout(() => {
@@ -134,208 +133,210 @@ const Editor = ({
 	}
 
 	return (
-		<div>
+		React.createElement(
+			"div",
+			{
+				ref,
 
-			{React.createElement(
-				"div",
-				{
-					ref,
+				id,
 
-					id,
+				className: trimWhiteSpace(`em-context codex-editor ${!state.readOnly ? "" : "feature-read-only"} ${className || ""}`),
 
-					className: trimWhiteSpace(`em-context codex-editor ${!state.readOnly ? "" : "feature-read-only"} ${className || ""}`),
+				style: {
+					...style, // Takes precedence
+					whiteSpace: "pre-wrap",
+					outline: "none",
+					wordBreak: "break-word",
+				},
 
-					style: {
-						...style, // Takes precedence
-						whiteSpace: "pre-wrap",
-						outline: "none",
-						wordBreak: "break-word",
-					},
+				onFocus: newReadWriteHandler(() => {
+					dispatch.focus()
+				}),
 
-					onFocus: newReadWriteHandler(() => {
-						dispatch.focus()
-					}),
+				onBlur: newReadWriteHandler(() => {
+					dispatch.blur()
+				}),
 
-					onBlur: newReadWriteHandler(() => {
-						dispatch.blur()
-					}),
+				onSelect: newReadWriteHandler(() => {
+					const selection = document.getSelection()
+					if (!selection || !selection.rangeCount) {
+						// No-op
+						return
+					}
+					// Guard document-range:
+					const range = selection.getRangeAt(0)
+					if (range.startContainer === ref.current && range.endContainer === ref.current) {
+						// Iterate to the deepest start node:
+						let node1 = ref.current.children[0]
+						while (node1.childNodes.length) {
+							node1 = node1.childNodes[0]
+						}
+						// Iterate to the deepest end node:
+						let node2 = ref.current.children[ref.current.children.length - 1]
+						while (node2.childNodes.length) {
+							node2 = node2.childNodes[node2.childNodes.length - 1]
+						}
+						range.setStart(node1, 0)
+						range.setEnd(node2, (node2.nodeValue || "").length)
+						selection.removeAllRanges()
+						selection.addRange(range)
+					}
+					// try {
+					// 	const [pos1, pos2] = computePosRange(state, ref.current)
+					// 	dispatch.select(pos1, pos2)
+					// } catch (error) {
+					// 	console.error(error)
+					// }
+					const [pos1, pos2] = computePosRange(state, ref.current)
+					dispatch.select(pos1, pos2)
+				}),
 
-					onSelect: newReadWriteHandler(() => {
-						const selection = document.getSelection()
-						if (!selection || !selection.rangeCount) {
+				onPointerDown: newReadWriteHandler(() => {
+					pointerDownRef.current = true
+				}),
+
+				onPointerMove: newReadWriteHandler(() => {
+					if (!state.focused || !pointerDownRef.current) {
+						pointerDownRef.current = false
+						return
+					}
+					const [pos1, pos2] = computePosRange(state, ref.current)
+					dispatch.select(pos1, pos2)
+				}),
+
+				onPointerUp: newReadWriteHandler(() => {
+					pointerDownRef.current = false
+				}),
+
+				onKeyDown: newReadWriteHandler(e => {
+					switch (detectKeyDownType(e)) {
+					case keyDownTypeEnum.tab:
+						const focusedTodoCheckbox = state.focused && state.collapsed && document.activeElement?.getAttribute("data-codex-checkbox")
+						if (focusedTodoCheckbox) {
 							// No-op
 							return
 						}
-						// Guard document-range:
-						const range = selection.getRangeAt(0)
-						if (range.startContainer === ref.current && range.endContainer === ref.current) {
-							// Iterate to the deepest start node:
-							let node1 = ref.current.children[0]
-							while (node1.childNodes.length) {
-								node1 = node1.childNodes[0]
-							}
-							// Iterate to the deepest end node:
-							let node2 = ref.current.children[ref.current.children.length - 1]
-							while (node2.childNodes.length) {
-								node2 = node2.childNodes[node2.childNodes.length - 1]
-							}
-							range.setStart(node1, 0)
-							range.setEnd(node2, (node2.nodeValue || "").length)
-							selection.removeAllRanges()
-							selection.addRange(range)
-						}
-						const [pos1, pos2] = computePosRange(state, ref.current)
-						dispatch.select(pos1, pos2)
-					}),
-
-					onPointerDown: newReadWriteHandler(() => {
-						pointerDownRef.current = true
-					}),
-
-					onPointerMove: newReadWriteHandler(() => {
-						if (!state.focused || !pointerDownRef.current) {
-							pointerDownRef.current = false
-							return
-						}
-						const [pos1, pos2] = computePosRange(state, ref.current)
-						dispatch.select(pos1, pos2)
-					}),
-
-					onPointerUp: newReadWriteHandler(() => {
-						pointerDownRef.current = false
-					}),
-
-					onKeyDown: newReadWriteHandler(e => {
-						switch (detectKeyDownType(e)) {
-						case keyDownTypeEnum.tab:
-							const focusedTodoCheckbox = state.focused && state.collapsed && document.activeElement?.getAttribute("data-codex-checkbox")
-							if (focusedTodoCheckbox) {
-								// No-op
-								return
-							}
-							e.preventDefault()
-							dispatch.tab(e.shiftKey)
-							return
-						case keyDownTypeEnum.enter:
-							e.preventDefault()
-							dispatch.enter()
-							return
-						case keyDownTypeEnum.backspaceParagraph:
-							e.preventDefault()
-							dispatch.backspaceParagraph()
-							return
-						case keyDownTypeEnum.backspaceWord:
-							e.preventDefault()
-							dispatch.backspaceWord()
-							return
-						case keyDownTypeEnum.backspaceRune:
-							e.preventDefault()
-							dispatch.backspaceRune()
-							return
-						case keyDownTypeEnum.forwardBackspaceWord:
-							dispatch.forwardBackspaceWord()
-							e.preventDefault()
-							return
-						case keyDownTypeEnum.forwardBackspaceRune:
-							e.preventDefault()
-							dispatch.forwardBackspaceRune()
-							return
-						case keyDownTypeEnum.undo:
-							e.preventDefault()
-							dispatch.undo()
-							return
-						case keyDownTypeEnum.redo:
-							e.preventDefault()
-							dispatch.redo()
-							return
+						e.preventDefault()
+						dispatch.tab(e.shiftKey)
+						return
+					case keyDownTypeEnum.enter:
+						e.preventDefault()
+						dispatch.enter()
+						return
+					case keyDownTypeEnum.backspaceParagraph:
+						e.preventDefault()
+						dispatch.backspaceParagraph()
+						return
+					case keyDownTypeEnum.backspaceWord:
+						e.preventDefault()
+						dispatch.backspaceWord()
+						return
+					case keyDownTypeEnum.backspaceRune:
+						e.preventDefault()
+						dispatch.backspaceRune()
+						return
+					case keyDownTypeEnum.forwardBackspaceWord:
+						dispatch.forwardBackspaceWord()
+						e.preventDefault()
+						return
+					case keyDownTypeEnum.forwardBackspaceRune:
+						e.preventDefault()
+						dispatch.forwardBackspaceRune()
+						return
+					case keyDownTypeEnum.undo:
+						e.preventDefault()
+						dispatch.undo()
+						return
+					case keyDownTypeEnum.redo:
+						e.preventDefault()
+						dispatch.redo()
+						return
 						// NOTE: Character data must be synthetic when
 						// focused and **not** collapsed
-						case keyDownTypeEnum.characterData:
-							if (state.focused && !state.collapsed) {
-								e.preventDefault()
-								// FIXME: e.key === "Dead" causes
-								// computePosRange to throw:
-								// "computePosRange: no such selection"
-								dispatch.write(e.key !== "Dead" ? e.key : "")
-								return
-							}
-							// No-op
-							break
-						default:
-							// No-op
-							break
-						}
-					}),
-
-					onCompositionEnd: newReadWriteHandler(e => {
-						// https://github.com/w3c/uievents/issues/202#issue-316461024
-						dedupedCompositionEnd.current = true
-						const nodes = computeNodes(ref.current, state.extPosRange)
-						const [pos1, pos2] = computePosRange(state, ref.current)
-						dispatch.input(nodes, [pos1, pos2])
-					}),
-
-					onInput: newReadWriteHandler(e => {
-						// Force rerender when empty (takes precedence):
-						if (!ref.current.children.length) {
-							dispatch.render()
+					case keyDownTypeEnum.characterData:
+						if (state.focused && !state.collapsed) {
+							e.preventDefault()
+							// FIXME: e.key === "Dead" causes
+							// computePosRange to throw:
+							// "computePosRange: no such selection"
+							dispatch.write(e.key !== "Dead" ? e.key : "")
 							return
 						}
-						// Dedupe "compositionend":
-						//
-						// https://github.com/w3c/uievents/issues/202#issue-316461024
-						if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
-							dedupedCompositionEnd.current = false
-							return
-						}
-						const nodes = computeNodes(ref.current, state.extPosRange)
-						const [pos1, pos2] = computePosRange(state, ref.current)
-						dispatch.input(nodes, [pos1, pos2])
-					}),
+						// No-op
+						break
+					default:
+						// No-op
+						break
+					}
+				}),
 
-					onCut: newReadWriteHandler(e => {
-						e.preventDefault()
-						if (state.collapsed) {
-							// No-op
-							return
-						}
-						const cutData = state.data.slice(state.pos1.pos, state.pos2.pos)
-						e.clipboardData.setData("text/plain", cutData)
-						dispatch.cut()
-					}),
+				onCompositionEnd: newReadWriteHandler(e => {
+					// https://github.com/w3c/uievents/issues/202#issue-316461024
+					dedupedCompositionEnd.current = true
+					const nodes = computeNodes(ref.current, state.extPosRange)
+					const [pos1, pos2] = computePosRange(state, ref.current)
+					dispatch.input(nodes, [pos1, pos2])
+				}),
 
-					onCopy: newReadWriteHandler(e => {
-						e.preventDefault()
-						if (state.collapsed) {
-							// No-op
-							return
-						}
-						const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
-						e.clipboardData.setData("text/plain", copyData)
-						dispatch.copy()
-					}),
+				onInput: newReadWriteHandler(e => {
+					// Force rerender when empty (takes precedence):
+					if (!ref.current.children.length) {
+						dispatch.render()
+						return
+					}
+					// Dedupe "compositionend":
+					//
+					// https://github.com/w3c/uievents/issues/202#issue-316461024
+					if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
+						dedupedCompositionEnd.current = false
+						return
+					}
+					const nodes = computeNodes(ref.current, state.extPosRange)
+					const [pos1, pos2] = computePosRange(state, ref.current)
+					dispatch.input(nodes, [pos1, pos2])
+				}),
 
-					onPaste: newReadWriteHandler(e => {
-						e.preventDefault()
-						const pasteData = e.clipboardData.getData("text/plain")
-						if (!pasteData) {
-							// No-op
-							return
-						}
-						dispatch.paste(pasteData)
-					}),
+				onCut: newReadWriteHandler(e => {
+					e.preventDefault()
+					if (state.collapsed) {
+						// No-op
+						return
+					}
+					const cutData = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", cutData)
+					dispatch.cut()
+				}),
 
-					contentEditable: !state.readOnly,
-					suppressContentEditableWarning: !state.readOnly,
-				},
-			)}
+				onCopy: newReadWriteHandler(e => {
+					e.preventDefault()
+					if (state.collapsed) {
+						// No-op
+						return
+					}
+					const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", copyData)
+					// dispatch.copy()
+				}),
 
-			<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-				{JSON.stringify(state.nodes, null, "\t")}
-			</pre>
+				onPaste: newReadWriteHandler(e => {
+					e.preventDefault()
+					const pasteData = e.clipboardData.getData("text/plain")
+					if (!pasteData) {
+						// No-op
+						return
+					}
+					dispatch.paste(pasteData)
+				}),
 
-		</div>
+				contentEditable: !state.readOnly,
+				suppressContentEditableWarning: !state.readOnly,
+			},
+		)
 	)
 }
+
+//	<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
+//		{JSON.stringify(state.nodes, null, "\t")}
+//	</pre>
 
 export default Editor

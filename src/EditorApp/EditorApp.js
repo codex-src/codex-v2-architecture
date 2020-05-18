@@ -20,6 +20,29 @@ import useTitleAndEmoji from "./useTitleAndEmoji"
 
 // document.body.classList.toggle("debug-css")
 
+// https://reactjs.org/docs/error-boundaries.html#introducing-error-boundaries
+class ErrorBoundary extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			errored: false,
+		}
+	}
+	static getDerivedStateFromError(error) {
+		return { errored: true }
+	}
+	componentDidCatch(error, errorInfo) {
+		// logErrorToMyService(error, errorInfo)
+		console.error(error, errorInfo)
+	}
+	render() {
+		// if (this.state.errored) {
+		// 	return <h1>Something went wrong.</h1>
+		// }
+		return this.props.children
+	}
+}
+
 const data = (() => {
 	return "Hello, `world`!"
 
@@ -219,7 +242,7 @@ const EditorApp = () => {
 			{/* RHS */}
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
-				<DocumentTitleAndEmoji title={(meta.title || "Untitled") + ` (v0.6)`} emoji={meta.emoji}>
+				<DocumentTitleAndEmoji title={(meta.title || "Untitled") + " (v0.6)"} emoji={meta.emoji}>
 					<div className="relative">
 
 						{/* Placeholder */}
@@ -232,19 +255,21 @@ const EditorApp = () => {
 						)}
 
 						{/* Editor */}
-						<Editor
-							// style={{ paddingBottom: "calc(100vh - 128px)", fontSize: prefs.fontSize }}
-							style={{
-								fontSize: prefs.fontSize,
-								transitionProperty: "font-size",
-								transitionDuration: "25ms",
-								transitionTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
-							}}
-							state={state}
-							dispatch={dispatch}
-							readOnly={prefs.readOnly}
-							autoFocus={!data}
-						/>
+						<ErrorBoundary>
+							<Editor
+								// style={{ paddingBottom: "calc(100vh - 128px)", fontSize: prefs.fontSize }}
+								style={{
+									fontSize: prefs.fontSize,
+									transitionProperty: "font-size",
+									transitionDuration: "25ms",
+									transitionTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+								}}
+								state={state}
+								dispatch={dispatch}
+								readOnly={prefs.readOnly}
+								autoFocus={!data}
+							/>
+						</ErrorBoundary>
 
 					</div>
 				</DocumentTitleAndEmoji>

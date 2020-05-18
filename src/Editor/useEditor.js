@@ -439,10 +439,12 @@ const methods = state => ({
 		state.history.mutate()
 		this.write("")
 	},
-	// Copies character data.
-	copy() {
-		// No-op
-	},
+
+	// // Copies character data.
+	// copy() {
+	// 	// No-op
+	// },
+
 	// Pastes character data.
 	paste(pasteData) {
 		state.history.mutate()
