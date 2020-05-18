@@ -10,11 +10,12 @@ const attrs = {
 	strike: {
 		style: {
 			"--md-blue-a400": "currentColor",
-			"textDecoration": "line-through",
 			"color": "var(--gray-500)",
+			"textDecoration": "line-through",
 		},
 	},
 	a: {
+		// https://mathiasbynens.github.io/rel-noopener
 		target: "_blank",
 		rel: "noopener noreferrer",
 	},
