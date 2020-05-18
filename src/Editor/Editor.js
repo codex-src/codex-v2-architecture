@@ -154,7 +154,7 @@ const Editor = ({
 
 				onSelect: newReadWriteHandler(() => {
 					const selection = document.getSelection()
-					if (!selection.rangeCount) {
+					if (!selection || !selection.rangeCount) {
 						// No-op
 						return
 					}

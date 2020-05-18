@@ -125,7 +125,7 @@ function computePos(editorState, editorRoot, range) {
 // Computes cursor data structures.
 function computePosRange(editorState, editorRoot) {
 	const selection = document.getSelection()
-	if (!selection.rangeCount) {
+	if (!selection || !selection.rangeCount) {
 		throw new Error("computePosRange: no such selection")
 	}
 	const range = selection.getRangeAt(0)

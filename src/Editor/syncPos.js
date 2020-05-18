@@ -85,7 +85,7 @@ function syncPos(editorState, editorRoot, [pos1, pos2]) {
 	// TODO: Use editorState.collapsed?
 	//
 	// // https://github.com/codex-src/codex-v2-architecture/commit/a295f2fe862b1cbe8bdaa7bc0cf4edb200cbd2ac
-	// if (selection.rangeCount) {
+	// if (selection && selection.rangeCount) {
 	// 	const [domPos1, domPos2] = computePosRange(editorState, editorRoot)
 	// 	if (domPos1.pos === pos1.pos && domPos2.pos === pos2.pos) {
 	// 		return false

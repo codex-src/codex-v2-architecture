@@ -28,7 +28,7 @@ function computeScrollingElementAndOffset(offsetTop = 0, offsetBottom = 0) {
 	offsetTop--
 	offsetBottom--
 	const selection = document.getSelection()
-	if (!selection.rangeCount) {
+	if (!selection || !selection.rangeCount) {
 		return null
 	}
 	const range = selection.getRangeAt(0)
