@@ -1,4 +1,4 @@
-// Maps strings to strings.
+// Maps strings to string properties.
 export class StringEnum {
 	constructor(...keys) {
 		for (const key of keys) {
@@ -8,8 +8,7 @@ export class StringEnum {
 	}
 }
 
-// Maps strings to numbers, from 0. NumberEnum is preferred
-// for performant code.
+// Maps strings to number properties (zero-based).
 export class NumberEnum {
 	constructor(...keys) {
 		for (let x = 0; x < keys.length; x++) {
