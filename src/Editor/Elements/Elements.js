@@ -7,6 +7,7 @@ import Markdown from "./Markdown"
 import prismMap from "lib/prismMap"
 import React from "react"
 import trimWhiteSpace from "lib/trimWhiteSpace"
+import typeEnum from "./typeEnum"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
 
@@ -50,8 +51,24 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</HOC.Root>
 ))
 
-export const Paragraph = React.memo(({ id, emojis, children }) => (
-	<HOC.Root id={id} data-codex-emojis={emojis}>
+// Counts the number of emojis. All inline elements must be
+// emojis in order to be counted.
+function emojiCount(children) {
+	const count = (
+		children &&
+		children.every &&
+		children.every(each => (
+			each &&
+			each.type &&
+			each.type === typeEnum.Emoji
+		)) &&
+		children.length
+	)
+	return count || 0
+}
+
+export const Paragraph = React.memo(({ id, children }) => (
+	<HOC.Root id={id} data-codex-emojis={emojiCount(children)}>
 		{toReact(children) || (
 			<br />
 		)}
