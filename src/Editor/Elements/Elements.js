@@ -1,10 +1,11 @@
 import * as HOC from "./HOC"
-import Button from "lib/Button"
-import Markdown from "./Markdown"
-import React from "react"
 import attrs from "./attrs"
+import Button from "lib/Button"
 import escape from "lodash/escape"
+import IfWrapper from "lib/IfWrapper"
+import Markdown from "./Markdown"
 import prismMap from "lib/prismMap"
+import React from "react"
 import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
@@ -57,30 +58,9 @@ export const Paragraph = React.memo(({ id, emojis, children }) => (
 	</HOC.Root>
 ))
 
-// export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-// 	<HOC.Node id={id} className={syntax[0] === ">" ? "pl-1" : "pl-6 text-gray-600"} data-codex-blockquote-item>
-// 		<Markdown className="hidden" syntax={syntax}>
-// 			{toReact(children) || (
-// 				<br />
-// 			)}
-// 		</Markdown>
-// 	</HOC.Node>
-// ))
-//
-// export const Blockquote = React.memo(({ id, children: range }) => (
-// 	<HOC.Root tag="blockquote" id={id} style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
-// 		{range.map(({ type: T, ...each }) => (
-// 			React.createElement(typeEnumArray[T], {
-// 				key: each.id,
-// 				...each,
-// 			})
-// 		))}
-// 	</HOC.Root>
-// ))
-
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<HOC.Node id={id} className="text-gray-600">
-		<Markdown className="text-md-blue-a400" syntax={syntax}>
+		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -212,20 +192,12 @@ export const AnyList = React.memo(({ atRoot, type, tag, id, children: range }) =
 	)
 })
 
-// Conditionally wraps a React element.
-const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
-	if (!cond) {
-		return children
-	}
-	return <Wrapper>{children}</Wrapper>
-}
-
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		// TODO: Remove -mx-6?
 		<HOC.Root id={id} className="-mx-6">
-			<IfWrapper cond={readOnly && href} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
+			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* contentEditable={false} */}
 				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
@@ -242,33 +214,21 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	)
 })
 
-// export const Break = React.memo(({ id, syntax }) => {
-// 	const [{ readOnly }] = useEditorState()
-// 	return (
-// 		<HOC.Root id={id}>
-// 			<Markdown syntax={syntax}>
-// 				{readOnly && (
-// 					<hr className="inline-block w-full border-t-2"
-// 						style={{ verticalAlign: "15%" }} />
-// 				)}
-// 			</Markdown>
-// 		</HOC.Root>
-// 	)
-// })
+export const Break = React.memo(({ id, syntax }) => {
+	const [{ readOnly }] = useEditorState()
 
-// FIXME
-const hr = "linear-gradient(" +
-	"transparent 0, " +
-	"transparent calc(0.75em - 2px), " +
-	"var(--gray-300) calc(0.75em - 2px), " +
-	"var(--gray-300) calc(0.75em + 2px), " +
-	"transparent calc(0.75em + 2px)" +
-")"
-
-export const Break = React.memo(({ id, syntax }) => (
-	<HOC.Root id={id} className="text-right" style={{ backgroundImage: hr }}>
-		<Markdown className="hidden" syntax={syntax}>
-			<br />
-		</Markdown>
-	</HOC.Root>
-))
+	const backgroundImage = "linear-gradient(" +
+		"transparent 0, " +
+		"transparent calc(0.75em - 2px), " +
+		"var(--gray-300) calc(0.75em - 2px), " +
+		"var(--gray-300) calc(0.75em + 2px), " +
+		"transparent calc(0.75em + 2px)" +
+	")"
+	return (
+		<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
+			<Markdown className="hidden" syntax={syntax}>
+				<br />
+			</Markdown>
+		</HOC.Root>
+	)
+})

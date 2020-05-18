@@ -18,7 +18,7 @@ import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitleAndEmoji from "./useTitleAndEmoji"
 
-document.body.classList.toggle("debug-css")
+// document.body.classList.toggle("debug-css")
 
 const data = (() => {
 	return "Hello, `world`!"
