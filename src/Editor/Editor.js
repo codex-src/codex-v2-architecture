@@ -255,12 +255,12 @@ const Editor = ({
 						e.preventDefault()
 						dispatch.redo()
 						return
-					// NOTE: Character data must be synthetic when
+					// NOTE (1): Character data must be synthetic when
 					// focused and **not** collapsed
+					// NOTE (2): Breaks "compositionstart"
 					case keyDownTypeEnum.characterData:
 						if (state.focused && !state.collapsed) {
 							e.preventDefault()
-							// NOTE: Breaks "compositionstart"
 							dispatch.write(e.key !== "Dead" ? e.key : "")
 							return
 						}
@@ -311,8 +311,8 @@ const Editor = ({
 						// No-op
 						return
 					}
-					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", data)
+					const cutData = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", cutData)
 					dispatch.cut()
 				}),
 
@@ -322,19 +322,19 @@ const Editor = ({
 						// No-op
 						return
 					}
-					const data = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", data)
+					const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
+					e.clipboardData.setData("text/plain", copyData)
 					dispatch.copy()
 				}),
 
 				onPaste: newReadWriteHandler(e => {
 					e.preventDefault()
-					const data = e.clipboardData.getData("text/plain")
-					if (!data) {
+					const pasteData = e.clipboardData.getData("text/plain")
+					if (!pasteData) {
 						// No-op
 						return
 					}
-					dispatch.paste(data)
+					dispatch.paste(pasteData)
 				}),
 
 				contentEditable: !state.readOnly,

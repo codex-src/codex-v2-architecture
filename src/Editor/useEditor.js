@@ -467,9 +467,9 @@ const methods = state => ({
 		// No-op
 	},
 	// Pastes character data.
-	paste(data) {
+	paste(pasteData) {
 		state.history.mutate()
-		this.write(data)
+		this.write(pasteData)
 	},
 	// Pushes the next undo state.
 	pushUndo() {
