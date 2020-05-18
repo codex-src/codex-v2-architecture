@@ -5,7 +5,7 @@ import ReactDOM from "react-dom"
 // https://github.com/codex-src/debug.css
 import "debug.css"
 
-import "stylesheets/prism-custom.css"
+import "stylesheets/prism_custom.css"
 import "stylesheets/tailwind.generated.css"
 
 ReactDOM.render(
