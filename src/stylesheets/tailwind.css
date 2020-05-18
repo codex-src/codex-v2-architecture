@@ -1,53 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 html {
 	scroll-behavior: smooth;
 }
+/* .overflow-y-scroll.scrolling-touch { */
+/* 	scroll-behavior: smooth; */
+/* } */
 
-.pb-2\/1 {
-	padding-bottom: 200%;
-}
-.pb-16\/9 {
-	padding-bottom: 177.7778%;
-}
-.pb-16\/10 {
-	padding-bottom: 160%;
-}
-.pb-3\/2 {
-	padding-bottom: 150%;
-}
-.pb-4\/3 {
-	padding-bottom: 133.3333%;
-}
-.pb-5\/4 {
-	padding-bottom: 125%;
-}
-.pb-1\/1 {
-	padding-bottom: 100%;
-}
-.pb-4\/5 {
-	padding-bottom: 80%;
-}
-.pb-3\/4 {
-	padding-bottom: 75%;
-}
-.pb-2\/3 {
-	padding-bottom: 66.6667%;
-}
-.pb-10\/16 {
-	padding-bottom: 62.5%;
-}
-.pb-9\/16 {
-	padding-bottom: 56.25%;
-}
-.pb-1\/2 {
-	padding-bottom: 50%;
-}
-
+/* NOTE: Decrements text-xs by 0.0625 not 0.125 */
 .text-xxs {
-	/* font-size: 0.625rem; */
 	font-size: 0.6875rem;
 }
 
@@ -58,49 +21,27 @@ html {
 	letter-spacing: 0.0125em;
 }
 
-.bg-opacity-10 {
-	--bg-opacity: 0.1;
-}
-
 .shadow-hero-sm {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 1px 2px 0 rgba(0, 0, 0, 0.05)
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 .shadow-hero {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 .shadow-hero-md {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 .shadow-hero-lg {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 .shadow-hero-xl {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 .shadow-hero-2xl {
-	box-shadow:
-		0 0 0 1px rgba(0, 0, 0, 0.05),
-		0 25px 50px -12px rgba(0, 0, 0, 0.25)
-}
-
-.overflow-y-scroll.scrolling-touch {
-	scroll-behavior: smooth;
-}
-
-.translate-z {
-	-webkit-transform: translateZ(0);
-	   -moz-transform: translateZ(0);
-	    -ms-transform: translateZ(0);
-	     -o-transform: translateZ(0);
-	        transform: translateZ(0);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
