@@ -166,7 +166,7 @@ const methods = state => ({
 		}
 		this.write("")
 	},
-	// Input method for onCompositionEnd and onInput.
+	// Input method for onInput and onCompositionEnd.
 	input(nodes, [pos1, pos2]) {
 		state.history.mutate()
 

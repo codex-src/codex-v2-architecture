@@ -1,12 +1,11 @@
+import computeNodes from "./computeNodes"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import detectKeyDownType from "./detectKeyDownType"
 import EditorContext from "./EditorContext"
 import keyDownTypeEnum from "./keyDownTypeEnum"
-import queryRoots from "./queryRoots"
 import React from "react"
 import ReactDOM from "react-dom"
-import readRoots from "./readRoots"
 import syncPos from "./syncPos"
 import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./Elements/typeEnumArray"
@@ -268,8 +267,7 @@ const Editor = ({
 
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
-					const [root1, root2] = queryRoots(ref.current, state.extPosRange)
-					const nodes = readRoots(ref.current, [root1, root2])
+					const nodes = computeNodes(ref.current, state.extPosRange)
 					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
@@ -288,8 +286,7 @@ const Editor = ({
 						// dedupedCompositionEnd.current = false
 						return
 					}
-					const [root1, root2] = queryRoots(ref.current, state.extPosRange)
-					const nodes = readRoots(ref.current, [root1, root2])
+					const nodes = computeNodes(ref.current, state.extPosRange)
 					const [pos1, pos2] = computePosRange(state, ref.current)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
