@@ -54,26 +54,18 @@ const Editor = ({
 	// Renders to the DOM.
 	React.useLayoutEffect(
 		React.useCallback(() => {
-
-			let t = Date.now()
-
-			// TODO: Eagerly dropping the selection may tamper
-			// break soft keyboards (on iOS this is a non-problem)
-
 			// Eagerly drop selection for performance reasons:
 			//
 			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
 			const selection = document.getSelection()
-			if (selection.rangeCount) {
+			if (selection && selection.rangeCount) {
 				selection.removeAllRanges()
 			}
 			ReactDOM.render(<Elements state={state} dispatch={dispatch} />, ref.current, () => {
-				console.log(`ReactDOM.render=${Date.now() - t}`)
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
 				}
-				t = Date.now()
 				// Sync DOM cursors:
 				try {
 					syncPos(state, ref.current, [state.pos1, state.pos2])
@@ -81,7 +73,6 @@ const Editor = ({
 					console.error(error)
 					return
 				}
-				console.log(`syncPos=${Date.now() - t}`)
 				// Defer to useEffect:
 				const id = setTimeout(() => {
 					const computed = computeScrollingElementAndOffset((scrollTopOffset || 0), (scrollBottomOffset || 0))
@@ -225,6 +216,7 @@ const Editor = ({
 						return
 					case keyDownTypeEnum.enter:
 						e.preventDefault()
+						console.log("detected and prevented enter")
 						dispatch.enter()
 						return
 					case keyDownTypeEnum.backspaceParagraph:

@@ -20,8 +20,8 @@ export function newRange() {
 }
 
 // Creates a new nodes data structure.
-export function newNodes(str) {
-	const nodes = str.split("\n").map(each => ({
+export function newNodes(data) {
+	const nodes = data.split("\n").map(each => ({
 		id: uuidv4(),
 		data: each,
 	}))

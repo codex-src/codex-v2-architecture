@@ -511,22 +511,8 @@ const methods = state => ({
 	},
 	// Rerenders the string and VDOM representations.
 	render() {
-		// let t = Date.now()
 		const data = state.nodes.map(each => each.data).join("\n")
-
-		//		// "Hello, world!"
-		//		// 				x   y
-		//
-		//		state.data     -> String
-		//		state.pos1.pos -> Number
-		//		state.pos2.pos -> Number
-
-		// console.log(`data=${Date.now() - t}`)
-
-		const t = Date.now()
 		const elements = parseElements(state.nodes, state.cachedElements)
-		console.log(`parseElements=${Date.now() - t}`)
-
 		Object.assign(state, {
 			data,
 			elements,

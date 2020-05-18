@@ -1,13 +1,12 @@
-import dedupeNodes from "./dedupeNodes"
+import { newNodes } from "./constructors"
 
 // Reads a data-codex-root element.
-function readRoot(root) {
-	const nodes = [{
-		id: root.id,
-		data: "",
-	}]
+function readRoot(rootElement) {
+	const nodes = newNodes("")
+	nodes[0].id = rootElement.id
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
+			// Concatenate the end node:
 			nodes[nodes.length - 1].data += on.nodeValue
 			return
 		}
@@ -15,6 +14,7 @@ function readRoot(root) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
+				// Push a new node:
 				nodes.push({
 					id: next.id,
 					data: "",
@@ -22,25 +22,24 @@ function readRoot(root) {
 			}
 		}
 	}
-	recurse(root)
+	recurse(rootElement)
 	return nodes
 }
 
 // Reads a range of data-codex-root elements.
-//
-// NOTE: readRoots depends on queryRoots
-function readRoots(editorRoot, [root1, root2]) {
+function readRoots(editorRoot, [rootElement1, rootElement2]) {
 	const nodes = []
-	while (root1) {
-		nodes.push(...readRoot(root1))
-		if (root1 === root2) {
+	while (rootElement1) {
+		nodes.push(...readRoot(rootElement1))
+		if (rootElement1 === rootElement2) {
 			// No-op
 			break
 		}
-		root1 = root1.nextElementSibling
+		rootElement1 = rootElement1.nextElementSibling
 	}
-	const deduped = dedupeNodes(nodes)
-	return deduped
+	// const deduped = dedupeNodes(nodes)
+	// return deduped
+	return nodes
 }
 
 export default readRoots
