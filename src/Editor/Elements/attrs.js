@@ -1,10 +1,6 @@
 // Extraneous shared attributes.
 const attrs = {
 	code: {
-		style: {
-			MozTabSize: 2,
-			tabSize: 2,
-		},
 		spellCheck: false,
 	},
 	strike: {
