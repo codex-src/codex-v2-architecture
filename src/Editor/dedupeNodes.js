@@ -1,9 +1,9 @@
 import uuidv4 from "uuid/v4"
 
-// Dedupes nodes (that share the same ID).
+// Dedupes repeat-ID nodes.
 function dedupeNodes(nodes) {
-	// NOTE: [...nodes] (v. nodes.map) does not work because
-	// references are shared
+	// NOTE: Do not use [...nodes] because references are
+	// shared
 	const deduped = nodes.map(each => ({ ...each }))
 	const seen = {}
 	for (const each of deduped) {

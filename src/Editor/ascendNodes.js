@@ -1,15 +1,17 @@
-// Ascends to the nearest element.
-function ascendToElement(node) {
+// Node    -> Element
+// Element -> No-op
+//
+function ascendElement(node) {
 	if (node && node.nodeType && node.nodeType !== Node.ELEMENT_NODE && node.parentElement) {
-		return node.parentElement // Node -> Element
+		return node.parentElement
 	}
-	return node // Element
+	return node
 }
 
 // Ascends to the nearest data-codex-node or data-codex-root
 // element.
 export function ascendNode(node) {
-	let element = ascendToElement(node)
+	let element = ascendElement(node)
 	while (element && element.parentElement && !(element.getAttribute("data-codex-node") || element.getAttribute("data-codex-root"))) {
 		element = element.parentElement
 	}
@@ -18,7 +20,7 @@ export function ascendNode(node) {
 
 // Ascends to the nearest data-codex-root element.
 export function ascendRoot(node) {
-	let element = ascendToElement(node)
+	let element = ascendElement(node)
 	while (element && element.parentElement && !element.getAttribute("data-codex-root")) {
 		element = element.parentElement
 	}
