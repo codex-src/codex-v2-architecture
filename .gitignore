@@ -2,12 +2,10 @@
 .DS_Store
 
 # Node
+/*.log*
 /.env
 /node_modules
 
 # Production
 /build
-tailwind.generated.css
-
-# Etc.
-*.log*
+/src/stylesheets/tailwind.generated.css
