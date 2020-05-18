@@ -2,16 +2,10 @@ import attrs from "./attrs"
 import Markdown from "./Markdown"
 import React from "react"
 
-// const Span = ({ className, ...props }) => (
-// 	<span className={!className ? "markdown" : `markdown ${className}`} {...props} />
-// )
-
 export const Escape = ({ syntax, children }) => (
-	// <span>
 	<Markdown syntax={syntax}>
 		{children}
 	</Markdown>
-	// </span>
 )
 
 export const Emoji = ({ description, children }) => (

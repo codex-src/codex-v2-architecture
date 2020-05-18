@@ -1,7 +1,6 @@
 import { NumberEnum } from "lib/Enum"
 
 const typeEnum = new NumberEnum(
-	// Elements:
 	"AnyList",
 	"AnyListItem",
 	"Blockquote",
@@ -13,7 +12,6 @@ const typeEnum = new NumberEnum(
 	"Preformatted",
 	"TodoItem",
 
-	// Inline elements:
 	"Anchor",
 	"Code",
 	"Emoji",

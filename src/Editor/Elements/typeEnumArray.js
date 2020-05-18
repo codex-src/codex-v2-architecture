@@ -23,7 +23,6 @@ import {
 } from "./InlineElements"
 
 const typeEnumArray = [
-	// Elements:
 	AnyList,
 	AnyListItem,
 	Blockquote,
@@ -35,7 +34,6 @@ const typeEnumArray = [
 	Preformatted,
 	TodoItem,
 
-	// Inline elements:
 	Anchor,
 	Code,
 	Emoji,

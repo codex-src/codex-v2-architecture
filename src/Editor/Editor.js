@@ -324,7 +324,7 @@ const Editor = ({
 					//
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					// if (e.nativeEvent.inputType == "insertCompositionText") {
-					if (e.nativeEvent.isComposing) {
+					if (e.nativeEvent.isComposing) { // FIXME
 						// dedupedCompositionEnd.current = false
 						return
 					}

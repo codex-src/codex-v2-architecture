@@ -1,6 +1,6 @@
 import uuidv4 from "uuid/v4"
 
-// Dedupes nodes e.g. repeat IDs.
+// Dedupes nodes (that share the same ID).
 function dedupeNodes(nodes) {
 	// NOTE: [...nodes] (v. nodes.map) does not work because
 	// references are shared
