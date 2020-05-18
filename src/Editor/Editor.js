@@ -115,19 +115,13 @@ const Editor = ({
 	)
 
 	// Pushes the next undo (debounced).
-	//
-	// TODO: Extract to useHistory?
 	React.useEffect(
 		React.useCallback(() => {
 			if (state.readOnly) {
 				// No-op
 				return
 			}
-			const id = setTimeout(() => {
-				const { data, nodes, pos1, pos2 } = state
-				const currentState = { data, nodes, pos1, pos2 }
-				dispatch.pushUndo(currentState)
-			}, 250)
+			const id = setTimeout(dispatch.pushUndo, 250)
 			return () => {
 				clearTimeout(id)
 			}
@@ -205,9 +199,9 @@ const Editor = ({
 				}),
 
 				onPointerMove: newReadWriteHandler(() => {
-					// Editor must be focused and pointer must be down:
+					// Must be focused and pointer must be down:
 					if (!state.focused || !pointerDownRef.current) {
-						pointerDownRef.current = false // Reset to be safe
+						pointerDownRef.current = false
 						return
 					}
 					const [pos1, pos2] = computePosRange(state, ref.current)

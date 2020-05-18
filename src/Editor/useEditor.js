@@ -472,34 +472,41 @@ const methods = state => ({
 		this.write(data)
 	},
 	// Pushes the next undo state.
-	pushUndo(currentState) {
-		state.history.push(currentState)
-	},
-	// Undos once (stores the current state).
-	undo() {
-		// Copy the current state -- deep copy references types:
+	pushUndo() {
+		// Copy the current state:
 		const currentState = {
 			data: state.data,
 			nodes: state.nodes.map(each => ({ ...each })),
 			pos1: { ...state.pos1 },
 			pos2: { ...state.pos2 },
 		}
-		const undoState = state.history.undo(currentState)
-		if (!undoState) {
+		state.history.push(currentState)
+	},
+	// Undos once.
+	undo() {
+		// Copy the current state:
+		const currentState = {
+			data: state.data,
+			nodes: state.nodes.map(each => ({ ...each })),
+			pos1: { ...state.pos1 },
+			pos2: { ...state.pos2 },
+		}
+		const nextState = state.history.undo(currentState)
+		if (!nextState) {
 			// No-op
 			return
 		}
-		Object.assign(state, undoState)
+		Object.assign(state, nextState)
 		this.render()
 	},
 	// Redos once.
 	redo() {
-		const redoState = state.history.redo()
-		if (!redoState) {
+		const nextState = state.history.redo()
+		if (!nextState) {
 			// No-op
 			return
 		}
-		Object.assign(state, redoState)
+		Object.assign(state, nextState)
 		this.render()
 	},
 	// Rerenders the string and VDOM representations.
