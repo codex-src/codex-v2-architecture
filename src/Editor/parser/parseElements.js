@@ -10,16 +10,18 @@ import {
 	StrictLinkedImageRegex,
 } from "./spec"
 
-const codeA = 0x41 // -> "A"
-const codeZ = 0x5a // -> "Z"
-const codea = 0x61 // -> "a"
-const codez = 0x71 // -> "z"
+const codes = {
+	A: 0x41, // -> "A"
+	Z: 0x5a, // -> "Z"
+	a: 0x61, // -> "a"
+	z: 0x71, // -> "z"
+}
 
 function testFastPass(char) {
 	const code = char.codePointAt(0)
 	const ok = (
-		(code >= codeA && code <= codeZ) || // Takes precedence
-		(code >= codea && code <= codez) ||
+		(code >= codes.A && code <= codes.Z) || // Takes precedence
+		(code >= codes.a && code <= codes.z) ||
 		(code > 0x7f) // 127
 	)
 	return ok
@@ -33,8 +35,10 @@ function parseElements(nodes, cachedElements) {
 	const elements = []
 	for (let x1 = 0, len = nodes.length; x1 < len; x1++) {
 		const each = nodes[x1]
+		const char = each.data.slice(0, 1)
+
 		// Fast pass:
-		if (!each.data.length || testFastPass(each.data[0])) {
+		if (!char || testFastPass(char)) {
 			const element = cacheStrategy(each, emitElements.Paragraph)
 			elements.push({
 				...element,
@@ -42,7 +46,8 @@ function parseElements(nodes, cachedElements) {
 			})
 			continue
 		}
-		switch (each.data[0]) {
+
+		switch (char) {
 		// <Header>
 		case "#":
 			if (testElements.Header(each)) {
@@ -141,24 +146,19 @@ function parseElements(nodes, cachedElements) {
 				const range = nodes.slice(x1, x2 + 1)
 				const element = cacheStrategy(range, emitElements.AnyList)
 
-				// Recursively mutates IDs; does not mutate the root
-				// ID because elements.push does.
-				//
-				// TODO: Extract?
+				// Recursively mutates <AnyList> IDs.
 				let y = 0
-				const recurse = element => {
+				const mutateAnyListIDs = element => {
 					for (let x = 0; x < element.children.length; x++) {
-						// console.log(element.children[x].id, range[y].id)
 						element.children[x].id = range[y].id
 						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
-							// Increment to the next node:
 							y++
 							continue
 						}
-						recurse(element.children[x])
+						mutateAnyListIDs(element.children[x])
 					}
 				}
-				recurse(element)
+				mutateAnyListIDs(element)
 
 				elements.push({
 					...element,
@@ -177,18 +177,13 @@ function parseElements(nodes, cachedElements) {
 			// No-op
 			break
 		// <Image>
-		//
-		// NOTE: Uses regex
 		case "!":
 		case "[":
 			// ![Image](src) or [![Image](src)](href)
-			//
-			// https://regex101.com/r/FBKxEO/1
-			// https://regex101.com/r/FBKxEO/2
 			let matches = null
-			if (each.data[0] === "!") {
+			if (char === "!") {
 				matches = each.data.match(StrictImageRegex)
-			} else if (each.data[0] === "[") {
+			} else if (char === "[") {
 				matches = each.data.match(StrictLinkedImageRegex)
 			}
 			if (matches) {
@@ -201,11 +196,11 @@ function parseElements(nodes, cachedElements) {
 				continue
 			}
 			// No-op
-			break
 		default:
 			// No-op
 			break
 		}
+
 		// <Paragraph>
 		const element = cacheStrategy(each, emitElements.Paragraph)
 		elements.push({

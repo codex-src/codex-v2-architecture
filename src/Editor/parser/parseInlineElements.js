@@ -66,8 +66,8 @@ function parseInlineElements(str) {
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
 		// Fast pass:
 		//
-		// NOTE: Use isStrictAlphanum because of "_"
-		if ((isStrictAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") { // Exempt "h" for "https://" and "http://"
+		// NOTE: Use isStrictAlphanum to negate "_"
+		if ((isStrictAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(str[x1])
 				continue
@@ -79,14 +79,14 @@ function parseInlineElements(str) {
 		switch (str[x1]) {
 		// <Escape>
 		case "\\":
-			// \*
-	 		if (x1 + 1 < str.length && spec.isASCIIPunctuation(str[x1 + 1])) {
+			// \Escape
+			if (nchars >= "\\?".length && spec.isASCIIPunctuation(str[x1 + 1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
 					children: str[x1 + 1],
 				})
-				// Increment to the next character; the punctuation
+				// Increment the escape character; the punctuation
 				// character is auto-incremented:
 				x1++
 				continue
@@ -115,7 +115,7 @@ function parseInlineElements(str) {
 			break
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
-			// ***Strong emphasis*** (takes precedence)
+			// ***Strong emphasis***
 			if (nchars >= "***?***".length && str.slice(x1, x1 + 3) === "***") {
 				const res = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
@@ -130,7 +130,7 @@ function parseInlineElements(str) {
 				elements.push(res.element)
 				x1 = res.x2 - 1
 				continue
-			// **Strong** (takes precedence)
+			// **Strong**
 			} else if (nchars >= "**?**".length && str.slice(x1, x1 + 2) === "**") {
 				const res = parseInlineElement({
 					type: typeEnum.Strong,
@@ -218,7 +218,7 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
-			// <Anchor> (1 of 2)
+		// <Anchor> (1 of 2)
 		case "h":
 			// https:// or http://
 			if (
@@ -280,15 +280,14 @@ function parseInlineElements(str) {
 			break
 		// <Emoji>
 		default:
-			// 😀
-			const info = emojiTrie.atStart(str.slice(x1))
-			if (info && info.status === "fully-qualified") { // TODO: Add "component"?
+			const metadata = emojiTrie.atStart(str.slice(x1))
+			if (metadata && metadata.status === "fully-qualified") {
 				elements.push({
 					type: typeEnum.Emoji,
-					description: info.description,
-					children: info.emoji,
+					description: metadata.description,
+					children: metadata.emoji,
 				})
-				x1 += info.emoji.length - 1
+				x1 += metadata.emoji.length - 1
 				continue
 			}
 			// No-op
