@@ -11,13 +11,6 @@ import {
 //
 // TODO: Use substr not str? What about x1 - 1?
 function parseInlineElement({ type, syntax, str, x1 }) {
-	// Syntax must be preceded by a BOL, space, or ASCII
-	// punctuation character:
-	//
-	// TODO: Move to parseInlineElements?
-	if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) { // E.g. " *text*"
-		return null
-	}
 	// Prepare an escaped regex pattern:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
@@ -87,15 +80,25 @@ function parseInlineElements(str) {
 	}
 	const elements = []
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
+		// TODO: Move substr **after** fast pass?
 		const substr = str.slice(x1)
-		const nchars = substr.length
 		const char = substr[0]
-
-		// const char = str[x1]
-		// const nchars = str.length - x1 // DEPRECATE
 
 		// Fast pass:
 		if ((testFastPass(char) && char !== "h") || char === " ") {
+			// TODO: Extract?
+			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
+				elements.push(char)
+				continue
+			}
+			elements[elements.length - 1] += char
+			continue
+		}
+
+		// Inline elements must be preceded by an ASCII white
+		// space or punctuation character:
+		if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) {
+			// TODO: Extract?
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
 				continue
@@ -108,7 +111,7 @@ function parseInlineElements(str) {
 		// <Escape>
 		case "\\":
 			// \Escape
-			if (nchars >= 2 && spec.isASCIIPunctuation(substr[1])) {
+			if (substr.length >= 2 && spec.isASCIIPunctuation(substr[1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
@@ -122,7 +125,7 @@ function parseInlineElements(str) {
 		// <Emphasis>
 		case "_":
 			// _Emphasis_
-			if (nchars >= "_?_".length) {
+			if (substr.length >= "_?_".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
@@ -142,7 +145,7 @@ function parseInlineElements(str) {
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis***
-			if (nchars >= "***?***".length && substr.startsWith("***")) {
+			if (substr.length >= "***?***".length && substr.startsWith("***")) {
 				const result = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
@@ -157,7 +160,7 @@ function parseInlineElements(str) {
 				x1 = result.x2 - 1
 				continue
 			// **Strong**
-			} else if (nchars >= "**?**".length && substr.startsWith("**")) {
+			} else if (substr.length >= "**?**".length && substr.startsWith("**")) {
 				const result = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
@@ -172,7 +175,7 @@ function parseInlineElements(str) {
 				x1 = result.x2 - 1
 				continue
 			// *Emphasis*
-			} else if (nchars >= "*?*".length) {
+			} else if (substr.length >= "*?*".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
@@ -192,7 +195,7 @@ function parseInlineElements(str) {
 		// <Code> (1 of 2)
 		case "`":
 			// `Code`
-			if (nchars >= "`?`".length) {
+			if (substr.length >= "`?`".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
@@ -212,7 +215,7 @@ function parseInlineElements(str) {
 		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
 			// ~~Strikethrough~~ (takes precedence)
-			if (nchars >= "~~?~~".length && substr.startsWith("~~")) {
+			if (substr.length >= "~~?~~".length && substr.startsWith("~~")) {
 				const result = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
@@ -227,7 +230,7 @@ function parseInlineElements(str) {
 				x1 = result.x2 - 1
 				continue
 			// ~Code~
-			} else if (nchars >= "~?~".length) {
+			} else if (substr.length >= "~?~".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
@@ -248,7 +251,7 @@ function parseInlineElements(str) {
 		// <Anchor> (1 of 2)
 		case "h":
 			// NOTE: Use spec.HTTP.length not spec.HTTPS.length
-			if (nchars >= spec.HTTP.length && (substr.startsWith(spec.HTTPS) || substr.startsWith(spec.HTTP))) {
+			if (substr.length >= spec.HTTP.length && (substr.startsWith(spec.HTTPS) || substr.startsWith(spec.HTTP))) {
 				const matches = substr.match(spec.URLRegex)
 				let [, syntax, children] = matches
 
@@ -276,7 +279,7 @@ function parseInlineElements(str) {
 			// // <Anchor> (2 of 2)
 			// case "[":
 			// 	// [Anchor](href)
-			// 	if (nchars >= "[?](?)".length) {
+			// 	if (substr.length >= "[?](?)".length) {
 			// 		const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
 			// 		if (!lhs) {
 			// 			// No-op
