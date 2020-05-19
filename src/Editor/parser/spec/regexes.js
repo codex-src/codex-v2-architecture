@@ -18,5 +18,13 @@ export const StrictImageRegex = /^!\[([^]*)\]\(([^)]+)\)$/
 // https://regex101.com/r/FBKxEO/2
 export const StrictLinkedImageRegex = /^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)$/
 
-// https://tools.ietf.org/html/rfc3986
-export const URIRegex = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
+// // https://tools.ietf.org/html/rfc3986 [Page 49]
+// export const URIRegex = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
+
+// (https://)()(<URI>)
+// (https://)(www.)(<URI>)
+// (http://)()(<URI>)
+// (http://)(www.)(<URI>)
+//
+// https://tools.ietf.org/html/rfc3986 [Page 49]
+export const URLRegex = /^(https?:\/\/(?:www\.)?)([\w-.~:/?#[\]@!$&'()*+,;=%]+)?/

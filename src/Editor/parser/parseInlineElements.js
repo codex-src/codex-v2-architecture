@@ -8,9 +8,13 @@ import {
 } from "lib/encoding/ascii"
 
 // Parses a GitHub Flavored Markdown inline element.
+//
+// TODO: Use substr not str? What about x1 - 1?
 function parseInlineElement({ type, syntax, str, x1 }) {
 	// Syntax must be preceded by a BOL, space, or ASCII
 	// punctuation character:
+	//
+	// TODO: Move to parseInlineElements?
 	if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) { // E.g. " *text*"
 		return null
 	}
@@ -81,8 +85,12 @@ function parseInlineElements(str) {
 	}
 	const elements = []
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
-		const char = str[x1]
-		const nchars = str.length - x1
+		const substr = str.slice(x1)
+		const nchars = substr.length
+		const char = substr[0]
+
+		// const char = str[x1]
+		// const nchars = str.length - x1 // DEPRECATE
 
 		// Fast pass:
 		if ((testFastPass(char) && char !== "h") || char === " ") {
@@ -98,7 +106,7 @@ function parseInlineElements(str) {
 		// <Escape>
 		case "\\":
 			// \Escape
-			if (nchars >= "\\?".length && spec.isASCIIPunctuation(str[x1 + 1])) {
+			if (nchars >= 2 && spec.isASCIIPunctuation(substr[1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
@@ -113,18 +121,18 @@ function parseInlineElements(str) {
 		case "_":
 			// _Emphasis_
 			if (nchars >= "_?_".length) {
-				const res = parseInlineElement({
+				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			}
 			// No-op
@@ -132,49 +140,49 @@ function parseInlineElements(str) {
 		// <StrongEmphasis> or <Strong> or <Emphasis>
 		case "*":
 			// ***Strong emphasis***
-			if (nchars >= "***?***".length && str.slice(x1, x1 + 3) === "***") {
-				const res = parseInlineElement({
+			if (nchars >= "***?***".length && substr.startsWith("***")) {
+				const result = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			// **Strong**
-			} else if (nchars >= "**?**".length && str.slice(x1, x1 + 2) === "**") {
-				const res = parseInlineElement({
+			} else if (nchars >= "**?**".length && substr.startsWith("**")) {
+				const result = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			// *Emphasis*
 			} else if (nchars >= "*?*".length) {
-				const res = parseInlineElement({
+				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			}
 			// No-op
@@ -183,18 +191,18 @@ function parseInlineElements(str) {
 		case "`":
 			// `Code`
 			if (nchars >= "`?`".length) {
-				const res = parseInlineElement({
+				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			}
 			// No-op
@@ -202,34 +210,34 @@ function parseInlineElements(str) {
 		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
 			// ~~Strikethrough~~ (takes precedence)
-			if (nchars >= "~~?~~".length && str.slice(x1, x1 + 2) === "~~") {
-				const res = parseInlineElement({
+			if (nchars >= "~~?~~".length && substr.startsWith("~~")) {
+				const result = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			// ~Code~
 			} else if (nchars >= "~?~".length) {
-				const res = parseInlineElement({
+				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
 					str,
 					x1,
 				})
-				if (!res) {
+				if (!result) {
 					// No-op
 					break
 				}
-				elements.push(res.element)
-				x1 = res.x2 - 1
+				elements.push(result.element)
+				x1 = result.x2 - 1
 				continue
 			}
 			// No-op
@@ -237,11 +245,9 @@ function parseInlineElements(str) {
 
 		// <Anchor> (1 of 2)
 		case "h":
-
-			// TODO: const substr = str.slice(x1)?
-			if (str.slice(x1).startsWith(spec.HTTPS) || str.slice(x1).startsWith(spec.HTTP)) {
-				// Based on spec.URIRegex
-				const matches = str.slice(x1).match(/^(https?:\/\/(?:www\.)?)([\w-.~:/?#[\]@!$&'()*+,;=%]+)?/)
+			// NOTE: Use spec.HTTP.length not spec.HTTPS.length
+			if (nchars >= spec.HTTP.length && (substr.startsWith(spec.HTTPS) || substr.startsWith(spec.HTTP))) {
+				const matches = substr.match(spec.URLRegex)
 				let [, syntax, children] = matches
 
 				// NOTE: String.match returns undefined for optional
@@ -300,7 +306,7 @@ function parseInlineElements(str) {
 
 		// <Emoji>
 		default:
-			const metadata = emojiTrie.atStart(str.slice(x1))
+			const metadata = emojiTrie.atStart(substr)
 			if (metadata && metadata.status === "fully-qualified") {
 				elements.push({
 					type: typeEnum.Emoji,
