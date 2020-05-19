@@ -4,8 +4,8 @@ import * as utf8 from "lib/encoding/utf8"
 // Returns the number of bytes to backspace or forward-
 // backspace.
 const posIterators = {
-	// Iterates one backspace.
-	backspace(data, pos) {
+	// Iterates one backspace rune.
+	backspaceRune(data, pos) {
 		let bytes = 0
 		if (pos) {
 			const substr = data.slice(0, pos)
@@ -14,8 +14,8 @@ const posIterators = {
 		}
 		return bytes
 	},
-	// Iterates one forward-backspace.
-	forwardBackspace(data, pos) {
+	// Iterates one forward-backspace rune.
+	forwardBackspaceRune(data, pos) {
 		let bytes = 0
 		if (pos < data.length) {
 			const substr = data.slice(pos)
@@ -75,7 +75,7 @@ const posIterators = {
 	// Iterates one forward-backspace-word.
 	forwardBackspaceWord(data, pos) {
 		// Iterate spaces:
-		let x = pos1
+		let x = pos
 		while (x < data.length) {
 			const substr = data.slice(x)
 			const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)

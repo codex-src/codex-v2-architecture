@@ -1,8 +1,9 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 import LRUCache from "lib/LRUCache"
-import UndoManager from "lib/UndoManager"
 import parseElements from "./parser/parseElements"
+import posIterators from "./posIterators"
+import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
 
 import {
@@ -198,9 +199,7 @@ const methods = state => ({
 
 		let dropL = 0
 		if (state.collapsed && state.pos1.pos) {
-			const substr = state.data.slice(0, state.pos1.pos)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			dropL = rune.length
+			dropL += posIterators.backspaceRune(state.data, state.pos1.pos)
 		}
 		this.dropBytes(dropL, 0)
 	},
