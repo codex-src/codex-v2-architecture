@@ -8,9 +8,7 @@ import {
 } from "lib/encoding/ascii"
 
 // Parses a GitHub Flavored Markdown inline element.
-//
-// TODO: Use substr not str? What about x1 - 1?
-function parseInlineElement({ type, syntax, str, x1 }) {
+function parseInlineElement({ type, syntax, substr }) {
 	// Prepare an escaped regex pattern:
 	let pattern = syntax.split("").map(each => `\\${each}`).join("")
 	let patternOffset = 0
@@ -22,34 +20,33 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 	// character, or EOL:
 	pattern += `(${spec.ASCIIWhiteSpacePattern}|${spec.ASCIIPunctuationPattern}|$)`
 	// Match cannot be empty:
-	const offset = str.slice(x1 + syntax.length).search(pattern) + patternOffset
+	const offset = substr.slice(syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) {
 		return null
 	// Match cannot be surrounded by a space (non-code):
 	} else if (type !== typeEnum.Code && (
-		spec.isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "* text"
-		spec.isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "text *"
+		spec.isASCIIWhiteSpace(substr[syntax.length]) ||           // E.g. "* text"
+		spec.isASCIIWhiteSpace(substr[syntax.length + offset - 1]) // E.g. "text *"
 	)) {
 		return null
 	// Match start or end cannot be redundant:
 	} else if (
-		str[x1 + syntax.length] === syntax[0] ||                              // E.g. "****text"
-		str[x1 + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "text****"
+		substr[syntax.length] === syntax[0] ||                              // E.g. "****text"
+		substr[syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "text****"
 		return null
 	}
 	// Increment start syntax (assumes start and end syntax
 	// are the same):
-	x1 += syntax.length
 	const element = {
 		type,
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
-			? parseInlineElements(str.slice(x1, x1 + offset))
-			: str.slice(x1, x1 + offset),
+			? parseInlineElements(substr.slice(syntax.length, syntax.length + offset))
+			: substr.slice(syntax.length, syntax.length + offset),
 	}
 	// Increment offset and end syntax:
-	const x2 = x1 + offset + syntax.length
-	return { element, x2 }
+	const length = syntax.length + offset + syntax.length
+	return { element, length }
 }
 
 const codes = {
@@ -129,15 +126,14 @@ function parseInlineElements(str) {
 				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "_",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			}
 			// No-op
@@ -149,45 +145,42 @@ function parseInlineElements(str) {
 				const result = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
 					syntax: "***",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			// **Strong**
 			} else if (substr.length >= "**?**".length && substr.startsWith("**")) {
 				const result = parseInlineElement({
 					type: typeEnum.Strong,
 					syntax: "**",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			// *Emphasis*
 			} else if (substr.length >= "*?*".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
 					syntax: "*",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			}
 			// No-op
@@ -199,15 +192,14 @@ function parseInlineElements(str) {
 				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "`",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			}
 			// No-op
@@ -219,30 +211,28 @@ function parseInlineElements(str) {
 				const result = parseInlineElement({
 					type: typeEnum.Strikethrough,
 					syntax: "~~",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			// ~Code~
 			} else if (substr.length >= "~?~".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Code,
 					syntax: "~",
-					str,
-					x1,
+					substr,
 				})
 				if (!result) {
 					// No-op
 					break
 				}
 				elements.push(result.element)
-				x1 = result.x2 - 1
+				x1 += result.length - 1
 				continue
 			}
 			// No-op
