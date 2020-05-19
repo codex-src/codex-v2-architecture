@@ -196,6 +196,7 @@ function parseElements(nodes, cachedElements) {
 				continue
 			}
 			// No-op
+			break
 		default:
 			// No-op
 			break

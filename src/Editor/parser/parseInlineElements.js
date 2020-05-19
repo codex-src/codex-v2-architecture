@@ -55,6 +55,23 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 	return { element, x2 }
 }
 
+const codes = {
+	A: 0x41, // -> "A"
+	Z: 0x5a, // -> "Z"
+	a: 0x61, // -> "a"
+	z: 0x71, // -> "z"
+}
+
+function testFastPass(char) {
+	const code = char.codePointAt(0)
+	const ok = (
+		(code >= codes.A && code <= codes.Z) || // Takes precedence
+		(code >= codes.a && code <= codes.z) ||
+		(code > 0x7f) // 127
+	)
+	return ok
+}
+
 // Parses GitHub Flavored Markdown inline elements.
 //
 // TODO: https://github.github.com/gfm/#delimiter-stack
@@ -64,19 +81,20 @@ function parseInlineElements(str) {
 	}
 	const elements = []
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
+		const char = str[x1]
+		const nchars = str.length - x1
+
 		// Fast pass:
-		//
-		// NOTE: Use isStrictAlphanum to negate "_"
-		if ((isStrictAlphanum(str[x1]) && str[x1] !== "h") || str[x1] === " ") {
+		if ((testFastPass(char) && char !== "h") || char === " ") {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-				elements.push(str[x1])
+				elements.push(char)
 				continue
 			}
-			elements[elements.length - 1] += str[x1]
+			elements[elements.length - 1] += char
 			continue
 		}
-		const nchars = str.length - x1
-		switch (str[x1]) {
+
+		switch (char) {
 		// <Escape>
 		case "\\":
 			// \Escape
@@ -86,8 +104,6 @@ function parseInlineElements(str) {
 					syntax: ["\\"],
 					children: str[x1 + 1],
 				})
-				// Increment the escape character; the punctuation
-				// character is auto-incremented:
 				x1++
 				continue
 			}
@@ -218,66 +234,70 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
+
 		// <Anchor> (1 of 2)
 		case "h":
-			// https:// or http://
-			if (
-				(nchars >= spec.HTTPS.length && str.slice(x1, x1 + spec.HTTPS.length) === spec.HTTPS) ||
-				(nchars >= spec.HTTP.length && str.slice(x1, x1 + spec.HTTP.length) === spec.HTTP)
-			) {
-				let syntax = `${str.slice(x1).split("://", 1)[0]}://`
-				if (str.slice(x1, x1 + syntax.length + 4) === `${syntax}www.`) {
-					syntax += "www."
+
+			// TODO: const substr = str.slice(x1)?
+			if (str.slice(x1).startsWith(spec.HTTPS) || str.slice(x1).startsWith(spec.HTTP)) {
+				// Based on spec.URIRegex
+				const matches = str.slice(x1).match(/^(https?:\/\/(?:www\.)?)([\w-.~:/?#[\]@!$&'()*+,;=%]+)?/)
+				let [, syntax, children] = matches
+
+				// NOTE: String.match returns undefined for optional
+				// groups
+				if (children === undefined) {
+					children = ""
 				}
-				let [href] = spec.URIRegex.exec(str.slice(x1))
-				if (href.length === syntax.length) {
-					// No-op; defer to end
-				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {
-					href = href.slice(0, href.length - 1)
+
+				if (children.length && spec.isASCIIPunctuation(children[children.length - 1]) && children[children.length - 1] !== "/") {
+					children = children.slice(0, children.length - 1)
 				}
 				elements.push({
 					type: typeEnum.Anchor,
 					syntax: [syntax],
-					href,
-					children: href.slice(syntax.length),
+					href: syntax + children,
+					children,
 				})
-				x1 += href.length - 1
+				x1 += (syntax + children).length - 1
 				continue
 			}
 			// No-op
 			break
-		// <Anchor> (2 of 2)
-		case "[":
-			// [Anchor](href)
-			if (nchars >= "[?](?)".length) {
-				const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
-				if (!lhs) {
-					// No-op
-					break
-				}
-				// Check "(" syntax:
-				if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
-					// No-op
-					break
-				}
-				// lhs.x2++
-				const rhs = parseInlineElement({ type: typeEnum.Anchor, syntax: ")", str, x1: lhs.x2 })
-				if (!rhs) {
-					// No-op
-					break
-				}
-				elements.push({
-					type: typeEnum.Anchor,
-					// syntax: ["[", "](…)"],
-					syntax: ["[", `](${rhs.element.children})`],
-					href: rhs.element.children,
-					children: lhs.element.children,
-				})
-				x1 = rhs.x2 - 1
-				continue
-			}
-			// No-op
-			break
+
+			// // <Anchor> (2 of 2)
+			// case "[":
+			// 	// [Anchor](href)
+			// 	if (nchars >= "[?](?)".length) {
+			// 		const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
+			// 		if (!lhs) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		// Check "(" syntax:
+			// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		// lhs.x2++
+			// 		const rhs = parseInlineElement({ type: typeEnum.Anchor, syntax: ")", str, x1: lhs.x2 })
+			// 		if (!rhs) {
+			// 			// No-op
+			// 			break
+			// 		}
+			// 		elements.push({
+			// 			type: typeEnum.Anchor,
+			// 			// syntax: ["[", "](…)"],
+			// 			syntax: ["[", `](${rhs.element.children})`],
+			// 			href: rhs.element.children,
+			// 			children: lhs.element.children,
+			// 		})
+			// 		x1 = rhs.x2 - 1
+			// 		continue
+			// 	}
+			// 	// No-op
+			// 	break
+
 		// <Emoji>
 		default:
 			const metadata = emojiTrie.atStart(str.slice(x1))
@@ -294,10 +314,10 @@ function parseInlineElements(str) {
 			break
 		}
 		if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-			elements.push(str[x1])
+			elements.push(char)
 			continue
 		}
-		elements[elements.length - 1] += str[x1]
+		elements[elements.length - 1] += char
 	}
 	if (elements.length === 1 && typeof elements[0] === "string") {
 		return elements[0]
