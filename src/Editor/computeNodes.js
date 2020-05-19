@@ -1,13 +1,18 @@
 import { ascendRoot } from "./ascendNodes"
 import { newNodes } from "./constructors"
 
+// Creates a new node from an ID.
+function newNode(fromID) {
+	const node = newNodes("")[0]
+	node.id = fromID
+	return node
+}
+
 // Reads a data-codex-root element.
 function readRoot(root) {
-	const nodes = newNodes("")
-	nodes[0].id = root.id
+	const nodes = [newNode(root.id)]
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
-			// Concatenate the end node:
 			nodes[nodes.length - 1].data += on.nodeValue
 			return
 		}
@@ -15,11 +20,7 @@ function readRoot(root) {
 			recurse(each)
 			const next = each.nextElementSibling
 			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
-				// Push a new node:
-				nodes.push({
-					id: next.id,
-					data: "",
-				})
+				nodes.push(newNode(next.id))
 			}
 		}
 	}

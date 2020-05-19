@@ -345,7 +345,6 @@ const methods = state => ({
 	},
 	// Pushes the next undo state.
 	pushUndo() {
-		// Copy the current state:
 		const currentState = {
 			data: state.data,
 			nodes: state.nodes.map(each => ({ ...each })),
@@ -356,7 +355,6 @@ const methods = state => ({
 	},
 	// Undos once.
 	undo() {
-		// Copy the current state:
 		const currentState = {
 			data: state.data,
 			nodes: state.nodes.map(each => ({ ...each })),

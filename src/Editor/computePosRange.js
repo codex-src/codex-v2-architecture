@@ -62,16 +62,16 @@ function computePos(editorState, editorRoot, range) {
 
 	// Compute extended ID; extend up to two data-codex-root
 	// elements backwards:
-	let rootElement = ascendRoot(range.node)
-	let prev = rootElement.previousElementSibling
+	let root = ascendRoot(range.node)
+	let prev = root.previousElementSibling
 	if (prev && prev.getAttribute("data-codex-root")) {
-		rootElement = prev
-		prev = rootElement.previousElementSibling
+		root = prev
+		prev = root.previousElementSibling
 		if (prev && prev.getAttribute("data-codex-root")) {
-			rootElement = prev
+			root = prev
 		}
 	}
-	const extID = rootElement.id
+	const extID = root.id
 
 	if (!extID) {
 		throw new Error("computePos: no such extID")

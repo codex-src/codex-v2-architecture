@@ -60,11 +60,11 @@ const Editor = ({
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
 				selection.removeAllRanges()
-				// NOTE: Use document.activeElement.blur for
-				// checkboxes
-				if (document.activeElement) { // TODO: Remove guard?
-					document.activeElement.blur()
-				}
+				// // NOTE: Use document.activeElement.blur for
+				// // checkboxes
+				// if (document.activeElement) { // TODO: Remove guard?
+				// 	document.activeElement.blur()
+				// }
 			}
 			ReactDOM.render(<Elements state={state} dispatch={dispatch} />, ref.current, () => {
 				if (state.readOnly || !state.focused) {

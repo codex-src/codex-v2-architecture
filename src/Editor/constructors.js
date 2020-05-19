@@ -19,9 +19,22 @@ export function newRange() {
 	return range
 }
 
-// Creates a new nodes data structure.
+// // Creates a new node data structure.
+// export function newNode(id, data = "") {
+// 	const node = {
+// 		id,
+// 		// version: 0, // TODO
+// 		data,
+// 	}
+// 	return node
+// }
 //
-// TODO: Add version property?
+// // Creates a new nodes data structure.
+// export function newNodes(data) {
+// 	return data.split("\n").map(each => newNode(uuidv4(), each))
+// }
+
+// Creates a new nodes data structure.
 export function newNodes(data) {
 	const nodes = data.split("\n").map(each => ({
 		id: uuidv4(),
