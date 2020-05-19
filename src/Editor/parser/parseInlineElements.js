@@ -35,18 +35,15 @@ function parseInlineElement({ type, syntax, substr }) {
 		substr[syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "text****"
 		return null
 	}
-	// Increment start syntax (assumes start and end syntax
-	// are the same):
+	const match = substr.slice(0, syntax.length + offset + syntax.length)
 	const element = {
 		type,
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
-			? parseInlineElements(substr.slice(syntax.length, syntax.length + offset))
-			: substr.slice(syntax.length, syntax.length + offset),
+			? parseInlineElements(match.slice(syntax.length, -syntax.length))
+			: match.slice(syntax.length, -syntax.length)
 	}
-	// Increment offset and end syntax:
-	const length = syntax.length + offset + syntax.length
-	return { element, length }
+	return { element, match }
 }
 
 const codes = {
@@ -133,7 +130,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			}
 			// No-op
@@ -152,7 +149,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			// **Strong**
 			} else if (substr.length >= "**?**".length && substr.startsWith("**")) {
@@ -166,7 +163,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			// *Emphasis*
 			} else if (substr.length >= "*?*".length) {
@@ -180,7 +177,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			}
 			// No-op
@@ -199,7 +196,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			}
 			// No-op
@@ -218,7 +215,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			// ~Code~
 			} else if (substr.length >= "~?~".length) {
@@ -232,7 +229,7 @@ function parseInlineElements(str) {
 					break
 				}
 				elements.push(result.element)
-				x1 += result.length - 1
+				x1 += result.match.length - 1
 				continue
 			}
 			// No-op
