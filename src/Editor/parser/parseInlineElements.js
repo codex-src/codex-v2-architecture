@@ -76,6 +76,8 @@ function testFastPass(char) {
 	return ok
 }
 
+// TODO: parsers.asterisk?
+
 // Parses GitHub Flavored Markdown inline elements.
 //
 // TODO: https://github.github.com/gfm/#delimiter-stack
@@ -110,7 +112,7 @@ function parseInlineElements(str) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
-					children: str[x1 + 1],
+					children: substr[1],
 				})
 				x1++
 				continue
@@ -306,14 +308,14 @@ function parseInlineElements(str) {
 
 		// <Emoji>
 		default:
-			const metadata = emojiTrie.atStart(substr)
-			if (metadata && metadata.status === "fully-qualified") {
+			const info = emojiTrie.atStart(substr)
+			if (info && info.status === "fully-qualified") {
 				elements.push({
 					type: typeEnum.Emoji,
-					description: metadata.description,
-					children: metadata.emoji,
+					description: info.description,
+					children: info.emoji,
 				})
-				x1 += metadata.emoji.length - 1
+				x1 += info.emoji.length - 1
 				continue
 			}
 			// No-op
@@ -325,6 +327,7 @@ function parseInlineElements(str) {
 		}
 		elements[elements.length - 1] += char
 	}
+	// TODO: Deprecate?
 	if (elements.length === 1 && typeof elements[0] === "string") {
 		return elements[0]
 	}
