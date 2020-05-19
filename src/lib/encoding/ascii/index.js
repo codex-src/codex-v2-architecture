@@ -1,5 +1,5 @@
-// Returns whether a character is a strict alphanumeric
-// character.
+// Returns whether a character is strictly an alphanumeric
+// character (negates underscores "_").
 export function isStrictAlphanum(char) {
 	const ok = (
 		(char >= "a" && char <= "z") ||

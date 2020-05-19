@@ -7,60 +7,55 @@ import {
 	isStrictAlphanum,
 } from "lib/encoding/ascii"
 
+// Searches (e.g. String.search) for end-syntax.
+function searchEndSyntax({ type, syntax, substr }) {
+	// Create an escaped search pattern:
+	let search = syntax.split("").map(each => "\\" + each).join("")
+	let searchOffset = 0
+	if (type !== typeEnum.Code) {
+		search = "[^\\\\]" + search // End syntax cannot be escaped
+		searchOffset++
+	}
+	// End syntax must be proceeded by a space, punctuation,
+	// or EOL:
+	search += "(" + spec.ASCIIWhiteSpacePattern + "|" + spec.ASCIIPunctuationPattern + "|$)"
+	let offset = substr.slice(syntax.length).search(search)
+	if (offset !== -1) {
+		// Step over the escape character:
+		offset += searchOffset
+	}
+	return offset
+}
+
 // Parses a GitHub Flavored Markdown inline element.
 function parseInlineElement({ type, syntax, substr }) {
-	// Prepare an escaped regex pattern:
-	let pattern = syntax.split("").map(each => `\\${each}`).join("")
-	let patternOffset = 0
-	if (type !== typeEnum.Code) {
-		pattern = `[^\\\\]${pattern}`
-		patternOffset++
-	}
-	// Syntax must be proceeded by a space, punctuation
-	// character, or EOL:
-	pattern += `(${spec.ASCIIWhiteSpacePattern}|${spec.ASCIIPunctuationPattern}|$)`
-	// Match cannot be empty:
-	const offset = substr.slice(syntax.length).search(pattern) + patternOffset
+	// Matches cannot be empty:
+	const offset = searchEndSyntax({ type, syntax, substr })
 	if (offset <= 0) {
-		return null
-	// Match cannot be surrounded by a space (non-code):
-	} else if (type !== typeEnum.Code && (
-		spec.isASCIIWhiteSpace(substr[syntax.length]) ||           // E.g. "* text"
-		spec.isASCIIWhiteSpace(substr[syntax.length + offset - 1]) // E.g. "text *"
-	)) {
-		return null
-	// Match start or end cannot be redundant:
-	} else if (
-		substr[syntax.length] === syntax[0] ||                              // E.g. "****text"
-		substr[syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "text****"
 		return null
 	}
 	const match = substr.slice(0, syntax.length + offset + syntax.length)
+	const submatch = match.slice(syntax.length, -syntax.length)
+	// Non-code submatches cannot be surrounded by spaces:
+	if (type !== typeEnum.Code && (
+		spec.isASCIIWhiteSpace(submatch[0]) ||
+		spec.isASCIIWhiteSpace(submatch[submatch.length - 1]))
+	) {
+		return null
+	// Syntax and submatch cannot be redundant:
+	} else if (
+		submatch[0] === syntax[0] ||
+		submatch[submatch.length - 1] === syntax[0]) {
+		return null
+	}
 	const element = {
 		type,
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
-			? parseInlineElements(match.slice(syntax.length, -syntax.length))
-			: match.slice(syntax.length, -syntax.length)
+			? parseInlineElements(submatch)
+			: submatch,
 	}
-	return { element, match }
-}
-
-const codes = {
-	A: 0x41, // -> "A"
-	Z: 0x5a, // -> "Z"
-	a: 0x61, // -> "a"
-	z: 0x71, // -> "z"
-}
-
-function testFastPass(char) {
-	const code = char.codePointAt(0)
-	const ok = (
-		(code >= codes.A && code <= codes.Z) || // Takes precedence
-		(code >= codes.a && code <= codes.z) ||
-		(code > 0x7f) // 127
-	)
-	return ok
+	return { element, match, submatch }
 }
 
 // TODO: parsers.asterisk?
@@ -74,13 +69,10 @@ function parseInlineElements(str) {
 	}
 	const elements = []
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
-		// TODO: Move substr **after** fast pass?
-		const substr = str.slice(x1)
-		const char = substr[0]
+		const char = str[x1]
 
 		// Fast pass:
-		if ((testFastPass(char) && char !== "h") || char === " ") {
-			// TODO: Extract?
+		if ((isStrictAlphanum(char) && char !== "h") || char === " " || char > "\u007f") {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
 				continue
@@ -88,7 +80,6 @@ function parseInlineElements(str) {
 			elements[elements.length - 1] += char
 			continue
 		}
-
 		// Inline elements must be preceded by an ASCII white
 		// space or punctuation character:
 		if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) {
@@ -100,6 +91,10 @@ function parseInlineElements(str) {
 			elements[elements.length - 1] += char
 			continue
 		}
+
+		// NOTE: Allocate substr after fast pass and bounds
+		// checks
+		const substr = str.slice(x1)
 
 		switch (char) {
 		// <Escape>
@@ -317,10 +312,9 @@ function parseInlineElements(str) {
 		}
 		elements[elements.length - 1] += char
 	}
-	// TODO: Deprecate?
-	if (elements.length === 1 && typeof elements[0] === "string") {
-		return elements[0]
-	}
+	// if (elements.length === 1 && typeof elements[0] === "string") {
+	// 	return elements[0]
+	// }
 	return elements
 }
 
