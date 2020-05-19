@@ -23,7 +23,7 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 	}
 	// Syntax must be proceeded by a space, punctuation
 	// character, or EOL:
-	pattern += `(${spec.ASCIIWhiteSpaceRegex.source}|${spec.ASCIIPunctuationRegex.source}|$)`
+	pattern += `(${spec.ASCIIWhiteSpacePattern}|${spec.ASCIIPunctuationPattern}|$)`
 	// Match cannot be empty:
 	const offset = str.slice(x1 + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) {

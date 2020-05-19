@@ -5,6 +5,11 @@ import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
+import {
+	StrictImageRegex,
+	StrictLinkedImageRegex,
+} from "./spec"
+
 const codeA = 0x41 // -> "A"
 const codeZ = 0x5a // -> "Z"
 const codea = 0x61 // -> "a"
@@ -182,9 +187,9 @@ function parseElements(nodes, cachedElements) {
 			// https://regex101.com/r/FBKxEO/2
 			let matches = null
 			if (each.data[0] === "!") {
-				matches = each.data.match(/^!\[([^]*)\]\(([^)]+)\)$/)
+				matches = each.data.match(StrictImageRegex)
 			} else if (each.data[0] === "[") {
-				matches = each.data.match(/^\[!\[([^]*)\]\(([^)]+)\)\]\(([^)]+)\)$/)
+				matches = each.data.match(StrictLinkedImageRegex)
 			}
 			if (matches) {
 				const [, alt, src, href] = matches
