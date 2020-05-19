@@ -3,7 +3,7 @@ import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
-import { AnyListRegex } from "./parser/spec"
+import { AnyListRegex } from "./regexes"
 
 import {
 	newNodes,

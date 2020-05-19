@@ -1,4 +1,4 @@
-import { AnyListRegex } from "./spec"
+import { AnyListRegex } from "../regexes"
 
 // TODO: Add testElements.Image?
 const testElements = {

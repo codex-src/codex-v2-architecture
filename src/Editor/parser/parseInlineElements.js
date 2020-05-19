@@ -1,14 +1,16 @@
+import * as ascii from "lib/encoding/ascii"
 import * as emojiTrie from "emoji-trie"
-import * as spec from "./spec"
 import typeEnum from "../Elements/typeEnum"
-import { isStrictAlphanum } from "lib/encoding/ascii"
+import { URLRegex } from "../regexes"
+
+// TODO: Use isHWhiteSpace
 
 // Returns whether a character is an ASCII punctuation or
 // white space character.
-function isASCIIPunctuationOrWhiteSpace(char) {
+function isPunctuationOrWhiteSpace(char) {
 	const ok = (
-		spec.isASCIIPunctuation(char) ||
-		spec.isASCIIWhiteSpace(char)
+		ascii.isPunctuation(char) ||
+		ascii.isWhiteSpace(char)
 	)
 	return ok
 }
@@ -21,7 +23,7 @@ function computeEndSyntaxOffset({ type, syntax, substr }) {
 		const ok = (
 			substr.slice(offset).startsWith(syntax) &&
 			(offset - 1 >= 0 && substr[offset - 1] !== "\\") &&
-			(offset + syntax.length === substr.length || isASCIIPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+			(offset + syntax.length === substr.length || isPunctuationOrWhiteSpace(substr[offset + syntax.length]))
 		)
 		return ok
 	}
@@ -30,7 +32,7 @@ function computeEndSyntaxOffset({ type, syntax, substr }) {
 	const foundCodeEndSyntax = offset => {
 		const ok = (
 			substr.slice(offset).startsWith(syntax) &&
-			(offset + syntax.length === substr.length || isASCIIPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+			(offset + syntax.length === substr.length || isPunctuationOrWhiteSpace(substr[offset + syntax.length]))
 		)
 		return ok
 	}
@@ -59,8 +61,8 @@ function parseInlineElement({ type, syntax, substr }) {
 	const submatch = match.slice(syntax.length, -syntax.length)
 	// Non-code submatches cannot be surrounded by spaces:
 	if (type !== typeEnum.Code && (
-		spec.isASCIIWhiteSpace(submatch[0]) ||
-		spec.isASCIIWhiteSpace(submatch[submatch.length - 1]))
+		ascii.isWhiteSpace(submatch[0]) ||
+		ascii.isWhiteSpace(submatch[submatch.length - 1]))
 	) {
 		return null
 	// Syntax and submatch cannot be redundant:
@@ -93,7 +95,7 @@ function parseInlineElements(str) {
 		const char = str[x1]
 
 		// Fast pass:
-		if ((isStrictAlphanum(char) && char !== "h") || char === " " || char > "\u007f") {
+		if ((ascii.isStrictAlphanum(char) && char !== "h") || char === " " || char > "\u007f") {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
 				continue
@@ -103,7 +105,7 @@ function parseInlineElements(str) {
 		}
 		// Inline elements must be preceded by an ASCII white
 		// space or punctuation character:
-		if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) {
+		if (x1 - 1 >= 0 && !(ascii.isWhiteSpace(str[x1 - 1]) || ascii.isPunctuation(str[x1 - 1]))) {
 			// TODO: Extract?
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
@@ -121,7 +123,7 @@ function parseInlineElements(str) {
 		// <Escape>
 		case "\\":
 			// \Escape
-			if (substr.length >= 2 && spec.isASCIIPunctuation(substr[1])) {
+			if (substr.length >= 2 && ascii.isPunctuation(substr[1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
@@ -253,9 +255,8 @@ function parseInlineElements(str) {
 
 		// <Anchor> (1 of 2)
 		case "h":
-			// NOTE: Use spec.HTTP.length not spec.HTTPS.length
-			if (substr.length >= spec.HTTP.length && (substr.startsWith(spec.HTTPS) || substr.startsWith(spec.HTTP))) {
-				const matches = substr.match(spec.URLRegex)
+			if (substr.length >= "http://".length && (substr.startsWith("https://") || substr.startsWith("http://"))) {
+				const matches = substr.match(URLRegex)
 				let [, syntax, children] = matches
 
 				// NOTE: String.match returns undefined for optional
@@ -264,7 +265,7 @@ function parseInlineElements(str) {
 					children = ""
 				}
 
-				if (children.length && spec.isASCIIPunctuation(children[children.length - 1]) && children[children.length - 1] !== "/") {
+				if (children.length && ascii.isPunctuation(children[children.length - 1]) && children[children.length - 1] !== "/") {
 					children = children.slice(0, children.length - 1)
 				}
 				elements.push({
@@ -333,9 +334,9 @@ function parseInlineElements(str) {
 		}
 		elements[elements.length - 1] += char
 	}
-	// if (elements.length === 1 && typeof elements[0] === "string") {
-	// 	return elements[0]
-	// }
+	if (elements.length === 1 && typeof elements[0] === "string") {
+		return elements[0]
+	}
 	return elements
 }
 

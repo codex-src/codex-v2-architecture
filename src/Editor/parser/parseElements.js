@@ -8,7 +8,7 @@ import { toInnerText } from "../Elements/cmap"
 import {
 	StrictImageRegex,
 	StrictLinkedImageRegex,
-} from "./spec"
+} from "../regexes"
 
 const codes = {
 	A: 0x41, // -> "A"
