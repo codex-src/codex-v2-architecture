@@ -14,19 +14,20 @@ import {
 	TaskListRe,
 } from "./parser/spec"
 
+// Returns whether two states are equal; for UndoManager.
+function areEqual(currentState, nextState) {
+	const ok = (
+		currentState.data.length === nextState.data.length &&
+		currentState.data === nextState.data
+	)
+	return ok
+}
+
 // Prepares a new editor state (for useEditor).
 function newEditorState(data) {
 	const nodes = newNodes(data)
 	const [pos1, pos2] = [newPos(), newPos()]
 	const initialState = { data, nodes, pos1, pos2 }
-	// Returns whether the current and next state are equal.
-	const areEqual = (currentState, nextState) => {
-		const ok = (
-			currentState.data.length === nextState.data.length &&
-			currentState.data === nextState.data
-		)
-		return ok
-	}
 	const cachedElements = new LRUCache(100)
 	const editorState = {
 		readOnly: false,                                  // Is read-only?

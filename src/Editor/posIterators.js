@@ -1,10 +1,8 @@
 import * as emojiTrie from "emoji-trie"
 import * as utf8 from "lib/encoding/utf8"
 
-// Returns the number of bytes to backspace or forward-
-// backspace.
+// Returns the number of bytes to backspace.
 export const backspace = {
-	// Iterates one backspace rune.
 	rune(data, pos) {
 		let bytes = 0
 		if (pos) {
@@ -14,7 +12,6 @@ export const backspace = {
 		}
 		return bytes
 	},
-	// Iterates one backspace-word.
 	word(data, pos) {
 		// Iterate spaces:
 		let x = pos
@@ -62,7 +59,6 @@ export const backspace = {
 		}
 		return bytes
 	},
-	// Iterates one backspace-paragraph.
 	paragraph(data, pos) {
 		let x = pos
 		while (x) {
@@ -84,7 +80,6 @@ export const backspace = {
 
 // Returns the number of bytes to forward-backspace.
 export const forwardBackspace = {
-	// Iterates one forward-backspace rune.
 	rune(data, pos) {
 		let bytes = 0
 		if (pos < data.length) {
@@ -94,7 +89,6 @@ export const forwardBackspace = {
 		}
 		return bytes
 	},
-	// Iterates one forward-backspace-word.
 	word(data, pos) {
 		// Iterate spaces:
 		let x = pos
