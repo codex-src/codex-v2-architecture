@@ -1,38 +1,37 @@
 import * as ascii from "lib/encoding/ascii"
 import * as emojiTrie from "emoji-trie"
+import * as utf8 from "lib/encoding/utf8"
 import typeEnum from "../Elements/typeEnum"
 import { URLRegex } from "../regexes"
 
-// TODO: Use isHWhiteSpace
-
-// Returns whether a character is an ASCII punctuation or
-// white space character.
-function isPunctuationOrWhiteSpace(char) {
+function isASCIIPunctuationOrUTF8Space(char) {
 	const ok = (
 		ascii.isPunctuation(char) ||
-		ascii.isWhiteSpace(char)
+		utf8.isHWhiteSpace(char)
 	)
 	return ok
 }
 
 // Computes the end-syntax offset.
 function computeEndSyntaxOffset({ type, syntax, substr }) {
-	// Non-code breaks at non-escaped end-syntax and proceeded
-	// by punctuation, space, or EOL.
+	// Non-code breaks at non-escaped end-syntax and when
+	// proceeded by an ASCII punctuation character, UTF-8
+	// space, or EOL.
 	const foundNonCodeEndSyntax = offset => {
 		const ok = (
 			substr.slice(offset).startsWith(syntax) &&
 			(offset - 1 >= 0 && substr[offset - 1] !== "\\") &&
-			(offset + syntax.length === substr.length || isPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+			(offset + syntax.length === substr.length || isASCIIPunctuationOrUTF8Space(substr[offset + syntax.length]))
 		)
 		return ok
 	}
-	// Code breaks at end-syntax and proceeded by punctuation,
+	// Code breaks at non-escaped end-syntax and when
+	// proceeded by an ASCII punctuation character, UTF-8
 	// space, or EOL.
 	const foundCodeEndSyntax = offset => {
 		const ok = (
 			substr.slice(offset).startsWith(syntax) &&
-			(offset + syntax.length === substr.length || isPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+			(offset + syntax.length === substr.length || isASCIIPunctuationOrUTF8Space(substr[offset + syntax.length]))
 		)
 		return ok
 	}
@@ -61,8 +60,8 @@ function parseInlineElement({ type, syntax, substr }) {
 	const submatch = match.slice(syntax.length, -syntax.length)
 	// Non-code submatches cannot be surrounded by spaces:
 	if (type !== typeEnum.Code && (
-		ascii.isWhiteSpace(submatch[0]) ||
-		ascii.isWhiteSpace(submatch[submatch.length - 1]))
+		utf8.isHWhiteSpace(submatch[0]) ||
+		utf8.isHWhiteSpace(submatch[submatch.length - 1]))
 	) {
 		return null
 	// Syntax and submatch cannot be redundant:
@@ -80,8 +79,6 @@ function parseInlineElement({ type, syntax, substr }) {
 	}
 	return { element, match, submatch }
 }
-
-// TODO: parsers.asterisk?
 
 // Parses GitHub Flavored Markdown inline elements.
 //
@@ -103,10 +100,10 @@ function parseInlineElements(str) {
 			elements[elements.length - 1] += char
 			continue
 		}
-		// Inline elements must be preceded by an ASCII white
-		// space or punctuation character:
-		if (x1 - 1 >= 0 && !(ascii.isWhiteSpace(str[x1 - 1]) || ascii.isPunctuation(str[x1 - 1]))) {
-			// TODO: Extract?
+
+		// Inline elements must be preceded by an ASCII
+		// punctuation character, UTF-8 space, or BOL:
+		if (x1 - 1 >= 0 && !isASCIIPunctuationOrUTF8Space(str[x1 - 1])) {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
 				continue
@@ -115,10 +112,7 @@ function parseInlineElements(str) {
 			continue
 		}
 
-		// NOTE: Allocate substr after fast pass and bounds
-		// checks
 		const substr = str.slice(x1)
-
 		switch (char) {
 		// <Escape>
 		case "\\":

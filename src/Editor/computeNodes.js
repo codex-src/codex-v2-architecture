@@ -30,7 +30,6 @@ function readRoot(root) {
 
 // Computes nodes from an extended node (root ID) range.
 function computeNodes(editorRoot, extPosRange) {
-	// Query data-codex-root elements:
 	const root1 = ascendRoot(document.getElementById(extPosRange[0]))
 	if (!root1 || !editorRoot.contains(root1)) {
 		throw new Error("computeNodes: no such root1 or out of bounds")
@@ -39,7 +38,6 @@ function computeNodes(editorRoot, extPosRange) {
 	if (!root2 || !editorRoot.contains(root2)) {
 		throw new Error("computeNodes: no such root2 or out of bounds")
 	}
-	// Read nodes from data-codex-root elements:
 	const nodes = []
 	let currentRoot = root1
 	while (currentRoot) {
