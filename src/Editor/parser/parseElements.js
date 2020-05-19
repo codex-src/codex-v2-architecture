@@ -1,4 +1,5 @@
 import emitElements from "./emitElements"
+import newCacheStrategy from "./newCacheStrategy"
 import newURLHashEpoch from "./newURLHashEpoch"
 import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
@@ -21,21 +22,8 @@ function testFastPass(char) {
 
 // Parses GitHub Flavored Markdown elements.
 function parseElements(nodes, cachedElements) {
+	const cacheStrategy = newCacheStrategy(cachedElements)
 	const newURLHash = newURLHashEpoch()
-
-	// Gets and or caches an element. Uses range (text) as the
-	// key. emitElement emits and caches new elements.
-	//
-	// NOTE: Parameter range can be a node or a range of nodes
-	const cacheStrategy = (range, emitElement) => {
-		const key = !Array.isArray(range) ? range.data : range.map(each => each.data).join("\n")
-		let element = cachedElements.get(key)
-		if (!element) {
-			element = emitElement(range)
-			cachedElements.set(key, element)
-		}
-		return element
-	}
 
 	const elements = []
 	for (let x1 = 0, len = nodes.length; x1 < len; x1++) {
