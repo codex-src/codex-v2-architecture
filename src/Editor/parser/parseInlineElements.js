@@ -1,28 +1,49 @@
 import * as emojiTrie from "emoji-trie"
 import * as spec from "./spec"
 import typeEnum from "../Elements/typeEnum"
+import { isStrictAlphanum } from "lib/encoding/ascii"
 
-import {
-	isAlphanum,
-	isStrictAlphanum,
-} from "lib/encoding/ascii"
+// Returns whether a character is an ASCII punctuation or
+// white space character.
+function isASCIIPunctuationOrWhiteSpace(char) {
+	const ok = (
+		spec.isASCIIPunctuation(char) ||
+		spec.isASCIIWhiteSpace(char)
+	)
+	return ok
+}
 
-// Searches (e.g. String.search) for end-syntax.
-function searchEndSyntax({ type, syntax, substr }) {
-	// Create an escaped search pattern:
-	let search = syntax.split("").map(each => "\\" + each).join("")
-	let searchOffset = 0
-	if (type !== typeEnum.Code) {
-		search = "[^\\\\]" + search // End syntax cannot be escaped
-		searchOffset++
+// Computes the end-syntax offset.
+function computeEndSyntaxOffset({ type, syntax, substr }) {
+	// Non-code breaks at non-escaped end-syntax and proceeded
+	// by punctuation, space, or EOL.
+	const foundNonCodeEndSyntax = offset => {
+		const ok = (
+			substr.slice(offset).startsWith(syntax) &&
+			(offset - 1 >= 0 && substr[offset - 1] !== "\\") &&
+			(offset + syntax.length === substr.length || isASCIIPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+		)
+		return ok
 	}
-	// End syntax must be proceeded by a space, punctuation,
-	// or EOL:
-	search += "(" + spec.ASCIIWhiteSpacePattern + "|" + spec.ASCIIPunctuationPattern + "|$)"
-	let offset = substr.slice(syntax.length).search(search)
-	if (offset !== -1) {
-		// Step over the escape character:
-		offset += searchOffset
+	// Code breaks at end-syntax and proceeded by punctuation,
+	// space, or EOL.
+	const foundCodeEndSyntax = offset => {
+		const ok = (
+			substr.slice(offset).startsWith(syntax) &&
+			(offset + syntax.length === substr.length || isASCIIPunctuationOrWhiteSpace(substr[offset + syntax.length]))
+		)
+		return ok
+	}
+	let offset = syntax.length
+	const foundEndSyntax = type !== typeEnum.Code ? foundNonCodeEndSyntax : foundCodeEndSyntax
+	for (; offset < substr.length; offset++) {
+		if (foundEndSyntax(offset)) {
+			// No-op
+			break
+		}
+	}
+	if (offset === substr.length) {
+		offset = -1
 	}
 	return offset
 }
@@ -30,11 +51,11 @@ function searchEndSyntax({ type, syntax, substr }) {
 // Parses a GitHub Flavored Markdown inline element.
 function parseInlineElement({ type, syntax, substr }) {
 	// Matches cannot be empty:
-	const offset = searchEndSyntax({ type, syntax, substr })
+	const offset = computeEndSyntaxOffset({ type, syntax, substr })
 	if (offset <= 0) {
 		return null
 	}
-	const match = substr.slice(0, syntax.length + offset + syntax.length)
+	const match = substr.slice(0, offset + syntax.length)
 	const submatch = match.slice(syntax.length, -syntax.length)
 	// Non-code submatches cannot be surrounded by spaces:
 	if (type !== typeEnum.Code && (
@@ -45,7 +66,7 @@ function parseInlineElement({ type, syntax, substr }) {
 	// Syntax and submatch cannot be redundant:
 	} else if (
 		submatch[0] === syntax[0] ||
-		submatch[submatch.length - 1] === syntax[0]) {
+		submatch[submatch.length - 1] === syntax[syntax.length - 1]) {
 		return null
 	}
 	const element = {
