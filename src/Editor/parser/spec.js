@@ -1,28 +1,18 @@
-export const HTTPS = "https://"
-export const HTTP = "http://"
-export const WWW = "www."
-
-// Matches a URL terminated by an alphanumeric (word) or
-// forward-slash character.
-//
-// https://tools.ietf.org/html/rfc3986
-export const SafeURLRe = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
-
 /* eslint-disable no-multi-spaces */
-export const TaskListRe      = /^(\t*)(- \[(?: |x)\] )/
-export const UnorderedListRe = /^(\t*)([-*] )/
-export const OrderedListRe   = /^(\t*)(\d+\. )/
-export const AnyListRe       = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/ // TaskListRe takes precedence
+export const HTTPS = "https://"
+export const HTTP  = "http://"
+export const WWW   = "www."
 /* eslint-enable no-multi-spaces */
 
-// Returns whether a character is an ASCII punctuation
-// character as defined by the GFM spec.
-//
+// https://tools.ietf.org/html/rfc3986
+export const URLRegex = /^([a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]*)/ // eslint-disable-line no-useless-escape
+
+// https://github.github.com/gfm/#list-items
+// https://github.github.com/gfm/#task-list-items-extension-
+export const AnyListRegex = /^(\t*)(- \[(?: |x)\] |[-*] |\d+\. )/
+
 // https://github.github.com/gfm/#ascii-punctuation-character
-// https://github.github.com/gfm/#example-308
-//
-// TODO: Change to regex
-export const ASCIIPunctuationPattern = "[\\u0021-\\u002f\\u003a-\\u0040\\u005b-\\u0060\\u007b-\\u007e]"
+export const ASCIIPunctuationRegex = /[\u0021-\u002f\u003a-\u0040\u005b-\u0060\u007b-\u007e]/
 
 export function isASCIIPunctuation(char) {
 	const ok = (
@@ -34,13 +24,8 @@ export function isASCIIPunctuation(char) {
 	return ok
 }
 
-// Returns whether a character is an ASCII white space
-// character as defined by the GFM spec.
-//
 // https://github.github.com/gfm/#whitespace-character
-//
-// TODO: Change to regex
-export const ASCIIWhiteSpacePattern = "[\\u0020\\u0009\\u000a\\u000b\\u000c\\u000d]"
+export const ASCIIWhiteSpaceRegex = /[\u0020\u0009\u000a\u000b\u000c\u000d]/
 
 export function isASCIIWhiteSpace(char) {
 	const ok = (

@@ -15,10 +15,12 @@ import {
 } from "./parser/spec"
 
 // Returns whether two states are equal; for UndoManager.
-function areEqual(currentState, nextState) {
+//
+// NOTE: Cursor data structures are not compared
+function areEqual(current, next) {
 	const ok = (
-		currentState.data.length === nextState.data.length &&
-		currentState.data === nextState.data
+		current.data.length === next.data.length &&
+		current.data === next.data
 	)
 	return ok
 }
@@ -194,7 +196,6 @@ const methods = state => ({
 	},
 	// Backspaces one rune.
 	backspaceRune() {
-		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
@@ -204,7 +205,6 @@ const methods = state => ({
 	},
 	// Forward-backspaces one rune.
 	forwardBackspaceRune() {
-		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
@@ -214,7 +214,6 @@ const methods = state => ({
 	},
 	// Backspaces one word.
 	backspaceWord() {
-		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
@@ -224,7 +223,6 @@ const methods = state => ({
 	},
 	// Forward-backspaces one word.
 	forwardBackspaceWord() {
-		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
@@ -234,7 +232,6 @@ const methods = state => ({
 	},
 	// Backspaces one paragraph.
 	backspaceParagraph() {
-		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
@@ -303,7 +300,7 @@ const methods = state => ({
 				return
 			}
 			let autoSyntax = tabs + syntax
-			if (TaskListRe.test(autoSyntax)) {
+			if (TaskListRe.test(autoSyntax)) { // TODO: Remove regex
 				autoSyntax = `${tabs}- [ ] ` // Prefer unchecked for added todos
 			}
 			this.write(`\n${autoSyntax}`)
