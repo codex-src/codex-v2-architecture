@@ -11,7 +11,7 @@ import {
 function parseInlineElement({ type, syntax, str, x1 }) {
 	// Syntax must be preceded by a BOL, space, or ASCII
 	// punctuation character:
-	if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) { // E.g. "·*match*"
+	if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) { // E.g. " *text*"
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -30,14 +30,14 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 		return null
 	// Match cannot be surrounded by a space (non-code):
 	} else if (type !== typeEnum.Code && (
-		spec.isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "*·match"
-		spec.isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "match·*"
+		spec.isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "* text"
+		spec.isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "text *"
 	)) {
 		return null
 	// Match start or end cannot be redundant:
 	} else if (
-		str[x1 + syntax.length] === syntax[0] ||                              // E.g. "****match"
-		str[x1 + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "match****"
+		str[x1 + syntax.length] === syntax[0] ||                              // E.g. "****text"
+		str[x1 + syntax.length + offset - 1] === syntax[syntax.length - 1]) { // E.g. "text****"
 		return null
 	}
 	// Increment start syntax (assumes start and end syntax

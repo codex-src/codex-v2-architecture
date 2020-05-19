@@ -1,4 +1,6 @@
 // Creates a new cache strategy.
+//
+// TODO: Move to useEditor?
 function newCacheStrategy(cachedElements) {
 	// Gets and or caches an element. Parameter range can be a
 	// node or a range of nodes.
