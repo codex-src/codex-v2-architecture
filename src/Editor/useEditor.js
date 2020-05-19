@@ -1,5 +1,3 @@
-import * as emojiTrie from "emoji-trie"
-import * as utf8 from "lib/encoding/utf8"
 import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import posIterators from "./posIterators"
@@ -197,23 +195,21 @@ const methods = state => ({
 	backspaceRune() {
 		state.history.mutate()
 
-		let dropL = 0
+		let bytes = 0
 		if (state.collapsed && state.pos1.pos) {
-			dropL += posIterators.backspaceRune(state.data, state.pos1.pos)
+			bytes += posIterators.backspaceRune(state.data, state.pos1.pos)
 		}
-		this.dropBytes(dropL, 0)
+		this.dropBytes(bytes, 0)
 	},
 	// Forward-backspaces one rune.
 	forwardBackspaceRune() {
 		state.history.mutate()
 
-		let dropR = 0
+		let bytes = 0
 		if (state.collapsed && state.pos1.pos < state.data.length) {
-			const substr = state.data.slice(state.pos1.pos)
-			const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-			dropR = rune.length
+			bytes += posIterators.forwardBackspaceRune(state.data, state.pos1.pos)
 		}
-		this.dropBytes(0, dropR)
+		this.dropBytes(0, bytes)
 	},
 	// Backspaces one word.
 	backspaceWord() {
@@ -223,51 +219,8 @@ const methods = state => ({
 			this.write("")
 			return
 		}
-		// Iterate spaces:
-		let { pos } = state.pos1
-		while (pos) {
-			const substr = state.data.slice(0, pos)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			if (!utf8.isHWhiteSpace(rune)) {
-				// No-op
-				break
-			}
-			pos -= rune.length
-		}
-		// Iterate alphanumerics OR non-alphanumerics based on
-		// the next rune:
-		const substr = state.data.slice(0, pos)
-		const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-		if (!rune) {
-			// No-op; defer to end
-		// Iterate alphanumerics:
-		} else if (utf8.isAlphanum(rune)) {
-			while (pos) {
-				const substr = state.data.slice(0, pos)
-				const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-				if (!utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-					// No-op
-					break
-				}
-				pos -= rune.length
-			}
-		// Iterate non-alphanumerics:
-		} else {
-			while (pos) {
-				const substr = state.data.slice(0, pos)
-				const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-				if (utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-					// No-op
-					break
-				}
-				pos -= rune.length
-			}
-		}
-		let dropL = state.pos1.pos - pos
-		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
-			dropL = 1
-		}
-		this.dropBytes(dropL, 0)
+		const bytes = posIterators.backspaceWord(state.data, state.pos1.pos)
+		this.dropBytes(bytes, 0)
 	},
 	// Forward-backspaces one word.
 	forwardBackspaceWord() {
@@ -277,51 +230,8 @@ const methods = state => ({
 			this.write("")
 			return
 		}
-		// Iterate spaces:
-		let { pos } = state.pos1
-		while (pos < state.data.length) {
-			const substr = state.data.slice(pos)
-			const rune = emojiTrie.atStart(substr) || utf8.atStart(substr)
-			if (!utf8.isHWhiteSpace(rune)) {
-				// No-op
-				break
-			}
-			pos += rune.length
-		}
-		// Iterate alphanumerics OR non-alphanumerics based on
-		// the next rune:
-		const substr = state.data.slice(pos)
-		const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-		if (!rune) {
-			// No-op; defer to end
-		// Iterate alphanumerics:
-		} else if (utf8.isAlphanum(rune)) {
-			while (pos < state.data.length) {
-				const substr = state.data.slice(pos)
-				const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-				if (!utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-					// No-op
-					break
-				}
-				pos += rune.length
-			}
-		// Iterate non-alphanumerics:
-		} else {
-			while (pos < state.data.length) {
-				const substr = state.data.slice(pos)
-				const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-				if (utf8.isAlphanum(rune) || utf8.isWhiteSpace(rune)) {
-					// No-op
-					break
-				}
-				pos += rune.length
-			}
-		}
-		let dropR = pos - state.pos1.pos
-		if (!dropR && pos < state.data.length && state.data[pos] === "\n") {
-			dropR = 1
-		}
-		this.dropBytes(0, dropR)
+		const bytes = posIterators.forwardBackspaceWord(state.data, state.pos1.pos)
+		this.dropBytes(0, bytes)
 	},
 	// Backspaces one paragraph.
 	backspaceParagraph() {
@@ -331,22 +241,8 @@ const methods = state => ({
 			this.write("")
 			return
 		}
-		// Iterate non-breaks:
-		let { pos } = state.pos1
-		while (pos) {
-			const substr = state.data.slice(0, pos)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			if (utf8.isVWhiteSpace(rune)) {
-				// No-op
-				break
-			}
-			pos -= rune.length
-		}
-		let dropL = state.pos1.pos - pos
-		if (!dropL && pos - 1 >= 0 && state.data[pos - 1] === "\n") {
-			dropL = 1
-		}
-		this.dropBytes(dropL, 0)
+		const bytes = posIterators.backspaceParagraph(state.data, state.pos1.pos)
+		this.dropBytes(bytes, 0)
 	},
 	// Inserts a tab character.
 	tab(shiftKey) {
