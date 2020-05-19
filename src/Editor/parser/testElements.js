@@ -1,4 +1,4 @@
-import { AnyListRe } from "./spec"
+import { AnyListRegex } from "./spec"
 
 // TODO: Add testElements.Image?
 const testElements = {
@@ -31,7 +31,7 @@ const testElements = {
 		return data === syntax
 	},
 	AnyList({ data }) {
-		return AnyListRe.test(data)
+		return AnyListRegex.test(data)
 	},
 	Break({ data }) {
 		const ok = (

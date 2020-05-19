@@ -1,4 +1,5 @@
 import * as emojiTrie from "emoji-trie"
+import * as spec from "./spec"
 import typeEnum from "../Elements/typeEnum"
 
 import {
@@ -6,21 +7,11 @@ import {
 	isStrictAlphanum,
 } from "lib/encoding/ascii"
 
-import {
-	ASCIIPunctuationPattern,
-	ASCIIWhiteSpacePattern,
-	HTTP,
-	HTTPS,
-	isASCIIPunctuation,
-	isASCIIWhiteSpace,
-	SafeURLRe,
-} from "./spec"
-
 // Parses a GitHub Flavored Markdown inline element.
 function parseInlineElement({ type, syntax, str, x1 }) {
 	// Syntax must be preceded by a BOL, space, or ASCII
 	// punctuation character:
-	if (x1 - 1 >= 0 && !(isASCIIWhiteSpace(str[x1 - 1]) || isASCIIPunctuation(str[x1 - 1]))) { // E.g. "·*match*"
+	if (x1 - 1 >= 0 && !(spec.isASCIIWhiteSpace(str[x1 - 1]) || spec.isASCIIPunctuation(str[x1 - 1]))) { // E.g. "·*match*"
 		return null
 	}
 	// Prepare an escaped regex pattern:
@@ -32,15 +23,15 @@ function parseInlineElement({ type, syntax, str, x1 }) {
 	}
 	// Syntax must be proceeded by a space, punctuation
 	// character, or EOL:
-	pattern += `(${ASCIIWhiteSpacePattern}|${ASCIIPunctuationPattern}|$)`
+	pattern += `(${spec.ASCIIWhiteSpaceRegex.source}|${spec.ASCIIPunctuationRegex.source}|$)`
 	// Match cannot be empty:
 	const offset = str.slice(x1 + syntax.length).search(pattern) + patternOffset
 	if (offset <= 0) {
 		return null
 	// Match cannot be surrounded by a space (non-code):
 	} else if (type !== typeEnum.Code && (
-		isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "*·match"
-		isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "match·*"
+		spec.isASCIIWhiteSpace(str[x1 + syntax.length]) ||           // E.g. "*·match"
+		spec.isASCIIWhiteSpace(str[x1 + syntax.length + offset - 1]) // E.g. "match·*"
 	)) {
 		return null
 	// Match start or end cannot be redundant:
@@ -89,7 +80,7 @@ function parseInlineElements(str) {
 		// <Escape>
 		case "\\":
 			// \*
-	 		if (x1 + 1 < str.length && isASCIIPunctuation(str[x1 + 1])) {
+	 		if (x1 + 1 < str.length && spec.isASCIIPunctuation(str[x1 + 1])) {
 				elements.push({
 					type: typeEnum.Escape,
 					syntax: ["\\"],
@@ -231,14 +222,14 @@ function parseInlineElements(str) {
 		case "h":
 			// https:// or http://
 			if (
-				(nchars >= HTTPS.length && str.slice(x1, x1 + HTTPS.length) === HTTPS) ||
-				(nchars >= HTTP.length && str.slice(x1, x1 + HTTP.length) === HTTP)
+				(nchars >= spec.HTTPS.length && str.slice(x1, x1 + spec.HTTPS.length) === spec.HTTPS) ||
+				(nchars >= spec.HTTP.length && str.slice(x1, x1 + spec.HTTP.length) === spec.HTTP)
 			) {
 				let syntax = `${str.slice(x1).split("://", 1)[0]}://`
 				if (str.slice(x1, x1 + syntax.length + 4) === `${syntax}www.`) {
 					syntax += "www."
 				}
-				let [href] = SafeURLRe.exec(str.slice(x1))
+				let [href] = spec.URIRegex.exec(str.slice(x1))
 				if (href.length === syntax.length) {
 					// No-op; defer to end
 				} else if (!isAlphanum(href[href.length - 1]) && href[href.length - 1] !== "/") {

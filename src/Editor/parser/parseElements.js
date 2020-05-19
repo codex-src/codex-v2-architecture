@@ -4,17 +4,17 @@ import testElements from "./testElements"
 import typeEnum from "../Elements/typeEnum"
 import { toInnerText } from "../Elements/cmap"
 
-const A = 0x41
-const Z = 0x5a
-const a = 0x61
-const z = 0x71
+const codeA = 0x41 // -> "A"
+const codeZ = 0x5a // -> "Z"
+const codea = 0x61 // -> "a"
+const codez = 0x71 // -> "z"
 
 function testFastPass(char) {
 	const code = char.codePointAt(0)
 	const ok = (
-		(code >= A && code <= Z) || // Takes precedence
-		(code >= a && code <= z) ||
-		(code > 0x7f)
+		(code >= codeA && code <= codeZ) || // Takes precedence
+		(code >= codea && code <= codez) ||
+		(code > 0x7f) // 127
 	)
 	return ok
 }

@@ -3,16 +3,12 @@ import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
+import { AnyListRegex } from "./parser/spec"
 
 import {
 	newNodes,
 	newPos,
 } from "./constructors"
-
-import {
-	AnyListRe,
-	TaskListRe,
-} from "./parser/spec"
 
 // Returns whether two states are equal; for UndoManager.
 //
@@ -244,7 +240,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
-		if (state.collapsed && !AnyListRe.test(node.data)) {
+		if (state.collapsed && !AnyListRegex.test(node.data)) {
 			this.write("\t")
 		} else if (!shiftKey) {
 			this.tabMany()
@@ -293,17 +289,17 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
-		if (state.collapsed && state.pos1.x === node.data.length && AnyListRe.test(node.data)) {
-			const [, tabs, syntax] = node.data.match(AnyListRe)
+		if (state.collapsed && state.pos1.x === node.data.length && AnyListRegex.test(node.data)) {
+			const [, tabs, syntax] = node.data.match(AnyListRegex)
 			if ((tabs + syntax) === node.data) {
 				this.backspaceParagraph() // Revert to paragraph
 				return
 			}
-			let autoSyntax = tabs + syntax
-			if (TaskListRe.test(autoSyntax)) { // TODO: Remove regex
-				autoSyntax = `${tabs}- [ ] ` // Prefer unchecked for added todos
+			let auto = tabs + syntax
+			if (syntax === "- [ ] " || syntax === "- [x] ") {
+				auto = `${tabs}- [ ] `
 			}
-			this.write(`\n${autoSyntax}`)
+			this.write(`\n${auto}`)
 			return
 		}
 		this.write("\n")
@@ -315,7 +311,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes.find(each => each.id === id)
-		let [, tabs, syntax] = node.data.match(AnyListRe)
+		let [, tabs, syntax] = node.data.match(AnyListRegex)
 		if (syntax === "- [ ] ") {
 			syntax = "- [x] "
 		} else {

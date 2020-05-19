@@ -1,10 +1,10 @@
 import parseInlineElements from "./parseInlineElements"
 import typeEnum from "../Elements/typeEnum"
-import { AnyListRe } from "./spec"
+import { AnyListRegex } from "./spec"
 
 // Parses metadata for an <AnyList> element.
 function parseMetadata(node) {
-	const matches = node.data.match(AnyListRe)
+	const matches = node.data.match(AnyListRegex)
 	if (!matches) {
 		return null
 	}
