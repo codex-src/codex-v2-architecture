@@ -3,9 +3,9 @@ import * as utf8 from "lib/encoding/utf8"
 
 // Returns the number of bytes to backspace or forward-
 // backspace.
-const posIterators = {
+export const backspace = {
 	// Iterates one backspace rune.
-	backspaceRune(data, pos) {
+	rune(data, pos) {
 		let bytes = 0
 		if (pos) {
 			const substr = data.slice(0, pos)
@@ -14,18 +14,8 @@ const posIterators = {
 		}
 		return bytes
 	},
-	// Iterates one forward-backspace rune.
-	forwardBackspaceRune(data, pos) {
-		let bytes = 0
-		if (pos < data.length) {
-			const substr = data.slice(pos)
-			const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
-			bytes += rune.length
-		}
-		return bytes
-	},
 	// Iterates one backspace-word.
-	backspaceWord(data, pos) {
+	word(data, pos) {
 		// Iterate spaces:
 		let x = pos
 		while (x) {
@@ -72,8 +62,40 @@ const posIterators = {
 		}
 		return bytes
 	},
+	// Iterates one backspace-paragraph.
+	paragraph(data, pos) {
+		let x = pos
+		while (x) {
+			const substr = data.slice(0, x)
+			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
+			if (utf8.isVWhiteSpace(rune)) {
+				// No-op
+				break
+			}
+			x -= rune.length
+		}
+		let bytes = pos - x
+		if (!bytes && x - 1 >= 0 && data[x - 1] === "\n") {
+			bytes++
+		}
+		return bytes
+	},
+}
+
+// Returns the number of bytes to forward-backspace.
+export const forwardBackspace = {
+	// Iterates one forward-backspace rune.
+	rune(data, pos) {
+		let bytes = 0
+		if (pos < data.length) {
+			const substr = data.slice(pos)
+			const rune = emojiTrie.atStart(substr)?.emoji || utf8.atStart(substr)
+			bytes += rune.length
+		}
+		return bytes
+	},
 	// Iterates one forward-backspace-word.
-	forwardBackspaceWord(data, pos) {
+	word(data, pos) {
 		// Iterate spaces:
 		let x = pos
 		while (x < data.length) {
@@ -120,24 +142,4 @@ const posIterators = {
 		}
 		return bytes
 	},
-	// Iterates one backspace-paragraph.
-	backspaceParagraph(data, pos) {
-		let x = pos
-		while (x) {
-			const substr = data.slice(0, x)
-			const rune = emojiTrie.atEnd(substr)?.emoji || utf8.atEnd(substr)
-			if (utf8.isVWhiteSpace(rune)) {
-				// No-op
-				break
-			}
-			x -= rune.length
-		}
-		let bytes = pos - x
-		if (!bytes && x - 1 >= 0 && data[x - 1] === "\n") {
-			bytes++
-		}
-		return bytes
-	},
 }
-
-export default posIterators

@@ -1,6 +1,6 @@
+import * as posIterators from "./posIterators"
 import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
-import posIterators from "./posIterators"
 import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
 
@@ -193,55 +193,52 @@ const methods = state => ({
 	},
 	// Backspaces one rune.
 	backspaceRune() {
-		state.history.mutate()
-
-		let bytes = 0
-		if (state.collapsed && state.pos1.pos) {
-			bytes += posIterators.backspaceRune(state.data, state.pos1.pos)
+		// state.history.mutate()
+		if (!state.collapsed) {
+			this.write("")
+			return
 		}
+		const bytes = posIterators.backspace.rune(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
 	// Forward-backspaces one rune.
 	forwardBackspaceRune() {
-		state.history.mutate()
-
-		let bytes = 0
-		if (state.collapsed && state.pos1.pos < state.data.length) {
-			bytes += posIterators.forwardBackspaceRune(state.data, state.pos1.pos)
+		// state.history.mutate()
+		if (!state.collapsed) {
+			this.write("")
+			return
 		}
+		const bytes = posIterators.forwardBackspace.rune(state.data, state.pos1.pos)
 		this.dropBytes(0, bytes)
 	},
 	// Backspaces one word.
 	backspaceWord() {
-		state.history.mutate()
-
+		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
-		const bytes = posIterators.backspaceWord(state.data, state.pos1.pos)
+		const bytes = posIterators.backspace.word(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
 	// Forward-backspaces one word.
 	forwardBackspaceWord() {
-		state.history.mutate()
-
+		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
-		const bytes = posIterators.forwardBackspaceWord(state.data, state.pos1.pos)
+		const bytes = posIterators.forwardBackspace.word(state.data, state.pos1.pos)
 		this.dropBytes(0, bytes)
 	},
 	// Backspaces one paragraph.
 	backspaceParagraph() {
-		state.history.mutate()
-
+		// state.history.mutate()
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
-		const bytes = posIterators.backspaceParagraph(state.data, state.pos1.pos)
+		const bytes = posIterators.backspace.paragraph(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
 	// Inserts a tab character.
