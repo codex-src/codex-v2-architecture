@@ -4,26 +4,26 @@ import { AnyListRegex } from "../regexes"
 const testElements = {
 	Header({ data }) {
 		const ok = (
-			data.slice(0, 2) === "# " ||
-			data.slice(0, 3) === "## " ||
-			data.slice(0, 4) === "### " ||
-			data.slice(0, 5) === "#### " ||
-			data.slice(0, 6) === "##### " ||
-			data.slice(0, 7) === "###### "
+			data.startsWith("# ") ||
+			data.startsWith("## ") ||
+			data.startsWith("### ") ||
+			data.startsWith("#### ") ||
+			data.startsWith("##### ") ||
+			data.startsWith("###### ")
 		)
 		return ok
 	},
 	Blockquote({ data }) {
 		const ok = (
-			data.slice(0, 2) === "> " ||
+			data.startsWith("> ") ||
 			data === ">"
 		)
 		return ok
 	},
 	PreformattedStart({ data }) {
 		const ok = (
-			(data.slice(0, 3) === "```" && data.slice(3).indexOf("`") === -1) ||
-			(data.slice(0, 3) === "~~~" && data.slice(3).indexOf("~") === -1)
+			(data.startsWith("```") && data.slice(3).indexOf("`") === -1) ||
+			(data.startsWith("~~~") && data.slice(3).indexOf("~") === -1)
 		)
 		return ok
 	},

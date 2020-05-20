@@ -304,6 +304,7 @@ function parseInlineElements(str) {
 			// No-op
 			break
 		}
+
 		if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 			elements.push(char)
 			continue
