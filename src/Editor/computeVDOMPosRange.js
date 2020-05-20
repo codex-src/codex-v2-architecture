@@ -52,8 +52,8 @@ function newMetaPos(vdomPos, domPos) {
 	return pos
 }
 
-// Computes a meta cursor data structure; sums VDOM- and
-// DOM-computed data structures.
+// Computes a meta cursor data structure; uses VDOM and DOM
+// to compute.
 function computeMetaPos(editorState, { node, offset }) {
 	const vdomPos = newPos()
 	const root = ascendRoot(node)
@@ -73,7 +73,7 @@ function computeMetaPos(editorState, { node, offset }) {
 function computeVDOMPosRange(editorState) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
-		throw new Error("computeVDOMPosRange: !selection || !selection.rangeCount")
+		throw new Error("computeVDOMPosRange: selection does not exists when it should")
 	}
 	const range = selection.getRangeAt(0)
 	const pos1 = computeMetaPos(editorState, { node: range.startContainer, offset: range.startOffset })

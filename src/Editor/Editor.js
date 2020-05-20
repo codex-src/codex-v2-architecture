@@ -73,7 +73,7 @@ const Editor = ({
 				}
 				// Sync DOM cursors:
 				try {
-					syncDOMPos(state, ref.current, [state.pos1, state.pos2])
+					syncDOMPos(state, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 				}
@@ -267,7 +267,7 @@ const Editor = ({
 				onCompositionEnd: newReadWriteHandler(e => {
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
-					const nodes = computeVDOMNodes(ref.current, state.extPosRange)
+					const nodes = computeVDOMNodes(state.extPosRange)
 					const [pos1, pos2] = computeVDOMPosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
@@ -284,7 +284,7 @@ const Editor = ({
 						dedupedCompositionEnd.current = false
 						return
 					}
-					const nodes = computeVDOMNodes(ref.current, state.extPosRange)
+					const nodes = computeVDOMNodes(state.extPosRange)
 					const [pos1, pos2] = computeVDOMPosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),

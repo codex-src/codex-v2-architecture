@@ -1,7 +1,7 @@
 import { newRange } from "./constructors"
 
 // Computes a range data structure based on the DOM.
-function computeDOMRange(editorRoot, pos) {
+function computeDOMRange(root, pos) {
 	const range = newRange()
 	const recurse = on => {
 		if (pos - (on.nodeValue || "").length <= 0) {
@@ -23,7 +23,7 @@ function computeDOMRange(editorRoot, pos) {
 		}
 		return false
 	}
-	recurse(editorRoot)
+	recurse(root)
 	// COMPAT: Firefox does not step over <div class="hidden">
 	//
 	// <ul data-codex-root>
@@ -43,59 +43,40 @@ function computeDOMRange(editorRoot, pos) {
 	return range
 }
 
-// Computes a range data structure based on pos.pos.
-//
-// TODO: Can we use document.getElementByID and computeRange
-// off of the data-codex-node or data-codex-root element?
-function computeRange(editorState, editorRoot, pos) {
-	const { nodes } = editorState
-
-	let id = ""
-	for (let x = 0; x < nodes.length; x++) {
-		if (pos - nodes[x].data.length <= 0) {
-			id = nodes[x].id
+// Computes a meta DOM cursor; uses VDOM and DOM to compute.
+function computeMetaRange(editorState, pos) {
+	let nodeID = ""
+	for (const each of editorState.nodes) {
+		if (pos - each.data.length <= 0) {
+			nodeID = each.id
 			break
 		}
-		pos -= nodes[x].data.length
-		if (x + 1 < nodes.length) {
-			pos--
-		}
+		pos -= (each.data + "\n").length
 	}
-
-	if (!id) {
-		throw new Error("computeRange: no such id")
+	// NOTE: nodeID can resolve to a data-codex-node or
+	// data-codex-root element
+	const node = document.getElementById(nodeID)
+	if (!nodeID || !node) {
+		throw new Error(`computeMetaRange: could not query node (id=${nodeID || "\"\""}`)
 	}
-
-	// // Compares two range data structures.
-	// const compareRange = (range1, range2) => {
-	// 	const ok = (
-	// 		range1.node === range2.node &&
-	// 		range1.offset === range2.offset
-	// 	)
-	// 	return ok
-	// }
-
-	return computeDOMRange(document.getElementById(id), pos)
+	return computeDOMRange(node, pos)
 }
 
 // Synchronizes DOM cursors.
-function syncDOMPos(editorState, editorRoot, [pos1, pos2]) {
+function syncDOMPos(editorState, [pos1, pos2]) {
 	const selection = document.getSelection()
-	const range1 = computeRange(editorState, editorRoot, pos1.pos)
-	let range2 = { ...range1 }
-	if (pos2.pos !== pos1.pos) { // TODO: Use !editorState.collapsed?
-		range2 = computeRange(editorState, editorRoot, pos2.pos)
+	if (!selection || selection.rangeCount) {
+		throw new Error("syncDOMPos: selection exists when it should not")
 	}
-	// Guard bounds:
-	if (!range1.node || !range2.node) {
-		return false
+	const range1 = computeMetaRange(editorState, pos1.pos)
+	let range2 = { ...range1 }
+	if (!editorState.collapsed) {
+		range2 = computeMetaRange(editorState, pos2.pos)
 	}
 	const range = document.createRange()
 	range.setStart(range1.node, range1.offset)
 	range.setEnd(range2.node, range2.offset)
-	// selection.removeAllRanges()
 	selection.addRange(range)
-	return true
 }
 
 export default syncDOMPos
