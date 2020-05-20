@@ -22,7 +22,7 @@ import "./Editor.css"
 // https://github.com/facebook/react/tree/3e94bce765d355d74f6a60feb4addb6d196e3482/packages/react-dom/src/client
 ;(() => {
 	if (typeof Node === "function" && Node.prototype) {
-		const nodeValueSetter = Node.prototype.__lookupSetter__("nodeValue")
+		const { set: nodeValueSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "nodeValue")
 		Object.defineProperty(Node.prototype, "nodeValue", {
 			set(text) {
 				if (this.nodeValue === text) {
@@ -32,7 +32,7 @@ import "./Editor.css"
 				return nodeValueSetter.apply(this, arguments)
 			},
 		})
-		const textContentSetter = Node.prototype.__lookupSetter__("textContent")
+		const { set: textContentSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "textContent")
 		Object.defineProperty(Node.prototype, "textContent", {
 			set(text) {
 				if (this.textContent === text) {
@@ -44,6 +44,9 @@ import "./Editor.css"
 		})
 	}
 })()
+
+// key: each.id
+// key: each.id + "-" + String(each.version)
 
 const Elements = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
