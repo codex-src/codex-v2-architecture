@@ -14,14 +14,45 @@ import uuidv4 from "uuid/v4"
 
 import "./Editor.css"
 
+// No-ops redundant text content -- prevents spellcheck from
+// rerendering.
+//
+// https://github.com/facebook/react/issues/11538#issuecomment-417504600
+// https://github.com/facebook/react/blob/master/packages/react-dom/src/client/setTextContent.js
+// https://github.com/facebook/react/tree/3e94bce765d355d74f6a60feb4addb6d196e3482/packages/react-dom/src/client
+;(() => {
+	if (typeof Node === "function" && Node.prototype) {
+		const nodeValueSetter = Node.prototype.__lookupSetter__("nodeValue")
+		Object.defineProperty(Node.prototype, "nodeValue", {
+			set(text) {
+				if (this.nodeValue === text) {
+					// No-op
+					return
+				}
+				return nodeValueSetter.apply(this, arguments)
+			},
+		})
+		const textContentSetter = Node.prototype.__lookupSetter__("textContent")
+		Object.defineProperty(Node.prototype, "textContent", {
+			set(text) {
+				if (this.textContent === text) {
+					// No-op
+					return
+				}
+				return textContentSetter.apply(this, arguments)
+			},
+		})
+	}
+})()
+
 const Elements = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
 			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
-					key: uuidv4(),
-					// key: each.id,
+					// key: uuidv4(),
+					key: each.id,
 					...each,
 				})
 			))}
