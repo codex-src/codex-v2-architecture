@@ -11,8 +11,6 @@ import {
 } from "./constructors"
 
 // Returns whether two states are equal; for UndoManager.
-//
-// NOTE: Cursor data structures are not compared
 function areEqual(current, next) {
 	const ok = (
 		current.data.length === next.data.length &&
@@ -45,6 +43,8 @@ function newEditorState(data) {
 
 const methods = state => ({
 	// Registers props.
+	//
+	// TODO: Deprecate?
 	registerProps({ readOnly, autoFocus }) {
 		Object.assign(state, {
 			readOnly: Boolean(readOnly),
@@ -52,21 +52,27 @@ const methods = state => ({
 		})
 	},
 	// Toggles read-only mode.
+	//
+	// TODO: Add previewMode -- readOnlyMode and previewMode
+	// are not the same; previewMode relies on readOnlyMode
+	// and disabling markdown syntax
 	toggleReadOnly() {
 		Object.assign(state, {
 			readOnly: !state.readOnly,
 			focused:  false,
 		})
 	},
-	// Focuses the editor.
+
+	/*
+	 * Focus and cursors
+	 */
 	focus() {
 		state.focused = true
 	},
-	// Blurs the editor.
 	blur() {
 		state.focused = false
 	},
-	// Selects the editor.
+	// TODO: Extract logic?
 	select(pos1, pos2) {
 		// Decrement 2x:
 		let y1 = pos1.y - 2
@@ -86,9 +92,8 @@ const methods = state => ({
 			extPosRange,
 		})
 	},
-	// Writes character data.
-	//
-	// FIXME: write does **not** update pos.x and pos.y
+
+	// TODO: Correct pos.x and pos.y?
 	write(data) {
 		state.history.mutate()
 
@@ -118,7 +123,6 @@ const methods = state => ({
 		})
 		this.render()
 	},
-	// Drops L and R bytes.
 	dropBytes(dropL, dropR) {
 		state.history.mutate()
 
@@ -152,7 +156,8 @@ const methods = state => ({
 		}
 		this.write("")
 	},
-	// Input method for onInput and onCompositionEnd.
+
+	// TODO: Refactor
 	input(nodes, [pos1, pos2]) {
 		state.history.mutate()
 
@@ -178,53 +183,63 @@ const methods = state => ({
 		})
 		this.render()
 	},
-	// Backspaces one rune.
+
+	/*
+	 * Backspace and forward-backsapce
+	 */
 	backspaceRune() {
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
+		// TODO: Change posIterators API to return
+		// [dropL, dropR]?
 		const bytes = posIterators.backspace.rune(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
-	// Forward-backspaces one rune.
 	forwardBackspaceRune() {
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
+		// TODO: Change posIterators API to return
+		// [dropL, dropR]?
 		const bytes = posIterators.forwardBackspace.rune(state.data, state.pos1.pos)
 		this.dropBytes(0, bytes)
 	},
-	// Backspaces one word.
 	backspaceWord() {
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
+		// TODO: Change posIterators API to return
+		// [dropL, dropR]?
 		const bytes = posIterators.backspace.word(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
-	// Forward-backspaces one word.
 	forwardBackspaceWord() {
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
+		// TODO: Change posIterators API to return
+		// [dropL, dropR]?
 		const bytes = posIterators.forwardBackspace.word(state.data, state.pos1.pos)
 		this.dropBytes(0, bytes)
 	},
-	// Backspaces one paragraph.
 	backspaceParagraph() {
 		if (!state.collapsed) {
 			this.write("")
 			return
 		}
+		// TODO: Change posIterators API to return
+		// [dropL, dropR]?
 		const bytes = posIterators.backspace.paragraph(state.data, state.pos1.pos)
 		this.dropBytes(bytes, 0)
 	},
+
 	// Inserts a tab character.
-	tab(shiftKey) {
+	tab(shiftKey) { // TODO: Rename shiftKey
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
@@ -308,21 +323,22 @@ const methods = state => ({
 		node.data = tabs + syntax + node.data.slice((tabs + syntax).length)
 		this.render()
 	},
-	// Cuts character data.
+
 	cut() {
 		state.history.mutate()
 		this.write("")
 	},
-	// Copies character data.
 	copy() {
 		// No-op
 	},
-	// Pastes character data.
 	paste(pasteData) {
 		state.history.mutate()
 		this.write(pasteData)
 	},
-	// Pushes the next undo state.
+
+	/*
+	 * Undo
+	 */
 	pushUndo() {
 		const currentState = {
 			data: state.data,
@@ -332,7 +348,6 @@ const methods = state => ({
 		}
 		state.history.push(currentState)
 	},
-	// Undos once.
 	undo() {
 		const currentState = {
 			data: state.data,
@@ -348,7 +363,6 @@ const methods = state => ({
 		Object.assign(state, nextState)
 		this.render()
 	},
-	// Redos once.
 	redo() {
 		const nextState = state.history.redo()
 		if (!nextState) {
@@ -358,7 +372,10 @@ const methods = state => ({
 		Object.assign(state, nextState)
 		this.render()
 	},
-	// Rerenders the string and VDOM representations.
+
+	/*
+	 * Render
+	 */
 	render() {
 		const data = state.nodes.map(each => each.data).join("\n")
 		const elements = parseElements(state.nodes, state.cachedElements)
