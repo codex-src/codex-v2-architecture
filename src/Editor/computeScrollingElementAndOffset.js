@@ -1,7 +1,7 @@
 import {
 	ascendNode,
 	ascendRoot,
-} from "./ascendNodes"
+} from "./ascenders"
 
 // Ascends to the nearest scrolling element.
 //

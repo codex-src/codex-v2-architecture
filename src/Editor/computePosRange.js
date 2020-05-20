@@ -1,16 +1,15 @@
-import { ascendRoot } from "./ascendNodes"
+import { ascendRoot } from "./ascenders"
 import { newPos } from "./constructors"
 
-// Computes a cursor data structure based on the DOM. Uses
-// childrenOffset to offset data-codex-root elements.
-function computeDOMPos(editorRoot, childrenOffset, { node, offset }) {
+// Computes a cursor data structure from the DOM.
+function computeDOMPos(root, { node, offset }) {
 	// Iterate to the deepest node:
 	const pos = newPos()
 	while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
 		node = node.childNodes[offset]
 		offset = 0
 	}
-	const recurse = (on, childrenOffset) => { // Shadows childrenOffset on purpose
+	const recurse = on => {
 		if (on === node) {
 			Object.assign(pos, {
 				x: pos.x + offset,
@@ -18,11 +17,7 @@ function computeDOMPos(editorRoot, childrenOffset, { node, offset }) {
 			})
 			return true
 		}
-		let { childNodes } = on
-		if (childrenOffset) {
-			childNodes = [...on.children].slice(childrenOffset)
-		}
-		for (const each of childNodes) {
+		for (const each of on.childNodes) {
 			if (recurse(each)) {
 				return true
 			}
@@ -42,99 +37,49 @@ function computeDOMPos(editorRoot, childrenOffset, { node, offset }) {
 		}
 		return false
 	}
-	recurse(editorRoot, childrenOffset)
+	recurse(root)
 	return pos
 }
 
-// Merges two cursor data structures.
-function mergePos(src, dst) {
-	Object.assign(dst, {
-		x: dst.x + src.x,
-		y: dst.y + src.y,
-		pos: dst.pos + src.pos,
-	})
-}
-
-// Computes a cursor data structure by merging the returns
-// computeVDOMPos and computeDOMPos.
-function computePos(editorState, editorRoot, range) {
-	const { nodes } = editorState
-
-	// Compute extended ID; extend up to two data-codex-root
-	// elements backwards:
-	let root = ascendRoot(range.node)
-	let prev = root.previousElementSibling
-	if (prev && prev.getAttribute("data-codex-root")) {
-		root = prev
-		prev = root.previousElementSibling
-		if (prev && prev.getAttribute("data-codex-root")) {
-			root = prev
-		}
-	}
-	const extID = root.id
-
-	if (!extID) {
-		throw new Error("computePos: no such extID")
-	}
-
-	// Attempt to precompute a cursor data structure based on
-	// VDOM nodes:
+// Sums VDOM- and DOM-computed cursor data structures.
+function newMetaPos(vdomPos, domPos) {
 	const pos = newPos()
-	if (extID) {
-		for (let y = 0; y < nodes.length; y++) {
-			if (extID === nodes[y].id) {
-				// No-op
-				break
-			}
-			pos.pos += nodes[y].data.length
-			if (y + 1 < nodes.length) {
-				Object.assign(pos, { // Based on computeDOMPos
-					y: pos.y + 1,
-					pos: pos.pos + 1,
-				})
-			}
-		}
-	}
-	// Compute data-codex-root element offset for
-	// computeDOMPos (based on extID):
-	let childrenOffset = 0
-	if (extID) {
-		childrenOffset = [...editorRoot.children].findIndex(each => each.id === extID)
-	}
-
-	// TODO: Use editorState.collapsed?
-	//
-	// // Compares two cursor data structures.
-	// const comparePos = (pos1, pos2) => {
-	// 	const ok = (
-	// 		pos1.x === pos2.x &&
-	// 		pos1.y === pos2.y &&
-	// 		pos1.pos === pos2.pos
-	// 	)
-	// 	return ok
-	// }
-
-	// Compute cursor data structure based on the DOM; use
-	// childrenOffset to offset data-codex-root elements:
-	const domPos = computeDOMPos(editorRoot, childrenOffset, range)
-	// Merge cursor data structures (merges to pos):
-	mergePos(domPos, pos)
+	Object.assign(pos, {
+		x: vdomPos.x + domPos.x,
+		y: vdomPos.y + domPos.y,
+		pos: vdomPos.pos + domPos.pos,
+	})
 	return pos
+}
+
+// Computes a meta cursor data structure; sums VDOM- and
+// DOM-computed data structures.
+function computeMetaPos(editorState, editorRoot, { node, offset }) {
+	const vdomPos = newPos()
+	const root = ascendRoot(node)
+	for (const each of editorState.nodes) {
+		if (each.id === root.id) {
+			// No-op
+			break
+		}
+		vdomPos.y++
+		vdomPos.pos += (each.data + "\n").length
+	}
+	const domPos = computeDOMPos(root, { node, offset })
+	return newMetaPos(vdomPos, domPos)
 }
 
 // Computes cursor data structures.
-//
-// TODO: Do not throw -- reuse editorState.pos?
 function computePosRange(editorState, editorRoot) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
-		throw new Error("computePosRange: no such selection")
+		throw new Error("computePosRange: !selection || !selection.rangeCount")
 	}
 	const range = selection.getRangeAt(0)
-	const pos1 = computePos(editorState, editorRoot, { node: range.startContainer, offset: range.startOffset })
+	const pos1 = computeMetaPos(editorState, editorRoot, { node: range.startContainer, offset: range.startOffset })
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
-		pos2 = computePos(editorState, editorRoot, { node: range.endContainer, offset: range.endOffset })
+		pos2 = computeMetaPos(editorState, editorRoot, { node: range.endContainer, offset: range.endOffset })
 	}
 	return [pos1, pos2]
 }

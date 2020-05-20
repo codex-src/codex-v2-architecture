@@ -1,4 +1,4 @@
-import { ascendRoot } from "./ascendNodes"
+import { ascendRoot } from "./ascenders"
 import { newNodes } from "./constructors"
 
 // Creates a new node from an ID.
