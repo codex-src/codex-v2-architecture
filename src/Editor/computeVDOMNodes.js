@@ -29,15 +29,15 @@ function readRoot(root) {
 }
 
 // Computes nodes from an extended node (root ID) range.
-function computeNodes(editorRoot, extPosRange) {
+function computeVDOMNodes(editorRoot, extPosRange) {
 	// Get data-codex-root elements:
 	const root1 = ascendRoot(document.getElementById(extPosRange[0]))
 	if (!root1 || !editorRoot.contains(root1)) {
-		throw new Error("computeNodes: no such root1 or out of bounds")
+		throw new Error("computeVDOMNodes: no such root1 or out of bounds")
 	}
 	const root2 = ascendRoot(document.getElementById(extPosRange[1]))
 	if (!root2 || !editorRoot.contains(root2)) {
-		throw new Error("computeNodes: no such root2 or out of bounds")
+		throw new Error("computeVDOMNodes: no such root2 or out of bounds")
 	}
 	// Read nodes from data-codex-root elements:
 	const nodes = []
@@ -53,4 +53,4 @@ function computeNodes(editorRoot, extPosRange) {
 	return nodes
 }
 
-export default computeNodes
+export default computeVDOMNodes

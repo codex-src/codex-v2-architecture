@@ -54,7 +54,7 @@ function newMetaPos(vdomPos, domPos) {
 
 // Computes a meta cursor data structure; sums VDOM- and
 // DOM-computed data structures.
-function computeMetaPos(editorState, editorRoot, { node, offset }) {
+function computeMetaPos(editorState, { node, offset }) {
 	const vdomPos = newPos()
 	const root = ascendRoot(node)
 	for (const each of editorState.nodes) {
@@ -70,18 +70,18 @@ function computeMetaPos(editorState, editorRoot, { node, offset }) {
 }
 
 // Computes a range of cursor data structures.
-function computePosRange(editorState, editorRoot) {
+function computeVDOMPosRange(editorState) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
-		throw new Error("computePosRange: !selection || !selection.rangeCount")
+		throw new Error("computeVDOMPosRange: !selection || !selection.rangeCount")
 	}
 	const range = selection.getRangeAt(0)
-	const pos1 = computeMetaPos(editorState, editorRoot, { node: range.startContainer, offset: range.startOffset })
+	const pos1 = computeMetaPos(editorState, { node: range.startContainer, offset: range.startOffset })
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
-		pos2 = computeMetaPos(editorState, editorRoot, { node: range.endContainer, offset: range.endOffset })
+		pos2 = computeMetaPos(editorState, { node: range.endContainer, offset: range.endOffset })
 	}
 	return [pos1, pos2]
 }
 
-export default computePosRange
+export default computeVDOMPosRange
