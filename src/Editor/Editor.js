@@ -45,17 +45,15 @@ import "./Editor.css"
 	}
 })()
 
-// key: each.id
-// key: each.id + "-" + String(each.version)
-
 const ReactElements = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
 			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
+					// key: each.id,
 					// key: uuidv4(),
-					key: each.id,
+					key: each.reactKey || each.id,
 					...each,
 				})
 			))}

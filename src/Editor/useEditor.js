@@ -3,6 +3,7 @@ import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
 import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
+import uuidv4 from "uuid/v4"
 import { AnyListRegex } from "./regexes"
 
 import {
@@ -377,11 +378,29 @@ const methods = state => ({
 	 * Render
 	 */
 	render() {
+
 		const data = state.nodes.map(each => each.data).join("\n")
-		const elements = parseElements(state.nodes, state.cachedElements)
+
+		const elements = state.elements
+		const nextElements = parseElements(state.nodes, state.cachedElements)
+
+		const { id } = state.nodes[state.pos1.y]
+		const nextElement = nextElements.find(each => each.id === id)
+		nextElement.reactKey = uuidv4()
+
+		// const areEqualElements = (nextElement, element) => {
+		// 	return JSON.stringify(nextElement, null, "\t") === JSON.stringify(element, null, "\t")
+		// 	// const ok = (
+		// 	// 	nextElement.type === element.type &&
+		// 	// 	nextElement.id === element.id &&
+		// 	// 	nextElement.children === element.children // TODO: areEqualInlineElements
+		// 	// )
+		// 	// return ok
+		// }
+
 		Object.assign(state, {
 			data,
-			elements,
+			elements: nextElements,
 		})
 	},
 })
