@@ -69,7 +69,7 @@ function computeMetaPos(editorState, editorRoot, { node, offset }) {
 	return newMetaPos(vdomPos, domPos)
 }
 
-// Computes cursor data structures.
+// Computes a range of cursor data structures.
 function computePosRange(editorState, editorRoot) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {

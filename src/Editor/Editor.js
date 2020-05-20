@@ -181,7 +181,7 @@ const Editor = ({
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
-					const [pos1, pos2] = computePosRange(state, ref.current)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -194,7 +194,7 @@ const Editor = ({
 						pointerDownRef.current = false
 						return
 					}
-					const [pos1, pos2] = computePosRange(state, ref.current)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -252,8 +252,7 @@ const Editor = ({
 						if (state.focused && !state.collapsed) {
 							e.preventDefault()
 							// FIXME: e.key === "Dead" causes
-							// computePosRange to throw:
-							// "computePosRange: no such selection"
+							// computePosRange to throw
 							dispatch.write(e.key !== "Dead" ? e.key : "")
 							return
 						}
@@ -269,7 +268,7 @@ const Editor = ({
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
 					const nodes = computeNodes(ref.current, state.extPosRange)
-					const [pos1, pos2] = computePosRange(state, ref.current)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
 
@@ -286,7 +285,7 @@ const Editor = ({
 						return
 					}
 					const nodes = computeNodes(ref.current, state.extPosRange)
-					const [pos1, pos2] = computePosRange(state, ref.current)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
 

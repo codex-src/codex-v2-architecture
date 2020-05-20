@@ -25,7 +25,7 @@ function computeDOMRange(editorRoot, pos) {
 		return false
 	}
 	recurse(editorRoot)
-	// COMPAT: FF does not step over <div class="hidden">
+	// COMPAT: Firefox does not step over <div class="hidden">
 	//
 	// <ul data-codex-root>
 	//   <li data-codex-node> <- to { node, offset: 2 }
@@ -36,8 +36,8 @@ function computeDOMRange(editorRoot, pos) {
 	//   </li>
 	// </ul>
 	//
-	const isFF = navigator.userAgent.indexOf("Firefox") !== -1
-	if (isFF && range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
+	const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1
+	if (isFirefox && range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
 		range.node = range.node.parentElement.parentElement
 		range.offset = range.node.children.length - 1
 	}
