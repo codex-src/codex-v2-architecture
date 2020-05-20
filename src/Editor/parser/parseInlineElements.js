@@ -252,40 +252,43 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
-
-			// // <Anchor> (2 of 2)
-			// case "[":
-			// 	// [Anchor](href)
-			// 	if (substr.length >= "[?](?)".length) {
-			// 		const lhs = parseInlineElement({ type: typeEnum.Anchor, syntax: "]", str, x1 })
-			// 		if (!lhs) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		// Check "(" syntax:
-			// 		if (lhs.x2 < str.length && str[lhs.x2] !== "(") {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		// lhs.x2++
-			// 		const rhs = parseInlineElement({ type: typeEnum.Anchor, syntax: ")", str, x1: lhs.x2 })
-			// 		if (!rhs) {
-			// 			// No-op
-			// 			break
-			// 		}
-			// 		elements.push({
-			// 			type: typeEnum.Anchor,
-			// 			// syntax: ["[", "](…)"],
-			// 			syntax: ["[", `](${rhs.element.children})`],
-			// 			href: rhs.element.children,
-			// 			children: lhs.element.children,
-			// 		})
-			// 		x1 = rhs.x2 - 1
-			// 		continue
-			// 	}
-			// 	// No-op
-			// 	break
-
+		// <Anchor> (2 of 2)
+		case "[":
+			// [Anchor](href)
+			if (substr.length >= "[?](?)".length) {
+				const lhs = parseInlineElement({
+					type: typeEnum.Anchor,
+					syntax: "]",
+					substr,
+				})
+				if (!lhs) {
+					// No-op
+					break
+				}
+				if (lhs.match.length < substr.length && substr[lhs.match.length] !== "(") {
+					// No-op
+					break
+				}
+				const rhs = parseInlineElement({
+					type: typeEnum.Anchor,
+					syntax: ")",
+					substr: substr.slice(lhs.match.length),
+				})
+				if (!rhs) {
+					// No-op
+					break
+				}
+				elements.push({
+					type: typeEnum.Anchor,
+					syntax: ["[", "](" + rhs.element.children + ")"],
+					href: rhs.element.children,
+					children: lhs.element.children,
+				})
+				x1 += lhs.match.length + rhs.match.length - 1
+				continue
+			}
+			// No-op
+			break
 		// <Emoji>
 		default:
 			const info = emojiTrie.atStart(substr)
