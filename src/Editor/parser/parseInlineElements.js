@@ -53,7 +53,7 @@ function computeEndSyntaxOffset({ type, syntax, substr }) {
 function parseInlineElement({ type, syntax, substr }) {
 	// Matches cannot be empty:
 	const offset = computeEndSyntaxOffset({ type, syntax, substr })
-	if (offset <= 0) {
+	if (offset <= syntax.length) {
 		return null
 	}
 	const match = substr.slice(0, offset + syntax.length)
@@ -128,32 +128,14 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
-		// <Emphasis>
-		case "_":
-			// _Emphasis_
-			if (substr.length >= "_?_".length) {
-				const result = parseInlineElement({
-					type: typeEnum.Emphasis,
-					syntax: "_",
-					substr,
-				})
-				if (!result) {
-					// No-op
-					break
-				}
-				elements.push(result.element)
-				x1 += result.match.length - 1
-				continue
-			}
-			// No-op
-			break
 		// <StrongEmphasis> or <Strong> or <Emphasis>
+		case "_":
 		case "*":
-			// ***Strong emphasis***
-			if (substr.length >= "***?***".length && substr.startsWith("***")) {
+			// ***Strong emphasis*** or ___Strong emphasis___
+			if (substr.length >= "***?***".length && substr.startsWith(char.repeat(3))) {
 				const result = parseInlineElement({
 					type: typeEnum.StrongEmphasis,
-					syntax: "***",
+					syntax: char.repeat(3),
 					substr,
 				})
 				if (!result) {
@@ -163,11 +145,11 @@ function parseInlineElements(str) {
 				elements.push(result.element)
 				x1 += result.match.length - 1
 				continue
-			// **Strong**
-			} else if (substr.length >= "**?**".length && substr.startsWith("**")) {
+			// **Strong** or __Strong__
+			} else if (substr.length >= "**?**".length && substr.startsWith(char.repeat(2))) {
 				const result = parseInlineElement({
 					type: typeEnum.Strong,
-					syntax: "**",
+					syntax: char.repeat(2),
 					substr,
 				})
 				if (!result) {
@@ -177,11 +159,11 @@ function parseInlineElements(str) {
 				elements.push(result.element)
 				x1 += result.match.length - 1
 				continue
-			// *Emphasis*
+			// *Emphasis* or _Emphasis_
 			} else if (substr.length >= "*?*".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Emphasis,
-					syntax: "*",
+					syntax: char.repeat(1),
 					substr,
 				})
 				if (!result) {
@@ -194,28 +176,26 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
-		// <Code> (1 of 2)
+		// <Code> and <Strikethrough>
 		case "`":
-			// `Code`
-			if (substr.length >= "`?`".length) {
-				const result = parseInlineElement({
-					type: typeEnum.Code,
-					syntax: "`",
-					substr,
-				})
-				if (!result) {
-					// No-op
-					break
-				}
-				elements.push(result.element)
-				x1 += result.match.length - 1
-				continue
-			}
-			// No-op
-			break
-		// <Code> (2 of 2) or <Strikethrough>
 		case "~":
-			// ~~Strikethrough~~ (takes precedence)
+
+			// // ```Code``` or ~~~Code~~~
+			// if (substr.length >= "```?```".length && substr.startsWith(char.repeat(3))) {
+			// 	const result = parseInlineElement({
+			// 		type: typeEnum.Code,
+			// 		syntax: char.repeat(3),
+			// 		substr,
+			// 	})
+			// 	if (!result) {
+			// 		// No-op
+			// 		break
+			// 	}
+			// 	elements.push(result.element)
+			// 	x1 += result.match.length - 1
+			// 	continue
+
+			// ~~Strikethrough~~
 			if (substr.length >= "~~?~~".length && substr.startsWith("~~")) {
 				const result = parseInlineElement({
 					type: typeEnum.Strikethrough,
@@ -229,11 +209,11 @@ function parseInlineElements(str) {
 				elements.push(result.element)
 				x1 += result.match.length - 1
 				continue
-			// ~Code~
+			// `Code` or ~Code~
 			} else if (substr.length >= "~?~".length) {
 				const result = parseInlineElement({
 					type: typeEnum.Code,
-					syntax: "~",
+					syntax: char,
 					substr,
 				})
 				if (!result) {
@@ -246,7 +226,6 @@ function parseInlineElements(str) {
 			}
 			// No-op
 			break
-
 		// <Anchor> (1 of 2)
 		case "h":
 			if (substr.length >= "http://".length && (substr.startsWith("https://") || substr.startsWith("http://"))) {

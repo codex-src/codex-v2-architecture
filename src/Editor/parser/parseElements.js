@@ -122,8 +122,9 @@ function parseElements(nodes, cachedElements) {
 			break
 		// <AnyList> or <Break>
 		case "\t":
-		case "-":
-		case "*":
+		case "-": // <Break>
+		case "*": // <Break>
+		case "_": // <Break>
 		case "0":
 		case "1":
 		case "2":

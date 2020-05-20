@@ -21,14 +21,9 @@ const testElements = {
 		return ok
 	},
 	PreformattedStart({ data }) {
-		// const ok = (
-		// 	data.slice(0, 3) === "```" ||
-		// 	data.slice(0, 3) === "~~~"
-		// )
-		// return ok
 		const ok = (
-			data.slice(0, 3) === "```" &&
-			data.slice(3).indexOf("`") === -1
+			(data.slice(0, 3) === "```" && data.slice(3).indexOf("`") === -1) ||
+			(data.slice(0, 3) === "~~~" && data.slice(3).indexOf("~") === -1)
 		)
 		return ok
 	},
@@ -41,8 +36,8 @@ const testElements = {
 	Break({ data }) {
 		const ok = (
 			data === "---" ||
-			data === "***" // ||
-			// data === "___"
+			data === "***" ||
+			data === "___"
 		)
 		return ok
 	},
