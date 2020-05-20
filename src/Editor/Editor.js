@@ -20,9 +20,8 @@ const Elements = ({ state, dispatch }) => {
 		<Provider value={[state, dispatch]}>
 			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
-					// FIXME
-					// key: uuidv4(),
-					key: each.id,
+					key: uuidv4(),
+					// key: each.id,
 					...each,
 				})
 			))}
@@ -237,14 +236,14 @@ const Editor = ({
 						e.preventDefault()
 						dispatch.redo()
 						return
-					// NOTE: Character data must be synthetic when
-					// not collapsed
+					// NOTE: Character data must be synthetic when not
+					// collapsed
 					case keyDownTypeEnum.characterData:
 						if (!state.collapsed) {
 							e.preventDefault()
 							// FIXME: e.key === "Dead" causes
 							// computePosRange to throw
-							dispatch.write(e.key !== "Dead" ? e.key : "")
+							dispatch.write(e.key !== "Dead" ? e.key : "") // TODO: Deprecate "Dead" case
 							return
 						}
 						// No-op
