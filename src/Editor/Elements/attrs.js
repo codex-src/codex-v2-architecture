@@ -1,7 +1,7 @@
 // Extraneous shared attributes.
 const attrs = {
-	code: {
-		// https://davidwalsh.name/disable-autocorrect
+	// https://davidwalsh.name/disable-autocorrect
+	disableAutoCorrect: {
 		autoCapitalize: "off",
 		autoComplete: "off",
 		autoCorrect: "off",

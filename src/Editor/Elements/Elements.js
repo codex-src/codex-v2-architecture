@@ -120,7 +120,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.code}>
+		<HOC.Root id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
 			<span className="inline-block">
 				<HOCPre id={range[0].id} className="font-mono text-sm leading-none">
 					<Markdown syntax={[syntax[0]]}>
@@ -209,6 +209,7 @@ export const AnyList = React.memo(({ type, tag, id, children: range, __nested })
 	)
 })
 
+// TODO: Add {...attrs.disableAutoCorrect} to syntax
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (

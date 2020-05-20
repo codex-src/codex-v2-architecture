@@ -86,18 +86,6 @@ const methods = state => ({
 			extPosRange,
 		})
 	},
-
-	// // Resets character data.
-	// reset(data) {
-	// 	Object.assign(state, {
-	// 		focused: false,
-	// 		nodes: newNodes(data),
-	// 		pos1: newPos(),
-	// 		pos2: newPos(),
-	// 	})
-	// 	this.render()
-	// },
-
 	// Writes character data.
 	//
 	// FIXME: write does **not** update pos.x and pos.y
