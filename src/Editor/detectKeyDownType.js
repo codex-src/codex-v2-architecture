@@ -1,5 +1,5 @@
+import isMetaOrCtrlKey from "lib/isMetaOrCtrlKey"
 import keyDownTypeEnum from "./keyDownTypeEnum"
-import usesMetaOrCtrlKey from "lib/usesMetaOrCtrlKey"
 
 const keyCodes = {
 	Tab: 9,
@@ -27,7 +27,7 @@ const detect = {
 	// NOTE: detect.backspace* are ordered by precedence
 	backspaceParagraph(e) {
 		const ok = (
-			usesMetaOrCtrlKey(e) &&
+			isMetaOrCtrlKey(e) &&
 			e.keyCode === keyCodes.Backspace
 		)
 		return ok
@@ -69,7 +69,7 @@ const detect = {
 		const ok = (
 			!e.shiftKey &&
 			!e.altKey &&
-			usesMetaOrCtrlKey(e) &&
+			isMetaOrCtrlKey(e) &&
 			e.keyCode === keyCodes.Z
 		)
 		return ok
@@ -78,7 +78,7 @@ const detect = {
 		const ok = (
 			e.shiftKey &&
 			!e.altKey &&
-			usesMetaOrCtrlKey(e) &&
+			isMetaOrCtrlKey(e) &&
 			e.keyCode === keyCodes.Z
 		)
 		return ok
@@ -87,7 +87,7 @@ const detect = {
 		const ok = (
 			!e.shiftKey &&
 			!e.altKey &&
-			usesMetaOrCtrlKey(e) &&
+			isMetaOrCtrlKey(e) &&
 			e.keyCode === keyCodes.Y
 		)
 		return ok
@@ -99,7 +99,7 @@ const detect = {
 	//
 	characterData(e) {
 		const ok = (
-			!usesMetaOrCtrlKey(e) &&
+			!isMetaOrCtrlKey(e) &&
 			[...e.key].length === 1
 		)
 		return ok
