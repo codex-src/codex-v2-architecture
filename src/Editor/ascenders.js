@@ -1,7 +1,7 @@
 // Node    -> Element
 // Element -> No-op
 //
-function ascendElement(node) {
+export function ascendElement(node) {
 	if (node && node.nodeType && node.nodeType !== Node.ELEMENT_NODE && node.parentElement) {
 		return node.parentElement
 	}

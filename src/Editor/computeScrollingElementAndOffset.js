@@ -1,74 +1,71 @@
 import {
-	ascendNode,
+	ascendElement,
 	ascendRoot,
 } from "./ascenders"
 
-// Ascends to the nearest scrolling element.
+// Ascends to the scrolling element. The scrolling element
+// can be the nearest overflow-y-scroll element or the
+// <html> element.
 //
-// NOTE: Use + 2 for ± 1 offsets
-//
-// +---+ ± 1
-// | y |
-// +---+ ± 1
-//
-const ascendToScrollingElement = element => {
+// NOTE: Use element.offsetHeight + 2 because edges are
+// fuzzy to 1px
+function ascendToScrollingElement(element) {
+	// Ascend to the scrolling context:
 	while (element && element.parentElement && !(element.scrollHeight > element.offsetHeight + 2)) {
 		element = element.parentElement
 	}
-	// Guard <div id="root" class="h-full">:
-	if (element.parentElement && element.parentElement.nodeName === "BODY") {
+	// Ascend from <div id="root" class="h-full"> to <html>:
+	if (element && element.parentElement && element.parentElement.nodeName === "BODY") {
 		return element.ownerDocument.scrollingElement
 	}
 	return element
 }
 
-// Computes the scrolling element and offset (y-axis only).
+// Computes the y-axis scrolling element and offset.
 function computeScrollingElementAndOffset(offsetTop = 0, offsetBottom = 0) {
-	// Decrement offsets because of ± 1 offset:
-	offsetTop--
-	offsetBottom--
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
 		return null
 	}
 	const range = selection.getRangeAt(0)
-	const scrollingElement = ascendToScrollingElement(ascendRoot(range.commonAncestorContainer))
+	const scrollingElement = ascendToScrollingElement(range.commonAncestorContainer)
 	let { top: scrollTop, bottom: scrollBottom } = scrollingElement.getBoundingClientRect()
 	if (scrollingElement.nodeName === "HTML") {
 		scrollTop = 0
 		scrollBottom = window.innerHeight
 	}
-	const startElement = ascendNode(range.startContainer)
-	const { top } = startElement.getBoundingClientRect()
-	const endElement = ascendNode(range.endContainer)
-	const { bottom } = endElement.getBoundingClientRect()
+	const { top: elementTop } = ascendElement(range.startContainer).getBoundingClientRect()
+	const { bottom: elementBottom } = ascendElement(range.endContainer).getBoundingClientRect()
 	//
-	// +---+ <- here and
+	// +===+ <- here and
 	// +---+
 	// | y |
 	// +---+
-	// +---+ <- here
+	// +===+ <- here
 	//
-	if (top - offsetTop < scrollTop && bottom + offsetBottom > scrollBottom) {
+	// Decrement offsets because edges are fuzzy to 1px:
+	offsetTop--
+	offsetBottom--
+	if (elementTop - offsetTop < scrollTop && elementBottom + offsetBottom > scrollBottom) {
 		return null
 	}
 	//
-	// +---+ <- here
+	// +===+ <- here
 	// +---+
 	// | y |
-	// +---+
+	// +===+
 	//
 	let offset = 0
-	if (top - offsetTop < scrollTop) {
-		offset = -1 * (scrollTop - top + offsetTop)
+	if (elementTop - offsetTop < scrollTop) {
+		offset = -1 * (scrollTop - elementTop + offsetTop)
 	//
 	// +---+
 	// | y |
 	// +---+
-	// +---+ <- here
+	// +===+ <- here
 	//
-	} else if (bottom + offsetBottom > scrollBottom) {
-		offset = -1 * (scrollBottom - bottom - offsetBottom)
+	} else if (elementBottom + offsetBottom > scrollBottom) {
+		offset = -1 * (scrollBottom - elementBottom - offsetBottom)
 	}
 	return { scrollingElement, offset }
 }

@@ -54,8 +54,6 @@ const Editor = ({
 	// Renders VDOM to the DOM.
 	React.useLayoutEffect(
 		React.useCallback(() => {
-			// Eagerly drop selection for performance reasons:
-			//
 			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
@@ -71,25 +69,18 @@ const Editor = ({
 					// No-op
 					return
 				}
-				// Sync DOM cursors:
 				try {
 					syncPos(state, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 				}
-				// Mocks scrollIntoViewIfNeeded.
-				const id = setTimeout(() => {
-					const computed = computeScrollingElementAndOffset((scrollTopOffset || 0), (scrollBottomOffset || 0))
-					if (!computed || !computed.offset) {
-						// No-op
-						return
-					}
-					const { scrollingElement, offset } = computed
-					scrollingElement.scrollBy(0, offset)
-				}, 0)
-				return () => {
-					clearTimeout(id)
+				const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
+				if (!computed || !computed.offset) {
+					// No-op
+					return
 				}
+				const { scrollingElement, offset } = computed
+				scrollingElement.scrollBy(0, offset)
 			})
 		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
 		[state.readOnly, state.elements],
