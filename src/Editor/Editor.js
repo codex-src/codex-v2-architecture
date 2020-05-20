@@ -48,7 +48,7 @@ import "./Editor.css"
 // key: each.id
 // key: each.id + "-" + String(each.version)
 
-const Elements = ({ state, dispatch }) => {
+const ReactElements = ({ state, dispatch }) => {
 	const { Provider } = EditorContext
 	return (
 		<Provider value={[state, dispatch]}>
@@ -97,7 +97,7 @@ const Editor = ({
 				// 	document.activeElement.blur()
 				// }
 			}
-			ReactDOM.render(<Elements state={state} dispatch={dispatch} />, ref.current, () => {
+			ReactDOM.render(<ReactElements state={state} dispatch={dispatch} />, ref.current, () => {
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
