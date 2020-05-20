@@ -25,7 +25,7 @@ import "./Editor.css"
 		const { set: nodeValueSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "nodeValue")
 		Object.defineProperty(Node.prototype, "nodeValue", {
 			set(text) {
-				if (this.nodeValue === text) {
+				if (this.nodeValue.length === text.length && this.nodeValue === text) {
 					// No-op
 					return
 				}
@@ -35,7 +35,7 @@ import "./Editor.css"
 		const { set: textContentSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "textContent")
 		Object.defineProperty(Node.prototype, "textContent", {
 			set(text) {
-				if (this.textContent === text) {
+				if (this.textContent.length === text.length && this.textContent === text) {
 					// No-op
 					return
 				}
