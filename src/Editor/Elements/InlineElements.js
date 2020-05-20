@@ -58,10 +58,9 @@ export const Strikethrough = ({ syntax, children }) => (
 	</span>
 )
 
-// TODO: Add {...attrs.disableAutoCorrect} to syntax
 export const Anchor = ({ syntax, href, children }) => (
 	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
-		<Markdown syntax={!children || syntax}>
+		<Markdown syntax={!children || syntax} {...attrs.disableAutoCorrect}>
 			{children || syntax}
 		</Markdown>
 	</a>

@@ -309,7 +309,7 @@ const Editor = ({
 					}
 					const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
 					e.clipboardData.setData("text/plain", copyData)
-					// dispatch.copy()
+					dispatch.copy()
 				}),
 
 				onPaste: newReadWriteHandler(e => {

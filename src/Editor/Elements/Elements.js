@@ -209,7 +209,6 @@ export const AnyList = React.memo(({ type, tag, id, children: range, __nested })
 	)
 })
 
-// TODO: Add {...attrs.disableAutoCorrect} to syntax
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
@@ -221,7 +220,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				<div className="px-6 py-2 text-sm text-center text-gray-600">
-					<Markdown syntax={syntax}>
+					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
 							<br />
 						)}

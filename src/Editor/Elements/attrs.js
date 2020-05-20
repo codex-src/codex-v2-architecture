@@ -14,8 +14,8 @@ const attrs = {
 			"textDecoration": "line-through",
 		},
 	},
+	// https://mathiasbynens.github.io/rel-noopener
 	a: {
-		// https://mathiasbynens.github.io/rel-noopener
 		target: "_blank",
 		rel: "noopener noreferrer",
 	},
