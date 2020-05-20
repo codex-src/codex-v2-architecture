@@ -29,15 +29,15 @@ function readRoot(root) {
 }
 
 // Computes nodes from an extended node (root ID) range.
-function computeVDOMNodes(extPosRange) {
+function computeNodes(extPosRange) {
 	// Get data-codex-root elements:
 	const root1 = ascendRoot(document.getElementById(extPosRange[0]))
 	if (!root1 || !root1.getAttribute("data-codex-root")) {
-		throw new Error("computeVDOMNodes: could not query root1 and or does not have attribute data-codex-root")
+		throw new Error("computeNodes: could not query root1 and or does not have attribute data-codex-root")
 	}
 	const root2 = ascendRoot(document.getElementById(extPosRange[1]))
 	if (!root2 || !root2.getAttribute("data-codex-root")) {
-		throw new Error("computeVDOMNodes: could not query root2 and or does not have attribute data-codex-root")
+		throw new Error("computeNodes: could not query root2 and or does not have attribute data-codex-root")
 	}
 	// Read nodes from data-codex-root elements:
 	const nodes = []
@@ -53,4 +53,4 @@ function computeVDOMNodes(extPosRange) {
 	return nodes
 }
 
-export default computeVDOMNodes
+export default computeNodes

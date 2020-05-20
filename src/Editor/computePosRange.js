@@ -70,10 +70,10 @@ function computeMetaPos(editorState, { node, offset }) {
 }
 
 // Computes a range of cursor data structures.
-function computeVDOMPosRange(editorState) {
+function computePosRange(editorState) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
-		throw new Error("computeVDOMPosRange: selection does not exists when it should")
+		throw new Error("computePosRange: selection does not exists when it should")
 	}
 	const range = selection.getRangeAt(0)
 	const pos1 = computeMetaPos(editorState, { node: range.startContainer, offset: range.startOffset })
@@ -84,4 +84,4 @@ function computeVDOMPosRange(editorState) {
 	return [pos1, pos2]
 }
 
-export default computeVDOMPosRange
+export default computePosRange

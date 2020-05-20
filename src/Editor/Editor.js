@@ -1,12 +1,12 @@
-import computeVDOMNodes from "./computeVDOMNodes"
+import computeNodes from "./computeNodes"
+import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-import computeVDOMPosRange from "./computeVDOMPosRange"
 import detectKeyDownType from "./detectKeyDownType"
 import EditorContext from "./EditorContext"
 import keyDownTypeEnum from "./keyDownTypeEnum"
 import React from "react"
 import ReactDOM from "react-dom"
-import syncDOMPos from "./syncDOMPos"
+import syncPos from "./syncPos"
 import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
@@ -73,7 +73,7 @@ const Editor = ({
 				}
 				// Sync DOM cursors:
 				try {
-					syncDOMPos(state, [state.pos1, state.pos2])
+					syncPos(state, [state.pos1, state.pos2])
 				} catch (error) {
 					console.error(error)
 				}
@@ -181,7 +181,7 @@ const Editor = ({
 						selection.removeAllRanges()
 						selection.addRange(range)
 					}
-					const [pos1, pos2] = computeVDOMPosRange(state)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -194,7 +194,7 @@ const Editor = ({
 						pointerDownRef.current = false
 						return
 					}
-					const [pos1, pos2] = computeVDOMPosRange(state)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.select(pos1, pos2)
 				}),
 
@@ -252,7 +252,7 @@ const Editor = ({
 						if (state.focused && !state.collapsed) {
 							e.preventDefault()
 							// FIXME: e.key === "Dead" causes
-							// computeVDOMPosRange to throw
+							// computePosRange to throw
 							dispatch.write(e.key !== "Dead" ? e.key : "")
 							return
 						}
@@ -267,8 +267,8 @@ const Editor = ({
 				onCompositionEnd: newReadWriteHandler(e => {
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
-					const nodes = computeVDOMNodes(state.extPosRange)
-					const [pos1, pos2] = computeVDOMPosRange(state)
+					const nodes = computeNodes(state.extPosRange)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
 
@@ -284,8 +284,8 @@ const Editor = ({
 						dedupedCompositionEnd.current = false
 						return
 					}
-					const nodes = computeVDOMNodes(state.extPosRange)
-					const [pos1, pos2] = computeVDOMPosRange(state)
+					const nodes = computeNodes(state.extPosRange)
+					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
 				}),
 
