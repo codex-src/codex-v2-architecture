@@ -21,8 +21,8 @@ const Elements = ({ state, dispatch }) => {
 			{state.elements.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					// FIXME
-					key: uuidv4(),
-					// key: each.id,
+					// key: uuidv4(),
+					key: each.id,
 					...each,
 				})
 			))}
@@ -238,9 +238,9 @@ const Editor = ({
 						dispatch.redo()
 						return
 					// NOTE: Character data must be synthetic when
-					// focused and **not** collapsed
+					// not collapsed
 					case keyDownTypeEnum.characterData:
-						if (state.focused && !state.collapsed) {
+						if (!state.collapsed) {
 							e.preventDefault()
 							// FIXME: e.key === "Dead" causes
 							// computePosRange to throw
@@ -256,8 +256,8 @@ const Editor = ({
 				}),
 
 				onCompositionEnd: newReadWriteHandler(e => {
-					// https://github.com/w3c/uievents/issues/202#issue-316461024
 					dedupedCompositionEnd.current = true
+
 					const nodes = computeNodes(state.extPosRange)
 					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])
