@@ -7,7 +7,6 @@ import keyDownTypeEnum from "./keyDownTypeEnum"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncPos from "./syncPos"
-import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import uuidv4 from "uuid/v4"
@@ -164,7 +163,11 @@ const Editor = ({
 
 				id,
 
-				className: trimWhiteSpace(`em-context codex-editor ${!state.readOnly ? "" : "feature-read-only"} ${className || ""}`),
+				className: `em-context codex-editor ${
+					!state.readOnly ? "" : "feature-read-only"
+				} ${
+					className || ""
+				}`.trim(),
 
 				style: {
 					...style, // Takes precedence

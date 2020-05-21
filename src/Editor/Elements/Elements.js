@@ -6,7 +6,6 @@ import IfWrapper from "lib/IfWrapper"
 import Markdown from "./Markdown"
 import prismMap from "lib/prismMap"
 import React from "react"
-import trimWhiteSpace from "lib/trimWhiteSpace"
 import typeEnum from "./typeEnum"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
@@ -15,7 +14,7 @@ import useEditorState from "../useEditorState"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
-		return <span>{children || <br />}</span>
+		return children
 	}
 	const components = []
 	for (const each of children) {
