@@ -9,9 +9,6 @@ import ReactDOM from "react-dom"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
-import uuidv4 from "uuid/v4"
-
-import "./Editor.css"
 
 // No-ops redundant text content -- prevents spellcheck from
 // rerendering.

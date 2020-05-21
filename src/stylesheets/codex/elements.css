@@ -29,16 +29,6 @@
 	font-size: 1.25em;
 }
 
-/* https://stackoverflow.com/a/12198561 */
-.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(1),
-.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(2),
-.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(2) ~ [aria-label][role="img"],
-.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(3),
-.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(3) ~ [aria-label][role="img"] {
-	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
-	background-color: red;
-}
-
 .codex-editor > blockquote {
 	padding-left: 1.5em;
 	color: var(--text-gray-600);
@@ -59,33 +49,6 @@
 .codex-editor > pre > code {
 	font-size: 0.875em;
 	line-height: 1.375;
-}
-
-.codex-editor > ul li {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
-}
-.codex-editor > ul li:before {
-	margin-left: -1.5em;
-	position: absolute;
-	content: "• ";
-	color: var(--md-blue-a400);
-}
-
-.codex-editor > ol li {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
-}
-.codex-editor > ol li:first-of-type {
-	counter-reset: count;
-}
-.codex-editor > ol li:before {
-	margin-left: -1.5em;
-	position: absolute;
-	counter-increment: count;
-	content: counter(count) ". ";
-	font-feature-settings: "tnum";
-	color: var(--md-blue-a400);
 }
 
 /* FIXME? */

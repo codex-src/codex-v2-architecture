@@ -1,8 +1,16 @@
-/* .codex-editor [aria-label][role="img"] { */
-/* 	vertical-align: -10%; */
-/* 	font-size: 120%; */
-/* 	line-height: 1; */
-/* } */
+.codex-editor [aria-label][role="img"] {
+	vertical-align: -10%;
+	font-size: 120%;
+	line-height: 1;
+}
+/* https://stackoverflow.com/a/12198561 */
+.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(1),
+.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(2),
+.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(2) ~ [aria-label][role="img"],
+.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(3),
+.codex-editor > p > [aria-label][role="img"]:first-child:nth-last-child(3) ~ [aria-label][role="img"] {
+	font-size: 2em;
+}
 
 .codex-editor em {
 	font-style: italic;

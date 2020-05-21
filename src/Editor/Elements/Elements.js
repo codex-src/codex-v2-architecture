@@ -1,12 +1,10 @@
 import * as HOC from "./HOC"
 import attrs from "./attrs"
-import Button from "lib/Button"
 import escape from "lodash/escape"
 import IfWrapper from "lib/IfWrapper"
 import Markdown from "./Markdown"
 import prismMap from "lib/prismMap"
 import React from "react"
-import typeEnum from "./typeEnum"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
 
@@ -135,49 +133,62 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</HOC.Node>
 ))
 
-const TodoItemCheckbox = ({ id, checked }) => {
+// const TodoItemCheckbox = ({ id, checked }) => {
+// 	const [, { checkTodo }] = useEditorState()
+// 	const ref = React.useRef()
+//
+// 	return (
+// 		// FIXME: Tag?
+// 		<button
+// 			ref={ref}
+// 			className={ // TODO
+// 				`-mt-px w-4 h-4 align-middle ${!checked
+// 					? "bg-white shadow-hero"
+// 					: "bg-md-blue-a200 shadow"
+// 				} rounded-md focus:outline-none transform scale-105 transition ease-out duration-75`
+// 			}
+// 			onClick={() => {
+// 				ref.current.focus()
+// 				checkTodo(id)
+// 			}}
+// 			data-codex-checkbox={checked}
+// 		>
+// 			<svg fill="#fff" viewBox="0 0 16 16">
+// 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
+// 			</svg>
+// 		</button>
+// 	)
+// }
+
+// style={checked && attrs.strike.style}
+export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
 
 	return (
-		// FIXME: Tag?
-		<button
-			ref={ref}
-			className={ // TODO
-				`-mt-px w-4 h-4 align-middle ${!checked
-					? "bg-white shadow-hero"
-					: "bg-md-blue-a200 shadow"
-				} rounded-md focus:outline-none transform scale-105 transition ease-out duration-75`
-			}
-			onClick={() => {
-				ref.current.focus()
-				checkTodo(id)
-			}}
-			data-codex-checkbox={checked}
-		>
-			<svg fill="#fff" viewBox="0 0 16 16">
-				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-			</svg>
-		</button>
+		// TODO
+		<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
+			{/* TODO: Change hidden to style={{ display: "none" }} */}
+			<Markdown className="hidden" syntax={syntax}>
+				{/* TODO: Change absolute to style={{ position: "absolute" }} */}
+				<div className="absolute">
+					<input
+						className="form-checkbox"
+						type="checkbox"
+						checked={checked}
+						onChange={() => {
+							// ref.current.focus()
+							checkTodo(id)
+						}}
+					/>
+				</div>
+				{toReact(children) || (
+					<br />
+				)}
+			</Markdown>
+		</HOC.Node>
 	)
-}
-
-// style={checked && attrs.strike.style}
-export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
-	// TODO
-	<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
-		{/* TODO: Change hidden to style={{ display: "none" }} */}
-		<Markdown className="hidden" syntax={syntax}>
-			{/* TODO: Change absolute to style={{ position: "absolute" }} */}
-			<div className="absolute">
-				<TodoItemCheckbox id={id} checked={checked} />
-			</div>
-			{toReact(children) || (
-				<br />
-			)}
-		</Markdown>
-	</HOC.Node>
-))
+})
 
 // NOTE: Computes recursed
 export const AnyList = React.memo(({ type, tag, id, children: range, recursed }) => {
