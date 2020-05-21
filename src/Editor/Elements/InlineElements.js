@@ -51,7 +51,7 @@ export const Code = ({ syntax, children }) => (
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<strike {...attrs.strike}>
+	<strike>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>

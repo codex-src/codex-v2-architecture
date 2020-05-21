@@ -59,6 +59,7 @@ function emojiCount(children) {
 }
 
 export const Paragraph = React.memo(({ id, children }) => (
+	// TODO: Remove data-codex-emojis?
 	<HOC.Root tag="p" id={id} data-codex-emojis={emojiCount(children)}>
 		{toReact(children) || (
 			<br />
@@ -160,7 +161,7 @@ const TodoItemCheckbox = ({ id, checked }) => {
 		// FIXME: Tag?
 		<button
 			ref={ref}
-			className={
+			className={ // TODO
 				`-mt-px w-4 h-4 align-middle ${!checked
 					? "bg-white shadow-hero"
 					: "bg-md-blue-a200 shadow"
@@ -180,9 +181,11 @@ const TodoItemCheckbox = ({ id, checked }) => {
 }
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
+	// TODO
 	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
+			{/* TODO: Change absolute to style={{ position: "absolute" }} */}
 			<div className="absolute">
 				<TodoItemCheckbox id={id} checked={checked} />
 			</div>
@@ -193,15 +196,16 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	</HOC.Node>
 ))
 
-// NOTE: <AnyList> computes __nested
-export const AnyList = React.memo(({ type, tag, id, children: range, __nested }) => {
-	const Parent = !__nested ? HOC.Root : HOC.Node
+// NOTE: Computes recursed
+export const AnyList = React.memo(({ type, tag, id, children: range, recursed }) => {
+	const Parent = !recursed ? HOC.Root : HOC.Node
 	return (
+		// TODO
 		<Parent tag={tag} id={id} className="ml-6">
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
-					__nested: true,
+					recursed: true,
 					...each,
 				})
 			))}
@@ -214,6 +218,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	return (
 		<HOC.Root tag="figure" id={id}>
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
+				{/* TODO */}
 				<img style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
@@ -239,7 +244,7 @@ const backgroundImage = "linear-gradient(" +
 
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
-	<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
+	<HOC.Root id={id} className="text-right" style={{ backgroundImage }}>
 		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
 			<br />

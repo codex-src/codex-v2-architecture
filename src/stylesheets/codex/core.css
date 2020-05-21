@@ -1,0 +1,21 @@
+.codex-editor {
+	-webkit-font-smoothing: auto;
+	-moz-osx-font-smoothing: auto;
+
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+	-moz-tab-size: 4;
+	tab-size: 4;
+	font-feature-settings: "tnum";
+}
+.codex-editor code {
+	font-family: "iA Writer Mono var", monospace;
+	-moz-tab-size: 2;
+	tab-size: 2;
+}
+.codex-editor * {
+	caret-color: #000;
+}
+
+.codex-editor .markdown {
+	color: var(--md-blue-a400);
+}
