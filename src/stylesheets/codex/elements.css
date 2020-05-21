@@ -49,18 +49,17 @@
 	overflow-x: scroll;
 	-webkit-overflow-scrolling: touch;
 }
-.codex-editor pre > code {
+.codex-editor pre code {
 	font-size: 0.875em;
 	line-height: 1.375;
 }
 
-/* FIXME? */
-.codex-editor figure > img,
-.codex-editor figure > a > img {
+.codex-editor figure img,
+.codex-editor figure a img { /* FIXME */
 	margin-left: auto;
 	margin-right: auto;
 }
-.codex-editor figure > figcaption {
+.codex-editor figure figcaption {
 	padding-left: 1.5em;
 	padding-right: 1.5em;
 	padding-top: 0.5em;
