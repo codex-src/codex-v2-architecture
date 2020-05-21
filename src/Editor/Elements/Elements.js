@@ -48,7 +48,7 @@ export const Paragraph = React.memo(({ id, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<HOC.Node tag="p" id={id}>
+	<HOC.Node tag="li" id={id}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -132,33 +132,6 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 		</Markdown>
 	</HOC.Node>
 ))
-
-// const TodoItemCheckbox = ({ id, checked }) => {
-// 	const [, { checkTodo }] = useEditorState()
-// 	const ref = React.useRef()
-//
-// 	return (
-// 		// FIXME: Tag?
-// 		<button
-// 			ref={ref}
-// 			className={ // TODO
-// 				`-mt-px w-4 h-4 align-middle ${!checked
-// 					? "bg-white shadow-hero"
-// 					: "bg-md-blue-a200 shadow"
-// 				} rounded-md focus:outline-none transform scale-105 transition ease-out duration-75`
-// 			}
-// 			onClick={() => {
-// 				ref.current.focus()
-// 				checkTodo(id)
-// 			}}
-// 			data-codex-checkbox={checked}
-// 		>
-// 			<svg fill="#fff" viewBox="0 0 16 16">
-// 				<path d="M5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L7 8.586 5.707 7.293z"></path>
-// 			</svg>
-// 		</button>
-// 	)
-// }
 
 // style={checked && attrs.strike.style}
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
