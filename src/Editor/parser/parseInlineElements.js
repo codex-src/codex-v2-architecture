@@ -92,7 +92,7 @@ function parseInlineElements(str) {
 		const char = str[x1]
 
 		// Fast pass:
-		if ((ascii.isStrictAlphanum(char) && char !== "h") || char === " " || char > "\u007f") {
+		if ((ascii.isStrictAlphanum(char) && char !== "h") || char === " ") {
 			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
 				elements.push(char)
 				continue
@@ -314,6 +314,7 @@ function parseInlineElements(str) {
 	if (elements.length === 1 && typeof elements[0] === "string") {
 		return elements[0]
 	}
+	console.log(elements)
 	return elements
 }
 

@@ -30,9 +30,7 @@
 }
 
 /* FIXME */
-.codex-editor p[data-codex-emojis="1"],
-.codex-editor p[data-codex-emojis="2"],
-.codex-editor p[data-codex-emojis="3"] {
+.codex-editor p > [aria-label][role="img"] {
 	font-size: 208.3333%;
 	/* 208.3333 * 120% === 250% */
 }
