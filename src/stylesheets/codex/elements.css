@@ -29,10 +29,14 @@
 	font-size: 1.25em;
 }
 
-/* FIXME */
-.codex-editor p ~ [aria-label][role="img"] {
-	font-size: 208.3333%;
-	/* 208.3333 * 120% === 250% */
+/* https://stackoverflow.com/a/12198561 */
+.codex-editor [aria-label][role="img"]:first-child:nth-last-child(1),
+.codex-editor [aria-label][role="img"]:first-child:nth-last-child(2),
+.codex-editor [aria-label][role="img"]:first-child:nth-last-child(2) ~ [aria-label][role="img"],
+.codex-editor [aria-label][role="img"]:first-child:nth-last-child(3),
+.codex-editor [aria-label][role="img"]:first-child:nth-last-child(3) ~ [aria-label][role="img"] {
+	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
+	background-color: red;
 }
 
 .codex-editor blockquote {

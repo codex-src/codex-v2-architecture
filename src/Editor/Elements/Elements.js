@@ -15,7 +15,7 @@ import useEditorState from "../useEditorState"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
-		return children
+		return <span>{children || <br />}</span>
 	}
 	const components = []
 	for (const each of children) {
@@ -42,25 +42,8 @@ export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	</HOC.Root>
 ))
 
-// Counts the number of emojis. All inline elements must be
-// emojis in order to be counted.
-function emojiCount(children) {
-	const count = (
-		children &&
-		children.every &&
-		children.every(each => (
-			each &&
-			each.type &&
-			each.type === typeEnum.Emoji
-		)) &&
-		children.length
-	)
-	return count || 0
-}
-
 export const Paragraph = React.memo(({ id, children }) => (
-	// TODO: Remove data-codex-emojis?
-	<HOC.Root tag="p" id={id} data-codex-emojis={emojiCount(children)}>
+	<HOC.Root tag="p" id={id}>
 		{toReact(children) || (
 			<br />
 		)}
@@ -180,9 +163,10 @@ const TodoItemCheckbox = ({ id, checked }) => {
 	)
 }
 
+// style={checked && attrs.strike.style}
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	// TODO
-	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
+	<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
 		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
 			{/* TODO: Change absolute to style={{ position: "absolute" }} */}
