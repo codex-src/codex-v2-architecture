@@ -1,0 +1,84 @@
+.codex-editor {
+	-webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; /* subpixel-antialiased */
+
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+	-moz-tab-size: 4;
+	tab-size: 4;
+	font-feature-settings: "tnum";
+}
+.codex-editor code {
+	font-family: "iA Writer Mono var", monospace;
+	-moz-tab-size: 2;
+	tab-size: 2;
+}
+.codex-editor * {
+	caret-color: #000;
+}
+
+.codex-editor h1,
+.codex-editor h2,
+.codex-editor h3,
+.codex-editor h4,
+.codex-editor h5,
+.codex-editor h6 {
+	font-weight: 700;                                 /* font-bold */
+}
+
+.codex-editor pre {
+	padding-left: 1.5em; padding-right: 1.5em;        /* px-6 (em) */
+	border-radius: 0.25em;                            /* rounded (em) */
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05),
+		0 1px 3px 0 rgba(0, 0, 0, 0.1),
+		0 1px 2px 0 rgba(0, 0, 0, 0.06);                /* shadow-hero */
+	overflow-x: scroll;                               /* overflow-x-scroll */
+	-webkit-overflow-scrolling: touch;                /* scrolling-touch */
+}
+
+.codex-editor pre > code {
+	font-size: 0.875em;                               /* text-sm (em) */
+	line-height: 1.375;                               /* leading-snug */
+}
+
+/* FIXME? */
+.codex-editor figure > img,
+.codex-editor figure > a > img {
+	margin-left: auto; margin-right: auto;            /* mx-auto */
+}
+.codex-editor figure > figcaption {
+	padding-left: 1.5em; padding-right: 1.5em;        /* px-6 */
+	padding-top: 0.5em; padding-bottom: 0.5em;        /* py-2 */
+	font-size: 0.875em;                               /* text-sm (em) */
+	text-align: center;                               /* text-center */
+	color: var(--text-gray-600);                      /* text-gray-600 */
+}
+
+.codex-editor code {
+	padding-left: 0.25em; padding-right: 0.25em;      /* px-1 (em) */
+	padding-top: 1px; padding-bottom: 1px;            /* py-px */
+	font-size: 0.875em;                               /* text-sm (em) */
+	color: var(--md-blue-a400);                       /* text-md-blue-a400 */
+	background-color: var(--gray-100);                /* bg-gray-100 */
+	border-width: 1px; border-color: var(--gray-300); /* border */
+	border-radius: 0.25em;                            /* rounded (em) */
+}
+.codex-editor em {
+	font-style: italic;                               /* italic */
+}
+.codex-editor strong {
+	font-weight: 600;                                 /* font-semibold */
+}
+.codex-editor a {
+	text-decoration: underline;                       /* underline */
+	color: var(--md-blue-a400);                       /* text-md-blue-a400 */
+}
+.codex-editor [aria-label][role="img"] {
+	vertical-align: -10%;
+	font-size: 120%;
+	line-height: 1;
+}
+/* FIXME */
+.codex-editor [data-codex-emojis="1"],
+.codex-editor [data-codex-emojis="2"],
+.codex-editor [data-codex-emojis="3"] {
+	font-size: 208.3333%; /* 208.3333 * 120% === 250% */
+}

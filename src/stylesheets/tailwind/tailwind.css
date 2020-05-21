@@ -2,9 +2,9 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-html {
-	scroll-behavior: smooth;
-}
+/* html { */
+/* 	scroll-behavior: smooth; */
+/* } */
 
 /* NOTE: Decrements text-xs by 0.0625 not 0.125 */
 .text-xxs {

@@ -120,34 +120,32 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root tag="pre" id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
-			{/* <span className="inline-block"> */}
-				<code>
-					<Pre id={range[0].id} className="font-mono text-sm leading-none">
-						<Markdown syntax={[syntax[0]]}>
-							{readOnly && (
-								<br />
-							)}
-						</Markdown>
+		<HOC.Root tag="pre" id={id} {...attrs.disableAutoCorrect}>
+			<code>
+				<Pre id={range[0].id}>
+					<Markdown syntax={[syntax[0]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Pre>
+				{$range.map(each => (
+					<Pre key={each.id} id={each.id}>
+						<span dangerouslySetInnerHTML={{
+							__html: each.data || (
+								"<br />"
+							),
+						}} />
 					</Pre>
-					{$range.map(each => (
-						<Pre key={each.id} id={each.id} className="font-mono text-sm leading-snug">
-							<span dangerouslySetInnerHTML={{
-								__html: each.data || (
-									"<br />"
-								),
-							}} />
-						</Pre>
-					))}
-					<Pre id={range[range.length - 1].id} className="font-mono text-sm leading-none">
-						<Markdown syntax={[syntax[1]]}>
-							{readOnly && (
-								<br />
-							)}
-						</Markdown>
-					</Pre>
-				</code>
-			{/* </span> */}
+				))}
+				<Pre id={range[range.length - 1].id}>
+					<Markdown syntax={[syntax[1]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</Pre>
+			</code>
 		</HOC.Root>
 	)
 })
@@ -221,14 +219,12 @@ export const AnyList = React.memo(({ type, tag, id, children: range, __nested })
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
-		// TODO: Remove -mx-6?
-		<HOC.Root tag="figure" id={id} className="-mx-6">
+		<HOC.Root tag="figure" id={id}>
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				{/* contentEditable={false} */}
-				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
+				<img style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
-				<figcaption className="px-6 py-2 text-sm text-center text-gray-600">
+				<figcaption>
 					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
 							<br />
