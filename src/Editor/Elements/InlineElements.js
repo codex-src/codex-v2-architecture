@@ -19,43 +19,46 @@ export const Emoji = ({ description, children }) => (
 )
 
 export const Emphasis = ({ syntax, children }) => (
-	<span className="italic">
+	<em className="italic">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</em>
 )
 
 export const Strong = ({ syntax, children }) => (
-	<span className="font-semibold">
+	<strong className="font-semibold">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</strong>
 )
 
 export const StrongEmphasis = ({ syntax, children }) => (
-	<span className="font-semibold italic">
-		<Markdown syntax={syntax}>
-			{children}
-		</Markdown>
-	</span>
+	<strong className="font-semibold italic">
+		{/* FIXME? */}
+		<em>
+			<Markdown syntax={syntax}>
+				{children}
+			</Markdown>
+		</em>
+	</strong>
 )
 
 export const Code = ({ syntax, children }) => (
-	<span className="px-1 py-px font-mono text-sm text-md-blue-a400 border rounded" {...attrs.disableAutoCorrect}>
+	<code className="px-1 py-px font-mono text-sm text-md-blue-a400 border rounded" {...attrs.disableAutoCorrect}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</code>
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<span {...attrs.strike}>
+	<strike {...attrs.strike}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
-	</span>
+	</strike>
 )
 
 export const Anchor = ({ syntax, href, children }) => (

@@ -42,7 +42,7 @@ const headerClassNames = {
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<HOC.Root id={id} className={headerClassNames[tag]}>
+	<HOC.Root tag={tag} id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -68,7 +68,7 @@ function emojiCount(children) {
 }
 
 export const Paragraph = React.memo(({ id, children }) => (
-	<HOC.Root id={id} data-codex-emojis={emojiCount(children)}>
+	<HOC.Root tag="p" id={id} data-codex-emojis={emojiCount(children)}>
 		{toReact(children) || (
 			<br />
 		)}
@@ -76,7 +76,7 @@ export const Paragraph = React.memo(({ id, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<HOC.Node id={id} className="text-gray-600">
+	<HOC.Node tag="p" id={id} className="text-gray-600">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -86,7 +86,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<HOC.Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<HOC.Root tag="blockquote" id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -120,32 +120,34 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
-			<span className="inline-block">
-				<Pre id={range[0].id} className="font-mono text-sm leading-none">
-					<Markdown syntax={[syntax[0]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
-				</Pre>
-				{$range.map(each => (
-					<Pre key={each.id} id={each.id} className="font-mono text-sm leading-snug">
-						<span dangerouslySetInnerHTML={{
-							__html: each.data || (
-								"<br />"
-							),
-						}} />
+		<HOC.Root tag="pre" id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+			{/* <span className="inline-block"> */}
+				<code>
+					<Pre id={range[0].id} className="font-mono text-sm leading-none">
+						<Markdown syntax={[syntax[0]]}>
+							{readOnly && (
+								<br />
+							)}
+						</Markdown>
 					</Pre>
-				))}
-				<Pre id={range[range.length - 1].id} className="font-mono text-sm leading-none">
-					<Markdown syntax={[syntax[1]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
-				</Pre>
-			</span>
+					{$range.map(each => (
+						<Pre key={each.id} id={each.id} className="font-mono text-sm leading-snug">
+							<span dangerouslySetInnerHTML={{
+								__html: each.data || (
+									"<br />"
+								),
+							}} />
+						</Pre>
+					))}
+					<Pre id={range[range.length - 1].id} className="font-mono text-sm leading-none">
+						<Markdown syntax={[syntax[1]]}>
+							{readOnly && (
+								<br />
+							)}
+						</Markdown>
+					</Pre>
+				</code>
+			{/* </span> */}
 		</HOC.Root>
 	)
 })
@@ -165,6 +167,7 @@ const TodoItemCheckbox = ({ id, checked }) => {
 	const ref = React.useRef()
 
 	return (
+		// FIXME: Tag?
 		<button
 			ref={ref}
 			className={
@@ -219,19 +222,19 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		// TODO: Remove -mx-6?
-		<HOC.Root id={id} className="-mx-6">
+		<HOC.Root tag="figure" id={id} className="-mx-6">
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* contentEditable={false} */}
 				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
-				<div className="px-6 py-2 text-sm text-center text-gray-600">
+				<figcaption className="px-6 py-2 text-sm text-center text-gray-600">
 					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
 							<br />
 						)}
 					</Markdown>
-				</div>
+				</figcaption>
 			)}
 		</HOC.Root>
 	)
@@ -246,6 +249,7 @@ const backgroundImage = "linear-gradient(" +
 ")"
 
 export const Break = React.memo(({ id, syntax }) => (
+	// TODO: Use tag="hr"?
 	<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
