@@ -58,18 +58,20 @@ function parseInlineElement({ type, syntax, substr }) {
 	}
 	const match = substr.slice(0, offset + syntax.length)
 	const submatch = match.slice(syntax.length, -syntax.length)
-	// Non-code submatches cannot be surrounded by spaces:
-	if (type !== typeEnum.Code && (
-		utf8.isHWhiteSpace(submatch[0]) ||
-		utf8.isHWhiteSpace(submatch[submatch.length - 1]))
-	) {
-		return null
-	// Syntax and submatch cannot be redundant:
-	} else if (
-		submatch[0] === syntax[0] ||
-		submatch[submatch.length - 1] === syntax[syntax.length - 1]) {
-		return null
-	}
+
+	// // Non-code submatches cannot be surrounded by spaces:
+	// if (type !== typeEnum.Code && (
+	// 	utf8.isHWhiteSpace(submatch[0]) ||
+	// 	utf8.isHWhiteSpace(submatch[submatch.length - 1]))
+	// ) {
+	// 	return null
+	// // Syntax and submatch cannot be redundant:
+	// } else if (
+	// 	submatch[0] === syntax[0] ||
+	// 	submatch[submatch.length - 1] === syntax[syntax.length - 1]) {
+	// 	return null
+	// }
+
 	const element = {
 		type,
 		syntax,
@@ -101,16 +103,16 @@ function parseInlineElements(str) {
 			continue
 		}
 
-		// Inline elements must be preceded by an ASCII
-		// punctuation character, UTF-8 space, or BOL:
-		if (x1 - 1 >= 0 && !isASCIIPunctuationOrUTF8Space(str[x1 - 1])) {
-			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-				elements.push(char)
-				continue
-			}
-			elements[elements.length - 1] += char
-			continue
-		}
+		// // Inline elements must be preceded by an ASCII
+		// // punctuation character, UTF-8 space, or BOL:
+		// if (x1 - 1 >= 0 && !isASCIIPunctuationOrUTF8Space(str[x1 - 1])) {
+		// 	if (!elements.length || typeof elements[elements.length - 1] !== "string") {
+		// 		elements.push(char)
+		// 		continue
+		// 	}
+		// 	elements[elements.length - 1] += char
+		// 	continue
+		// }
 
 		const substr = str.slice(x1)
 		switch (char) {
@@ -314,7 +316,6 @@ function parseInlineElements(str) {
 	if (elements.length === 1 && typeof elements[0] === "string") {
 		return elements[0]
 	}
-	console.log(elements)
 	return elements
 }
 

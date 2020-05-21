@@ -15,8 +15,6 @@ function getHeaderInfo(node) {
 
 // Gets preformatted metadata.
 function getPreformattedMetadata(node) {
-	// TODO: Rename to infoString?
-	//
 	// https://github.github.com/gfm/#info-string
 	const info = node.data.slice(3)
 	const metadata = {

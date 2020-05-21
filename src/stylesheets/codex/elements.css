@@ -30,7 +30,7 @@
 }
 
 /* FIXME */
-.codex-editor p > [aria-label][role="img"] {
+.codex-editor p ~ [aria-label][role="img"] {
 	font-size: 208.3333%;
 	/* 208.3333 * 120% === 250% */
 }
