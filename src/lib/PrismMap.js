@@ -3,6 +3,10 @@
 const prismMap = {}
 
 document.addEventListener("DOMContentLoaded", e => {
+	if (!window.Prism) {
+		// No-op
+		return
+	}
 	const extensions = {
 		bash:       window.Prism.languages.bash,
 		c:          window.Prism.languages.c,

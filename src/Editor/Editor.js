@@ -105,13 +105,15 @@ const Editor = ({
 				} catch (error) {
 					console.error(error)
 				}
-				const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
-				if (!computed || !computed.offset) {
-					// No-op
-					return
-				}
-				const { scrollingElement, offset } = computed
-				scrollingElement.scrollBy(0, offset)
+				// setTimeout(() => {
+				// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
+				// 	if (!computed || !computed.offset) {
+				// 		// No-op
+				// 		return
+				// 	}
+				// 	const { scrollingElement, offset } = computed
+				// 	scrollingElement.scrollBy(0, offset)
+				// }, 0)
 			})
 		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
 		[state.readOnly, state.elements],

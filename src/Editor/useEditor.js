@@ -387,16 +387,18 @@ const methods = state => ({
 
 		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
 
-		let id2 = ""
+		let id = ""
 		const selection = document.getSelection()
 		if (selection && selection.rangeCount) {
 			const range = selection.getRangeAt(0)
-			id2 = ascendRoot(range.startContainer).id
+			const root = ascendRoot(range.startContainer)
+			console.log(root)
+			id = root.id
 		}
-		console.log(id2)
+		console.log(id)
 
 		// const { id } = state.nodes[state.pos1.y]
-		const nextElement = nextElements.find(each => each.id === id2)
+		const nextElement = nextElements.find(each => each.id === id)
 		if (nextElement) {
 			nextElement.reactKey = uuidv4()
 		}
