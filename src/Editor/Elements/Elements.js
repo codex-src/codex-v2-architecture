@@ -68,8 +68,8 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</HOC.Root>
 ))
 
-const Pre = props => (
-	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
+const HOCDiv = props => (
+	<HOC.Node style={{ display: "inline-block", whiteSpace: "pre" }} {...props} />
 )
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
@@ -93,31 +93,29 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 	return (
 		<HOC.Root tag="pre" id={id} {...attrs.disableAutoCorrect}>
-			<code>
-				<Pre id={range[0].id}>
-					<Markdown syntax={[syntax[0]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
-				</Pre>
-				{$range.map(each => (
-					<Pre key={each.id} id={each.id}>
-						<span dangerouslySetInnerHTML={{
-							__html: each.data || (
-								"<br />"
-							),
-						}} />
-					</Pre>
-				))}
-				<Pre id={range[range.length - 1].id}>
-					<Markdown syntax={[syntax[1]]}>
-						{readOnly && (
-							<br />
-						)}
-					</Markdown>
-				</Pre>
-			</code>
+			<HOCDiv id={range[0].id}>
+				<Markdown syntax={[syntax[0]]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
+			</HOCDiv>
+			{$range.map(each => (
+				<HOCDiv key={each.id} id={each.id}>
+					<span dangerouslySetInnerHTML={{
+						__html: each.data || (
+							"<br />"
+						),
+					}} />
+				</HOCDiv>
+			))}
+			<HOCDiv id={range[range.length - 1].id}>
+				<Markdown syntax={[syntax[1]]}>
+					{readOnly && (
+						<br />
+					)}
+				</Markdown>
+			</HOCDiv>
 		</HOC.Root>
 	)
 })
