@@ -1,7 +1,7 @@
 import React from "react"
 
 // NOTE: Shadows browser API
-export const Node = React.memo(React.forwardRef(({ id, tag, style, ...props }, ref) => (
+export const Node = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
 		ref,
 		id,
@@ -14,9 +14,9 @@ export const Node = React.memo(React.forwardRef(({ id, tag, style, ...props }, r
 		"data-codex-node": true,
 		...props,
 	})
-)))
+))
 
-export const Root = React.memo(React.forwardRef(({ id, tag, style, ...props }, ref) => (
+export const Root = React.forwardRef(({ id, tag, style, ...props }, ref) => (
 	React.createElement(tag || "div", {
 		ref,
 		id,
@@ -29,4 +29,4 @@ export const Root = React.memo(React.forwardRef(({ id, tag, style, ...props }, r
 		"data-codex-root": true,
 		...props,
 	})
-)))
+))

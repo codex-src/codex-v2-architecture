@@ -41,7 +41,7 @@ const headerClassNames = {
 	h6: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
 }
 
-export const Header = ({ tag, id, syntax, hash, children }) => (
+export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
 	<HOC.Root id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
@@ -49,7 +49,7 @@ export const Header = ({ tag, id, syntax, hash, children }) => (
 			)}
 		</Markdown>
 	</HOC.Root>
-)
+))
 
 // Counts the number of emojis. All inline elements must be
 // emojis in order to be counted.
@@ -67,15 +67,15 @@ function emojiCount(children) {
 	return count || 0
 }
 
-export const Paragraph = ({ id, children }) => (
+export const Paragraph = React.memo(({ id, children }) => (
 	<HOC.Root id={id} data-codex-emojis={emojiCount(children)}>
 		{toReact(children) || (
 			<br />
 		)}
 	</HOC.Root>
-)
+))
 
-export const BlockquoteItem = ({ id, syntax, children }) => (
+export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	<HOC.Node id={id} className="text-gray-600">
 		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
 			{toReact(children) || (
@@ -83,9 +83,9 @@ export const BlockquoteItem = ({ id, syntax, children }) => (
 			)}
 		</Markdown>
 	</HOC.Node>
-)
+))
 
-export const Blockquote = ({ id, children: range }) => (
+export const Blockquote = React.memo(({ id, children: range }) => (
 	<HOC.Root id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
@@ -94,13 +94,13 @@ export const Blockquote = ({ id, children: range }) => (
 			})
 		))}
 	</HOC.Root>
-)
+))
 
 const Pre = props => (
 	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
 )
 
-export const Preformatted = ({ id, syntax, extension, children: range }) => {
+export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
@@ -148,9 +148,9 @@ export const Preformatted = ({ id, syntax, extension, children: range }) => {
 			</span>
 		</HOC.Root>
 	)
-}
+})
 
-export const AnyListItem = ({ tag, id, syntax, ordered, children }) => (
+export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
 	<HOC.Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
@@ -158,7 +158,7 @@ export const AnyListItem = ({ tag, id, syntax, ordered, children }) => (
 			)}
 		</Markdown>
 	</HOC.Node>
-)
+))
 
 const TodoItemCheckbox = ({ id, checked }) => {
 	const [, { checkTodo }] = useEditorState()
@@ -186,7 +186,7 @@ const TodoItemCheckbox = ({ id, checked }) => {
 	)
 }
 
-export const TodoItem = ({ tag, id, syntax, checked, children }) => (
+export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
@@ -197,10 +197,10 @@ export const TodoItem = ({ tag, id, syntax, checked, children }) => (
 			)}
 		</Markdown>
 	</HOC.Node>
-)
+))
 
 // NOTE: <AnyList> computes __nested
-export const AnyList = ({ type, tag, id, children: range, __nested }) => {
+export const AnyList = React.memo(({ type, tag, id, children: range, __nested }) => {
 	const Parent = !__nested ? HOC.Root : HOC.Node
 	return (
 		<Parent tag={tag} id={id} className="ml-6">
@@ -213,9 +213,9 @@ export const AnyList = ({ type, tag, id, children: range, __nested }) => {
 			))}
 		</Parent>
 	)
-}
+})
 
-export const Image = ({ id, syntax, src, alt, href, children }) => {
+export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		// TODO: Remove -mx-6?
@@ -235,7 +235,7 @@ export const Image = ({ id, syntax, src, alt, href, children }) => {
 			)}
 		</HOC.Root>
 	)
-}
+})
 
 const backgroundImage = "linear-gradient(" +
 	"transparent 0, " +
@@ -245,10 +245,10 @@ const backgroundImage = "linear-gradient(" +
 	"transparent calc(0.75em + 2px)" +
 ")"
 
-export const Break = ({ id, syntax }) => (
+export const Break = React.memo(({ id, syntax }) => (
 	<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>
 	</HOC.Root>
-)
+))
