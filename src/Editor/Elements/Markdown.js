@@ -20,12 +20,12 @@ function parseSyntax(syntax) {
 	return [s1, s2]
 }
 
-const Syntax = ({ className, ...props }) => {
+const Syntax = props => {
 	const [{ readOnly }] = useEditorState()
 	if (!props.children || readOnly) {
 		return null
 	}
-	return <span className={className === undefined ? "text-md-blue-a400" : className} {...props} />
+	return <span className="markdown" {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {

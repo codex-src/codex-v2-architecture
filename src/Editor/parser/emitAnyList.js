@@ -24,7 +24,7 @@ function parseMetadata(node) {
 				tag: "li",
 				id: node.id,
 				checked: syntax === "- [x] ",
-				ordered: undefined,
+				// ordered: undefined,
 			}
 			return metadata
 		} else {
@@ -39,7 +39,7 @@ function parseMetadata(node) {
 				tag: "li",
 				id: node.id,
 				checked: undefined,
-				ordered: false,
+				// ordered: false,
 			}
 			return metadata
 		}
@@ -64,7 +64,7 @@ function parseMetadata(node) {
 			tag: "li",
 			id: node.id,
 			checked: undefined,
-			ordered: true,
+			// ordered: true,
 		}
 		return metadata
 	default:

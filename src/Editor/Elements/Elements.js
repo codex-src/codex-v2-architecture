@@ -32,17 +32,8 @@ function toReact(children) {
 	return components
 }
 
-const headerClassNames = {
-	h1: trimWhiteSpace("font-semibold text-3xl leading-tight antialiased"),
-	h2: trimWhiteSpace("font-semibold text-2xl leading-tight antialiased"),
-	h3: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
-	h4: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
-	h5: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
-	h6: trimWhiteSpace("font-semibold text-xl  leading-tight antialiased"),
-}
-
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<HOC.Root tag={tag} id={id} className={headerClassNames[tag]}>
+	<HOC.Root tag={tag} id={id}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -76,8 +67,8 @@ export const Paragraph = React.memo(({ id, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<HOC.Node tag="p" id={id} className="text-gray-600">
-		<Markdown className="mr-2 text-md-blue-a400" syntax={syntax}>
+	<HOC.Node tag="p" id={id}>
+		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -86,7 +77,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<HOC.Root tag="blockquote" id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<HOC.Root tag="blockquote" id={id}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -151,7 +142,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 })
 
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<HOC.Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
+	<HOC.Node tag={tag} id={id}>
+		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -189,6 +181,7 @@ const TodoItemCheckbox = ({ id, checked }) => {
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => (
 	<HOC.Node tag={tag} id={id} className="my-1 relative" style={checked && attrs.strike.style} data-codex-checked={checked}>
+		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
 			<div className="absolute">
 				<TodoItemCheckbox id={id} checked={checked} />
@@ -247,6 +240,7 @@ const backgroundImage = "linear-gradient(" +
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
 	<HOC.Root id={id} className="relative text-right" style={{ backgroundImage }}>
+		{/* TODO: Change hidden to style={{ display: "none" }} */}
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>

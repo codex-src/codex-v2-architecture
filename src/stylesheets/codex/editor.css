@@ -1,10 +1,10 @@
 .codex-editor {
-	-webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; /* subpixel-antialiased */
-
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 	-moz-tab-size: 4;
 	tab-size: 4;
 	font-feature-settings: "tnum";
+
+	-webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; /* subpixel-antialiased */
 }
 .codex-editor code {
 	font-family: "iA Writer Mono var", monospace;
@@ -15,15 +15,74 @@
 	caret-color: #000;
 }
 
-.codex-editor h1,
-.codex-editor h2,
-.codex-editor h3,
-.codex-editor h4,
-.codex-editor h5,
+.codex-editor .markdown {
+	color: var(--md-blue-a400);                       /* text-md-blue-a400 */
+}
+
+/*
+ * <h1-h6>
+ */
+.codex-editor h1 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.875em;                               /* text-3xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
+.codex-editor h2 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.5em;                                 /* text-2xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
+.codex-editor h3 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.25em;                                /* text-xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
+.codex-editor h4 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.25em;                                /* text-xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
+.codex-editor h5 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.25em;                                /* text-xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
 .codex-editor h6 {
+	font-weight: 600;                                 /* font-semibold */
+	font-size: 1.25em;                                /* text-xl (em) */
+	line-height: 1.25;                                /* leading-tight */
+	-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; /* antialiased */
+}
+
+.codex-editor h1 strong,
+.codex-editor h2 strong,
+.codex-editor h3 strong,
+.codex-editor h4 strong,
+.codex-editor h5 strong,
+.codex-editor h6 strong {
 	font-weight: 700;                                 /* font-bold */
 }
 
+/*
+ * <blockquote>
+ */
+.codex-editor blockquote {
+	padding-left: 1.5em;                              /* pl-6 (em) */
+	color: var(--text-gray-600);                      /* text-gray-600 */
+	box-shadow: inset 0.25em 0 var(--gray-300);
+}
+.codex-editor blockquote .markdown {
+	margin-right: 0.5em;                              /* mr-2 (em) */
+}
+
+/*
+ * <pre>
+ */
 .codex-editor pre {
 	padding-left: 1.5em; padding-right: 1.5em;        /* px-6 (em) */
 	border-radius: 0.25em;                            /* rounded (em) */
@@ -33,25 +92,62 @@
 	overflow-x: scroll;                               /* overflow-x-scroll */
 	-webkit-overflow-scrolling: touch;                /* scrolling-touch */
 }
-
 .codex-editor pre > code {
 	font-size: 0.875em;                               /* text-sm (em) */
 	line-height: 1.375;                               /* leading-snug */
 }
 
+/*
+ * <ul>
+ */
+.codex-editor ul li {
+	margin-top: 0.25em; margin-bottom: 0.25em;        /* my-1 (em) */
+}
+.codex-editor ul li:before {
+	margin-left: -1.5em;                              /* -ml-6 (em) */
+	position: absolute;                               /* absolute */
+	content: "• ";
+	color: var(--md-blue-a400);                       /* text-md-blue-a400 */
+}
+
+/*
+ * <ol>
+ */
+.codex-editor ol li {
+	margin-top: 0.25em; margin-bottom: 0.25em;        /* my-1 (em) */
+}
+.codex-editor ol li:first-of-type {
+	counter-reset: count;
+}
+.codex-editor ol li:before {
+	margin-left: -1.5em;                              /* -ml-6 (em) */
+	position: absolute;                               /* absolute */
+	counter-increment: count;
+	content: counter(count) ". ";
+	font-feature-settings: "tnum";
+	color: var(--md-blue-a400);                       /* text-md-blue-a400 */
+}
+
+
+/*
+ * <figure>
+ */
 /* FIXME? */
 .codex-editor figure > img,
 .codex-editor figure > a > img {
 	margin-left: auto; margin-right: auto;            /* mx-auto */
 }
 .codex-editor figure > figcaption {
-	padding-left: 1.5em; padding-right: 1.5em;        /* px-6 */
-	padding-top: 0.5em; padding-bottom: 0.5em;        /* py-2 */
+	padding-left: 1.5em; padding-right: 1.5em;        /* px-6 (em) */
+	padding-top: 0.5em; padding-bottom: 0.5em;        /* py-2 (em) */
 	font-size: 0.875em;                               /* text-sm (em) */
 	text-align: center;                               /* text-center */
 	color: var(--text-gray-600);                      /* text-gray-600 */
 }
 
+/*
+ * Etc.
+ */
 .codex-editor code {
 	padding-left: 0.25em; padding-right: 0.25em;      /* px-1 (em) */
 	padding-top: 1px; padding-bottom: 1px;            /* py-px */

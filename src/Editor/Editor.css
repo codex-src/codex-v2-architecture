@@ -1,24 +1,3 @@
-/* Unordered */
-.codex-editor [data-codex-ordered="false"]:before  {
-	margin-left: -1.5em;
-	position: absolute;
-	content: "• ";
-	color: var(--md-blue-a400);
-}
-
-/* Ordered */
-.codex-editor [data-codex-ordered="true"]:first-of-type {
-	counter-reset: count;
-}
-.codex-editor [data-codex-ordered="true"]:before  {
-	margin-left: -1.5em;
-	position: absolute;
-	counter-increment: count;
-	content: counter(count) ". ";
-	font-feature-settings: "tnum";
-	color: var(--md-blue-a400);
-}
-
 /* Checked */
 .codex-editor [data-codex-checked] [data-codex-checkbox] {
 	margin-left: -1.75em;

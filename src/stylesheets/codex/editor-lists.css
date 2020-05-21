@@ -1,0 +1,23 @@
+.codex-editor ul li,
+.codex-editor ol li, {
+	margin-top: 0.25em; margin-bottom: 0.25em; /* my-1 (em) */
+}
+
+.codex-editor ul li:before {
+	margin-left: -1.5em;                       /* -ml-6 (em) */
+	position: absolute;                        /* absolute */
+	content: "• ";
+	color: var(--md-blue-a400);                /* text-md-blue-a400 */
+}
+
+.codex-editor ol li:first-of-type {
+	counter-reset: count;
+}
+.codex-editor ol li:before {
+	margin-left: -1.5em;                       /* -ml-6 (em) */
+	position: absolute;                        /* absolute */
+	counter-increment: count;
+	content: counter(count) ". ";
+	font-feature-settings: "tnum";
+	color: var(--md-blue-a400);                /* text-md-blue-a400 */
+}

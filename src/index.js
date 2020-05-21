@@ -4,6 +4,7 @@ import ReactDOM from "react-dom"
 
 import "debug.css"
 
+import "stylesheets/codex/editor-lists.css"
 import "stylesheets/codex/editor.css"
 import "stylesheets/material-design/colors.css"
 import "stylesheets/prism/custom.css"
