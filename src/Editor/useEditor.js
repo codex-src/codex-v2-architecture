@@ -5,6 +5,7 @@ import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
 import uuidv4 from "uuid/v4"
 import { AnyListRegex } from "./regexes"
+import { ascendRoot } from "./ascenders"
 
 import {
 	newNodes,
@@ -384,9 +385,21 @@ const methods = state => ({
 		const elements = state.elements
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 
-		const { id } = state.nodes[state.pos1.y]
-		const nextElement = nextElements.find(each => each.id === id)
-		nextElement.reactKey = uuidv4()
+		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
+
+		let id2 = ""
+		const selection = document.getSelection()
+		if (selection && selection.rangeCount) {
+			const range = selection.getRangeAt(0)
+			id2 = ascendRoot(range.startContainer).id
+		}
+		console.log(id2)
+
+		// const { id } = state.nodes[state.pos1.y]
+		const nextElement = nextElements.find(each => each.id === id2)
+		if (nextElement) {
+			nextElement.reactKey = uuidv4()
+		}
 
 		// const areEqualElements = (nextElement, element) => {
 		// 	return JSON.stringify(nextElement, null, "\t") === JSON.stringify(element, null, "\t")

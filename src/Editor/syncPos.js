@@ -45,19 +45,17 @@ function computeDOMRange(root, pos) {
 
 // Computes a meta DOM cursor; uses VDOM and DOM to compute.
 function computeMetaRange(editorState, pos) {
-	let nodeID = ""
+	let id = ""
 	for (const each of editorState.nodes) {
 		if (pos - each.data.length <= 0) {
-			nodeID = each.id
+			id = each.id
 			break
 		}
 		pos -= (each.data + "\n").length
 	}
-	// NOTE: nodeID can resolve to a data-codex-node or
-	// data-codex-root element
-	const node = document.getElementById(nodeID)
-	if (!nodeID || !node) {
-		throw new Error(`computeMetaRange: could not query node (id=${nodeID || "\"\""}`)
+	const node = document.getElementById(id)
+	if (!id || !node) {
+		throw new Error(`computeMetaRange: could not query node (id=${id || "\"\""}`)
 	}
 	return computeDOMRange(node, pos)
 }
