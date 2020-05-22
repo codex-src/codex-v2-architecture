@@ -2,8 +2,7 @@
 	-webkit-font-smoothing: auto;
 	-moz-osx-font-smoothing: auto;
 
-	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-	font-size: 1em;
+	font: 1em/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
 	-moz-tab-size: 4;
 	tab-size: 4;
 
@@ -11,8 +10,7 @@
 }
 .codex-editor pre,
 .codex-editor code {
-	font-family: "iA Writer Mono var", monospace;
-	font-size: 0.875em;
+	font: 0.875em/1.375 "iA Writer Mono var", monospace;
 	-moz-tab-size: 2;
 	tab-size: 2;
 }

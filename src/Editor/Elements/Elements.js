@@ -12,7 +12,7 @@ import useEditorState from "../useEditorState"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
-		return !children ? null : <span>{children}</span>
+		return !children ? null : <span key={Math.random().toString(16).substr(2, 4)}>{children}</span>
 	}
 	const components = []
 	for (const each of children) {
@@ -68,10 +68,6 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</HOC.Root>
 ))
 
-const HOCDiv = props => (
-	<HOC.Node style={{ display: "inline-block", whiteSpace: "pre" }} {...props} />
-)
-
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
@@ -93,37 +89,36 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 	return (
 		<HOC.Root tag="pre" id={id} {...attrs.disableAutoCorrect}>
-			<HOCDiv id={range[0].id}>
+			<HOC.Node id={range[0].id} style={{ whiteSpace: "pre", lineHeight: 1 }}>
 				<Markdown syntax={[syntax[0]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
-			</HOCDiv>
+			</HOC.Node>
 			{$range.map(each => (
-				<HOCDiv key={each.id} id={each.id}>
+				<HOC.Node key={each.id} id={each.id} style={{ whiteSpace: "pre" }}>
 					<span dangerouslySetInnerHTML={{
 						__html: each.data || (
 							"<br />"
 						),
 					}} />
-				</HOCDiv>
+				</HOC.Node>
 			))}
-			<HOCDiv id={range[range.length - 1].id}>
+			<HOC.Node id={range[range.length - 1].id} style={{ whiteSpace: "pre", lineHeight: 1 }}>
 				<Markdown syntax={[syntax[1]]}>
 					{readOnly && (
 						<br />
 					)}
 				</Markdown>
-			</HOCDiv>
+			</HOC.Node>
 		</HOC.Root>
 	)
 })
 
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
 	<HOC.Node tag={tag} id={id}>
-		{/* TODO: Change hidden to style={{ display: "none" }} */}
-		<Markdown className="hidden" syntax={syntax}>
+		<Markdown style={{ display: "hidden" }} syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -139,8 +134,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	return (
 		// TODO
 		<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
-			{/* TODO: Change hidden to style={{ display: "none" }} */}
-			<Markdown className="hidden" syntax={syntax}>
+			<Markdown style={{ display: "hidden" }} syntax={syntax}>
 				{/* TODO: Change absolute to style={{ position: "absolute" }} */}
 				<div className="absolute">
 					<input
@@ -199,6 +193,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	)
 })
 
+// TODO: Compute line-height?
 const backgroundImage = "linear-gradient(" +
 	"transparent 0, " +
 	"transparent calc(0.75em - 2px), " +
@@ -210,8 +205,7 @@ const backgroundImage = "linear-gradient(" +
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
 	<HOC.Root id={id} className="text-right" style={{ backgroundImage }}>
-		{/* TODO: Change hidden to style={{ display: "none" }} */}
-		<Markdown className="hidden" syntax={syntax}>
+		<Markdown style={{ display: "hidden" }} syntax={syntax}>
 			<br />
 		</Markdown>
 	</HOC.Root>
