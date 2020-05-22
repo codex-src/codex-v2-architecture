@@ -6,10 +6,10 @@
 	-moz-tab-size: 4;
 	tab-size: 4;
 
-	/* font-feature-settings: "tnum"; */
+	font-feature-settings: "tnum";
 }
-.codex-editor pre,
-.codex-editor code {
+.codex-editor pre > code,
+.codex-editor :not(pre) > code {
 	font: 0.875em/1.375 "iA Writer Mono var", monospace;
 	-moz-tab-size: 2;
 	tab-size: 2;

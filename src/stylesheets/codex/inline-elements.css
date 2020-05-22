@@ -28,7 +28,7 @@
 	font-weight: 700;
 }
 
-.codex-editor code {
+.codex-editor :not(pre) > code {
 	padding-left: 0.25em;
 	padding-right: 0.25em;
 	padding-top: 1px;

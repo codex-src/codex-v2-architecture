@@ -104,7 +104,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 	return (
 		<HOC.Root tag="pre" id={id} className={`language-${extension}`} {...attrs.disableAutoCorrect}>
-			<span style={{ display: "inline-block", minWidth: "100%" }}>
+			<code style={{ display: "inline-block", minWidth: "100%" }}>
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
@@ -128,7 +128,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 						)}
 					</Markdown>
 				</PreEdge>
-			</span>
+			</code>
 		</HOC.Root>
 	)
 })

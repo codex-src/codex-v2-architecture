@@ -44,8 +44,6 @@ class ErrorBoundary extends React.Component {
 }
 
 const data = (() => {
-	// return "Hello, `world`!"
-
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)
 	if (!cache) {
 		return raw("./EditorApp.md")
