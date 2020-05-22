@@ -68,12 +68,20 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</HOC.Root>
 ))
 
+const Pre = props => (
+	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
+)
+const PreEdge = props => (
+	<HOC.Node style={{ whiteSpace: "pre", lineHeight: 1 }} {...props} />
+)
+
 // TODO: Tab "\t" can cause the fmt.Println(")" bug?
 //
 // -> \tfmt.Println()<cursor>
 // -> \tfmt.Println(<cursor>)
 // -> \tfmt.Println(")"<cursor>
 //
+// TODO: Extract <Preformated>
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
@@ -95,33 +103,36 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 	return (
 		<HOC.Root tag="pre" id={id} {...attrs.disableAutoCorrect}>
-			<HOC.Node id={range[0].id} style={{ whiteSpace: "pre", lineHeight: 1 }}>
-				<Markdown syntax={[syntax[0]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</HOC.Node>
-			{$range.map(each => (
-				<HOC.Node key={each.id} id={each.id} style={{ whiteSpace: "pre" }}>
-					<span dangerouslySetInnerHTML={{
-						__html: each.data || (
-							"<br />"
-						),
-					}} />
-				</HOC.Node>
-			))}
-			<HOC.Node id={range[range.length - 1].id} style={{ whiteSpace: "pre", lineHeight: 1 }}>
-				<Markdown syntax={[syntax[1]]}>
-					{readOnly && (
-						<br />
-					)}
-				</Markdown>
-			</HOC.Node>
+			<span style={{ display: "inline-block", minWidth: "100%" }}>
+				<PreEdge id={range[0].id}>
+					<Markdown syntax={[syntax[0]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</PreEdge>
+				{$range.map(each => (
+					<Pre key={each.id} id={each.id}>
+						<span dangerouslySetInnerHTML={{
+							__html: each.data || (
+								"<br />"
+							),
+						}} />
+					</Pre>
+				))}
+				<PreEdge id={range[range.length - 1].id}>
+					<Markdown syntax={[syntax[1]]}>
+						{readOnly && (
+							<br />
+						)}
+					</Markdown>
+				</PreEdge>
+			</span>
 		</HOC.Root>
 	)
 })
 
+// TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
 	<HOC.Node tag={tag} id={id}>
 		<Markdown style={{ display: "hidden" }} syntax={syntax}>
@@ -178,6 +189,7 @@ export const AnyList = React.memo(({ type, tag, id, children: range, recursed })
 	)
 })
 
+// TODO: Extract <Image>
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
