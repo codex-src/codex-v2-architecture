@@ -294,7 +294,7 @@ const methods = state => ({
 		state.history.mutate()
 
 		const node = state.nodes[state.pos1.y]
-		if (state.collapsed && state.pos1.x === node.data.length && AnyListRegex.test(node.data)) {
+		if (state.collapsed && AnyListRegex.test(node.data)) {
 			const [, tabs, syntax] = node.data.match(AnyListRegex)
 			if ((tabs + syntax) === node.data) {
 				this.backspaceParagraph() // Revert to paragraph

@@ -33,7 +33,6 @@
 	padding-right: 0.25em;
 	padding-top: 1px;
 	padding-bottom: 1px;
-	/* font-size: 0.875em; */
 	color: var(--md-blue-a400);
 	border-width: 1px;
 	border-radius: 0.25em;
@@ -49,4 +48,3 @@
 	color: var(--gray-500);
 	text-decoration: line-through;
 }
-/* TODO */
