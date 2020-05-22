@@ -20,6 +20,9 @@ const testElements = {
 		)
 		return ok
 	},
+	// BlockquoteEdge({ data }) {
+	// 	return data.startsWith("> ")
+	// },
 	PreformattedStart({ data }) {
 		const ok = (
 			(data.startsWith("```") && data.slice(3).indexOf("`") === -1) ||

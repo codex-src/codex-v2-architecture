@@ -1,4 +1,3 @@
-import * as HOC from "./HOC"
 import attrs from "./attrs"
 import escape from "lodash/escape"
 import IfWrapper from "lib/IfWrapper"
@@ -8,6 +7,11 @@ import React from "react"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
 import { Strikethrough } from "./InlineElements"
+
+import {
+	Node,
+	Root,
+} from "./HOC"
 
 // Converts a parsed data structure (children) to renderable
 // React components.
@@ -31,49 +35,49 @@ function toReact(children) {
 }
 
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<HOC.Root tag={tag} id={id}>
+	<Root tag={tag} id={id}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</HOC.Root>
+	</Root>
 ))
 
 export const Paragraph = React.memo(({ id, children }) => (
-	<HOC.Root tag="p" id={id}>
+	<Root tag="p" id={id}>
 		{toReact(children) || (
 			<br />
 		)}
-	</HOC.Root>
+	</Root>
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<HOC.Node tag="li" id={id}>
+	<Node tag="li" id={id}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</HOC.Node>
+	</Node>
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<HOC.Root tag="blockquote" id={id}>
+	<Root tag="blockquote" id={id}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
 				...each,
 			})
 		))}
-	</HOC.Root>
+	</Root>
 ))
 
 const Pre = props => (
-	<HOC.Node style={{ whiteSpace: "pre" }} {...props} />
+	<Node style={{ whiteSpace: "pre" }} {...props} />
 )
 const PreEdge = props => (
-	<HOC.Node style={{ whiteSpace: "pre", lineHeight: 1 }} {...props} />
+	<Node style={{ whiteSpace: "pre", lineHeight: 1 }} {...props} />
 )
 
 // TODO: Tab "\t" can cause the fmt.Println(")" bug?
@@ -103,7 +107,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<HOC.Root tag="pre" id={id} className={`language-${extension}`} {...attrs.disableAutoCorrect}>
+		<Root tag="pre" id={id} className={`language-${extension}`} {...attrs.disableAutoCorrect}>
 			<code style={{ display: "inline-block", minWidth: "100%" }}>
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
@@ -129,19 +133,19 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					</Markdown>
 				</PreEdge>
 			</code>
-		</HOC.Root>
+		</Root>
 	)
 })
 
 // TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<HOC.Node tag={tag} id={id}>
+	<Node tag={tag} id={id}>
 		<Markdown style={{ display: "none" }} syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</HOC.Node>
+	</Node>
 ))
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
@@ -149,7 +153,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const ref = React.useRef()
 
 	return (
-		<HOC.Node tag={tag} id={id} style={{ position: "relative" }}>
+		<Node tag={tag} id={id} style={{ position: "relative" }}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
 				<div style={{ position: "absolute" }} /* contentEditable={false} */>
 					<input
@@ -168,13 +172,13 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 					)}
 				</IfWrapper>
 			</Markdown>
-		</HOC.Node>
+		</Node>
 	)
 })
 
 // NOTE: <AnyList> computes recursed
 export const AnyList = React.memo(({ type, tag, id, children: range, recursed }) => {
-	const Element = !recursed ? HOC.Root : HOC.Node
+	const Element = !recursed ? Root : Node
 	return (
 		// TODO
 		<Element tag={tag} id={id}>
@@ -193,7 +197,7 @@ export const AnyList = React.memo(({ type, tag, id, children: range, recursed })
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
-		<HOC.Root tag="figure" id={id}>
+		<Root tag="figure" id={id}>
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* TODO */}
 				<img style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
@@ -207,7 +211,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 					</Markdown>
 				</figcaption>
 			)}
-		</HOC.Root>
+		</Root>
 	)
 })
 
@@ -223,9 +227,9 @@ const backgroundImage = "linear-gradient(" +
 // FIXME
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
-	<HOC.Root id={id} className="text-right" style={{ backgroundImage }}>
+	<Root id={id} className="text-right" style={{ backgroundImage }}>
 		<Markdown style={{ display: "none" }} syntax={syntax}>
 			<br />
 		</Markdown>
-	</HOC.Root>
+	</Root>
 ))

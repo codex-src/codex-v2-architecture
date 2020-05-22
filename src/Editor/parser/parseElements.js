@@ -63,6 +63,7 @@ function parseElements(nodes, cachedElements) {
 			break
 		// <Blockquote>
 		case ">":
+			// if (testElements.BlockquoteEdge(each)) {
 			if (testElements.Blockquote(each)) {
 				let x2 = x1
 				x2++

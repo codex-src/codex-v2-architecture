@@ -33,12 +33,12 @@
 	padding-left: 1.5em;
 	box-shadow: inset 0.25em 0 var(--gray-300);
 }
-.codex-editor blockquote li {
+.codex-editor blockquote > li {
 	list-style: none;
-	color: var(--text-gray-600);
+	color: var(--gray-600);
 }
-.codex-editor blockquote .markdown {
-	margin-right: 0.5em;
+.codex-editor blockquote > li > .markdown:first-of-type {
+	letter-spacing: 0.25em;
 }
 
 .codex-editor pre {
@@ -63,5 +63,5 @@
 	padding-bottom: 0.5em;
 	font-size: 0.875em;
 	text-align: center;
-	color: var(--text-gray-600);
+	color: var(--gray-600);
 }

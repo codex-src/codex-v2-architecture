@@ -10,7 +10,7 @@
 }
 .codex-editor pre > code,
 .codex-editor :not(pre) > code {
-	font: 0.875em/1.375 "iA Writer Mono var", monospace;
+	font: 0.875em/1.3125 "iA Writer Mono var", monospace;
 	-moz-tab-size: 2;
 	tab-size: 2;
 }
@@ -21,3 +21,8 @@
 .codex-editor .markdown {
 	color: var(--md-blue-a400);
 }
+/* .codex-editor .markdown[data-codex-syntax="*"], */
+/* .codex-editor .markdown[data-codex-syntax="**"], */
+/* .codex-editor .markdown[data-codex-syntax="***"] { */
+/* 	font-family: "iA Writer Mono var", monospace; */
+/* } */
