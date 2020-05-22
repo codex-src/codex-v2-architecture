@@ -19,6 +19,7 @@ function getPreformattedMetadata(node) {
 	const info = node.data.slice(3)
 	const metadata = {
 		info,
+		// TODO: Add support for "jsx {6-8}"
 		extension: info.split(".").slice(-1)[0].toLowerCase(),
 	}
 	return metadata
@@ -28,13 +29,13 @@ function getPreformattedMetadata(node) {
 // *id
 // *children
 const emitElements = {
-	// +tag (needed for cmap)
+	// +tag
 	// +syntax
 	Header(node) {
 		const metadata = getHeaderInfo(node)
 		const element = {
 			type: typeEnum.Header,
-			tag: metadata.tag, // cmap
+			tag: metadata.tag,
 			id: node.id,
 			syntax: [metadata.syntax],
 			children: parseInlineElements(node.data.slice(metadata.syntax.length)),
@@ -102,12 +103,12 @@ const emitElements = {
 		return element
 	},
 	// +syntax
-	// -children
 	Break(node) {
 		const element = {
 			type: typeEnum.Break,
 			id: node.id,
 			syntax: [node.data],
+			children: null,
 		}
 		return element
 	},
