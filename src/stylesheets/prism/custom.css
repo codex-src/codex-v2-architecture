@@ -1,5 +1,14 @@
 /* https://k88hudson.github.io/syntax-highlighting-theme-generator/www */
 
+pre[class*="language-"] {
+	color: #5c6e74;
+	/* background-color: #f8f5ec; */
+}
+
+.namespace {
+	opacity: .7;
+}
+
 .token.comment,
 .token.prolog,
 .token.doctype,
@@ -36,7 +45,7 @@
 .language-css .token.string,
 .style .token.string {
 	color: #a67f59;
-	/* background: #ffffff; */
+	/* background-color: #ffffff; */
 }
 
 .token.atrule,
@@ -55,10 +64,10 @@
 	color: #ee9900;
 }
 
-/* .token.important, */
-/* .token.bold { */
-/* 	font-weight: bold; */
-/* } */
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
 
 .token.italic {
 	font-style: italic;

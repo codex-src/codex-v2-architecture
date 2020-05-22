@@ -1,0 +1,90 @@
+/* https://github.com/SaraVieira/prism-theme-night-owl/blob/master/light.css */
+
+pre[class*="language-"] {
+	color: #403f53;
+	background-color: #fbfbfb;
+}
+
+.token.comment,
+.token.prolog,
+.token.cdata {
+	color: rgb(152, 159, 177);
+	/* font-style: italic; */
+}
+
+.token.punctuation {
+	color: rgb(153, 76, 195);
+}
+
+.namespace {
+	color: rgb(12, 150, 155);
+}
+
+.token.deleted {
+	color: rgba(239, 83, 80, 0.56);
+	/* font-style: italic; */
+}
+
+.token.symbol,
+.token.operator,
+.token.keyword,
+.token.property {
+	color: rgb(12, 150, 155);
+}
+
+.token.tag {
+	color: rgb(153, 76, 195);
+}
+
+.token.boolean {
+	color: rgb(188, 84, 84);
+}
+
+.token.number {
+	color: rgb(170, 9, 130);
+}
+
+.token.constant,
+.token.builtin,
+.token.string,
+.token.url,
+.token.entity,
+.language-css .token.string,
+.style .token.string,
+.token.char {
+	color: rgb(72, 118, 214);
+}
+
+.token.selector,
+.token.function,
+.token.doctype {
+	color: rgb(153, 76, 195);
+	/* font-style: italic; */
+}
+
+.token.attr-name,
+.token.inserted {
+	color: rgb(72, 118, 214);
+	/* font-style: italic; */
+}
+
+.token.class-name,
+.token.atrule,
+.token.attr-value {
+	color: rgb(17, 17, 17);
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+	color: rgb(201, 103, 101);
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+
+.token.italic {
+	/* font-style: italic; */
+}
