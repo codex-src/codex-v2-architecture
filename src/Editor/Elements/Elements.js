@@ -68,6 +68,12 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</HOC.Root>
 ))
 
+// TODO: Tab "\t" can cause the fmt.Println(")" bug?
+//
+// -> \tfmt.Println()<cursor>
+// -> \tfmt.Println(<cursor>)
+// -> \tfmt.Println(")"<cursor>
+//
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
