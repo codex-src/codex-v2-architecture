@@ -7,6 +7,7 @@ import prismMap from "lib/prismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
+import { Strikethrough } from "./InlineElements"
 
 // Converts a parsed data structure (children) to renderable
 // React components.
@@ -149,13 +150,11 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const ref = React.useRef()
 
 	return (
-		// TODO
-		<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
+		// TODO: Reuse <Strikethrough> here? And remove my-1
+		<HOC.Node tag={tag} id={id} className="my-1" style={{ position: "relative" }} data-codex-checked={checked}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
-				{/* TODO: Change absolute to style={{ position: "absolute" }} */}
-				<div className="absolute">
+				<div style={{ position: "absolute" }}>
 					<input
-						className="form-checkbox"
 						type="checkbox"
 						checked={checked}
 						onChange={() => {
@@ -164,20 +163,22 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 						}}
 					/>
 				</div>
-				{toReact(children) || (
-					<br />
-				)}
+				<IfWrapper cond={checked} wrapper={({ children }) => <Strikethrough>{children}</Strikethrough>}>
+					{toReact(children) || (
+						<br />
+					)}
+				</IfWrapper>
 			</Markdown>
 		</HOC.Node>
 	)
 })
 
-// NOTE: Computes recursed
+// NOTE: <AnyList> computes recursed
 export const AnyList = React.memo(({ type, tag, id, children: range, recursed }) => {
-	const Parent = !recursed ? HOC.Root : HOC.Node
+	const Element = !recursed ? HOC.Root : HOC.Node
 	return (
 		// TODO
-		<Parent tag={tag} id={id} className="ml-6">
+		<Element tag={tag} id={id}>
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
@@ -185,7 +186,7 @@ export const AnyList = React.memo(({ type, tag, id, children: range, recursed })
 					...each,
 				})
 			))}
-		</Parent>
+		</Element>
 	)
 })
 
@@ -220,6 +221,7 @@ const backgroundImage = "linear-gradient(" +
 	"transparent calc(0.75em + 2px)" +
 ")"
 
+// FIXME
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
 	<HOC.Root id={id} className="text-right" style={{ backgroundImage }}>
