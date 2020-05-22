@@ -6,7 +6,7 @@
 	margin-left: -1.5em;
 	position: absolute;
 	content: "• ";
-	color: var(--md-blue-a200);
+	color: var(--md-blue-a400);
 }
 
 .codex-editor ol li {
@@ -22,7 +22,7 @@
 	counter-increment: count;
 	content: counter(count) ". ";
 	font-feature-settings: "tnum";
-	color: var(--md-blue-a200);
+	color: var(--md-blue-a400);
 }
 
 .codex-editor ul li input[type="checkbox"],

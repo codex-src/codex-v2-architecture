@@ -18,7 +18,7 @@ import useStatusBars from "./useStatusBars"
 import useTitleAndEmoji from "./useTitleAndEmoji"
 import { toText } from "Editor/Elements/cmap"
 
-document.body.classList.toggle("debug-css")
+// document.body.classList.toggle("debug-css")
 
 // https://reactjs.org/docs/error-boundaries.html#introducing-error-boundaries
 class ErrorBoundary extends React.Component {

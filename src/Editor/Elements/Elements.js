@@ -135,7 +135,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 // TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
 	<HOC.Node tag={tag} id={id}>
-		<Markdown style={{ display: "hidden" }} syntax={syntax}>
+		<Markdown style={{ display: "none" }} syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -151,7 +151,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	return (
 		// TODO
 		<HOC.Node tag={tag} id={id} className="my-1 relative" data-codex-checked={checked}>
-			<Markdown style={{ display: "hidden" }} syntax={syntax}>
+			<Markdown style={{ display: "none" }} syntax={syntax}>
 				{/* TODO: Change absolute to style={{ position: "absolute" }} */}
 				<div className="absolute">
 					<input
@@ -223,7 +223,7 @@ const backgroundImage = "linear-gradient(" +
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
 	<HOC.Root id={id} className="text-right" style={{ backgroundImage }}>
-		<Markdown style={{ display: "hidden" }} syntax={syntax}>
+		<Markdown style={{ display: "none" }} syntax={syntax}>
 			<br />
 		</Markdown>
 	</HOC.Root>
