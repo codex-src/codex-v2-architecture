@@ -51,7 +51,6 @@ function computeEndSyntaxOffset({ type, syntax, substr }) {
 
 // Parses a GitHub Flavored Markdown inline element.
 function parseInlineElement({ type, syntax, substr }) {
-	// Matches cannot be empty:
 	const offset = computeEndSyntaxOffset({ type, syntax, substr })
 	if (offset <= syntax.length) {
 		return null
@@ -103,16 +102,16 @@ function parseInlineElements(str) {
 			continue
 		}
 
-		// // Inline elements must be preceded by an ASCII
-		// // punctuation character, UTF-8 space, or BOL:
-		// if (x1 - 1 >= 0 && !isASCIIPunctuationOrUTF8Space(str[x1 - 1])) {
-		// 	if (!elements.length || typeof elements[elements.length - 1] !== "string") {
-		// 		elements.push(char)
-		// 		continue
-		// 	}
-		// 	elements[elements.length - 1] += char
-		// 	continue
-		// }
+		// Inline elements must be preceded by an ASCII
+		// punctuation character, UTF-8 space, or BOL:
+		if (x1 - 1 >= 0 && str[x1 - 1] <= "\u007f" && !isASCIIPunctuationOrUTF8Space(str[x1 - 1])) {
+			if (!elements.length || typeof elements[elements.length - 1] !== "string") {
+				elements.push(char)
+				continue
+			}
+			elements[elements.length - 1] += char
+			continue
+		}
 
 		const substr = str.slice(x1)
 		switch (char) {

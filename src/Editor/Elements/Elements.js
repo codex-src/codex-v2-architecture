@@ -146,18 +146,18 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
-	// const ref = React.useRef()
+	const ref = React.useRef()
 
 	return (
 		<HOC.Node tag={tag} id={id} style={{ position: "relative" }}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
 				<div style={{ position: "absolute" }} /* contentEditable={false} */>
 					<input
-						// ref={ref}
+						ref={ref}
 						type="checkbox"
 						checked={checked}
 						onChange={() => {
-							// ref.current.focus()
+							ref.current.focus()
 							checkTodo(id)
 						}}
 					/>

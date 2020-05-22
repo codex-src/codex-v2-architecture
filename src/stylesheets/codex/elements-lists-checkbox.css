@@ -32,6 +32,9 @@
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   transition-duration: 75ms;
+
+	/* @apply cursor-pointer */
+	cursor: pointer;
 }
 
 .codex-editor ul li input[type="checkbox"]:checked,

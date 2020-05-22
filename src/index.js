@@ -8,7 +8,7 @@ import "stylesheets/material-design/color-vars.css"
 import "stylesheets/tailwind/color-vars.css"
 
 import "stylesheets/codex/core.css"
-import "stylesheets/codex/elements-checkbox.css"
+import "stylesheets/codex/elements-lists-checkbox.css"
 import "stylesheets/codex/elements-lists.css"
 import "stylesheets/codex/elements.css"
 import "stylesheets/codex/inline-elements.css"
