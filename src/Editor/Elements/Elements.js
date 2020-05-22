@@ -144,17 +144,16 @@ export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) =
 	</HOC.Node>
 ))
 
-// style={checked && attrs.strike.style}
 export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
-	const ref = React.useRef()
+	// const ref = React.useRef()
 
 	return (
-		// TODO: Reuse <Strikethrough> here? And remove my-1
-		<HOC.Node tag={tag} id={id} className="my-1" style={{ position: "relative" }} data-codex-checked={checked}>
+		<HOC.Node tag={tag} id={id} style={{ position: "relative" }}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
 				<div style={{ position: "absolute" }} /* contentEditable={false} */>
 					<input
+						// ref={ref}
 						type="checkbox"
 						checked={checked}
 						onChange={() => {

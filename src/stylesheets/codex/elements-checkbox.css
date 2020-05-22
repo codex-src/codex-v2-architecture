@@ -50,4 +50,10 @@
 .codex-editor ul li input[type="checkbox"]:focus,
 .codex-editor ol li input[type="checkbox"]:focus {
 	outline: none;
+
+	/* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
+	/* border-color: #63b3ed; */
+
+	box-shadow: 0 0 0 0.1875em rgba(164, 202, 254, 0.45);
+	border-color: #a4cafe;
 }

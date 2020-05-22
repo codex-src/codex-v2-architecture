@@ -2,11 +2,12 @@
 .codex-editor ol {
 	margin-left: 1.5em;
 }
-
-.codex-editor ul li {
+.codex-editor ul li,
+.codex-editor ol li, {
 	margin-top: 0.25em;
 	margin-bottom: 0.25em;
 }
+
 .codex-editor ul li:before {
 	margin-left: -1.5em;
 	position: absolute;
@@ -14,10 +15,6 @@
 	color: var(--md-blue-a400);
 }
 
-.codex-editor ol li {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
-}
 .codex-editor ol li:first-of-type {
 	counter-reset: count;
 }

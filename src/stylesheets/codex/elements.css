@@ -49,10 +49,6 @@
 	overflow-x: scroll;
 	-webkit-overflow-scrolling: touch;
 }
-.codex-editor pre code {
-	font-size: 0.875em;
-	line-height: 1.375;
-}
 
 .codex-editor figure img,
 .codex-editor figure a img { /* FIXME */
