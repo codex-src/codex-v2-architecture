@@ -297,6 +297,11 @@ const Editor = ({
 				}),
 
 				onInput: newReadWriteHandler(e => {
+					if (e.target && e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
+						// No-op
+						return
+					}
+
 					if (!ref.current.children.length) {
 						dispatch.render()
 						return

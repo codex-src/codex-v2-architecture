@@ -1,6 +1,18 @@
 import { ascendRoot } from "./ascenders"
 import { newPos } from "./constructors"
 
+// // Returns whether a node is a hidden node.
+// function isHiddenNode(node) {
+// 	if (node.nodeType === Node.TEXT_NODE) {
+// 		return isHiddenNode(node.parentElement)
+// 	}
+// 	const ok = (
+// 		node.nodeType === Node.ELEMENT_NODE &&
+// 		node.style.display === "none"
+// 	)
+// 	return ok
+// }
+
 // Computes a cursor data structure from the DOM.
 function computeDOMPos(root, { node, offset }) {
 	// Iterate to the deepest node:

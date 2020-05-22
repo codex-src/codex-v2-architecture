@@ -153,7 +153,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 		// TODO: Reuse <Strikethrough> here? And remove my-1
 		<HOC.Node tag={tag} id={id} className="my-1" style={{ position: "relative" }} data-codex-checked={checked}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
-				<div style={{ position: "absolute" }}>
+				<div style={{ position: "absolute" }} /* contentEditable={false} */>
 					<input
 						type="checkbox"
 						checked={checked}
