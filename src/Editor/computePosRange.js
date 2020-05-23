@@ -13,6 +13,23 @@ import { newPos } from "./constructors"
 // 	return ok
 // }
 
+// FIXME
+//
+// console.log(node, offset)
+//
+// // while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
+// // 	node = node.childNodes[offset]
+// // 	offset = 0
+// // }
+//
+// //	// Iterate to the deepest text node:
+// //	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
+// //		node = node.childNodes[offset]
+// //		offset = 0
+// //
+// //		console.log({ node, offset })
+// //	}
+
 // Computes a cursor data structure from the DOM.
 function computeDOMPos(root, { node, offset }) {
 	// Iterate to the deepest node:

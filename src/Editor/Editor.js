@@ -300,6 +300,7 @@ const Editor = ({
 						dispatch.render()
 						return
 					}
+
 					// Dedupe "compositionend":
 					//
 					// https://github.com/w3c/uievents/issues/202#issue-316461024
@@ -307,6 +308,7 @@ const Editor = ({
 						dedupedCompositionEnd.current = false
 						return
 					}
+
 					const nodes = computeNodes(state.extPosRange)
 					const [pos1, pos2] = computePosRange(state)
 					dispatch.input(nodes, [pos1, pos2])

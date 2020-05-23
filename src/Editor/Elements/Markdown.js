@@ -25,7 +25,7 @@ const Syntax = ({ className, ...props }) => {
 	if (!props.children || readOnly) {
 		return null
 	}
-	return <span className={`markdown ${className || ""}`.trim()} data-codex-syntax={props.children} {...props} />
+	return <span className={`markdown ${className || ""}`.trim()} {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {

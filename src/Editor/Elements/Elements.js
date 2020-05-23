@@ -77,6 +77,7 @@ const Pre = props => (
 	<Node style={{ whiteSpace: "pre" }} {...props} />
 )
 const PreEdge = props => (
+	// TODO: Extract line-height: 1 to CSS
 	<Node style={{ whiteSpace: "pre", lineHeight: 1 }} {...props} />
 )
 
@@ -155,7 +156,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	return (
 		<Node tag={tag} id={id} style={{ position: "relative" }}>
 			<Markdown style={{ display: "none" }} syntax={syntax}>
-				<div style={{ position: "absolute" }} /* contentEditable={false} */>
+				<div style={{ position: "absolute" }}>
 					<input
 						ref={ref}
 						type="checkbox"
