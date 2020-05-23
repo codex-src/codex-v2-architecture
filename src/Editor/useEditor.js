@@ -26,7 +26,7 @@ function newEditorState(data) {
 	const nodes = newNodes(data)
 	const [pos1, pos2] = [newPos(), newPos()]
 	const initialState = { data, nodes, pos1, pos2 }
-	const cachedElements = new LRUCache(100)
+	const cachedElements = new LRUCache(500)
 	const editorState = {
 		readOnly: false,                                  // Is read-only?
 		focused: false,                                   // Is focused?
@@ -380,10 +380,21 @@ const methods = state => ({
 	 */
 	render() {
 
-		const data = state.nodes.map(each => each.data).join("\n")
+		let t = Date.now()
 
-		const elements = state.elements
+		let data = ""
+		for (let x = 0, len = state.nodes.length; x < len; x++) {
+			data += state.nodes[x].data
+		}
+
+		console.log("state.nodes.map.join", Date.now() - t)
+		t = Date.now()
+
+		// const elements = state.elements
+
 		const nextElements = parseElements(state.nodes, state.cachedElements)
+		console.log("parseElements", Date.now() - t)
+		t = Date.now()
 
 		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
 
@@ -392,10 +403,10 @@ const methods = state => ({
 		if (selection && selection.rangeCount) {
 			const range = selection.getRangeAt(0)
 			const root = ascendRoot(range.startContainer)
-			console.log(root)
+			// console.log(root)
 			id = root.id
 		}
-		console.log(id)
+		// console.log(id)
 
 		// const { id } = state.nodes[state.pos1.y]
 		const nextElement = nextElements.find(each => each.id === id)

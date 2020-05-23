@@ -236,7 +236,7 @@ const EditorApp = () => {
 						)}
 
 						{/* Editor */}
-						<ErrorBoundary>
+						{/* <ErrorBoundary> */}
 							<Editor
 								style={{
 									paddingBottom: `calc(100vh - 128px - ${prefs.fontSize * 1.5}px)`,
@@ -250,7 +250,7 @@ const EditorApp = () => {
 								readOnly={prefs.readOnly}
 								autoFocus={!data}
 							/>
-						</ErrorBoundary>
+						{/* </ErrorBoundary> */}
 
 					</div>
 				</DocumentTitleAndEmoji>

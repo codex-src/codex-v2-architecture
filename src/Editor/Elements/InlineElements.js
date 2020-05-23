@@ -58,34 +58,10 @@ export const Strikethrough = ({ syntax, children }) => (
 	</strike>
 )
 
-// TODO: Add <NakedAnchor>
-export const Anchor = ({ syntax, href, children }) => {
-	// const ref = React.useRef()
-	//
-	// const [show, setShow] = React.useState(false)
-	//
-	// React.useEffect(() => {
-	// 	const handleSelectionChange = () => {
-	// 		const selection = document.getSelection()
-	// 		if (!selection || !selection.rangeCount) {
-	// 			// No-op
-	// 			return
-	// 		}
-	// 		const range = selection.getRangeAt(0)
-	// 		// setShow(range.collapsed && ref.current.contains(range.startContainer))
-	// 		setShow(ref.current.contains(range.commonAncestorContainer) || range.commonAncestorContainer.contains(ref.current))
-	// 	}
-	// 	document.addEventListener("selectionchange", handleSelectionChange)
-	// 	return () => {
-	// 		document.removeEventListener("selectionchange", handleSelectionChange)
-	// 	}
-	// }, [])
-
-	return (
-		<a /* ref={ref} */ href={href} {...attrs.a} onClick={() => console.log("test")}>
-			<Markdown /* style={{ display: !show ? "none" : null }} */ syntax={!children || syntax} {...attrs.disableAutoCorrect}>
-				{children || syntax}
-			</Markdown>
-		</a>
-	)
-}
+export const Anchor = ({ syntax, href, children }) => (
+	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
+		<Markdown syntax={!children || syntax} {...attrs.disableAutoCorrect}>
+			{children || syntax}
+		</Markdown>
+	</a>
+)

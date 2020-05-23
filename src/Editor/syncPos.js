@@ -44,35 +44,66 @@ function computeDOMRange(root, pos) {
 // Computes a meta DOM cursor; uses VDOM and DOM to compute.
 function computeMetaRange(editorState, pos) {
 	let id = ""
-	for (const each of editorState.nodes) {
+	for (const each of editorState.nodes) { // FIXME
 		if (pos - each.data.length <= 0) {
 			id = each.id
 			break
 		}
-		pos -= (each.data + "\n").length
+		pos -= (each.data + "\n").length // FIXME
 	}
 	const node = document.getElementById(id)
 	if (!id || !node) {
-		throw new Error(`computeMetaRange: could not query node (id=${id || "\"\""}`)
+		throw new Error(`computeMetaRange: could not query node (id=${id || "\"\""})`)
 	}
 	return computeDOMRange(node, pos)
 }
 
 // Synchronizes DOM cursors.
-function syncPos(editorState, [pos1, pos2]) {
-	const selection = document.getSelection()
-	if (!selection || selection.rangeCount) {
-		throw new Error("syncPos: selection exists when it should not")
-	}
-	const range1 = computeMetaRange(editorState, pos1.pos)
+function syncPos(selection, editorState) {
+	let t = Date.now()
+
+	// const selection = document.getSelection()
+	// if (!selection || selection.rangeCount) {
+	// 	throw new Error("syncPos: selection exists when it should not")
+	// }
+
+	console.log("b", Date.now() - t)
+	t = Date.now()
+
+	const range1 = computeMetaRange(editorState, editorState.pos1.pos)
+
+	console.log("c", Date.now() - t)
+	t = Date.now()
+
 	let range2 = { ...range1 }
 	if (!editorState.collapsed) {
-		range2 = computeMetaRange(editorState, pos2.pos)
+		range2 = computeMetaRange(editorState, editorState.pos2.pos)
+
+		console.log("d", Date.now() - t)
+		t = Date.now()
+
 	}
+
+	console.log("e", Date.now() - t)
+	t = Date.now()
+
 	const range = document.createRange()
 	range.setStart(range1.node, range1.offset)
+
+	console.log("f", Date.now() - t)
+	t = Date.now()
+
 	range.setEnd(range2.node, range2.offset)
+
+
+	console.log("g", Date.now() - t)
+	t = Date.now()
+
+	selection.removeAllRanges()
 	selection.addRange(range)
+
+	console.log("h", Date.now() - t)
+	t = Date.now()
 }
 
 export default syncPos

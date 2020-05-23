@@ -15,6 +15,9 @@ import { Strikethrough } from "./InlineElements"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
+		console.log({ children })
+
+		// return children
 		return !children ? null : <span key={Math.random().toString(16).substr(2, 4)}>{children}</span>
 	}
 	const components = []
@@ -97,7 +100,7 @@ const PreEdge = props => (
 )
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
-	const [{ readOnly }] = useEditorState()
+	// const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
@@ -120,9 +123,9 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
-						{readOnly && (
-							<br />
-						)}
+						{/* {readOnly && ( */}
+						{/* 	<br /> */}
+						{/* )} */}
 					</Markdown>
 				</PreEdge>
 				{$range.map(each => (
@@ -135,9 +138,9 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				))}
 				<PreEdge id={range[range.length - 1].id}>
 					<Markdown syntax={[syntax[1]]}>
-						{readOnly && (
-							<br />
-						)}
+						{/* {readOnly && (} */}
+						{/* 	<br />} */}
+						{/* )}} */}
 					</Markdown>
 				</PreEdge>
 			</code>
@@ -145,7 +148,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	)
 })
 
-export const AnyListItem = React.memo(({ id, syntax, ordered, children }) => (
+export const AnyListItem = ({ id, syntax, ordered, children }) => (
 	<li id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
@@ -153,13 +156,15 @@ export const AnyListItem = React.memo(({ id, syntax, ordered, children }) => (
 			)}
 		</Markdown>
 	</li>
-))
+)
 
+// TODO: Add markdown to CSS to prevent useless rerenders
 export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
 
-	return (
+	// https://github.com/facebook/react/issues/15156#issuecomment-474590693
+	return React.useMemo(() => (
 		<li id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use contentEditable={false} to prevent
@@ -195,7 +200,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 				</IfWrapper>
 			</Markdown>
 		</li>
-	)
+	), [checkTodo])
 })
 
 export const AnyList = React.memo(({ type, tag: Tag, id, children: range }) => (
@@ -209,16 +214,15 @@ export const AnyList = React.memo(({ type, tag: Tag, id, children: range }) => (
 	</Tag>
 ))
 
+// TODO: Can we reuse <Anchor> here? Do we want to?
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
-	const [{ readOnly }] = useEditorState()
+	// const [{ readOnly }] = useEditorState()
 	return (
 		<figure id={id}>
-			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
-				{/* TODO */}
-				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
-			</IfWrapper>
-			{(!readOnly || (readOnly && children)) && (
-				// TODO: Can we reuse <Anchor> here? Do we want to?
+			{/* <IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}> */}
+			<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
+			{/* </IfWrapper> */}
+			{/* {(!readOnly || (readOnly && children)) && ( */}
 				<figcaption className="px-6 py-2 text-center text-sm text-gray-600">
 					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
@@ -226,7 +230,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 						)}
 					</Markdown>
 				</figcaption>
-			)}
+			{/* )} */}
 		</figure>
 	)
 })

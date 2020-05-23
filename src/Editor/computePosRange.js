@@ -99,7 +99,7 @@ function computeMetaPos(editorState, { node, offset }) {
 function computePosRange(editorState) {
 	const selection = document.getSelection()
 	if (!selection || !selection.rangeCount) {
-		throw new Error("computePosRange: selection does not exists when it should")
+		throw new Error("computePosRange: selection does not exist when it should")
 	}
 	const range = selection.getRangeAt(0)
 	const pos1 = computeMetaPos(editorState, { node: range.startContainer, offset: range.startOffset })

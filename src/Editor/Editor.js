@@ -85,21 +85,33 @@ const Editor = ({
 	// Renders VDOM to the DOM.
 	React.useLayoutEffect(
 		React.useCallback(() => {
+
+
 			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
 				selection.removeAllRanges()
 			}
+
+			let t = Date.now()
+
 			ReactDOM.render(<ReactElements state={state} dispatch={dispatch} />, ref.current, () => {
+
+				console.log("ReactDOM.render", Date.now() - t)
+				t = Date.now()
+
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
 				}
+
 				try {
-					syncPos(state, [state.pos1, state.pos2])
+					syncPos(selection, state)
+					console.log("syncPos", Date.now() - t)
 				} catch (error) {
 					console.error(error)
 				}
+
 				// setTimeout(() => {
 				// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
 				// 	if (!computed || !computed.offset) {
