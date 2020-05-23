@@ -45,13 +45,12 @@
 	margin-left: -1.75em;
 }
 
-/* .codex-editor pre > code > div:nth-of-type(2) { */
 .codex-editor pre > code > div:nth-of-type(2) {
 	counter-reset: count;
 }
-/* https://stackoverflow.com/a/15604013 */
 .codex-editor pre > code > div:before {
-	margin-right: 1.5em;
+	/* NOTE: Use > 2ch because of tabs */
+	margin-right: 2.01ch;
 	display: inline-block;
 	/* width: var(--width); */
 	width: 2ch;
@@ -65,15 +64,3 @@
 .codex-editor pre > code > div:last-child:before {
 	content: " ";
 }
-
-/* .codex-editor pre > code > div:first-of-type { */
-/* 	counter-reset: count; */
-/* } */
-/* .codex-editor pre > code > div:before { */
-/* 	margin-left: -1em; */
-/* 	position: absolute; */
-/* 	content: counter(count) ". "; */
-/* 	counter-increment: count; */
-/* 	font-feature-settings: "tnum"; */
-/* 	color: var(--gray-400); */
-/* } */
