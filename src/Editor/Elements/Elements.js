@@ -9,10 +9,7 @@ import typeEnumArray from "./typeEnumArray"
 import useEditorState from "../useEditorState"
 import { Strikethrough } from "./InlineElements"
 
-import {
-	Node,
-	Root,
-} from "./HOC"
+// TODO: Return tags for all elements and inline elements?
 
 // Converts a parsed data structure (children) to renderable
 // React components.
@@ -44,52 +41,59 @@ const headerClassNames = {
 	h6: dedupeSpaces("font-semibold text-xl  leading-tight antialiased"),
 }
 
-export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root tag={tag} id={id} className={headerClassNames[tag]}>
+export const Header = React.memo(({ tag: Tag, id, syntax, hash, children }) => (
+	<Tag id={id} className={headerClassNames[Tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Root>
+	</Tag>
 ))
 
 export const Paragraph = React.memo(({ id, children }) => (
-	<Root tag="p" id={id}>
+	<p id={id}>
 		{toReact(children) || (
 			<br />
 		)}
-	</Root>
+	</p>
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node tag="li" id={id} className="list-none text-gray-600">
+	<li id={id} className="list-none text-gray-600">
 		<Markdown style={{ letterSpacing: "0.25em" }} syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Node>
+	</li>
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root tag="blockquote" id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+	<blockquote id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
 				...each,
 			})
 		))}
-	</Root>
+	</blockquote>
 ))
 
-// NOTE: Use style={{ whiteSpace: "pre" }} not className
-// because of <Node>
+// // NOTE: Use style={{ whiteSpace: "pre" }} not className
+// // because of <Node>
+// const Pre = props => (
+// 	<Node style={{ whiteSpace: "pre" }} {...props} />
+// )
+// const PreEdge = props => (
+// 	<Node className="leading-none" style={{ whiteSpace: "pre" }} {...props} />
+// )
+
 const Pre = props => (
-	<Node style={{ whiteSpace: "pre" }} {...props} />
+	<div className="whitespace-pre" {...props} />
 )
 const PreEdge = props => (
-	<Node className="leading-none" style={{ whiteSpace: "pre" }} {...props} />
+	<div className="whitespace-pre leading-none" {...props} />
 )
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
@@ -112,7 +116,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root tag="pre" id={id} className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+		<pre id={id} className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
@@ -122,16 +126,12 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					</Markdown>
 				</PreEdge>
 				{$range.map(each => (
-					<Pre
-						key={each.id}
-						id={each.id}
-						// style={{ "--width": String(range.length).length + "ch" }}
-						dangerouslySetInnerHTML={{
-							__html: each.data || (
-								"<br />"
-							),
-						}}
-					/>
+					// style={{ "--width": String(range.length).length + "ch" }}
+					<Pre key={each.id} id={each.id} dangerouslySetInnerHTML={{
+						__html: each.data || (
+							"<br />"
+						),
+					}} />
 				))}
 				<PreEdge id={range[range.length - 1].id}>
 					<Markdown syntax={[syntax[1]]}>
@@ -141,27 +141,27 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					</Markdown>
 				</PreEdge>
 			</code>
-		</Root>
+		</pre>
 	)
 })
 
 // TODO: Extract <AnyList>
-export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
+export const AnyListItem = React.memo(({ tag: Tag, id, syntax, ordered, children }) => (
+	<Tag id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Node>
+	</Tag>
 ))
 
-export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
+export const TodoItem = React.memo(({ tag: Tag, id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
 
 	return (
-		<Node tag={tag} id={id} className="relative my-1" data-codex-checked={checked}>
+		<Tag id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
 					<input
@@ -193,31 +193,25 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 					)}
 				</IfWrapper>
 			</Markdown>
-		</Node>
+		</Tag>
 	)
 })
 
-// NOTE: <AnyList> computes recursed
-export const AnyList = React.memo(({ type, tag, id, children: range, recursed }) => {
-	const Element = !recursed ? Root : Node
-	return (
-		// TODO
-		<Element tag={tag} id={id} className="ml-6">
-			{range.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumArray[T], {
-					key: each.id,
-					recursed: true,
-					...each,
-				})
-			))}
-		</Element>
-	)
-})
+export const AnyList = React.memo(({ type, tag: Tag, id, children: range }) => (
+	<Tag id={id} className="ml-6">
+		{range.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumArray[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</Tag>
+))
 
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
-		<Root tag="figure" id={id}>
+		<figure id={id}>
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* TODO */}
 				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
@@ -232,7 +226,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 					</Markdown>
 				</figcaption>
 			)}
-		</Root>
+		</figure>
 	)
 })
 
@@ -248,9 +242,9 @@ const backgroundImage = "linear-gradient(" +
 // FIXME
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
-	<Root id={id} className="text-right" style={{ backgroundImage }}>
+	<div id={id} className="text-right" style={{ backgroundImage }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>
-	</Root>
+	</div>
 ))
