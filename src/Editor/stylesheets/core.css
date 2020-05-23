@@ -35,8 +35,8 @@
 .codex-editor [data-codex-ordered="true"]:before {
 	margin-left: -1.5em;
 	position: absolute;
-	counter-increment: count;
 	content: counter(count) ". ";
+	counter-increment: count;
 	font-feature-settings: "tnum";
 	color: var(--md-blue-a400);
 }
@@ -44,3 +44,36 @@
 .codex-editor [data-codex-checked] input[type="checkbox"] {
 	margin-left: -1.75em;
 }
+
+/* .codex-editor pre > code > div:nth-of-type(2) { */
+.codex-editor pre > code > div:nth-of-type(2) {
+	counter-reset: count;
+}
+/* https://stackoverflow.com/a/15604013 */
+.codex-editor pre > code > div:before {
+	margin-right: 1.5em;
+	display: inline-block;
+	/* width: var(--width); */
+	width: 2ch;
+	text-align: right;
+	font-size: 0.875em;
+	content: counter(count);
+	counter-increment: count;
+	color: var(--gray-400);
+}
+.codex-editor pre > code > div:first-child:before,
+.codex-editor pre > code > div:last-child:before {
+	content: " ";
+}
+
+/* .codex-editor pre > code > div:first-of-type { */
+/* 	counter-reset: count; */
+/* } */
+/* .codex-editor pre > code > div:before { */
+/* 	margin-left: -1em; */
+/* 	position: absolute; */
+/* 	content: counter(count) ". "; */
+/* 	counter-increment: count; */
+/* 	font-feature-settings: "tnum"; */
+/* 	color: var(--gray-400); */
+/* } */

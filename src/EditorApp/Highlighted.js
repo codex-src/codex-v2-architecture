@@ -14,9 +14,17 @@ const Highlighted = React.memo(({ extension, children }) => {
 			// No-op
 			return
 		}
+
+		const html = window.Prism.highlight(children, parser, extension)
+			// .split("\n")
+			// .map(each => `<div class="code-line">${each}</div>`)
+
+		// // Pre-computed width; width: var(--width)
+		// const width = String(String(lines.length).length) + "ch"
+
 		setHighlighted((
-			<div className={extension === undefined ? null : `language-${extension}`} dangerouslySetInnerHTML={{
-				__html: window.Prism.highlight(children, parser, extension),
+			<div className={extension === undefined ? null : `language-${extension}`} /* style={{ "--width": width }} */ dangerouslySetInnerHTML={{
+				__html: html,
 			}} />
 		))
 	}, [extension, children])

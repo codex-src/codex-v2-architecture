@@ -90,13 +90,6 @@ const PreEdge = props => (
 	<Node className="whitespace-pre leading-none" {...props} />
 )
 
-// TODO: Tab "\t" can cause the fmt.Println(")" bug?
-//
-// -> \tfmt.Println()<cursor>
-// -> \tfmt.Println(<cursor>)
-// -> \tfmt.Println(")"<cursor>
-//
-// TODO: Extract <Preformated>
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
 	const [{ readOnly }] = useEditorState()
 
@@ -117,7 +110,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root tag="pre" id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+		<Root tag="pre" id={id} className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
@@ -127,15 +120,16 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 					</Markdown>
 				</PreEdge>
 				{$range.map(each => (
-					<Pre key={each.id} id={each.id}>
-						{/* TODO: Can we put dangerouslySetInnerHTML on
-						<Pre>? */}
-						<span dangerouslySetInnerHTML={{
+					<Pre
+						key={each.id}
+						id={each.id}
+						// style={{ "--width": String(range.length).length + "ch" }}
+						dangerouslySetInnerHTML={{
 							__html: each.data || (
 								"<br />"
 							),
-						}} />
-					</Pre>
+						}}
+					/>
 				))}
 				<PreEdge id={range[range.length - 1].id}>
 					<Markdown syntax={[syntax[1]]}>
@@ -228,7 +222,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
 				// TODO: Can we reuse <Anchor> here? Do we want to?
-				<figcaption className="px-6 py-2 text-sm text-center text-gray-600">
+				<figcaption className="px-6 py-2 text-center text-sm text-gray-600">
 					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
 							<br />
