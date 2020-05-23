@@ -10,6 +10,10 @@ import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 
+import "./stylesheets/core.css"
+import "./stylesheets/form-checkbox.css"
+import "./stylesheets/theme.css"
+
 // No-ops redundant text content -- prevents spellcheck from
 // rerendering.
 //

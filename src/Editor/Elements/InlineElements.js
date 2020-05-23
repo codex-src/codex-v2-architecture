@@ -17,7 +17,7 @@ export const Emoji = ({ description, children }) => (
 )
 
 export const Emphasis = ({ syntax, children }) => (
-	<em>
+	<em className="italic">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
@@ -25,7 +25,7 @@ export const Emphasis = ({ syntax, children }) => (
 )
 
 export const Strong = ({ syntax, children }) => (
-	<strong>
+	<strong className="font-semibold">
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
@@ -33,7 +33,7 @@ export const Strong = ({ syntax, children }) => (
 )
 
 export const StrongEmphasis = ({ syntax, children }) => (
-	<strong>
+	<strong className="font-semibold italic">
 		<em>
 			<Markdown syntax={syntax}>
 				{children}
@@ -43,7 +43,7 @@ export const StrongEmphasis = ({ syntax, children }) => (
 )
 
 export const Code = ({ syntax, children }) => (
-	<code {...attrs.disableAutoCorrect}>
+	<code className="px-1 py-px text-md-blue-a400 border rounded" {...attrs.disableAutoCorrect}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
@@ -51,7 +51,7 @@ export const Code = ({ syntax, children }) => (
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<strike>
+	<strike className="line-through text-gray-500" style={{ "--md-blue-a400": "currentColor" }}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>

@@ -1,6 +1,6 @@
 /* https://tailwindcss-custom-forms.netlify.app */
-.codex-editor ul li input[type="checkbox"],
-.codex-editor ol li input[type="checkbox"] {
+
+.form-checkbox {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -16,29 +16,14 @@
 	flex-shrink: 0;
 	height: 1em;
 	width: 1em;
-	color: var(--md-blue-a200);
+	color: #4299e1;
 	background-color: #fff;
-
-	/* @apply rounded-md */
-	border-radius: 0.375em;
-
-	/* @apply shadow-hero */
-	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-
-	/* @apply transform scale-105 */
-	transform: scale(1.05);
-
-	/* @apply transition ease-out duration-75 */
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  transition-duration: 75ms;
-
-	/* @apply cursor-pointer */
-	cursor: pointer;
+	border-color: #e2e8f0;
+	border-width: 1px;
+	border-radius: 0.25rem;
 }
 
-.codex-editor ul li input[type="checkbox"]:checked,
-.codex-editor ol li input[type="checkbox"]:checked {
+.form-checkbox:checked {
 	background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
 	border-color: transparent;
 	background-color: currentColor;
@@ -50,9 +35,11 @@
 	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.codex-editor ul li input[type="checkbox"]:focus,
-.codex-editor ol li input[type="checkbox"]:focus {
+.form-checkbox:focus {
 	outline: none;
+
+	/* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
+	/* border-color: #63b3ed; */
 
 	/* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
 	/* border-color: #63b3ed; */

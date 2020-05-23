@@ -1,4 +1,5 @@
 import attrs from "./attrs"
+import dedupeSpaces from "lib/dedupeSpaces"
 import escape from "lodash/escape"
 import IfWrapper from "lib/IfWrapper"
 import Markdown from "./Markdown"
@@ -34,8 +35,17 @@ function toReact(children) {
 	return components
 }
 
+const headerClassNames = {
+	h1: dedupeSpaces("font-semibold text-3xl leading-tight antialiased"),
+	h2: dedupeSpaces("font-semibold text-2xl leading-tight antialiased"),
+	h3: dedupeSpaces("font-semibold text-xl  leading-tight antialiased"),
+	h4: dedupeSpaces("font-semibold text-xl  leading-tight antialiased"),
+	h5: dedupeSpaces("font-semibold text-xl  leading-tight antialiased"),
+	h6: dedupeSpaces("font-semibold text-xl  leading-tight antialiased"),
+}
+
 export const Header = React.memo(({ tag, id, syntax, hash, children }) => (
-	<Root tag={tag} id={id}>
+	<Root tag={tag} id={id} className={headerClassNames[tag]}>
 		<Markdown syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -53,8 +63,8 @@ export const Paragraph = React.memo(({ id, children }) => (
 ))
 
 export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
-	<Node tag="li" id={id}>
-		<Markdown syntax={syntax}>
+	<Node tag="li" id={id} className="list-none text-gray-600">
+		<Markdown style={{ letterSpacing: "0.25em" }} syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -63,7 +73,7 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 ))
 
 export const Blockquote = React.memo(({ id, children: range }) => (
-	<Root tag="blockquote" id={id}>
+	<Root tag="blockquote" id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -74,11 +84,10 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 ))
 
 const Pre = props => (
-	<Node style={{ whiteSpace: "pre" }} {...props} />
+	<Node className="whitespace-pre" {...props} />
 )
 const PreEdge = props => (
-	// TODO: Extract line-height: 1 to CSS
-	<Node style={{ whiteSpace: "pre", lineHeight: 1 }} {...props} />
+	<Node className="whitespace-pre leading-none" {...props} />
 )
 
 // TODO: Tab "\t" can cause the fmt.Println(")" bug?
@@ -108,8 +117,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<Root tag="pre" id={id} className={`language-${extension}`} {...attrs.disableAutoCorrect}>
-			<code style={{ display: "inline-block", minWidth: "100%" }}>
+		<Root tag="pre" id={id} className="px-6 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
 						{readOnly && (
@@ -119,6 +128,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				</PreEdge>
 				{$range.map(each => (
 					<Pre key={each.id} id={each.id}>
+						{/* TODO: Can we put dangerouslySetInnerHTML on
+						<Pre>? */}
 						<span dangerouslySetInnerHTML={{
 							__html: each.data || (
 								"<br />"
@@ -140,8 +151,8 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 // TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<Node tag={tag} id={id}>
-		<Markdown style={{ display: "none" }} syntax={syntax}>
+	<Node tag={tag} id={id} data-codex-ordered={ordered}>
+		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
@@ -154,11 +165,24 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const ref = React.useRef()
 
 	return (
-		<Node tag={tag} id={id} style={{ position: "relative" }}>
-			<Markdown style={{ display: "none" }} syntax={syntax}>
-				<div style={{ position: "absolute" }}>
+		<Node tag={tag} id={id} className="relative" data-codex-checked={checked}>
+			<Markdown className="hidden" syntax={syntax}>
+				<div className="absolute">
 					<input
 						ref={ref}
+						className={dedupeSpaces(`
+							form-checkbox
+							text-md-blue-a200
+							border-none
+							rounded-md
+							shadow-hero
+							transform
+							scale-105
+							transition
+							ease-out
+							duration-150
+							cursor-pointer
+						`)}
 						type="checkbox"
 						checked={checked}
 						onChange={() => {
@@ -194,17 +218,17 @@ export const AnyList = React.memo(({ type, tag, id, children: range, recursed })
 	)
 })
 
-// TODO: Extract <Image>
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	const [{ readOnly }] = useEditorState()
 	return (
 		<Root tag="figure" id={id}>
 			<IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}>
 				{/* TODO */}
-				<img style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
+				<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			</IfWrapper>
 			{(!readOnly || (readOnly && children)) && (
-				<figcaption>
+				// TODO: Can we reuse <Anchor> here? Do we want to?
+				<figcaption className="px-6 py-2 text-sm text-center text-gray-600">
 					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
 						{toReact(children) || (
 							<br />
@@ -229,7 +253,7 @@ const backgroundImage = "linear-gradient(" +
 export const Break = React.memo(({ id, syntax }) => (
 	// TODO: Use tag="hr"?
 	<Root id={id} className="text-right" style={{ backgroundImage }}>
-		<Markdown style={{ display: "none" }} syntax={syntax}>
+		<Markdown className="hidden" syntax={syntax}>
 			<br />
 		</Markdown>
 	</Root>

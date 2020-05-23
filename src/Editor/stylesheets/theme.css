@@ -5,11 +5,8 @@
 	font: 1em/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
 	-moz-tab-size: 4;
 	tab-size: 4;
-
-	font-feature-settings: "tnum";
 }
-.codex-editor pre > code,
-.codex-editor :not(pre) > code {
+.codex-editor code {
 	font: 0.875em/1.3125 "iA Writer Mono var", monospace;
 	-moz-tab-size: 2;
 	tab-size: 2;
@@ -18,11 +15,13 @@
 	caret-color: #000;
 }
 
+.codex-editor *::-moz-selection {
+	/* background-color: ... */
+}
+.codex-editor *::selection {
+	/* background-color: ... */
+}
+
 .codex-editor .markdown {
 	color: var(--md-blue-a400);
 }
-/* .codex-editor .markdown[data-codex-syntax="*"], */
-/* .codex-editor .markdown[data-codex-syntax="**"], */
-/* .codex-editor .markdown[data-codex-syntax="***"] { */
-/* 	font-family: "iA Writer Mono var", monospace; */
-/* } */

@@ -1,0 +1,55 @@
+.codex-editor h1 strong,
+.codex-editor h2 strong,
+.codex-editor h3 strong,
+.codex-editor h4 strong,
+.codex-editor h5 strong,
+.codex-editor h6 strong {
+	font-weight: 700;
+}
+
+.codex-editor [aria-label][role="img"] {
+	vertical-align: -10%;
+	font-size: 120%;
+	line-height: 1;
+}
+
+/* https://stackoverflow.com/a/12198561 */
+.codex-editor p [aria-label][role="img"]:first-child:nth-last-child(1),
+.codex-editor p [aria-label][role="img"]:first-child:nth-last-child(2),
+.codex-editor p [aria-label][role="img"]:first-child:nth-last-child(2) ~ [aria-label][role="img"],
+.codex-editor p [aria-label][role="img"]:first-child:nth-last-child(3),
+.codex-editor p [aria-label][role="img"]:first-child:nth-last-child(3) ~ [aria-label][role="img"] {
+	font-size: 2em;
+}
+
+.codex-editor ul,
+.codex-editor ol {
+	margin-left: 1.5em;
+}
+.codex-editor [data-codex-ordered] {
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+}
+
+.codex-editor [data-codex-ordered="false"]:before {
+	margin-left: -1.5em;
+	position: absolute;
+	content: "• ";
+	color: var(--md-blue-a400);
+}
+
+.codex-editor [data-codex-ordered="true"]:first-of-type {
+	counter-reset: count;
+}
+.codex-editor [data-codex-ordered="true"]:before {
+	margin-left: -1.5em;
+	position: absolute;
+	counter-increment: count;
+	content: counter(count) ". ";
+	font-feature-settings: "tnum";
+	color: var(--md-blue-a400);
+}
+
+.codex-editor [data-codex-checked] input[type="checkbox"] {
+	margin-left: -1.75em;
+}
