@@ -36,7 +36,15 @@ function computeDOMPos(root, { node, offset }) {
 			return true
 		}
 		for (const each of on.childNodes) {
-			if (recurse(each)) {
+			if (each.nodeType === Node.ELEMENT_NODE && each.classList.contains("absolute")) {
+				// No-op; defer to end
+			} else if (each.nodeType === Node.ELEMENT_NODE && each.classList.contains("hidden")) {
+				const { length } = each.innerHTML // FIXME
+				Object.assign(pos, {
+					x: pos.x + length,
+					pos: pos.pos + length,
+				})
+			} else if (recurse(each)) {
 				return true
 			}
 			const { length } = each.nodeValue || ""

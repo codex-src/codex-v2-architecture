@@ -13,7 +13,11 @@ function computeDOMRange(root, pos) {
 			return true
 		}
 		for (const each of on.childNodes) {
-			if (recurse(each)) {
+			if (each.nodeType === Node.ELEMENT_NODE && each.classList.contains("absolute")) {
+				// No-op; defer to end
+			} else if (each.nodeType === Node.ELEMENT_NODE && each.classList.contains("hidden")) {
+				pos -= each.innerHTML.length // FIXME
+			} else if (recurse(each)) {
 				return true
 			}
 			pos -= (each.nodeValue || "").length
@@ -26,20 +30,12 @@ function computeDOMRange(root, pos) {
 	}
 	recurse(root)
 
-	// FIXME:
-	//
-	// <ul data-codex-root>
-	//   <li data-codex-node> <- to { node, offset: 2 }
-	//     <div class="hidden">
-	//       ... <- from { node, offset: 0 }
-	//     </div>
-	//     <br>
-	//   </li>
-	// </ul>
-	//
-	if (range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
-		range.node = range.node.parentElement.parentElement
-		range.offset = range.node.children.length - 1
+	// FIXME
+	if (range.node.nodeType === Node.ELEMENT_NODE && range.node.nodeName === "BR") {
+		// const br = range.node
+		range.node = range.node.parentElement
+		// range.offset = [...range.node.childNodes].indexOf(each => each === br) // FIXME
+		range.offset = [...range.node.childNodes].length - 1
 	}
 
 	return range

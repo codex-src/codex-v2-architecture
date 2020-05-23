@@ -162,7 +162,9 @@ export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 	return (
 		<li id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
-				<div className="absolute">
+				{/* NOTE: Use contentEditable={false} to prevent
+				Chrome arrow keys and enable Firefox onChange */}
+				<div className="absolute" contentEditable={false}>
 					<input
 						ref={ref}
 						className={dedupeSpaces(`
