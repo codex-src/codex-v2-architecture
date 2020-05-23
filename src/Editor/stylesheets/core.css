@@ -22,15 +22,6 @@
 	font-size: 2em;
 }
 
-.codex-editor ul,
-.codex-editor ol {
-	margin-left: 1.5em;
-}
-.codex-editor [data-codex-ordered] {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
-}
-
 .codex-editor [data-codex-ordered="false"]:before {
 	margin-left: -1.5em;
 	position: absolute;

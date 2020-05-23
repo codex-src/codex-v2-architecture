@@ -151,7 +151,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 
 // TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ tag, id, syntax, ordered, children }) => (
-	<Node tag={tag} id={id} data-codex-ordered={ordered}>
+	<Node tag={tag} id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -165,7 +165,7 @@ export const TodoItem = React.memo(({ tag, id, syntax, checked, children }) => {
 	const ref = React.useRef()
 
 	return (
-		<Node tag={tag} id={id} className="relative" data-codex-checked={checked}>
+		<Node tag={tag} id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
 					<input
@@ -206,7 +206,7 @@ export const AnyList = React.memo(({ type, tag, id, children: range, recursed })
 	const Element = !recursed ? Root : Node
 	return (
 		// TODO
-		<Element tag={tag} id={id}>
+		<Element tag={tag} id={id} className="ml-6">
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,
