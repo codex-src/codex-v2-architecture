@@ -1,17 +1,6 @@
+import * as documentNodes from "./documentNodes"
 import { ascendRoot } from "./ascenders"
 import { newPos } from "./constructors"
-
-// // Returns whether a node is a hidden node.
-// function isHiddenNode(node) {
-// 	if (node.nodeType === Node.TEXT_NODE) {
-// 		return isHiddenNode(node.parentElement)
-// 	}
-// 	const ok = (
-// 		node.nodeType === Node.ELEMENT_NODE &&
-// 		node.style.display === "none"
-// 	)
-// 	return ok
-// }
 
 // FIXME
 //
@@ -56,7 +45,7 @@ function computeDOMPos(root, { node, offset }) {
 				pos: pos.pos + length,
 			})
 			const next = each.nextElementSibling
-			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
+			if (next && documentNodes.isNode(next)) {
 				Object.assign(pos, {
 					x: 0,
 					y: pos.y + 1,

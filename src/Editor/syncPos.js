@@ -1,3 +1,4 @@
+import * as documentNodes from "./documentNodes"
 import { newRange } from "./constructors"
 
 // Computes a range data structure based on the DOM.
@@ -17,14 +18,15 @@ function computeDOMRange(root, pos) {
 			}
 			pos -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
-			if (next && (next.getAttribute("data-codex-node") || next.getAttribute("data-codex-root"))) {
+			if (next && documentNodes.isNode(next)) {
 				pos--
 			}
 		}
 		return false
 	}
 	recurse(root)
-	// COMPAT: Firefox does not step over <div class="hidden">
+
+	// FIXME:
 	//
 	// <ul data-codex-root>
 	//   <li data-codex-node> <- to { node, offset: 2 }
@@ -35,11 +37,11 @@ function computeDOMRange(root, pos) {
 	//   </li>
 	// </ul>
 	//
-	const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1
-	if (isFirefox && range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
+	if (range.node.nodeType === Node.TEXT_NODE && range.node.parentElement.classList.contains("hidden")) {
 		range.node = range.node.parentElement.parentElement
 		range.offset = range.node.children.length - 1
 	}
+
 	return range
 }
 
