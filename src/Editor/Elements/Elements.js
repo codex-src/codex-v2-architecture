@@ -145,7 +145,6 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	)
 })
 
-// TODO: Extract <AnyList>
 export const AnyListItem = React.memo(({ id, syntax, ordered, children }) => (
 	<li id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
@@ -241,7 +240,6 @@ const backgroundImage = "linear-gradient(" +
 
 // FIXME
 export const Break = React.memo(({ id, syntax }) => (
-	// TODO: Use tag="hr"?
 	<div id={id} className="text-right" style={{ backgroundImage }}>
 		<Markdown className="hidden" syntax={syntax}>
 			<br />
