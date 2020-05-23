@@ -83,11 +83,13 @@ export const Blockquote = React.memo(({ id, children: range }) => (
 	</Root>
 ))
 
+// NOTE: Use style={{ whiteSpace: "pre" }} not className
+// because of <Node>
 const Pre = props => (
-	<Node className="whitespace-pre" {...props} />
+	<Node style={{ whiteSpace: "pre" }} {...props} />
 )
 const PreEdge = props => (
-	<Node className="whitespace-pre leading-none" {...props} />
+	<Node className="leading-none" style={{ whiteSpace: "pre" }} {...props} />
 )
 
 export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
