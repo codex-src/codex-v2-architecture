@@ -15,13 +15,6 @@
 	caret-color: #000;
 }
 
-.codex-editor *::-moz-selection {
-	/* background-color: ... */
-}
-.codex-editor *::selection {
-	/* background-color: ... */
-}
-
 .codex-editor .markdown {
 	color: var(--md-blue-a400);
 }

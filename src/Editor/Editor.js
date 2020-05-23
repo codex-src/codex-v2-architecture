@@ -350,6 +350,10 @@ const Editor = ({
 					dispatch.paste(pasteData)
 				}),
 
+				onDragStart: newReadWriteHandler(e => {
+					e.preventDefault()
+				}),
+
 				contentEditable: !state.readOnly,
 				suppressContentEditableWarning: !state.readOnly,
 			},
