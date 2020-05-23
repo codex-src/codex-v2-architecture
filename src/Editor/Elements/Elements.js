@@ -146,22 +146,22 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 })
 
 // TODO: Extract <AnyList>
-export const AnyListItem = React.memo(({ tag: Tag, id, syntax, ordered, children }) => (
-	<Tag id={id} className="my-1" data-codex-ordered={ordered}>
+export const AnyListItem = React.memo(({ id, syntax, ordered, children }) => (
+	<li id={id} className="my-1" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
 			)}
 		</Markdown>
-	</Tag>
+	</li>
 ))
 
-export const TodoItem = React.memo(({ tag: Tag, id, syntax, checked, children }) => {
+export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 	const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
 
 	return (
-		<Tag id={id} className="relative my-1" data-codex-checked={checked}>
+		<li id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				<div className="absolute">
 					<input
@@ -193,7 +193,7 @@ export const TodoItem = React.memo(({ tag: Tag, id, syntax, checked, children })
 					)}
 				</IfWrapper>
 			</Markdown>
-		</Tag>
+		</li>
 	)
 })
 
