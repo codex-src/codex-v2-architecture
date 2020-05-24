@@ -111,13 +111,16 @@ const Editor = ({
 				// 	scrollingElement.scrollBy(0, offset)
 				// }, 0)
 			})
-		}, [state, dispatch /* , scrollTopOffset, scrollBottomOffset */]),
+		}, [state, dispatch]),
 		[state.readOnly, state.elements],
 	)
 
 	const DOMContentLoaded = useDOMContentLoaded()
 
 	// Rerenders on DOMContentLoaded.
+	//
+	// TODO: No-op for whent there are no <Preformatted>
+	// elements
 	React.useEffect(
 		React.useCallback(() => {
 			if (!DOMContentLoaded) {
@@ -162,13 +165,13 @@ const Editor = ({
 
 					id,
 
-					className: `em-context codex-editor ${
+					"className": `em-context codex-editor ${
 						!state.readOnly ? "" : "feature-read-only"
 					} ${
 						className || ""
 					}`.trim(),
 
-					style: {
+					"style": {
 						...style, // Takes precedence
 						whiteSpace: "pre-wrap",
 						outline: "none",
@@ -177,47 +180,47 @@ const Editor = ({
 
 					"data-codex-editor": true,
 
-					onFocus: newReadWriteHandler(() => {
+					"onFocus": newReadWriteHandler(() => {
 						dispatch.focus()
 					}),
 
-					onBlur: newReadWriteHandler(() => {
+					"onBlur": newReadWriteHandler(() => {
 						dispatch.blur()
 					}),
 
-					onSelect: newReadWriteHandler(() => {
+					"onSelect": newReadWriteHandler(() => {
 						const selection = document.getSelection()
 						if (!selection || !selection.rangeCount) {
 							// No-op
 							return
 						}
-						// Guard document-range:
-						const range = selection.getRangeAt(0)
-						if (range.startContainer === ref.current && range.endContainer === ref.current) {
-							// Iterate to the deepest start node:
-							let node1 = ref.current.children[0]
-							while (node1.childNodes.length) {
-								node1 = node1.childNodes[0]
-							}
-							// Iterate to the deepest end node:
-							let node2 = ref.current.children[ref.current.children.length - 1]
-							while (node2.childNodes.length) {
-								node2 = node2.childNodes[node2.childNodes.length - 1]
-							}
-							range.setStart(node1, 0)
-							range.setEnd(node2, (node2.nodeValue || "").length)
-							selection.removeAllRanges()
-							selection.addRange(range)
-						}
+						// // Guard document-range:
+						// const range = selection.getRangeAt(0)
+						// if (range.startContainer === ref.current && range.endContainer === ref.current) {
+						// 	// Iterate to the deepest start node:
+						// 	let node1 = ref.current.children[0]
+						// 	while (node1.childNodes.length) {
+						// 		node1 = node1.childNodes[0]
+						// 	}
+						// 	// Iterate to the deepest end node:
+						// 	let node2 = ref.current.children[ref.current.children.length - 1]
+						// 	while (node2.childNodes.length) {
+						// 		node2 = node2.childNodes[node2.childNodes.length - 1]
+						// 	}
+						// 	range.setStart(node1, 0)
+						// 	range.setEnd(node2, (node2.nodeValue || "").length)
+						// 	selection.removeAllRanges()
+						// 	selection.addRange(range)
+						// }
 						const [pos1, pos2] = computePosRange(state)
 						dispatch.select(pos1, pos2)
 					}),
 
-					onPointerDown: newReadWriteHandler(() => {
+					"onPointerDown": newReadWriteHandler(() => {
 						pointerDownRef.current = true
 					}),
 
-					onPointerMove: newReadWriteHandler(() => {
+					"onPointerMove": newReadWriteHandler(() => {
 						if (!state.focused || !pointerDownRef.current) {
 							pointerDownRef.current = false
 							return
@@ -226,12 +229,12 @@ const Editor = ({
 						dispatch.select(pos1, pos2)
 					}),
 
-					onPointerUp: newReadWriteHandler(() => {
+					"onPointerUp": newReadWriteHandler(() => {
 						pointerDownRef.current = false
 					}),
 
 					// TODO: Prevent browser-formatting shortcuts?
-					onKeyDown: newReadWriteHandler(e => {
+					"onKeyDown": newReadWriteHandler(e => {
 						switch (detectKeyDownType(e)) {
 						case keyDownTypeEnum.tab:
 							if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
@@ -291,7 +294,7 @@ const Editor = ({
 						}
 					}),
 
-					onCompositionEnd: newReadWriteHandler(e => {
+					"onCompositionEnd": newReadWriteHandler(e => {
 						if (!ref.current.children.length) {
 							dispatch.render()
 							return
@@ -300,26 +303,49 @@ const Editor = ({
 						dedupedFirefoxCompositionEnd.current = true
 
 						const data = readCurrentNode(state)
-						const [pos] = computePosRange(state)
+						let [pos] = computePosRange(state)
 
-						console.log("onCompositionEnd", pos.pos)
-						dispatch.input(data, [pos])
-					}),
+						// const selection = document.getSelection()
+						// const range = selection.getRangeAt(0)
+						// console.log(range.startContainer, range.startOffset)
 
-					onInput: newReadWriteHandler(e => {
-						if (!ref.current.children.length) {
-							dispatch.render()
-							return
+						// COMPAT: In Firefox, backspace on a
+						// composition event can create an empty text
+						// node at the start of the document.
+						//
+						// **DESTROY IT AND REMOVE THE SELECTION**
+						//
+						//
+						if (ref.current.childNodes[0].nodeType === Node.TEXT_NODE) {
+							ref.current.childNodes[0].remove()
+							const selection = document.getSelection()
+							if (selection && selection.rangeCount) {
+								selection.removeAllRanges()
+							}
+							pos = state.pos1
+							if (pos.pos <= state.nodes[pos.y].data.length) {
+								// pos.pos++
+							}
 						}
 
+						// console.log("onCompositionEnd", pos.pos, { innerHTML: ref.current.innerHTML })
+						// dispatch.input(data, [pos], true)
+					}),
+
+					"onInput": newReadWriteHandler(e => {
+						// No-op onChange events from <TodoItem>:
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 							// No-op
 							return
+						// No-op deduped "compositionend" event:
+						} else if (dedupedFirefoxCompositionEnd.current) {
+							dedupedFirefoxCompositionEnd.current = false
+							return
 						}
 
-						// Ignore deduped "compositionend" event:
-						if (dedupedFirefoxCompositionEnd.current) {
-							dedupedFirefoxCompositionEnd.current = false
+						// Force rerender:
+						if (!ref.current.children.length) {
+							dispatch.render()
 							return
 						}
 
@@ -332,7 +358,7 @@ const Editor = ({
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 
-					onCut: newReadWriteHandler(e => {
+					"onCut": newReadWriteHandler(e => {
 						e.preventDefault()
 						if (state.collapsed) {
 							// No-op
@@ -343,7 +369,7 @@ const Editor = ({
 						dispatch.cut()
 					}),
 
-					onCopy: newReadWriteHandler(e => {
+					"onCopy": newReadWriteHandler(e => {
 						e.preventDefault()
 						if (state.collapsed) {
 							// No-op
@@ -354,7 +380,7 @@ const Editor = ({
 						dispatch.copy()
 					}),
 
-					onPaste: newReadWriteHandler(e => {
+					"onPaste": newReadWriteHandler(e => {
 						e.preventDefault()
 						const pasteData = e.clipboardData.getData("text/plain")
 						if (!pasteData) {
@@ -364,12 +390,12 @@ const Editor = ({
 						dispatch.paste(pasteData)
 					}),
 
-					onDragStart: newReadWriteHandler(e => {
+					"onDragStart": newReadWriteHandler(e => {
 						e.preventDefault()
 					}),
 
-					contentEditable: !state.readOnly,
-					suppressContentEditableWarning: !state.readOnly,
+					"contentEditable": !state.readOnly,
+					"suppressContentEditableWarning": !state.readOnly,
 				},
 			)}
 
