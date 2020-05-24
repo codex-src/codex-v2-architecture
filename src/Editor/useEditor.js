@@ -5,7 +5,7 @@ import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
 import uuidv4 from "uuid/v4"
 import { AnyListRegex } from "./regexes"
-import { ascendRoot } from "./nodes/ascendNodes"
+import { ascendElement } from "./nodes/ascendNodes"
 
 import {
 	newNodes,
@@ -382,7 +382,7 @@ const methods = state => ({
 		const selection = document.getSelection()
 		if (selection && selection.rangeCount) {
 			const range = selection.getRangeAt(0)
-			const root = ascendRoot(range.startContainer)
+			const root = ascendElement(range.startContainer).closest("[data-codex-editor] > *")
 			id = root.id || root.querySelector("[id]").id
 		}
 		// console.log(id)
