@@ -6,7 +6,6 @@ import Markdown from "./Markdown"
 import prismMap from "lib/prismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
-import useEditorState from "../useEditorState"
 import { Strikethrough } from "./InlineElements"
 
 // TODO: Return tags for all elements and inline elements?
@@ -17,8 +16,7 @@ function toReact(children) {
 	if (children === null || typeof children === "string") {
 		console.log({ children })
 
-		// return children
-		return !children ? null : <span key={Math.random().toString(16).substr(2, 4)}>{children}</span>
+		return children
 	}
 	const components = []
 	for (const each of children) {
@@ -159,12 +157,11 @@ export const AnyListItem = ({ id, syntax, ordered, children }) => (
 )
 
 // TODO: Add markdown to CSS to prevent useless rerenders
-export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
-	const [, { checkTodo }] = useEditorState()
+export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch }) => {
+	// const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
 
-	// https://github.com/facebook/react/issues/15156#issuecomment-474590693
-	return React.useMemo(() => (
+	return (
 		<li id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use contentEditable={false} to prevent
@@ -189,7 +186,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 						checked={checked}
 						onChange={() => {
 							ref.current.focus()
-							checkTodo(id)
+							dispatch(id)
 						}}
 					/>
 				</div>
@@ -200,15 +197,17 @@ export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 				</IfWrapper>
 			</Markdown>
 		</li>
-	), [checkTodo])
+	)
 })
 
-export const AnyList = React.memo(({ type, tag: Tag, id, children: range }) => (
+// Pass dispatch for dispatch.checkTodo
+export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispatch }) => (
 	<Tag id={id} className="ml-6">
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
 				...each,
+				dispatch,
 			})
 		))}
 	</Tag>

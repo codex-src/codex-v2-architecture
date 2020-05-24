@@ -382,11 +382,15 @@ const methods = state => ({
 
 		let t = Date.now()
 
-		let data = ""
-		for (let x = 0, len = state.nodes.length; x < len; x++) {
-			data += state.nodes[x].data
-		}
+		// let data = ""
+		// for (let x = 0, len = state.nodes.length; x < len; x++) {
+		// 	if (x) {
+		// 		data += "\n"
+		// 	}
+		// 	data += state.nodes[x].data
+		// }
 
+		const data = state.nodes.map(each => each.data).join("\n")
 		console.log("state.nodes.map.join", Date.now() - t)
 		t = Date.now()
 

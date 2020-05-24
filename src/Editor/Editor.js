@@ -2,7 +2,6 @@ import computeNodes from "./computeNodes"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import detectKeyDownType from "./detectKeyDownType"
-import EditorContext from "./EditorContext"
 import keyDownTypeEnum from "./keyDownTypeEnum"
 import React from "react"
 import ReactDOM from "react-dom"
@@ -45,21 +44,18 @@ import "./stylesheets/theme.css"
 	}
 })()
 
-const ReactElements = ({ state, dispatch }) => {
-	const { Provider } = EditorContext
-	return (
-		<Provider value={[state, dispatch]}>
-			{state.elements.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumArray[T], {
-					// key: each.id,
-					// key: uuidv4(),
-					key: each.reactKey || each.id,
-					...each,
-				})
-			))}
-		</Provider>
-	)
-}
+const ReactElements = ({ state, dispatch }) => (
+	state.elements.map(({ type: T, ...each }) => (
+		React.createElement(typeEnumArray[T], {
+			// key: each.id,
+			// key: uuidv4(),
+			key: each.reactKey || each.id,
+			...each,
+
+			dispatch,
+		})
+	))
+)
 
 const Editor = ({
 	id,
@@ -373,8 +369,11 @@ const Editor = ({
 	)
 }
 
-//	<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-//		{JSON.stringify(state.nodes, null, "\t")}
-//	</pre>
+// <pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
+// 	{JSON.stringify({
+// 		data: state.data,
+// 		nodes: state.nodes,
+// 	}, null, "\t")}
+// </pre>
 
 export default Editor

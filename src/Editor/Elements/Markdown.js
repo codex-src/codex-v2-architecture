@@ -1,5 +1,4 @@
 import React from "react"
-// import useEditorState from "../useEditorState"
 
 // Parses syntax from a string or array of strings to an
 // array of strings.
@@ -21,10 +20,6 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, ...props }) => {
-	// const [{ readOnly }] = useEditorState()
-	// if (!props.children || readOnly) {
-	// 	return null
-	// }
 	return <span className={`markdown ${className || ""}`.trim()} {...props} />
 }
 
