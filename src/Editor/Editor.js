@@ -156,9 +156,9 @@ const Editor = ({
 	}
 
 	return (
-		<>
+		// <>
 
-			{React.createElement(
+			/* { */React.createElement(
 				"div",
 				{
 					ref,
@@ -194,24 +194,24 @@ const Editor = ({
 							// No-op
 							return
 						}
-						// // Guard document-range:
-						// const range = selection.getRangeAt(0)
-						// if (range.startContainer === ref.current && range.endContainer === ref.current) {
-						// 	// Iterate to the deepest start node:
-						// 	let node1 = ref.current.children[0]
-						// 	while (node1.childNodes.length) {
-						// 		node1 = node1.childNodes[0]
-						// 	}
-						// 	// Iterate to the deepest end node:
-						// 	let node2 = ref.current.children[ref.current.children.length - 1]
-						// 	while (node2.childNodes.length) {
-						// 		node2 = node2.childNodes[node2.childNodes.length - 1]
-						// 	}
-						// 	range.setStart(node1, 0)
-						// 	range.setEnd(node2, (node2.nodeValue || "").length)
-						// 	selection.removeAllRanges()
-						// 	selection.addRange(range)
-						// }
+						// COMPAT (FF): Guard document-range:
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current && range.endContainer === ref.current) {
+							// Iterate to the deepest start node:
+							let node1 = ref.current.children[0]
+							while (node1.childNodes.length) {
+								node1 = node1.childNodes[0]
+							}
+							// Iterate to the deepest end node:
+							let node2 = ref.current.children[ref.current.children.length - 1]
+							while (node2.childNodes.length) {
+								node2 = node2.childNodes[node2.childNodes.length - 1]
+							}
+							range.setStartBefore(node1)
+							range.setEndAfter(node2)
+							selection.removeAllRanges()
+							selection.addRange(range)
+						}
 						const [pos1, pos2] = computePosRange(state)
 						dispatch.select(pos1, pos2)
 					}),
@@ -305,10 +305,9 @@ const Editor = ({
 						const data = readCurrentNode(state)
 						let [pos] = computePosRange(state)
 
-						// COMPAT: In Firefox, backspace during a
-						// composition event can create an empty text
-						// node; **REMOVE THE SELECTION AND DESTROY THE
-						// TEXT NODE**:
+						// COMPAT (FF): Backspace during a composition
+						// event can create an empty text node; **REMOVE
+						// THE SELECTION AND DESTROY THE TEXT NODE**:
 						const textNodes = []
 						for (const each of ref.current.childNodes) {
 							if (each.nodeType === Node.TEXT_NODE) {
@@ -392,17 +391,17 @@ const Editor = ({
 					"contentEditable": !state.readOnly,
 					"suppressContentEditableWarning": !state.readOnly,
 				},
-			)}
+			) // }
 
-			<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-				{JSON.stringify({
-					data: state.data,
-					nodes: state.nodes,
-				}, null, "\t")}
-			</pre>
-
-		</>
+		// </>
 	)
 }
+
+// <pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
+// 	{JSON.stringify({
+// 		data: state.data,
+// 		nodes: state.nodes,
+// 	}, null, "\t")}
+// </pre>
 
 export default Editor

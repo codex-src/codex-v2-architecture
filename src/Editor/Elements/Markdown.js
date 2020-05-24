@@ -28,16 +28,24 @@ const Markdown = ({ syntax, ...props }) => {
 	return (
 		<React.Fragment>
 
+			{/* NOTE: Do not use syntax && ( ... ); use
+			Boolean(syntax) creating revent empty text nodes */}
+
 			{/* LHS */}
-			<Syntax {...props}>
-				{syntax1}
-			</Syntax>
+			{Boolean(syntax1) && (
+				<Syntax {...props}>
+					{syntax1}
+				</Syntax>
+			)}
+
+			{props.children}
 
 			{/* RHS */}
-			{props.children}
-			<Syntax {...props}>
-				{syntax2}
-			</Syntax>
+			{Boolean(syntax2) && (
+				<Syntax {...props}>
+					{syntax2}
+				</Syntax>
+			)}
 
 		</React.Fragment>
 	)
