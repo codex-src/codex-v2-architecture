@@ -1,4 +1,5 @@
 // import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
+// import uuidv4 from "uuid/v4"
 import computePosRange from "./computePosRange"
 import detectKeyDownType from "./keydown/detectKeyDownType"
 import keyDownTypeEnum from "./keydown/keyDownTypeEnum"
@@ -47,7 +48,6 @@ import "./stylesheets/theme.css"
 const ReactElements = ({ state, dispatch }) => (
 	state.elements.map(({ type: T, ...each }) => (
 		React.createElement(typeEnumArray[T], {
-			// key: each.id,
 			// key: uuidv4(),
 			key: each.reactKey || each.id,
 			...each,
@@ -156,9 +156,9 @@ const Editor = ({
 	}
 
 	return (
-		// <>
+		<>
 
-			/* { */React.createElement(
+			{React.createElement(
 				"div",
 				{
 					ref,
@@ -391,17 +391,19 @@ const Editor = ({
 					"contentEditable": !state.readOnly,
 					"suppressContentEditableWarning": !state.readOnly,
 				},
-			) // }
+			)}
 
-		// </>
+			<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
+				{JSON.stringify({
+					data: state.data,
+					// nodes: state.nodes,
+					elements: state.elements,
+				}, null, "\t")}
+			</pre>
+
+
+		</>
 	)
 }
-
-// <pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-// 	{JSON.stringify({
-// 		data: state.data,
-// 		nodes: state.nodes,
-// 	}, null, "\t")}
-// </pre>
 
 export default Editor

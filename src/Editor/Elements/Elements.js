@@ -123,7 +123,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
 						{/* {readOnly && ( */}
-						{/* 	<br /> */}
+						<br />
 						{/* )} */}
 					</Markdown>
 				</PreEdge>
@@ -138,7 +138,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 				<PreEdge id={range[range.length - 1].id}>
 					<Markdown syntax={[syntax[1]]}>
 						{/* {readOnly && (} */}
-						{/* 	<br />} */}
+						<br />
 						{/* )}} */}
 					</Markdown>
 				</PreEdge>

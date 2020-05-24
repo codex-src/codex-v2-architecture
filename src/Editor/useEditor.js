@@ -364,6 +364,7 @@ const methods = state => ({
 		// console.log("state.nodes.map.join", Date.now() - t)
 		// t = Date.now()
 
+		// Prevent rerender to the DOM:
 		if (shouldPreventDOMRerender) {
 			state.data = data
 			return
