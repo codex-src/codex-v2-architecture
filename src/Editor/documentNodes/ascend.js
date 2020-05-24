@@ -1,23 +1,18 @@
-import { isDocumentNode } from "./documentNodes"
+import { isDocumentNode } from "./test"
 
 // Node    -> Element
 // Element -> No-op
 //
-//
-// TODO: Rename to ascendToElement?
-export function ascendElement(node) {
+export function ascendToElement(node) {
 	if (node && node.nodeType && node.nodeType !== Node.ELEMENT_NODE && node.parentElement) {
 		return node.parentElement
 	}
 	return node
 }
 
-// Ascends to the nearest data-codex-node or data-codex-root
-// element.
-//
-// TODO: Rename to ascendToNode?
-export function ascendNode(node) {
-	let element = ascendElement(node)
+// Ascends to the nearest document node.
+export function ascendToDocumentNode(node) {
+	let element = ascendToElement(node)
 	while (element && !isDocumentNode(element) && element.parentElement) {
 		element = element.parentElement
 	}

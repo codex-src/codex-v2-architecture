@@ -1,7 +1,7 @@
-import { isDocumentNode } from "./documentNodes"
+import { isDocumentNode } from "./test"
 
-// Reads a data-codex-node or data-codex-root element.
-export function readNode(node) {
+// Reads a document node; mocks element.innerHTML.
+export function readDocumentNode(node) {
 	let data = ""
 	const recurse = on => {
 		if (on.nodeType === Node.TEXT_NODE) {
@@ -20,15 +20,14 @@ export function readNode(node) {
 	return data
 }
 
-// Reads the current data-codex-node or data-codex-root
-// element.
-export function readCurrentNode(editorState) {
+// Reads the current document node.
+export function readCurrentDocumentNode(editorState) {
 	const { id } = editorState.nodes[editorState.pos1.y]
 	const node = document.getElementById(id)
 	if (!node) {
-		throw new Error(`readCurrentNode: could not query id=${id || "(empty)"}`)
+		throw new Error(`readCurrentDocumentNode: could not query id=${id || "(empty)"}`)
 	}
-	return readNode(node)
+	return readDocumentNode(node)
 }
 
-export default readCurrentNode
+export default readCurrentDocumentNode

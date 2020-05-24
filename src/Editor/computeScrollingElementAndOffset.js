@@ -1,4 +1,4 @@
-import { ascendElement } from "./nodes/ascendNodes"
+import { ascendToElement } from "./nodes/ascendNodes"
 
 // Ascends to the scrolling element. The scrolling element
 // can be the nearest overflow-y-scroll element or the
@@ -31,8 +31,8 @@ function computeScrollingElementAndOffset(offsetTop = 0, offsetBottom = 0) {
 		scrollTop = 0
 		scrollBottom = window.innerHeight
 	}
-	const { top: elementTop } = ascendElement(range.startContainer).getBoundingClientRect()
-	const { bottom: elementBottom } = ascendElement(range.endContainer).getBoundingClientRect()
+	const { top: elementTop } = ascendToElement(range.startContainer).getBoundingClientRect()
+	const { bottom: elementBottom } = ascendToElement(range.endContainer).getBoundingClientRect()
 	//
 	// +===+ <- here and
 	// +---+

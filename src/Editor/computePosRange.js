@@ -1,5 +1,5 @@
-import { ascendNode } from "./nodes/ascendNodes"
-import { isDocumentNode } from "./nodes/documentNodes"
+import { ascendToDocumentNode } from "./documentNodes/ascend"
+import { isDocumentNode } from "./documentNodes/test"
 import { newPos } from "./constructors"
 
 // Computes a cursor data structure from the DOM.
@@ -65,7 +65,7 @@ function newMetaPos(vdomPos, domPos) {
 // to compute.
 function computeMetaPos(nodes, { node, offset }) {
 	const vdomPos = newPos()
-	const documentNode = ascendNode(node)
+	const documentNode = ascendToDocumentNode(node)
 	for (const each of nodes) {
 		if (each.id === documentNode.id) {
 			// No-op

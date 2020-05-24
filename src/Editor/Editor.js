@@ -8,7 +8,7 @@ import ReactDOM from "react-dom"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
-import { readCurrentNode } from "./nodes/readNodes"
+import { readCurrentDocumentNode } from "./documentNodes/read"
 
 import "./stylesheets/core.css"
 import "./stylesheets/form-checkbox.css"
@@ -302,7 +302,7 @@ const Editor = ({
 
 						dedupedFirefoxCompositionEnd.current = true
 
-						const data = readCurrentNode(state)
+						const data = readCurrentDocumentNode(state)
 						let [pos] = computePosRange(state)
 
 						// COMPAT (FF): Backspace during a composition
@@ -347,7 +347,7 @@ const Editor = ({
 
 						const shouldPreventDOMRerender = e.nativeEvent.isComposing
 
-						const data = readCurrentNode(state)
+						const data = readCurrentDocumentNode(state)
 						console.log({ data })
 
 						const [pos] = computePosRange(state)

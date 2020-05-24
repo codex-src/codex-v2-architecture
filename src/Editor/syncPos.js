@@ -1,4 +1,4 @@
-import { isDocumentNode } from "./nodes/documentNodes"
+import { isDocumentNode } from "./documentNodes/test"
 import { newRange } from "./constructors"
 
 // Computes a range data structure based on the DOM.
