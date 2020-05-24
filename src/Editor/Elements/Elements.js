@@ -71,8 +71,9 @@ export const BlockquoteItem = React.memo(({ id, syntax, children }) => (
 	</li>
 ))
 
-export const Blockquote = React.memo(({ id, children: range }) => (
-	<blockquote id={id} className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
+// NOTE: Compound element; do not assign ID
+export const Blockquote = React.memo(({ children: range }) => (
+	<blockquote className="pl-6" style={{ boxShadow: "inset 0.25em 0 var(--gray-300)" }}>
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,
@@ -98,7 +99,8 @@ const PreEdge = props => (
 	<div className="whitespace-pre leading-none" {...props} />
 )
 
-export const Preformatted = React.memo(({ id, syntax, extension, children: range }) => {
+// NOTE: Compound element; do not assign ID
+export const Preformatted = React.memo(({ syntax, extension, children: range }) => {
 	// const [{ readOnly }] = useEditorState()
 
 	// NOTE: Use useMemo not useState; state needs to be
@@ -118,7 +120,7 @@ export const Preformatted = React.memo(({ id, syntax, extension, children: range
 	}, [extension, range])
 
 	return (
-		<pre id={id} className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+		<pre className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
@@ -202,8 +204,10 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 })
 
 // Pass dispatch for dispatch.checkTodo
+//
+// NOTE: Compound element; do not assign ID
 export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispatch }) => (
-	<Tag id={id} className="ml-6">
+	<Tag className="ml-6">
 		{range.map(({ type: T, ...each }) => (
 			React.createElement(typeEnumArray[T], {
 				key: each.id,

@@ -2,7 +2,7 @@ import { isDocumentNode } from "./nodes/documentNodes"
 import { newRange } from "./constructors"
 
 // Computes a range data structure based on the DOM.
-function computeDOMRange(root, pos) {
+function computeDOMRange(element, pos) {
 	const range = newRange()
 	const recurse = on => {
 		if (pos - (on.nodeValue || "").length <= 0) {
@@ -28,7 +28,7 @@ function computeDOMRange(root, pos) {
 		}
 		return false
 	}
-	recurse(root)
+	recurse(element)
 
 	// FIXME
 	if (range.node.nodeType === Node.ELEMENT_NODE && range.node.nodeName === "BR") {

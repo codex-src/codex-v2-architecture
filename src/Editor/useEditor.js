@@ -383,8 +383,7 @@ const methods = state => ({
 		if (selection && selection.rangeCount) {
 			const range = selection.getRangeAt(0)
 			const root = ascendRoot(range.startContainer)
-			// console.log(root)
-			id = root.id
+			id = root.id || root.querySelector("[id]").id
 		}
 		// console.log(id)
 

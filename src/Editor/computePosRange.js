@@ -3,7 +3,7 @@ import { isDocumentNode } from "./nodes/documentNodes"
 import { newPos } from "./constructors"
 
 // Computes a cursor data structure from the DOM.
-function computeDOMPos(root, { node, offset }) {
+function computeDOMPos(element, { node, offset }) {
 	// Iterate to the deepest node:
 	const pos = newPos()
 	if (node.nodeType === Node.ELEMENT_NODE) {
@@ -46,7 +46,7 @@ function computeDOMPos(root, { node, offset }) {
 		}
 		return false
 	}
-	recurse(root)
+	recurse(element)
 	return pos
 }
 
@@ -65,8 +65,6 @@ function newMetaPos(vdomPos, domPos) {
 // to compute.
 function computeMetaPos(nodes, { node, offset }) {
 	const vdomPos = newPos()
-
-	// TODO: Why are we asecending to the root?
 	const documentNode = ascendNode(node)
 	for (const each of nodes) {
 		if (each.id === documentNode.id) {

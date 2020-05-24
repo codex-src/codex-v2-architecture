@@ -348,6 +348,8 @@ const Editor = ({
 						const shouldPreventDOMRerender = e.nativeEvent.isComposing
 
 						const data = readCurrentNode(state)
+						console.log({ data })
+
 						const [pos] = computePosRange(state)
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
