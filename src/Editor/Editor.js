@@ -1,13 +1,13 @@
+// import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import computePosRange from "./computePosRange"
-import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-import detectKeyDownType from "./detectKeyDownType"
-import keyDownTypeEnum from "./keyDownTypeEnum"
+import detectKeyDownType from "./keydown/detectKeyDownType"
+import keyDownTypeEnum from "./keydown/keyDownTypeEnum"
 import React from "react"
 import ReactDOM from "react-dom"
-import readCurrentNode from "./readCurrentNode"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
+import { readCurrentNode } from "./nodes/readNodes"
 
 import "./stylesheets/core.css"
 import "./stylesheets/form-checkbox.css"
@@ -111,7 +111,7 @@ const Editor = ({
 				// 	scrollingElement.scrollBy(0, offset)
 				// }, 0)
 			})
-		}, [state, dispatch, scrollTopOffset, scrollBottomOffset]),
+		}, [state, dispatch /* , scrollTopOffset, scrollBottomOffset */]),
 		[state.readOnly, state.elements],
 	)
 

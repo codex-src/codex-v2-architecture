@@ -22,28 +22,28 @@ import "./EditorApp.css"
 
 // document.body.classList.toggle("debug-css")
 
-// https://reactjs.org/docs/error-boundaries.html#introducing-error-boundaries
-class ErrorBoundary extends React.Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			errored: false,
-		}
-	}
-	static getDerivedStateFromError(error) {
-		return { errored: true }
-	}
-	componentDidCatch(error, errorInfo) {
-		// logErrorToMyService(error, errorInfo)
-		console.error(error, errorInfo)
-	}
-	render() {
-		// if (this.state.errored) {
-		// 	return <h1>Something went wrong.</h1>
-		// }
-		return this.props.children
-	}
-}
+// // https://reactjs.org/docs/error-boundaries.html#introducing-error-boundaries
+// class ErrorBoundary extends React.Component {
+// 	constructor(props) {
+// 		super(props)
+// 		this.state = {
+// 			errored: false,
+// 		}
+// 	}
+// 	static getDerivedStateFromError(error) {
+// 		return { errored: true }
+// 	}
+// 	componentDidCatch(error, errorInfo) {
+// 		// logErrorToMyService(error, errorInfo)
+// 		console.error(error, errorInfo)
+// 	}
+// 	render() {
+// 		// if (this.state.errored) {
+// 		// 	return <h1>Something went wrong.</h1>
+// 		// }
+// 		return this.props.children
+// 	}
+// }
 
 const data = (() => {
 	const cache = localStorage.getItem(LOCALSTORAGE_KEY)

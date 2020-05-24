@@ -1,38 +1,15 @@
-import * as documentNodes from "./documentNodes"
-import { ascendRoot } from "./ascenders"
+import { ascendRoot } from "./nodes/ascendNodes"
 import { newPos } from "./constructors"
-
-// FIXME
-//
-// console.log(node, offset)
-//
-// // while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
-// // 	node = node.childNodes[offset]
-// // 	offset = 0
-// // }
-//
-// //	// Iterate to the deepest text node:
-// //	while (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length) {
-// //		node = node.childNodes[offset]
-// //		offset = 0
-// //
-// //		console.log({ node, offset })
-// //	}
+import { isDocumentRoot } from "./nodes/documentNodes"
 
 // Computes a cursor data structure from the DOM.
 function computeDOMPos(root, { node, offset }) {
 	// Iterate to the deepest node:
 	const pos = newPos()
-
 	if (node.nodeType === Node.ELEMENT_NODE) {
 		node = node.childNodes[offset]
 		offset = 0
 	}
-
-	// while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
-	// 	node = node.childNodes[offset]
-	// 	offset = 0
-	// }
 	const recurse = on => {
 		if (on === node) {
 			Object.assign(pos, {
@@ -59,7 +36,7 @@ function computeDOMPos(root, { node, offset }) {
 				pos: pos.pos + length,
 			})
 			const next = each.nextElementSibling
-			if (next && documentNodes.isNode(next)) {
+			if (next && isDocumentRoot(next)) {
 				Object.assign(pos, {
 					x: 0,
 					y: pos.y + 1,

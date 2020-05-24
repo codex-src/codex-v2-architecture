@@ -1,7 +1,4 @@
-import {
-	ascendElement,
-	ascendRoot,
-} from "./ascenders"
+import { ascendElement } from "./nodes/ascendNodes"
 
 // Ascends to the scrolling element. The scrolling element
 // can be the nearest overflow-y-scroll element or the

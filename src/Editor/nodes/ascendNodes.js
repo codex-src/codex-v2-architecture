@@ -1,4 +1,7 @@
-import * as documentNodes from "./documentNodes"
+import {
+	isDocumentNode,
+	isDocumentRoot,
+} from "./documentNodes"
 
 // Node    -> Element
 // Element -> No-op
@@ -14,7 +17,7 @@ export function ascendElement(node) {
 // element.
 export function ascendNode(node) {
 	let element = ascendElement(node)
-	while (element && !documentNodes.isNode(element) && element.parentElement) {
+	while (element && !isDocumentNode(element) && element.parentElement) {
 		element = element.parentElement
 	}
 	return element
@@ -23,7 +26,7 @@ export function ascendNode(node) {
 // Ascends to the nearest data-codex-root element.
 export function ascendRoot(node) {
 	let element = ascendElement(node)
-	while (element && !documentNodes.isRoot(element) && element.parentElement) {
+	while (element && !isDocumentRoot(element) && element.parentElement) {
 		element = element.parentElement
 	}
 	return element

@@ -1,4 +1,4 @@
-import * as documentNodes from "./documentNodes"
+import { isDocumentNode } from "./nodes/documentNodes"
 import { newRange } from "./constructors"
 
 // Computes a range data structure based on the DOM.
@@ -22,7 +22,7 @@ function computeDOMRange(root, pos) {
 			}
 			pos -= (each.nodeValue || "").length
 			const next = each.nextElementSibling
-			if (next && documentNodes.isNode(next)) {
+			if (next && isDocumentNode(next)) {
 				pos--
 			}
 		}

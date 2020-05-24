@@ -5,7 +5,7 @@ import UndoManager from "lib/UndoManager"
 import useMethods from "use-methods"
 import uuidv4 from "uuid/v4"
 import { AnyListRegex } from "./regexes"
-import { ascendRoot } from "./ascenders"
+import { ascendRoot } from "./nodes/ascendNodes"
 
 import {
 	newNodes,
