@@ -35,7 +35,6 @@ function newEditorState(data) {
 		pos1,                                             // Start cursor data structure
 		pos2,                                             // End cursor data structure
 		collapsed: true,                                  // Are the cursors collapsed?
-		extPosRange: ["", ""],                            // Extended node (root ID) range
 		history: new UndoManager(initialState, areEqual), // Undo manager
 		cachedElements,                                   // LRU cached parsed elements
 		elements: parseElements(nodes, cachedElements),   // Parsed elements
@@ -66,7 +65,7 @@ const methods = state => ({
 	},
 
 	/*
-	 * Focus and cursors
+	 * Cursors
 	 */
 	focus() {
 		state.focused = true
@@ -74,24 +73,11 @@ const methods = state => ({
 	blur() {
 		state.focused = false
 	},
-	// TODO: Extract logic?
 	select(pos1, pos2) {
-		// Decrement 2x:
-		let y1 = pos1.y - 2
-		if (y1 < 0) {
-			y1 = 0
-		}
-		// Increment 2x:
-		let y2 = pos2.y + 2
-		if (y2 >= state.nodes.length) {
-			y2 = state.nodes.length - 1
-		}
-		const extPosRange = [state.nodes[y1].id, state.nodes[y2].id]
 		Object.assign(state, {
 			pos1,
 			pos2,
 			collapsed: pos1.pos === pos2.pos,
-			extPosRange,
 		})
 	},
 
@@ -159,26 +145,10 @@ const methods = state => ({
 		this.write("")
 	},
 
-	// TODO: Refactor
-	input(nodes, [pos1, pos2]) {
+	input(data, [pos1, pos2]) {
 		state.history.mutate()
 
-		// Get the start and end keys:
-		const key1 = nodes[0].id
-		const key2 = nodes[nodes.length - 1].id
-
-		// Get the start and end offsets:
-		const offset1 = state.nodes.findIndex(each => each.id === key1)
-		if (offset1 === -1) {
-			throw new Error("dispatch.input: offset1 out of bounds")
-		}
-		const offset2 = state.nodes.findIndex(each => each.id === key2)
-		if (offset2 === -1) {
-			throw new Error("dispatch.input: offset2 out of bounds")
-		}
-
-		// Update and rerender:
-		state.nodes.splice(offset1, offset2 - offset1 + 1, ...nodes)
+		state.nodes[state.pos1.y].data = data
 		Object.assign(state, {
 			pos1,
 			pos2,

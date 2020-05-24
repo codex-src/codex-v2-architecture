@@ -1,10 +1,10 @@
-import computeNodes from "./computeNodes"
 import computePosRange from "./computePosRange"
 import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import detectKeyDownType from "./detectKeyDownType"
 import keyDownTypeEnum from "./keyDownTypeEnum"
 import React from "react"
 import ReactDOM from "react-dom"
+import readCurrentNode from "./readCurrentNode"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
@@ -70,8 +70,8 @@ const Editor = ({
 }) => {
 	const ref = React.useRef()
 
-	const pointerDownRef = React.useRef()
-	const dedupedCompositionEnd = React.useRef()
+	const pointerDownRef = React.useRef(false)
+	const dedupedCompositionEnd = React.useRef(false)
 
 	// Syncs props to state.
 	React.useEffect(() => {
@@ -81,31 +81,23 @@ const Editor = ({
 	// Renders VDOM to the DOM.
 	React.useLayoutEffect(
 		React.useCallback(() => {
-
-			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
 				selection.removeAllRanges()
 			}
-
-			let t = Date.now()
-
 			ReactDOM.render(<ReactElements state={state} dispatch={dispatch} />, ref.current, () => {
-
-				console.log("ReactDOM.render", Date.now() - t)
-				t = Date.now()
-
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
 				}
 
-				try {
-					syncPos(state)
-					console.log("syncPos", Date.now() - t)
-				} catch (error) {
-					console.error(error)
-				}
+				// try {
+				const t = Date.now()
+				syncPos(state)
+				console.log("syncPos", Date.now() - t)
+				// } catch (error) {
+				// 	console.error(error)
+				// }
 
 				// setTimeout(() => {
 				// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
@@ -159,222 +151,237 @@ const Editor = ({
 	}
 
 	return (
-		React.createElement(
-			"div",
-			{
-				ref,
+		<>
 
-				id,
+			{React.createElement(
+				"div",
+				{
+					ref,
 
-				className: `em-context codex-editor ${
-					!state.readOnly ? "" : "feature-read-only"
-				} ${
-					className || ""
-				}`.trim(),
+					id,
 
-				style: {
-					...style, // Takes precedence
-					whiteSpace: "pre-wrap",
-					outline: "none",
-					wordBreak: "break-word",
-				},
+					className: `em-context codex-editor ${
+						!state.readOnly ? "" : "feature-read-only"
+					} ${
+						className || ""
+					}`.trim(),
 
-				"data-codex-editor": true,
+					style: {
+						...style, // Takes precedence
+						whiteSpace: "pre-wrap",
+						outline: "none",
+						wordBreak: "break-word",
+					},
 
-				onFocus: newReadWriteHandler(() => {
-					dispatch.focus()
-				}),
+					"data-codex-editor": true,
 
-				onBlur: newReadWriteHandler(() => {
-					dispatch.blur()
-				}),
+					onFocus: newReadWriteHandler(() => {
+						dispatch.focus()
+					}),
 
-				onSelect: newReadWriteHandler(() => {
-					const selection = document.getSelection()
-					if (!selection || !selection.rangeCount) {
-						// No-op
-						return
-					}
-					// Guard document-range:
-					const range = selection.getRangeAt(0)
-					if (range.startContainer === ref.current && range.endContainer === ref.current) {
-						// Iterate to the deepest start node:
-						let node1 = ref.current.children[0]
-						while (node1.childNodes.length) {
-							node1 = node1.childNodes[0]
+					onBlur: newReadWriteHandler(() => {
+						dispatch.blur()
+					}),
+
+					onSelect: newReadWriteHandler(() => {
+						const selection = document.getSelection()
+						if (!selection || !selection.rangeCount) {
+							// No-op
+							return
 						}
-						// Iterate to the deepest end node:
-						let node2 = ref.current.children[ref.current.children.length - 1]
-						while (node2.childNodes.length) {
-							node2 = node2.childNodes[node2.childNodes.length - 1]
+						// Guard document-range:
+						const range = selection.getRangeAt(0)
+						if (range.startContainer === ref.current && range.endContainer === ref.current) {
+							// Iterate to the deepest start node:
+							let node1 = ref.current.children[0]
+							while (node1.childNodes.length) {
+								node1 = node1.childNodes[0]
+							}
+							// Iterate to the deepest end node:
+							let node2 = ref.current.children[ref.current.children.length - 1]
+							while (node2.childNodes.length) {
+								node2 = node2.childNodes[node2.childNodes.length - 1]
+							}
+							range.setStart(node1, 0)
+							range.setEnd(node2, (node2.nodeValue || "").length)
+							selection.removeAllRanges()
+							selection.addRange(range)
 						}
-						range.setStart(node1, 0)
-						range.setEnd(node2, (node2.nodeValue || "").length)
-						selection.removeAllRanges()
-						selection.addRange(range)
-					}
-					const [pos1, pos2] = computePosRange(state)
-					dispatch.select(pos1, pos2)
-				}),
+						const [pos1, pos2] = computePosRange(state)
+						dispatch.select(pos1, pos2)
+					}),
 
-				onPointerDown: newReadWriteHandler(() => {
-					pointerDownRef.current = true
-				}),
+					onPointerDown: newReadWriteHandler(() => {
+						pointerDownRef.current = true
+					}),
 
-				onPointerMove: newReadWriteHandler(() => {
-					if (!state.focused || !pointerDownRef.current) {
+					onPointerMove: newReadWriteHandler(() => {
+						if (!state.focused || !pointerDownRef.current) {
+							pointerDownRef.current = false
+							return
+						}
+						const [pos1, pos2] = computePosRange(state)
+						dispatch.select(pos1, pos2)
+					}),
+
+					onPointerUp: newReadWriteHandler(() => {
 						pointerDownRef.current = false
-						return
-					}
-					const [pos1, pos2] = computePosRange(state)
-					dispatch.select(pos1, pos2)
-				}),
+					}),
 
-				onPointerUp: newReadWriteHandler(() => {
-					pointerDownRef.current = false
-				}),
+					// TODO: Prevent browser-formatting shortcuts?
+					onKeyDown: newReadWriteHandler(e => {
+						switch (detectKeyDownType(e)) {
+						case keyDownTypeEnum.tab:
+							if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
+								// No-op
+								return
+							}
+							e.preventDefault()
+							dispatch.tab(e.shiftKey)
+							return
+						case keyDownTypeEnum.enter:
+							e.preventDefault()
+							dispatch.enter()
+							return
+						case keyDownTypeEnum.backspaceParagraph:
+							e.preventDefault()
+							dispatch.backspaceParagraph()
+							return
+						case keyDownTypeEnum.backspaceWord:
+							e.preventDefault()
+							dispatch.backspaceWord()
+							return
+						case keyDownTypeEnum.backspaceRune:
+							e.preventDefault()
+							dispatch.backspaceRune()
+							return
+						case keyDownTypeEnum.forwardBackspaceWord:
+							dispatch.forwardBackspaceWord()
+							e.preventDefault()
+							return
+						case keyDownTypeEnum.forwardBackspaceRune:
+							e.preventDefault()
+							dispatch.forwardBackspaceRune()
+							return
+						case keyDownTypeEnum.undo:
+							e.preventDefault()
+							dispatch.undo()
+							return
+						case keyDownTypeEnum.redo:
+							e.preventDefault()
+							dispatch.redo()
+							return
+						// NOTE: Character data must be synthetic when not
+						// collapsed
+						case keyDownTypeEnum.characterData:
+							if (!state.collapsed) {
+								e.preventDefault()
+								// FIXME: e.key === "Dead" causes
+								// computePosRange to throw
+								dispatch.write(e.key !== "Dead" ? e.key : "") // TODO: Deprecate "Dead" case
+								return
+							}
+							// No-op
+							break
+						default:
+							// No-op
+							break
+						}
+					}),
 
-				// TODO: Prevent browser-formatting shortcuts?
-				onKeyDown: newReadWriteHandler(e => {
-					switch (detectKeyDownType(e)) {
-					case keyDownTypeEnum.tab:
+					onCompositionEnd: newReadWriteHandler(e => {
+						// console.log("onCompositionEnd", { ...e }, dedupedCompositionEnd.current, e.nativeEvent.isComposing)
+
+						dedupedCompositionEnd.current = true
+
+						const data = readCurrentNode(state)
+						const [pos1, pos2] = computePosRange(state)
+
+						// TODO: Deprecate pos2?
+						dispatch.input(data, [pos1, pos2])
+					}),
+
+					onInput: newReadWriteHandler(e => {
+						// console.log("onInput", { ...e }, dedupedCompositionEnd.current, e.nativeEvent.isComposing)
+
+						// No-op onChange events (from checkboxes):
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 							// No-op
 							return
 						}
-						e.preventDefault()
-						dispatch.tab(e.shiftKey)
-						return
-					case keyDownTypeEnum.enter:
-						e.preventDefault()
-						dispatch.enter()
-						return
-					case keyDownTypeEnum.backspaceParagraph:
-						e.preventDefault()
-						dispatch.backspaceParagraph()
-						return
-					case keyDownTypeEnum.backspaceWord:
-						e.preventDefault()
-						dispatch.backspaceWord()
-						return
-					case keyDownTypeEnum.backspaceRune:
-						e.preventDefault()
-						dispatch.backspaceRune()
-						return
-					case keyDownTypeEnum.forwardBackspaceWord:
-						dispatch.forwardBackspaceWord()
-						e.preventDefault()
-						return
-					case keyDownTypeEnum.forwardBackspaceRune:
-						e.preventDefault()
-						dispatch.forwardBackspaceRune()
-						return
-					case keyDownTypeEnum.undo:
-						e.preventDefault()
-						dispatch.undo()
-						return
-					case keyDownTypeEnum.redo:
-						e.preventDefault()
-						dispatch.redo()
-						return
-					// NOTE: Character data must be synthetic when not
-					// collapsed
-					case keyDownTypeEnum.characterData:
-						if (!state.collapsed) {
-							e.preventDefault()
-							// FIXME: e.key === "Dead" causes
-							// computePosRange to throw
-							dispatch.write(e.key !== "Dead" ? e.key : "") // TODO: Deprecate "Dead" case
+
+						if (!ref.current.children.length) {
+							dispatch.render()
 							return
 						}
-						// No-op
-						break
-					default:
-						// No-op
-						break
-					}
-				}),
 
-				onCompositionEnd: newReadWriteHandler(e => {
-					dedupedCompositionEnd.current = true
+						// Dedupe "compositionend":
+						//
+						// https://github.com/w3c/uievents/issues/202#issue-316461024
+						if (dedupedCompositionEnd.current) {
+							dedupedCompositionEnd.current = false
+							return
+						}
 
-					const nodes = computeNodes(state.extPosRange)
-					const [pos1, pos2] = computePosRange(state)
-					dispatch.input(nodes, [pos1, pos2])
-				}),
+						// const { isComposing } = e.nativeEvent.isComposing
 
-				onInput: newReadWriteHandler(e => {
-					if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
-						// No-op
-						return
-					}
+						const data = readCurrentNode(state)
+						const [pos1, pos2] = computePosRange(state)
 
-					if (!ref.current.children.length) {
-						dispatch.render()
-						return
-					}
+						// TODO: Deprecate pos2?
+						dispatch.input(data, [pos1, pos2])
+					}),
 
-					// Dedupe "compositionend":
-					//
-					// https://github.com/w3c/uievents/issues/202#issue-316461024
-					if (dedupedCompositionEnd.current || e.nativeEvent.isComposing) {
-						dedupedCompositionEnd.current = false
-						return
-					}
+					onCut: newReadWriteHandler(e => {
+						e.preventDefault()
+						if (state.collapsed) {
+							// No-op
+							return
+						}
+						const cutData = state.data.slice(state.pos1.pos, state.pos2.pos)
+						e.clipboardData.setData("text/plain", cutData)
+						dispatch.cut()
+					}),
 
-					const nodes = computeNodes(state.extPosRange)
-					const [pos1, pos2] = computePosRange(state)
-					dispatch.input(nodes, [pos1, pos2])
-				}),
+					onCopy: newReadWriteHandler(e => {
+						e.preventDefault()
+						if (state.collapsed) {
+							// No-op
+							return
+						}
+						const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
+						e.clipboardData.setData("text/plain", copyData)
+						dispatch.copy()
+					}),
 
-				onCut: newReadWriteHandler(e => {
-					e.preventDefault()
-					if (state.collapsed) {
-						// No-op
-						return
-					}
-					const cutData = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", cutData)
-					dispatch.cut()
-				}),
+					onPaste: newReadWriteHandler(e => {
+						e.preventDefault()
+						const pasteData = e.clipboardData.getData("text/plain")
+						if (!pasteData) {
+							// No-op
+							return
+						}
+						dispatch.paste(pasteData)
+					}),
 
-				onCopy: newReadWriteHandler(e => {
-					e.preventDefault()
-					if (state.collapsed) {
-						// No-op
-						return
-					}
-					const copyData = state.data.slice(state.pos1.pos, state.pos2.pos)
-					e.clipboardData.setData("text/plain", copyData)
-					dispatch.copy()
-				}),
+					onDragStart: newReadWriteHandler(e => {
+						e.preventDefault()
+					}),
 
-				onPaste: newReadWriteHandler(e => {
-					e.preventDefault()
-					const pasteData = e.clipboardData.getData("text/plain")
-					if (!pasteData) {
-						// No-op
-						return
-					}
-					dispatch.paste(pasteData)
-				}),
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
+				},
+			)}
 
-				onDragStart: newReadWriteHandler(e => {
-					e.preventDefault()
-				}),
+			<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
+				{JSON.stringify({
+					data: state.data,
+					nodes: state.nodes,
+				}, null, "\t")}
+			</pre>
 
-				contentEditable: !state.readOnly,
-				suppressContentEditableWarning: !state.readOnly,
-			},
-		)
+		</>
 	)
 }
-
-// <pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-// 	{JSON.stringify({
-// 		data: state.data,
-// 		nodes: state.nodes,
-// 	}, null, "\t")}
-// </pre>
 
 export default Editor

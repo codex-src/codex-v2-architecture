@@ -52,58 +52,28 @@ function computeMetaRange(editorState, pos) {
 		pos -= (each.data + "\n").length // FIXME
 	}
 	const node = document.getElementById(id)
-	if (!id || !node) {
-		throw new Error(`computeMetaRange: could not query node (id=${id || "\"\""})`)
+	if (!node) {
+		throw new Error(`computeMetaRange: could not query id=${id || "``"}`)
 	}
 	return computeDOMRange(node, pos)
 }
 
 // Synchronizes DOM cursors.
 function syncPos(editorState) {
-	let t = Date.now()
-
 	const selection = document.getSelection()
-	// if (!selection || selection.rangeCount) {
-	// 	throw new Error("syncPos: selection exists when it should not")
-	// }
-
-	console.log("b", Date.now() - t)
-	t = Date.now()
-
+	if (!selection || selection.rangeCount) {
+		throw new Error("syncPos: selection exists when it should not")
+	}
 	const range1 = computeMetaRange(editorState, editorState.pos1.pos)
-
-	console.log("c", Date.now() - t)
-	t = Date.now()
-
 	let range2 = { ...range1 }
 	if (!editorState.collapsed) {
 		range2 = computeMetaRange(editorState, editorState.pos2.pos)
-
-		console.log("d", Date.now() - t)
-		t = Date.now()
-
 	}
-
-	console.log("e", Date.now() - t)
-	t = Date.now()
-
 	const range = document.createRange()
 	range.setStart(range1.node, range1.offset)
-
-	console.log("f", Date.now() - t)
-	t = Date.now()
-
 	range.setEnd(range2.node, range2.offset)
-
-
-	console.log("g", Date.now() - t)
-	t = Date.now()
-
 	// selection.removeAllRanges()
 	selection.addRange(range)
-
-	console.log("h", Date.now() - t)
-	t = Date.now()
 }
 
 export default syncPos
