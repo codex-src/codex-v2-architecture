@@ -1,4 +1,4 @@
-import { ascendRoot } from "./nodes/ascendNodes"
+import { ascendNode } from "./nodes/ascendNodes"
 import { isDocumentNode } from "./nodes/documentNodes"
 import { newPos } from "./constructors"
 
@@ -67,16 +67,16 @@ function computeMetaPos(nodes, { node, offset }) {
 	const vdomPos = newPos()
 
 	// TODO: Why are we asecending to the root?
-	const root = ascendRoot(node)
+	const documentNode = ascendNode(node)
 	for (const each of nodes) {
-		if (each.id === root.id) {
+		if (each.id === documentNode.id) {
 			// No-op
 			break
 		}
 		vdomPos.y++
 		vdomPos.pos += (each.data + "\n").length
 	}
-	const domPos = computeDOMPos(root, { node, offset })
+	const domPos = computeDOMPos(documentNode, { node, offset })
 	return newMetaPos(vdomPos, domPos)
 }
 

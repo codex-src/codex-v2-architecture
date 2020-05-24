@@ -305,31 +305,28 @@ const Editor = ({
 						const data = readCurrentNode(state)
 						let [pos] = computePosRange(state)
 
-						// const selection = document.getSelection()
-						// const range = selection.getRangeAt(0)
-						// console.log(range.startContainer, range.startOffset)
-
-						// COMPAT: In Firefox, backspace on a
+						// COMPAT: In Firefox, backspace during a
 						// composition event can create an empty text
-						// node at the start of the document.
-						//
-						// **DESTROY IT AND REMOVE THE SELECTION**
-						//
-						//
-						if (ref.current.childNodes[0].nodeType === Node.TEXT_NODE) {
-							ref.current.childNodes[0].remove()
+						// node; **DROP THE SELECTION AND DESTROY IT**:
+						const textNodes = []
+						for (const each of ref.current.childNodes) {
+							if (each.nodeType === Node.TEXT_NODE) {
+								textNodes.push(each)
+							}
+						}
+						if (textNodes.length) {
 							const selection = document.getSelection()
 							if (selection && selection.rangeCount) {
 								selection.removeAllRanges()
 							}
-							pos = state.pos1
-							if (pos.pos <= state.nodes[pos.y].data.length) {
-								// pos.pos++
+							for (const each of textNodes) {
+								each.remove()
 							}
+							pos = state.pos1
 						}
 
-						// console.log("onCompositionEnd", pos.pos, { innerHTML: ref.current.innerHTML })
-						// dispatch.input(data, [pos], true)
+						console.log("onCompositionEnd", pos.pos, { innerHTML: ref.current.innerHTML })
+						dispatch.input(data, [pos], true)
 					}),
 
 					"onInput": newReadWriteHandler(e => {
