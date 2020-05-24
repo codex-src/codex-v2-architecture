@@ -1,6 +1,6 @@
 import { ascendRoot } from "./nodes/ascendNodes"
+import { isDocumentNode } from "./nodes/documentNodes"
 import { newPos } from "./constructors"
-import { isDocumentRoot } from "./nodes/documentNodes"
 
 // Computes a cursor data structure from the DOM.
 function computeDOMPos(root, { node, offset }) {
@@ -36,7 +36,7 @@ function computeDOMPos(root, { node, offset }) {
 				pos: pos.pos + length,
 			})
 			const next = each.nextElementSibling
-			if (next && isDocumentRoot(next)) {
+			if (next && isDocumentNode(next)) {
 				Object.assign(pos, {
 					x: 0,
 					y: pos.y + 1,

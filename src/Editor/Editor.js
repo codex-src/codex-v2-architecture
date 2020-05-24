@@ -354,7 +354,7 @@ const Editor = ({
 						const data = readCurrentNode(state)
 						const [pos] = computePosRange(state)
 
-						console.log("onInput", pos.pos)
+						console.log("onInput", state.pos1.y, { data })
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 
