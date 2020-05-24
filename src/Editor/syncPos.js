@@ -59,10 +59,10 @@ function computeMetaRange(editorState, pos) {
 }
 
 // Synchronizes DOM cursors.
-function syncPos(selection, editorState) {
+function syncPos(editorState) {
 	let t = Date.now()
 
-	// const selection = document.getSelection()
+	const selection = document.getSelection()
 	// if (!selection || selection.rangeCount) {
 	// 	throw new Error("syncPos: selection exists when it should not")
 	// }
@@ -99,7 +99,7 @@ function syncPos(selection, editorState) {
 	console.log("g", Date.now() - t)
 	t = Date.now()
 
-	selection.removeAllRanges()
+	// selection.removeAllRanges()
 	selection.addRange(range)
 
 	console.log("h", Date.now() - t)

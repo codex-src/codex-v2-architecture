@@ -415,6 +415,7 @@ const methods = state => ({
 		// const { id } = state.nodes[state.pos1.y]
 		const nextElement = nextElements.find(each => each.id === id)
 		if (nextElement) {
+			console.log(nextElement)
 			nextElement.reactKey = uuidv4()
 		}
 

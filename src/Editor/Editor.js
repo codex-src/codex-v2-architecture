@@ -82,7 +82,6 @@ const Editor = ({
 	React.useLayoutEffect(
 		React.useCallback(() => {
 
-
 			// https://bugs.chromium.org/p/chromium/issues/detail?id=138439#c10
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
@@ -102,7 +101,7 @@ const Editor = ({
 				}
 
 				try {
-					syncPos(selection, state)
+					syncPos(state)
 					console.log("syncPos", Date.now() - t)
 				} catch (error) {
 					console.error(error)
