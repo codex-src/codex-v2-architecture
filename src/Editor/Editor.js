@@ -297,14 +297,12 @@ const Editor = ({
 							return
 						}
 
-						// Dedupe "compositionend" events:
 						dedupedFirefoxCompositionEnd.current = true
-
-						console.log("onCompositionEnd")
-						console.log("here", state.pos1.pos, state.pos2.pos)
 
 						const data = readCurrentNode(state)
 						const [pos] = computePosRange(state)
+
+						console.log("onCompositionEnd", pos.pos)
 						dispatch.input(data, [pos])
 					}),
 
@@ -314,7 +312,6 @@ const Editor = ({
 							return
 						}
 
-						// No-op onChange events (from checkboxes):
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 							// No-op
 							return
@@ -326,12 +323,12 @@ const Editor = ({
 							return
 						}
 
-						console.log("onInput")
-
 						const shouldPreventDOMRerender = e.nativeEvent.isComposing
 
 						const data = readCurrentNode(state)
 						const [pos] = computePosRange(state)
+
+						console.log("onInput", pos.pos)
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 

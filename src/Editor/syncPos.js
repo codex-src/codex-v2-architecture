@@ -43,8 +43,6 @@ function computeDOMRange(root, pos) {
 
 // Computes a meta DOM cursor; uses VDOM and DOM to compute.
 function computeMetaRange(nodes, pos) {
-	// console.log({ nodes, pos })
-
 	let id = ""
 	for (const each of nodes) { // FIXME
 		if (pos - each.data.length <= 0) {
@@ -53,9 +51,6 @@ function computeMetaRange(nodes, pos) {
 		}
 		pos -= (each.data + "\n").length // FIXME
 	}
-
-	// console.log({ id })
-
 	const node = document.getElementById(id)
 	if (!node) {
 		throw new Error(`computeMetaRange: could not query id=${id || "(empty)"}`)

@@ -23,10 +23,16 @@ import { newPos } from "./constructors"
 function computeDOMPos(root, { node, offset }) {
 	// Iterate to the deepest node:
 	const pos = newPos()
-	while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
+
+	if (node.nodeType === Node.ELEMENT_NODE) {
 		node = node.childNodes[offset]
 		offset = 0
 	}
+
+	// while (node.nodeType === Node.ELEMENT_NODE && offset < node.childNodes.length) {
+	// 	node = node.childNodes[offset]
+	// 	offset = 0
+	// }
 	const recurse = on => {
 		if (on === node) {
 			Object.assign(pos, {
