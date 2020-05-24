@@ -307,7 +307,8 @@ const Editor = ({
 
 						// COMPAT: In Firefox, backspace during a
 						// composition event can create an empty text
-						// node; **DROP THE SELECTION AND DESTROY IT**:
+						// node; **REMOVE THE SELECTION AND DESTROY THE
+						// TEXT NODE**:
 						const textNodes = []
 						for (const each of ref.current.childNodes) {
 							if (each.nodeType === Node.TEXT_NODE) {
@@ -325,8 +326,7 @@ const Editor = ({
 							pos = state.pos1
 						}
 
-						console.log("onCompositionEnd", pos.pos, { innerHTML: ref.current.innerHTML })
-						dispatch.input(data, [pos], true)
+						dispatch.input(data, [pos])
 					}),
 
 					"onInput": newReadWriteHandler(e => {
@@ -350,8 +350,6 @@ const Editor = ({
 
 						const data = readCurrentNode(state)
 						const [pos] = computePosRange(state)
-
-						console.log("onInput", state.pos1.y, { data })
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 
