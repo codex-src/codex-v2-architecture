@@ -80,10 +80,12 @@ function newMetaPos(vdomPos, domPos) {
 
 // Computes a meta cursor data structure; uses VDOM and DOM
 // to compute.
-function computeMetaPos(editorState, { node, offset }) {
+function computeMetaPos(nodes, { node, offset }) {
 	const vdomPos = newPos()
+
+	// TODO: Why are we asecending to the root?
 	const root = ascendRoot(node)
-	for (const each of editorState.nodes) {
+	for (const each of nodes) {
 		if (each.id === root.id) {
 			// No-op
 			break
@@ -102,10 +104,10 @@ function computePosRange(editorState) {
 		throw new Error("computePosRange: selection does not exist when it should")
 	}
 	const range = selection.getRangeAt(0)
-	const pos1 = computeMetaPos(editorState, { node: range.startContainer, offset: range.startOffset })
+	const pos1 = computeMetaPos(editorState.nodes, { node: range.startContainer, offset: range.startOffset })
 	let pos2 = { ...pos1 }
 	if (!range.collapsed) {
-		pos2 = computeMetaPos(editorState, { node: range.endContainer, offset: range.endOffset })
+		pos2 = computeMetaPos(editorState.nodes, { node: range.endContainer, offset: range.endOffset })
 	}
 	return [pos1, pos2]
 }

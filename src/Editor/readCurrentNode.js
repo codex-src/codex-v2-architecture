@@ -3,7 +3,7 @@ function readCurrentNode(editorState) {
 	const { id } = editorState.nodes[editorState.pos1.y]
 	const node = document.getElementById(id)
 	if (!node) {
-		throw new Error(`readCurrentNode: could not query id=${id || "``"}`)
+		throw new Error(`readCurrentNode: could not query id=${id || "(empty)"}`)
 	}
 	let data = ""
 	const recurse = on => {

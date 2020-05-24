@@ -71,7 +71,9 @@ const Editor = ({
 	const ref = React.useRef()
 
 	const pointerDownRef = React.useRef(false)
-	const dedupedCompositionEnd = React.useRef(false)
+
+	// https://github.com/w3c/uievents/issues/202#issue-316461024
+	const dedupedFirefoxCompositionEnd = React.useRef(false)
 
 	// Syncs props to state.
 	React.useEffect(() => {
@@ -91,13 +93,13 @@ const Editor = ({
 					return
 				}
 
-				// try {
-				const t = Date.now()
-				syncPos(state)
-				console.log("syncPos", Date.now() - t)
-				// } catch (error) {
-				// 	console.error(error)
-				// }
+				try {
+					// const t = Date.now()
+					syncPos(state)
+					// console.log("syncPos", Date.now() - t)
+				} catch (error) {
+					console.error(error)
+				}
 
 				// setTimeout(() => {
 				// 	const computed = computeScrollingElementAndOffset(scrollTopOffset, scrollBottomOffset)
@@ -290,19 +292,27 @@ const Editor = ({
 					}),
 
 					onCompositionEnd: newReadWriteHandler(e => {
-						// console.log("onCompositionEnd", { ...e }, dedupedCompositionEnd.current, e.nativeEvent.isComposing)
+						if (!ref.current.children.length) {
+							dispatch.render()
+							return
+						}
 
-						dedupedCompositionEnd.current = true
+						// Dedupe "compositionend" events:
+						dedupedFirefoxCompositionEnd.current = true
+
+						console.log("onCompositionEnd")
+						console.log("here", state.pos1.pos, state.pos2.pos)
 
 						const data = readCurrentNode(state)
-						const [pos1, pos2] = computePosRange(state)
-
-						// TODO: Deprecate pos2?
-						dispatch.input(data, [pos1, pos2])
+						const [pos] = computePosRange(state)
+						dispatch.input(data, [pos])
 					}),
 
 					onInput: newReadWriteHandler(e => {
-						// console.log("onInput", { ...e }, dedupedCompositionEnd.current, e.nativeEvent.isComposing)
+						if (!ref.current.children.length) {
+							dispatch.render()
+							return
+						}
 
 						// No-op onChange events (from checkboxes):
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
@@ -310,26 +320,19 @@ const Editor = ({
 							return
 						}
 
-						if (!ref.current.children.length) {
-							dispatch.render()
+						// Ignore deduped "compositionend" event:
+						if (dedupedFirefoxCompositionEnd.current) {
+							dedupedFirefoxCompositionEnd.current = false
 							return
 						}
 
-						// Dedupe "compositionend":
-						//
-						// https://github.com/w3c/uievents/issues/202#issue-316461024
-						if (dedupedCompositionEnd.current) {
-							dedupedCompositionEnd.current = false
-							return
-						}
+						console.log("onInput")
 
-						// const { isComposing } = e.nativeEvent.isComposing
+						const shouldPreventDOMRerender = e.nativeEvent.isComposing
 
 						const data = readCurrentNode(state)
-						const [pos1, pos2] = computePosRange(state)
-
-						// TODO: Deprecate pos2?
-						dispatch.input(data, [pos1, pos2])
+						const [pos] = computePosRange(state)
+						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 
 					onCut: newReadWriteHandler(e => {

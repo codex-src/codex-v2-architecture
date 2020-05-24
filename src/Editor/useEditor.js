@@ -145,15 +145,15 @@ const methods = state => ({
 		this.write("")
 	},
 
-	input(data, [pos1, pos2]) {
+	input(data, [pos1], shouldPreventDOMRerender = false) {
 		state.history.mutate()
 
 		state.nodes[state.pos1.y].data = data
 		Object.assign(state, {
 			pos1,
-			pos2,
+			pos2: { ...pos1 },
 		})
-		this.render()
+		this.render(shouldPreventDOMRerender)
 	},
 
 	/*
@@ -348,9 +348,9 @@ const methods = state => ({
 	/*
 	 * Render
 	 */
-	render() {
+	render(shouldPreventDOMRerender = false) {
 
-		let t = Date.now()
+		// let t = Date.now()
 
 		// let data = ""
 		// for (let x = 0, len = state.nodes.length; x < len; x++) {
@@ -361,14 +361,19 @@ const methods = state => ({
 		// }
 
 		const data = state.nodes.map(each => each.data).join("\n")
-		console.log("state.nodes.map.join", Date.now() - t)
-		t = Date.now()
+		// console.log("state.nodes.map.join", Date.now() - t)
+		// t = Date.now()
+
+		if (shouldPreventDOMRerender) {
+			state.data = data
+			return
+		}
 
 		// const elements = state.elements
 
 		const nextElements = parseElements(state.nodes, state.cachedElements)
-		console.log("parseElements", Date.now() - t)
-		t = Date.now()
+		// console.log("parseElements", Date.now() - t)
+		// t = Date.now()
 
 		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
 
@@ -385,7 +390,7 @@ const methods = state => ({
 		// const { id } = state.nodes[state.pos1.y]
 		const nextElement = nextElements.find(each => each.id === id)
 		if (nextElement) {
-			console.log(nextElement)
+			// console.log(nextElement)
 			nextElement.reactKey = uuidv4()
 		}
 
