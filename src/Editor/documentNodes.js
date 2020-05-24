@@ -8,7 +8,7 @@ export function isNode(element) {
 export function isRoot(element) {
 	const ok = (
 		element.id &&
-		element.parentElement.getAttribute("data-codex-root")
+		element.parentElement.getAttribute("data-codex-editor")
 	)
 	return ok
 }
