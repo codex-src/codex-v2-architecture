@@ -180,6 +180,8 @@ const Editor = ({
 					wordBreak: "break-word",
 				},
 
+				"data-codex-root": true,
+
 				onFocus: newReadWriteHandler(() => {
 					dispatch.focus()
 				}),
