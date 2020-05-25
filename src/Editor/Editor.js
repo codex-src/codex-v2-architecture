@@ -235,8 +235,6 @@ const Editor = ({
 						pointerDownRef.current = false
 					}),
 
-					// TODO: Prevent browser-formatting shortcuts
-					// command-b and command-i -- are there more?
 					onKeyDown: newReadWriteHandler(e => {
 						switch (detectKeyDownTypes(e)) {
 						case keyDownTypesEnum.tab:
