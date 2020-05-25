@@ -1,8 +1,8 @@
 // import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 // import uuidv4 from "uuid/v4"
 import computePosRange from "./computePosRange"
-import detectKeyDownType from "./keydown/detectKeyDownType"
-import keyDownTypeEnum from "./keydown/keyDownTypeEnum"
+import detectKeyDownTypes from "./keydown/detectKeyDownTypes"
+import keyDownTypesEnum from "./keydown/keyDownTypesEnum"
 import React from "react"
 import ReactDOM from "react-dom"
 import syncPos from "./syncPos"
@@ -87,16 +87,18 @@ const Editor = ({
 			if (selection && selection.rangeCount) {
 				selection.removeAllRanges()
 			}
+			const t = Date.now()
 			ReactDOM.render(<ReactElements state={state} dispatch={dispatch} />, ref.current, () => {
+				console.log("ReactDOM.render", Date.now() - t)
 				if (state.readOnly || !state.focused) {
 					// No-op
 					return
 				}
 
 				try {
-					// const t = Date.now()
+					const t = Date.now()
 					syncPos(state)
-					// console.log("syncPos", Date.now() - t)
+					console.log("syncPos", Date.now() - t)
 				} catch (error) {
 					console.error(error)
 				}
@@ -165,13 +167,13 @@ const Editor = ({
 
 					id,
 
-					"className": `em-context codex-editor ${
+					className: `em-context codex-editor ${
 						!state.readOnly ? "" : "feature-read-only"
 					} ${
 						className || ""
 					}`.trim(),
 
-					"style": {
+					style: {
 						...style, // Takes precedence
 						whiteSpace: "pre-wrap",
 						outline: "none",
@@ -180,15 +182,15 @@ const Editor = ({
 
 					"data-codex-editor": true,
 
-					"onFocus": newReadWriteHandler(() => {
+					onFocus: newReadWriteHandler(() => {
 						dispatch.focus()
 					}),
 
-					"onBlur": newReadWriteHandler(() => {
+					onBlur: newReadWriteHandler(() => {
 						dispatch.blur()
 					}),
 
-					"onSelect": newReadWriteHandler(() => {
+					onSelect: newReadWriteHandler(() => {
 						const selection = document.getSelection()
 						if (!selection || !selection.rangeCount) {
 							// No-op
@@ -216,11 +218,11 @@ const Editor = ({
 						dispatch.select(pos1, pos2)
 					}),
 
-					"onPointerDown": newReadWriteHandler(() => {
+					onPointerDown: newReadWriteHandler(() => {
 						pointerDownRef.current = true
 					}),
 
-					"onPointerMove": newReadWriteHandler(() => {
+					onPointerMove: newReadWriteHandler(() => {
 						if (!state.focused || !pointerDownRef.current) {
 							pointerDownRef.current = false
 							return
@@ -229,14 +231,15 @@ const Editor = ({
 						dispatch.select(pos1, pos2)
 					}),
 
-					"onPointerUp": newReadWriteHandler(() => {
+					onPointerUp: newReadWriteHandler(() => {
 						pointerDownRef.current = false
 					}),
 
-					// TODO: Prevent browser-formatting shortcuts?
-					"onKeyDown": newReadWriteHandler(e => {
-						switch (detectKeyDownType(e)) {
-						case keyDownTypeEnum.tab:
+					// TODO: Prevent browser-formatting shortcuts
+					// command-b and command-i -- are there more?
+					onKeyDown: newReadWriteHandler(e => {
+						switch (detectKeyDownTypes(e)) {
+						case keyDownTypesEnum.tab:
 							if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 								// No-op
 								return
@@ -244,41 +247,49 @@ const Editor = ({
 							e.preventDefault()
 							dispatch.tab(e.shiftKey)
 							return
-						case keyDownTypeEnum.enter:
+						case keyDownTypesEnum.enter:
 							e.preventDefault()
 							dispatch.enter()
 							return
-						case keyDownTypeEnum.backspaceParagraph:
+						case keyDownTypesEnum.formatEm:
+							e.preventDefault()
+							// TODO
+							return
+						case keyDownTypesEnum.formatStrong:
+							e.preventDefault()
+							// TODO
+							return
+						case keyDownTypesEnum.backspaceParagraph:
 							e.preventDefault()
 							dispatch.backspaceParagraph()
 							return
-						case keyDownTypeEnum.backspaceWord:
+						case keyDownTypesEnum.backspaceWord:
 							e.preventDefault()
 							dispatch.backspaceWord()
 							return
-						case keyDownTypeEnum.backspaceRune:
+						case keyDownTypesEnum.backspaceRune:
 							e.preventDefault()
 							dispatch.backspaceRune()
 							return
-						case keyDownTypeEnum.forwardBackspaceWord:
+						case keyDownTypesEnum.forwardBackspaceWord:
 							dispatch.forwardBackspaceWord()
 							e.preventDefault()
 							return
-						case keyDownTypeEnum.forwardBackspaceRune:
+						case keyDownTypesEnum.forwardBackspaceRune:
 							e.preventDefault()
 							dispatch.forwardBackspaceRune()
 							return
-						case keyDownTypeEnum.undo:
+						case keyDownTypesEnum.undo:
 							e.preventDefault()
 							dispatch.undo()
 							return
-						case keyDownTypeEnum.redo:
+						case keyDownTypesEnum.redo:
 							e.preventDefault()
 							dispatch.redo()
 							return
 						// NOTE: Character data must be synthetic when not
 						// collapsed
-						case keyDownTypeEnum.characterData:
+						case keyDownTypesEnum.characterData:
 							if (!state.collapsed) {
 								e.preventDefault()
 								// FIXME: e.key === "Dead" causes
@@ -294,7 +305,7 @@ const Editor = ({
 						}
 					}),
 
-					"onCompositionEnd": newReadWriteHandler(e => {
+					onCompositionEnd: newReadWriteHandler(e => {
 						if (!ref.current.children.length) {
 							dispatch.render()
 							return
@@ -328,7 +339,7 @@ const Editor = ({
 						dispatch.input(data, [pos])
 					}),
 
-					"onInput": newReadWriteHandler(e => {
+					onInput: newReadWriteHandler(e => {
 						// No-op onChange events from <TodoItem>:
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 							// No-op
@@ -354,7 +365,7 @@ const Editor = ({
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 
-					"onCut": newReadWriteHandler(e => {
+					onCut: newReadWriteHandler(e => {
 						e.preventDefault()
 						if (state.collapsed) {
 							// No-op
@@ -365,7 +376,7 @@ const Editor = ({
 						dispatch.cut()
 					}),
 
-					"onCopy": newReadWriteHandler(e => {
+					onCopy: newReadWriteHandler(e => {
 						e.preventDefault()
 						if (state.collapsed) {
 							// No-op
@@ -376,7 +387,7 @@ const Editor = ({
 						dispatch.copy()
 					}),
 
-					"onPaste": newReadWriteHandler(e => {
+					onPaste: newReadWriteHandler(e => {
 						e.preventDefault()
 						const pasteData = e.clipboardData.getData("text/plain")
 						if (!pasteData) {
@@ -386,23 +397,22 @@ const Editor = ({
 						dispatch.paste(pasteData)
 					}),
 
-					"onDragStart": newReadWriteHandler(e => {
+					onDragStart: newReadWriteHandler(e => {
 						e.preventDefault()
 					}),
 
-					"contentEditable": !state.readOnly,
-					"suppressContentEditableWarning": !state.readOnly,
+					contentEditable: !state.readOnly,
+					suppressContentEditableWarning: !state.readOnly,
 				},
 			)}
 
-			<pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}>
-				{JSON.stringify({
-					data: state.data,
-					// nodes: state.nodes,
-					elements: state.elements,
-				}, null, "\t")}
-			</pre>
-
+			{/* <pre className="text-sm" style={{ tabSize: 2, MozTabSize: 2 }}> */}
+			{/* 	{JSON.stringify({ */}
+			{/* 		data: state.data, */}
+			{/* 		// nodes: state.nodes, */}
+			{/* 		elements: state.elements, */}
+			{/* 	}, null, "\t")} */}
+			{/* </pre> */}
 
 		</>
 	)

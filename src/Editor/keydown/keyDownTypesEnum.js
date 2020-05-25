@@ -1,8 +1,11 @@
 import { StringEnum } from "lib/Enums"
 
-const keyDownTypeEnum = new StringEnum(
+const keyDownTypesEnum = new StringEnum(
 	"tab",
 	"enter",
+
+	"formatEm",
+	"formatStrong",
 
 	"backspaceParagraph",
 	"backspaceWord",
@@ -16,4 +19,4 @@ const keyDownTypeEnum = new StringEnum(
 	"characterData",
 )
 
-export default keyDownTypeEnum
+export default keyDownTypesEnum

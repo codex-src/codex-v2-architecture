@@ -14,10 +14,7 @@ import { Strikethrough } from "./InlineElements"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
-		// console.log({ children })
-
-		// return !children ? null : <span>{children}</span>
-		return children
+		return !children ? null : <span>{children}</span>
 	}
 	const components = []
 	for (const each of children) {

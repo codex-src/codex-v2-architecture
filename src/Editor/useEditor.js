@@ -372,9 +372,9 @@ const methods = state => ({
 
 		// const elements = state.elements
 
+		const t = Date.now()
 		const nextElements = parseElements(state.nodes, state.cachedElements)
-		// console.log("parseElements", Date.now() - t)
-		// t = Date.now()
+		console.log("parseElements", Date.now() - t)
 
 		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
 
@@ -391,7 +391,7 @@ const methods = state => ({
 		const nextElement = nextElements.find(each => each.id === id)
 		if (nextElement) {
 			// console.log(nextElement)
-			nextElement.reactKey = uuidv4()
+			nextElement.reactKey = uuidv4().slice(0, 8)
 		}
 
 		// const areEqualElements = (nextElement, element) => {

@@ -1,9 +1,12 @@
 import isMetaOrCtrlKey from "lib/isMetaOrCtrlKey"
-import keyDownTypeEnum from "./keyDownTypeEnum"
+import keyDownTypesEnum from "./keyDownTypesEnum"
 
 const keyCodes = {
 	Tab: 9,
 	Enter: 13,
+
+	I: 73,
+	B: 66,
 
 	Backspace: 8,
 	Delete: 46,
@@ -23,6 +26,20 @@ const detect = {
 	},
 	enter(e) {
 		return e.keyCode === keyCodes.Enter
+	},
+	formatEm(e) {
+		const ok = (
+			isMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.I
+		)
+		return ok
+	},
+	formatStrong(e) {
+		const ok = (
+			isMetaOrCtrlKey(e) &&
+			e.keyCode === keyCodes.B
+		)
+		return ok
 	},
 	// NOTE: detect.backspace* are ordered by precedence
 	backspaceParagraph(e) {
@@ -110,34 +127,38 @@ const detect = {
 }
 
 // Detects a key down type.
-function detectKeyDownType(e) {
+function detectKeyDownTypes(e) {
 	switch (true) {
 	case detect.tab(e):
-		return keyDownTypeEnum.tab
+		return keyDownTypesEnum.tab
 	case detect.enter(e):
-		return keyDownTypeEnum.enter
+		return keyDownTypesEnum.enter
+	case detect.formatEm(e):
+		return keyDownTypesEnum.formatEm
+	case detect.formatStrong(e):
+		return keyDownTypesEnum.formatStrong
 	// NOTE: detect.backspace* are ordered by precedence
 	case detect.backspaceParagraph(e):
-		return keyDownTypeEnum.backspaceParagraph
+		return keyDownTypesEnum.backspaceParagraph
 	case detect.backspaceWord(e):
-		return keyDownTypeEnum.backspaceWord
+		return keyDownTypesEnum.backspaceWord
 	case detect.backspaceRune(e):
-		return keyDownTypeEnum.backspaceRune
+		return keyDownTypesEnum.backspaceRune
 	// NOTE: detect.forwardBackspace* are ordered by
 	// precedence
 	case detect.forwardBackspaceWord(e):
-		return keyDownTypeEnum.forwardBackspaceWord
+		return keyDownTypesEnum.forwardBackspaceWord
 	case detect.forwardBackspaceRune(e):
 	case detect.forwardBackspaceRuneMacOS(e):
-		return keyDownTypeEnum.forwardBackspaceRune
+		return keyDownTypesEnum.forwardBackspaceRune
 	case detect.undo(e):
-		return keyDownTypeEnum.undo
+		return keyDownTypesEnum.undo
 	case detect.redo(e):
 	case detect.redoNonMacOS(e):
-		return keyDownTypeEnum.redo
+		return keyDownTypesEnum.redo
 	case detect.characterData(e):
 	case detect.characterDataCompose(e):
-		return keyDownTypeEnum.characterData
+		return keyDownTypesEnum.characterData
 	default:
 		// No-op
 		break
@@ -145,4 +166,4 @@ function detectKeyDownType(e) {
 	return ""
 }
 
-export default detectKeyDownType
+export default detectKeyDownTypes
