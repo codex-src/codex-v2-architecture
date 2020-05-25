@@ -145,7 +145,7 @@ const methods = state => ({
 		this.write("")
 	},
 
-	input(data, [pos1], shouldPreventDOMRerender = false) {
+	input(data, pos1, renderOptions = { id: "", isComposing: true }) {
 		state.history.mutate()
 
 		state.nodes[state.pos1.y].data = data
@@ -153,7 +153,7 @@ const methods = state => ({
 			pos1,
 			pos2: { ...pos1 },
 		})
-		this.render(shouldPreventDOMRerender)
+		this.render(renderOptions)
 	},
 
 	/*
@@ -348,50 +348,22 @@ const methods = state => ({
 	/*
 	 * Render
 	 */
-	render(shouldPreventDOMRerender = false) {
-
-		// let t = Date.now()
-
-		// let data = ""
-		// for (let x = 0, len = state.nodes.length; x < len; x++) {
-		// 	if (x) {
-		// 		data += "\n"
-		// 	}
-		// 	data += state.nodes[x].data
-		// }
-
+	render(renderOptions = { id: "", isComposing: false }) {
 		const data = state.nodes.map(each => each.data).join("\n")
-		// console.log("state.nodes.map.join", Date.now() - t)
-		// t = Date.now()
-
-		// Prevent rerender to the DOM:
-		if (shouldPreventDOMRerender) {
+		if (renderOptions.isComposing) {
 			state.data = data
 			return
 		}
-
-		// const elements = state.elements
 
 		const t = Date.now()
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		// console.log(state.cachedElements.get(state.nodes[state.pos1.y].data))
-
-		let id = ""
-		const selection = document.getSelection()
-		if (selection.rangeCount) {
-			const range = selection.getRangeAt(0)
-			const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
-			id = root.id || root.querySelector("[id]").id
-		}
-		// console.log(id)
-
-		// const { id } = state.nodes[state.pos1.y]
-		const nextElement = nextElements.find(each => each.id === id)
-		if (nextElement) {
-			// console.log(nextElement)
-			nextElement.reactKey = uuidv4().slice(0, 8)
+		if (renderOptions.id) {
+			const nextElement = nextElements.find(each => each.id === renderOptions.id)
+			if (nextElement) {
+				nextElement.reactKey =uuidv4().slice(0, 8)
+			}
 		}
 
 		// const areEqualElements = (nextElement, element) => {

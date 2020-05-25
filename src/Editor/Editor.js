@@ -1,10 +1,10 @@
 // import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
-// import uuidv4 from "uuid/v4"
-import readCurrentPos from "./readCurrentPos"
 import detectKeyDownTypes from "./keydown/detectKeyDownTypes"
 import keyDownTypesEnum from "./keydown/keyDownTypesEnum"
 import React from "react"
 import ReactDOM from "react-dom"
+import readCurrentPos from "./readCurrentPos"
+import readCurrentPosAndID from "./readCurrentPosAndID"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
@@ -312,7 +312,7 @@ const Editor = ({
 						dedupedFirefoxCompositionEnd.current = true
 
 						const data = readCurrentDocumentNode(state)
-						let [pos] = readCurrentPos(state)
+						let { pos: [pos1], id } = readCurrentPosAndID(state)
 
 						// COMPAT (FF): Backspace during a composition
 						// event can create an empty text node; **REMOVE
@@ -331,10 +331,10 @@ const Editor = ({
 							for (const each of textNodes) {
 								each.remove()
 							}
-							pos = state.pos1
+							pos1 = state.pos1 // Revert to be safe
 						}
 
-						dispatch.input(data, [pos])
+						dispatch.input(data, pos1, { id, isComposing: false })
 					}),
 
 					onInput: newReadWriteHandler(e => {
@@ -354,13 +354,9 @@ const Editor = ({
 							return
 						}
 
-						const shouldPreventDOMRerender = e.nativeEvent.isComposing
-
 						const data = readCurrentDocumentNode(state)
-						console.log({ data })
-
-						const [pos] = readCurrentPos(state)
-						dispatch.input(data, [pos], shouldPreventDOMRerender)
+						const { pos: [pos1], id } = readCurrentPosAndID(state)
+						dispatch.input(data, pos1, { id, isComposing: e.nativeEvent.isComposing })
 					}),
 
 					onCut: newReadWriteHandler(e => {
