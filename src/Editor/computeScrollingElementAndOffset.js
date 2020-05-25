@@ -21,7 +21,7 @@ function ascendToScrollingElement(element) {
 // Computes the y-axis scrolling element and offset.
 function computeScrollingElementAndOffset(offsetTop = 0, offsetBottom = 0) {
 	const selection = document.getSelection()
-	if (!selection || !selection.rangeCount) {
+	if (!selection.rangeCount) {
 		return null
 	}
 	const range = selection.getRangeAt(0)

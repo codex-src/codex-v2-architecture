@@ -1,6 +1,6 @@
 // import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 // import uuidv4 from "uuid/v4"
-import computePosRange from "./computePosRange"
+import readCurrentPos from "./readCurrentPos"
 import detectKeyDownTypes from "./keydown/detectKeyDownTypes"
 import keyDownTypesEnum from "./keydown/keyDownTypesEnum"
 import React from "react"
@@ -84,7 +84,7 @@ const Editor = ({
 	React.useLayoutEffect(
 		React.useCallback(() => {
 			const selection = document.getSelection()
-			if (selection && selection.rangeCount) {
+			if (selection.rangeCount) {
 				selection.removeAllRanges()
 			}
 			const t = Date.now()
@@ -192,7 +192,7 @@ const Editor = ({
 
 					onSelect: newReadWriteHandler(() => {
 						const selection = document.getSelection()
-						if (!selection || !selection.rangeCount) {
+						if (!selection.rangeCount) {
 							// No-op
 							return
 						}
@@ -214,7 +214,7 @@ const Editor = ({
 							selection.removeAllRanges()
 							selection.addRange(range)
 						}
-						const [pos1, pos2] = computePosRange(state)
+						const [pos1, pos2] = readCurrentPos(state)
 						dispatch.select(pos1, pos2)
 					}),
 
@@ -227,7 +227,7 @@ const Editor = ({
 							pointerDownRef.current = false
 							return
 						}
-						const [pos1, pos2] = computePosRange(state)
+						const [pos1, pos2] = readCurrentPos(state)
 						dispatch.select(pos1, pos2)
 					}),
 
@@ -291,7 +291,7 @@ const Editor = ({
 							if (!state.collapsed) {
 								e.preventDefault()
 								// FIXME: e.key === "Dead" causes
-								// computePosRange to throw
+								// readCurrentPos to throw
 								dispatch.write(e.key !== "Dead" ? e.key : "") // TODO: Deprecate "Dead" case
 								return
 							}
@@ -312,7 +312,7 @@ const Editor = ({
 						dedupedFirefoxCompositionEnd.current = true
 
 						const data = readCurrentDocumentNode(state)
-						let [pos] = computePosRange(state)
+						let [pos] = readCurrentPos(state)
 
 						// COMPAT (FF): Backspace during a composition
 						// event can create an empty text node; **REMOVE
@@ -325,7 +325,7 @@ const Editor = ({
 						}
 						if (textNodes.length) {
 							const selection = document.getSelection()
-							if (selection && selection.rangeCount) {
+							if (selection.rangeCount) {
 								selection.removeAllRanges()
 							}
 							for (const each of textNodes) {
@@ -359,7 +359,7 @@ const Editor = ({
 						const data = readCurrentDocumentNode(state)
 						console.log({ data })
 
-						const [pos] = computePosRange(state)
+						const [pos] = readCurrentPos(state)
 						dispatch.input(data, [pos], shouldPreventDOMRerender)
 					}),
 

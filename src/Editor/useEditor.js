@@ -380,7 +380,7 @@ const methods = state => ({
 
 		let id = ""
 		const selection = document.getSelection()
-		if (selection && selection.rangeCount) {
+		if (selection.rangeCount) {
 			const range = selection.getRangeAt(0)
 			const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 			id = root.id || root.querySelector("[id]").id

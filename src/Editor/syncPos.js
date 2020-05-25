@@ -41,7 +41,8 @@ function computeDOMRange(element, pos) {
 	return range
 }
 
-// Computes a meta DOM cursor; uses VDOM and DOM to compute.
+// Computes a meta DOM cursor; uses VDOM and the DOM to
+// compute.
 function computeMetaRange(nodes, pos) {
 	let id = ""
 	for (const each of nodes) { // FIXME
@@ -61,9 +62,9 @@ function computeMetaRange(nodes, pos) {
 // Synchronizes DOM cursors.
 function syncPos(editorState) {
 	const selection = document.getSelection()
-	if (!selection || selection.rangeCount) {
-		throw new Error("syncPos: selection exists when it should not")
-	}
+	// if (selection.rangeCount) {
+	// 	throw new Error("syncPos: selection must not exist")
+	// }
 	const range1 = computeMetaRange(editorState.nodes, editorState.pos1.pos)
 	let range2 = { ...range1 }
 	if (!editorState.collapsed) {
@@ -72,7 +73,7 @@ function syncPos(editorState) {
 	const range = document.createRange()
 	range.setStart(range1.node, range1.offset)
 	range.setEnd(range2.node, range2.offset)
-	// selection.removeAllRanges()
+	selection.removeAllRanges()
 	selection.addRange(range)
 }
 
