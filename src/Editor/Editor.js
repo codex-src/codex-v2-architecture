@@ -1,6 +1,7 @@
 // import computeScrollingElementAndOffset from "./computeScrollingElementAndOffset"
 import detectKeyDownTypes from "./keydown/detectKeyDownTypes"
 import keyDownTypesEnum from "./keydown/keyDownTypesEnum"
+import noopTextContent from "./noopTextContent"
 import React from "react"
 import ReactDOM from "react-dom"
 import readCurrentPos from "./readCurrentPos"
@@ -14,44 +15,15 @@ import "./stylesheets/core.css"
 import "./stylesheets/form-checkbox.css"
 import "./stylesheets/theme.css"
 
-// No-ops redundant text content -- prevents spellcheck from
-// rerendering.
-//
-// https://github.com/facebook/react/issues/11538#issuecomment-417504600
-// https://github.com/facebook/react/blob/master/packages/react-dom/src/client/setTextContent.js
-// https://github.com/facebook/react/tree/3e94bce765d355d74f6a60feb4addb6d196e3482/packages/react-dom/src/client
 ;(() => {
-	if (typeof Node === "function" && Node.prototype) {
-		const { set: nodeValueSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "nodeValue")
-		Object.defineProperty(Node.prototype, "nodeValue", {
-			set(text) {
-				if (this.nodeValue.length === text.length && this.nodeValue === text) {
-					// No-op
-					return
-				}
-				return nodeValueSetter.apply(this, arguments)
-			},
-		})
-		const { set: textContentSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "textContent")
-		Object.defineProperty(Node.prototype, "textContent", {
-			set(text) {
-				if (this.textContent.length === text.length && this.textContent === text) {
-					// No-op
-					return
-				}
-				return textContentSetter.apply(this, arguments)
-			},
-		})
-	}
+	noopTextContent()
 })()
 
 const ReactElements = ({ state, dispatch }) => (
 	state.elements.map(({ type: T, ...each }) => (
 		React.createElement(typeEnumArray[T], {
-			// key: uuidv4(),
 			key: each.reactKey || each.id,
 			...each,
-
 			dispatch,
 		})
 	))
@@ -331,7 +303,7 @@ const Editor = ({
 							for (const each of textNodes) {
 								each.remove()
 							}
-							pos1 = state.pos1 // Revert to be safe
+							pos1 = state.pos1
 						}
 
 						dispatch.input(data, pos1, { id, isComposing: false })
@@ -342,7 +314,7 @@ const Editor = ({
 						if (e.target.nodeName === "INPUT" && e.target.type === "checkbox") {
 							// No-op
 							return
-						// No-op deduped "compositionend" event:
+						// No-op deduped onCompositionEnd event:
 						} else if (dedupedFirefoxCompositionEnd.current) {
 							dedupedFirefoxCompositionEnd.current = false
 							return

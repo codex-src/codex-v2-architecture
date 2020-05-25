@@ -359,11 +359,19 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
+		// Compares whether two VDOM one-off elements are equal.
+		// Elements are considered to be equal independent of
+		// character data. This prevents uselessly rerendering
+		// elements (because the DOM element was already mutated
+		// by the browser).
+
 		if (renderOptions.id) {
 			const nextElement = nextElements.find(each => each.id === renderOptions.id)
-			if (nextElement) {
-				nextElement.reactKey =uuidv4().slice(0, 8)
+			if (!nextElement) {
+				throw new Error("dispatch.render: no such nextElement")
 			}
+			// TODO
+			nextElement.reactKey = uuidv4().slice(0, 8)
 		}
 
 		// const areEqualElements = (nextElement, element) => {
