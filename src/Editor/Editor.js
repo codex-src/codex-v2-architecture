@@ -306,7 +306,8 @@ const Editor = ({
 							pos1 = state.pos1
 						}
 
-						dispatch.input(data, pos1, { id, isComposing: false })
+						const options = { currentRootID: id, isComposing: false }
+						dispatch.input(data, pos1, options)
 					}),
 
 					onInput: newReadWriteHandler(e => {
@@ -328,7 +329,9 @@ const Editor = ({
 
 						const data = readCurrentDocumentNode(state)
 						const { pos: [pos1], id } = readCurrentPosAndID(state)
-						dispatch.input(data, pos1, { id, isComposing: e.nativeEvent.isComposing })
+
+						const options = { currentRootID: id, isComposing: e.nativeEvent.isComposing }
+						dispatch.input(data, pos1, options)
 					}),
 
 					onCut: newReadWriteHandler(e => {

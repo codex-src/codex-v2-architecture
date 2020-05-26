@@ -146,7 +146,7 @@ const methods = state => ({
 		this.write("")
 	},
 
-	input(data, pos1, renderOptions = { id: "", isComposing: true }) {
+	input(data, pos1, renderOptions = { currentRootID: "", isComposing: true }) {
 		state.history.mutate()
 
 		state.nodes[state.pos1.y].data = data
@@ -349,7 +349,7 @@ const methods = state => ({
 	/*
 	 * Render
 	 */
-	render(renderOptions = { id: "", isComposing: false }) {
+	render(renderOptions = { currentRootID: "", isComposing: false }) {
 		const data = state.nodes.map(each => each.data).join("\n")
 		if (renderOptions.isComposing) {
 			state.data = data
@@ -360,58 +360,31 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		// Compares whether two inline elements are equal. Note
-		// that character data is not compared in order to
-		// preserve spellcheck highlighting.
-		const areEqualInlineElements = (elementA, elementB) => {
-			if (elementA === null || elementB === null) {
-				return elementA === elementB
-			} else if (typeof elementA === "string" && typeof elementB === "string") {
-				// return elementA === elementB
-				return true
-			}
-			console.log(elementA.children, elementB.children)
-			const ok = (
-				elementA.type === elementB.type &&
-				// elementA.syntax === elementB.syntax && // TODO: Use JSON.stringify?
-				elementA.children.length === elementB.children.length &&
-				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
-			)
-			return ok
-		}
+		if (renderOptions.currentRootID) {
 
-		// Compares whether two elements are equal. Elements are
-		// considered to be equal if their types, ID, and
-		// children are equal. Character data (for children) are
-		// not compared.
-		const areEqualElements = (elementA, elementB) => {
-			const ok = (
-				elementA.type === elementB.type &&
-				elementA.id === elementB.id &&
-				// elementA.syntax === elementB.syntax && // TODO: Use JSON.stringify?
-				elementA.children.length === elementB.children.length &&
-				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
-			)
-			return ok
-		}
-
-		if (renderOptions.id) {
-			const prevElement = state.elements.find(each => each.id === renderOptions.id)
-			if (!prevElement) {
-				throw new Error("dispatch.render: no such prevElement")
-			}
-			const nextElement = nextElements.find(each => each.id === renderOptions.id)
-			if (!nextElement) {
-				throw new Error("dispatch.render: no such nextElement")
-			}
-
+			// TODO: Extract to nativeRenderingStrategy(state)
 			const { data } = state.nodes[state.pos1.y]
 			const { x } = state.pos1
 
-			const substr = data.slice(x - 1, x + 1)
-			if (substr.split().some(each => ascii.isPunctuation(each))) {
-				nextElement.reactKey = uuidv4().slice(0, 8)
-			} else if (!areEqualElements(nextElement, prevElement)) {
+			// On or at the start of a node:
+			const onStart = (
+				!x ||
+				x === 1
+			)
+
+			// On-before, on, or on-after punctuation:
+			const onPunctuation = (
+				(x - 1 >= 0 && ascii.isPunctuation(data[x - 1])) ||
+				(ascii.isPunctuation(data[x])) ||
+				(x + 1 < data.length && ascii.isPunctuation(data[x + 1]))
+			)
+
+			console.log(renderOptions.currentRootID)
+			const nextElement = nextElements.find(each => each.id === renderOptions.currentRootID)
+			if (!nextElement) {
+				throw new Error("dispatch.render: no such nextElement")
+			}
+			if (onStart || onPunctuation) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
 		}
