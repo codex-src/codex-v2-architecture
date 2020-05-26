@@ -1,3 +1,4 @@
+import * as ascii from "lib/encoding/ascii"
 import * as posIterators from "./posIterators"
 import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
@@ -369,9 +370,10 @@ const methods = state => ({
 				// return elementA === elementB
 				return true
 			}
+			console.log(elementA.children, elementB.children)
 			const ok = (
 				elementA.type === elementB.type &&
-				// elementA.syntax === elementB.syntax &&
+				// elementA.syntax === elementB.syntax && // TODO: Use JSON.stringify?
 				elementA.children.length === elementB.children.length &&
 				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
 			)
@@ -386,7 +388,7 @@ const methods = state => ({
 			const ok = (
 				elementA.type === elementB.type &&
 				elementA.id === elementB.id &&
-				// elementA.syntax === elementB.syntax &&
+				// elementA.syntax === elementB.syntax && // TODO: Use JSON.stringify?
 				elementA.children.length === elementB.children.length &&
 				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
 			)
@@ -402,7 +404,14 @@ const methods = state => ({
 			if (!nextElement) {
 				throw new Error("dispatch.render: no such nextElement")
 			}
-			if (!areEqualElements(nextElement, prevElement)) {
+
+			const { data } = state.nodes[state.pos1.y]
+			const { x } = state.pos1
+
+			const substr = data.slice(x - 1, x + 1)
+			if (!substr.split().some(each => ascii.isPunctuation(each))) {
+				nextElement.reactKey = uuidv4().slice(0, 8)
+			} else if (!areEqualElements(nextElement, prevElement)) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
 		}

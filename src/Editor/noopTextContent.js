@@ -3,7 +3,6 @@
 //
 // https://github.com/facebook/react/issues/11538#issuecomment-417504600
 // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/setTextContent.js
-// https://github.com/facebook/react/tree/3e94bce765d355d74f6a60feb4addb6d196e3482/packages/react-dom/src/client
 function noopTextContent() {
 	if (typeof Node === "function" && Node.prototype) {
 		const { set: nodeValueSetter } = Object.getOwnPropertyDescriptor(Node.prototype, "nodeValue")
