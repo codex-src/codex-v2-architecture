@@ -359,22 +359,36 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		// // Compares whether two children are equal.
-		// const areEqualChildren = (childrenA, childrenB) => {
-		// }
+		// Compares whether two inline elements are equal. Note
+		// that character data is not compared in order to
+		// preserve spellcheck highlighting.
+		const areEqualInlineElements = (elementA, elementB) => {
+			if (elementA === null || elementB === null) {
+				return elementA === elementB
+			} else if (typeof elementA === "string" && typeof elementB === "string") {
+				// return elementA === elementB
+				return true
+			}
+			const ok = (
+				elementA.type === elementB.type &&
+				// elementA.syntax === elementB.syntax &&
+				elementA.children.length === elementB.children.length &&
+				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
+			)
+			return ok
+		}
 
 		// Compares whether two elements are equal. Elements are
 		// considered to be equal if their types, ID, and
 		// children are equal. Character data (for children) are
 		// not compared.
-		//
-		// TODO: What about null children?
 		const areEqualElements = (elementA, elementB) => {
 			const ok = (
 				elementA.type === elementB.type &&
 				elementA.id === elementB.id &&
-				typeof elementA.children === typeof elementB.children
-				// elementA.children === elementB.children
+				// elementA.syntax === elementB.syntax &&
+				elementA.children.length === elementB.children.length &&
+				elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
 			)
 			return ok
 		}
@@ -388,10 +402,6 @@ const methods = state => ({
 			if (!nextElement) {
 				throw new Error("dispatch.render: no such nextElement")
 			}
-
-			// console.log({ ...prevElement }, nextElement)
-
-			// TODO: Add nativeRenderingStrategy?
 			if (!areEqualElements(nextElement, prevElement)) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
