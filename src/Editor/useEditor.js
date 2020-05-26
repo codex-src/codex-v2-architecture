@@ -409,7 +409,7 @@ const methods = state => ({
 			const { x } = state.pos1
 
 			const substr = data.slice(x - 1, x + 1)
-			if (!substr.split().some(each => ascii.isPunctuation(each))) {
+			if (substr.split().some(each => ascii.isPunctuation(each))) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			} else if (!areEqualElements(nextElement, prevElement)) {
 				nextElement.reactKey = uuidv4().slice(0, 8)

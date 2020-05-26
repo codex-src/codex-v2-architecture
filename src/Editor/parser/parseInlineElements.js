@@ -76,7 +76,7 @@ function parseInlineElement({ type, syntax, substr }) {
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
 			? parseInlineElements(submatch)
-			: submatch,
+			: [submatch],
 	}
 	return { element, match, submatch }
 }
