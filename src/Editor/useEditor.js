@@ -370,7 +370,7 @@ const methods = state => ({
 			if (!nextElement) {
 				throw new Error("dispatch.render: no such nextElement")
 			}
-			// TODO
+			// TODO: Add nativeRenderingStrategy?
 			nextElement.reactKey = uuidv4().slice(0, 8)
 		}
 
