@@ -146,7 +146,7 @@ const methods = state => ({
 		this.write("")
 	},
 
-	input(data, pos1, renderOptions = { currentRootID: "", isComposing: true }) {
+	input(data, pos1, renderOpts = { preventRerender: false, forceRerender: false }) {
 		state.history.mutate()
 
 		state.nodes[state.pos1.y].data = data
@@ -154,7 +154,7 @@ const methods = state => ({
 			pos1,
 			pos2: { ...pos1 },
 		})
-		this.render(renderOptions)
+		this.render(renderOpts)
 	},
 
 	/*
@@ -349,9 +349,11 @@ const methods = state => ({
 	/*
 	 * Render
 	 */
-	render(renderOptions = { currentRootID: "", isComposing: false }) {
+	// preventRerender prevents a rerender. forceRerender
+	// attaches a reactKey property to the focused element.
+	render(renderOpts = { preventRerender: false, forceRerender: false }) {
 		const data = state.nodes.map(each => each.data).join("\n")
-		if (renderOptions.isComposing) {
+		if (renderOpts.preventRerender) {
 			state.data = data
 			return
 		}
@@ -360,36 +362,52 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		// if (renderOptions.currentRootID) {
-		// 	let id = ""
-		// 	const selection = document.getSelection()
-		// 	if (selection.rangeCount) {
-		// 		const range = selection.getRangeAt(0)
-		// 		const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
-		// 		id = root.id || root.querySelector("[id]").id
-		// 	}
-		// 	console.log({ id, currentRootID: renderOptions.currentRootID })
-		// 	const nextElement = nextElements.find(each => each.id === id)
-		// 	if (nextElement) {
-		// 		nextElement.reactKey = uuidv4().slice(0, 8)
-		// 	}
-		// }
+		if (renderOpts.forceRerender) {
 
-		// TODO (1): Extract to nativeRenderingStrategy(state)
-		// TODO (2): We can refactor pos.id.root and pos.id.node
-		if (renderOptions.currentRootID) {
-
-			const substr = state.nodes[state.pos1.y].data.slice(state.pos1.x - 2, state.pos1.x - 1)
-			const forceRerender = (
-				state.pos1.x === 1 ||
-				substr.split("").some(each => ascii.isPunctuation(each))
-			)
-
-			const nextElement = nextElements.find(each => each.id === renderOptions.currentRootID)
-			if (nextElement && forceRerender) {
-				nextElement.reactKey = uuidv4().slice(0, 8)
+			// Compares whether two inline elements are equal. Note
+			// that character data is not compared in order to
+			// preserve spellcheck highlighting.
+			const areEqualInlineElements = (elementA, elementB) => {
+				if (elementA === null || elementB === null) {
+					return elementA === elementB
+				} else if (typeof elementA === "string" && typeof elementB === "string") {
+					return true
+				}
+				const ok = (
+					elementA.type === elementB.type &&
+					JSON.stringify(elementA.syntax) === JSON.stringify(elementB.syntax) &&
+					elementA.children.length === elementB.children.length &&
+					elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
+				)
+				return ok
 			}
 
+			// Compares whether two elements are equal. Elements are
+			// considered to be equal if their types, ID, and
+			// children are equal. Character data (for children) are
+			// not compared.
+			const areEqualElements = (elementA, elementB) => {
+				const ok = (
+					elementA.type === elementB.type &&
+					elementA.id === elementB.id &&
+					JSON.stringify(elementA.syntax) === JSON.stringify(elementB.syntax) &&
+					elementA.children.length === elementB.children.length &&
+					elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
+				)
+				return ok
+			}
+
+			let id = ""
+			const selection = document.getSelection()
+			if (selection.rangeCount) {
+				const range = selection.getRangeAt(0)
+				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
+				id = root.id || root.querySelector("[id]").id
+			}
+			const nextElement = nextElements.find(each => each.id === id)
+			if (nextElement) {
+				nextElement.reactKey = uuidv4().slice(0, 8)
+			}
 		}
 
 		Object.assign(state, {

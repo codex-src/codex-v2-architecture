@@ -5,7 +5,6 @@ import noopTextContent from "./noopTextContent"
 import React from "react"
 import ReactDOM from "react-dom"
 import readCurrentPos from "./readCurrentPos"
-import readCurrentPosAndID from "./readCurrentPosAndID"
 import syncPos from "./syncPos"
 import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
@@ -284,7 +283,7 @@ const Editor = ({
 						dedupedFirefoxCompositionEnd.current = true
 
 						const data = readCurrentDocumentNode(state)
-						let { pos: [pos1], id } = readCurrentPosAndID(state)
+						const [pos1] = readCurrentPos(state)
 
 						// COMPAT (FF): Backspace during a composition
 						// event can create an empty text node; **REMOVE
@@ -306,8 +305,8 @@ const Editor = ({
 							pos1 = state.pos1
 						}
 
-						const options = { currentRootID: id, isComposing: false }
-						dispatch.input(data, pos1, options)
+						const renderOpts = { preventRerender: false, forceRerender: true }
+						dispatch.input(data, pos1, renderOpts)
 					}),
 
 					onInput: newReadWriteHandler(e => {
@@ -328,10 +327,10 @@ const Editor = ({
 						}
 
 						const data = readCurrentDocumentNode(state)
-						const { pos: [pos1], id } = readCurrentPosAndID(state)
+						const [pos1] = readCurrentPos(state)
 
-						const options = { currentRootID: id, isComposing: e.nativeEvent.isComposing }
-						dispatch.input(data, pos1, options)
+						const renderOpts = { preventRerender: e.nativeEvent.isComposing, forceRerender: true }
+						dispatch.input(data, pos1, renderOpts)
 					}),
 
 					onCut: newReadWriteHandler(e => {
