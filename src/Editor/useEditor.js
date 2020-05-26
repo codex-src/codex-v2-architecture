@@ -360,33 +360,36 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
+		// if (renderOptions.currentRootID) {
+		// 	let id = ""
+		// 	const selection = document.getSelection()
+		// 	if (selection.rangeCount) {
+		// 		const range = selection.getRangeAt(0)
+		// 		const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
+		// 		id = root.id || root.querySelector("[id]").id
+		// 	}
+		// 	console.log({ id, currentRootID: renderOptions.currentRootID })
+		// 	const nextElement = nextElements.find(each => each.id === id)
+		// 	if (nextElement) {
+		// 		nextElement.reactKey = uuidv4().slice(0, 8)
+		// 	}
+		// }
+
+		// TODO (1): Extract to nativeRenderingStrategy(state)
+		// TODO (2): We can refactor pos.id.root and pos.id.node
 		if (renderOptions.currentRootID) {
 
-			// TODO: Extract to nativeRenderingStrategy(state)
-			const { data } = state.nodes[state.pos1.y]
-			const { x } = state.pos1
-
-			// On or at the start of a node:
-			const onStart = (
-				!x ||
-				x === 1
+			const substr = state.nodes[state.pos1.y].data.slice(state.pos1.x - 2, state.pos1.x - 1)
+			const forceRerender = (
+				state.pos1.x === 1 ||
+				substr.split("").some(each => ascii.isPunctuation(each))
 			)
 
-			// On-before, on, or on-after punctuation:
-			const onPunctuation = (
-				(x - 1 >= 0 && ascii.isPunctuation(data[x - 1])) ||
-				(ascii.isPunctuation(data[x])) ||
-				(x + 1 < data.length && ascii.isPunctuation(data[x + 1]))
-			)
-
-			console.log(renderOptions.currentRootID)
 			const nextElement = nextElements.find(each => each.id === renderOptions.currentRootID)
-			if (!nextElement) {
-				throw new Error("dispatch.render: no such nextElement")
-			}
-			if (onStart || onPunctuation) {
+			if (nextElement && forceRerender) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
+
 		}
 
 		Object.assign(state, {
