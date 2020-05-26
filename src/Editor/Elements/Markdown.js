@@ -20,7 +20,7 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, ...props }) => {
-	return <span className={`markdown ${className || ""}`.trim()} {...props} />
+	return <span className={`markdown ${className || ""}`.trim()} {...props} data-codex-markdown />
 }
 
 const Markdown = ({ syntax, ...props }) => {
