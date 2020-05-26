@@ -359,30 +359,43 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		// Compares whether two VDOM one-off elements are equal.
-		// Elements are considered to be equal independent of
-		// character data. This prevents uselessly rerendering
-		// elements (because the DOM element was already mutated
-		// by the browser).
+		// // Compares whether two children are equal.
+		// const areEqualChildren = (childrenA, childrenB) => {
+		// }
+
+		// Compares whether two elements are equal. Elements are
+		// considered to be equal if their types, ID, and
+		// children are equal. Character data (for children) are
+		// not compared.
+		//
+		// TODO: What about null children?
+		const areEqualElements = (elementA, elementB) => {
+			const ok = (
+				elementA.type === elementB.type &&
+				elementA.id === elementB.id &&
+				typeof elementA.children === typeof elementB.children
+				// elementA.children === elementB.children
+			)
+			return ok
+		}
 
 		if (renderOptions.id) {
+			const prevElement = state.elements.find(each => each.id === renderOptions.id)
+			if (!prevElement) {
+				throw new Error("dispatch.render: no such prevElement")
+			}
 			const nextElement = nextElements.find(each => each.id === renderOptions.id)
 			if (!nextElement) {
 				throw new Error("dispatch.render: no such nextElement")
 			}
-			// TODO: Add nativeRenderingStrategy?
-			nextElement.reactKey = uuidv4().slice(0, 8)
-		}
 
-		// const areEqualElements = (nextElement, element) => {
-		// 	return JSON.stringify(nextElement, null, "\t") === JSON.stringify(element, null, "\t")
-		// 	// const ok = (
-		// 	// 	nextElement.type === element.type &&
-		// 	// 	nextElement.id === element.id &&
-		// 	// 	nextElement.children === element.children // TODO: areEqualInlineElements
-		// 	// )
-		// 	// return ok
-		// }
+			// console.log({ ...prevElement }, nextElement)
+
+			// TODO: Add nativeRenderingStrategy?
+			if (!areEqualElements(nextElement, prevElement)) {
+				nextElement.reactKey = uuidv4().slice(0, 8)
+			}
+		}
 
 		Object.assign(state, {
 			data,
