@@ -361,39 +361,68 @@ const methods = state => ({
 		console.log("parseElements", Date.now() - t)
 
 		if (renderOpts.rerenderIfNeeded) {
-
 			// Compares whether two children are equal. Character
 			// data is not compared in order to preserve
 			// spellcheck highlighting.
-			//
-			// Code based on toReact.
+
+			// const isUndefinedOrNull = value => {
+			// 	return value === undefined || value === null
+			// }
+
+			const isString = value => {
+				return typeof value === "string"
+			}
+
+			const isObject = value => {
+				const ok = (
+					typeof value === "object" &&
+					!Array.isArray(value)
+				)
+				return ok
+			}
+
+			const isArray = value => {
+				const ok = (
+					typeof value === "object" &&
+					Array.isArray(value)
+				)
+				return ok
+			}
+
+			// const areEqualChildrenObjects = (objectA, objectB) => {
+			// 	const ok = (
+			// 		objectA.type === objectB.type &&
+			// 		JSON.stringify(objectA.syntax) === JSON.stringify(objectB.syntax) &&
+			// 		areEqualChildren(objectA.children, objectB.children)
+			// 	)
+			// 	return ok
+			// }
+
 			const areEqualChildren = (childrenA, childrenB) => {
-				if (typeof childrenA === "string" && childrenB === "string") {
-					return true
-				}
-				// Non-objects:
-				if (typeof childrenA !== "object" || typeof childrenB !== "object") {
+				if (childrenA === null || childrenB === null) {
 					return childrenA === childrenB
 				}
-				// Objects (non-arrays):
-				if (
-					(typeof chidrenA === "object" && !Array.isArray(childrenA)) ||
-					(typeof chidrenB === "object" && !Array.isArray(childrenB))
-				) {
+
+				if (isString(childrenA) && isString(childrenB)) {
+					return true
+				} else if (isObject(childrenA) && isObject(childrenB)) {
 					const ok = (
 						childrenA.type === childrenB.type &&
-						childrenA.id === childrenB.id &&
 						JSON.stringify(childrenA.syntax) === JSON.stringify(childrenB.syntax) &&
 						areEqualChildren(childrenA.children, childrenB.children)
 					)
 					return ok
 				}
-				const ok = (
-					(childrenA.length && childrenB.length) &&
-					childrenA.length === childrenB.length &&
-					childrenA.every((_, x) => areEqualChildren(childrenA[x], childrenB[x]))
-				)
-				return ok
+
+				if (!isArray(childrenA) || !isArray(childrenB) || childrenA.length !== childrenB.length) {
+					return false
+				}
+				for (let x = 0; x < childrenA.length; x++) {
+					if (!areEqualChildren(childrenA[x], childrenB[x])) {
+						return false
+					}
+				}
+				return true
 			}
 
 			// Compares whether two elements are equal. Elements
@@ -408,7 +437,6 @@ const methods = state => ({
 				)
 				return ok
 			}
-
 			let id = ""
 			const selection = document.getSelection()
 			if (selection.rangeCount) {
@@ -420,13 +448,14 @@ const methods = state => ({
 			// if (nextElement) {
 			// 	nextElement.reactKey = uuidv4().slice(0, 8)
 			// }
-			const unsafe = (
+			const mustRerender = (
 				state.pos1.x - 1 >= 0 &&
 				ascii.isPunctuation(state.nodes[state.pos1.y].data[state.pos1.x - 1])
 			)
 			const prevElement = state.elements.find(each => each.id === id)
 			const nextElement = nextElements.find(each => each.id === id)
-			if (prevElement && nextElement && (!areEqualElements(prevElement, nextElement) || unsafe)) {
+			if (prevElement && nextElement && (mustRerender || !areEqualElements(prevElement, nextElement))) {
+				console.log("forced a rerender key")
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
 		}
