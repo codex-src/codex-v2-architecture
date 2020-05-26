@@ -146,7 +146,7 @@ const methods = state => ({
 		this.write("")
 	},
 
-	input(data, pos1, renderOpts = { preventRerender: false, forceRerender: false }) {
+	input(data, pos1, renderOpts = { preventRerender: false, rerenderIfNeeded: false }) {
 		state.history.mutate()
 
 		state.nodes[state.pos1.y].data = data
@@ -349,9 +349,7 @@ const methods = state => ({
 	/*
 	 * Render
 	 */
-	// preventRerender prevents a rerender. forceRerender
-	// attaches a reactKey property to the focused element.
-	render(renderOpts = { preventRerender: false, forceRerender: false }) {
+	render(renderOpts = { preventRerender: false, rerenderIfNeeded: false }) {
 		const data = state.nodes.map(each => each.data).join("\n")
 		if (renderOpts.preventRerender) {
 			state.data = data
@@ -362,37 +360,51 @@ const methods = state => ({
 		const nextElements = parseElements(state.nodes, state.cachedElements)
 		console.log("parseElements", Date.now() - t)
 
-		if (renderOpts.forceRerender) {
+		if (renderOpts.rerenderIfNeeded) {
 
-			// Compares whether two inline elements are equal. Note
-			// that character data is not compared in order to
-			// preserve spellcheck highlighting.
-			const areEqualInlineElements = (elementA, elementB) => {
-				if (elementA === null || elementB === null) {
-					return elementA === elementB
-				} else if (typeof elementA === "string" && typeof elementB === "string") {
+			// Compares whether two children are equal. Character
+			// data is not compared in order to preserve
+			// spellcheck highlighting.
+			//
+			// Code based on toReact.
+			const areEqualChildren = (childrenA, childrenB) => {
+				if (typeof childrenA === "string" && childrenB === "string") {
 					return true
 				}
+				// Non-objects:
+				if (typeof childrenA !== "object" || typeof childrenB !== "object") {
+					return childrenA === childrenB
+				}
+				// Objects (non-arrays):
+				if (
+					(typeof chidrenA === "object" && !Array.isArray(childrenA)) ||
+					(typeof chidrenB === "object" && !Array.isArray(childrenB))
+				) {
+					const ok = (
+						childrenA.type === childrenB.type &&
+						childrenA.id === childrenB.id &&
+						JSON.stringify(childrenA.syntax) === JSON.stringify(childrenB.syntax) &&
+						areEqualChildren(childrenA.children, childrenB.children)
+					)
+					return ok
+				}
 				const ok = (
-					elementA.type === elementB.type &&
-					JSON.stringify(elementA.syntax) === JSON.stringify(elementB.syntax) &&
-					elementA.children.length === elementB.children.length &&
-					elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
+					(childrenA.length && childrenB.length) &&
+					childrenA.length === childrenB.length &&
+					childrenA.every((_, x) => areEqualChildren(childrenA[x], childrenB[x]))
 				)
 				return ok
 			}
 
-			// Compares whether two elements are equal. Elements are
-			// considered to be equal if their types, ID, and
-			// children are equal. Character data (for children) are
-			// not compared.
+			// Compares whether two elements are equal. Elements
+			// are considered to be equal if their types, ID, and
+			// children are equal.
 			const areEqualElements = (elementA, elementB) => {
 				const ok = (
 					elementA.type === elementB.type &&
 					elementA.id === elementB.id &&
 					JSON.stringify(elementA.syntax) === JSON.stringify(elementB.syntax) &&
-					elementA.children.length === elementB.children.length &&
-					elementA.children.every((_, x) => areEqualInlineElements(elementA.children[x], elementB.children[x]))
+					areEqualChildren(elementA.children, elementB.children)
 				)
 				return ok
 			}
@@ -404,8 +416,17 @@ const methods = state => ({
 				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 				id = root.id || root.querySelector("[id]").id
 			}
+			// const nextElement = nextElements.find(each => each.id === id)
+			// if (nextElement) {
+			// 	nextElement.reactKey = uuidv4().slice(0, 8)
+			// }
+			const unsafe = (
+				state.pos1.x - 1 >= 0 &&
+				ascii.isPunctuation(state.nodes[state.pos1.y].data[state.pos1.x - 1])
+			)
+			const prevElement = state.elements.find(each => each.id === id)
 			const nextElement = nextElements.find(each => each.id === id)
-			if (nextElement) {
+			if (prevElement && nextElement && (!areEqualElements(prevElement, nextElement) || unsafe)) {
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
 		}

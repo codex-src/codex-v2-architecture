@@ -28,9 +28,6 @@ function toReact(children) {
 			...props,
 		}, toReact(props.children)))
 	}
-	if (components.length === 1 && components[0] === null) {
-		return components[0]
-	}
 	return components
 }
 

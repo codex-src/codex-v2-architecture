@@ -76,7 +76,7 @@ function parseInlineElement({ type, syntax, substr }) {
 		syntax,
 		children: !(type === typeEnum.Code || (type === typeEnum.Anchor && syntax === ")"))
 			? parseInlineElements(submatch)
-			: [submatch],
+			: submatch,
 	}
 	return { element, match, submatch }
 }
@@ -86,7 +86,7 @@ function parseInlineElement({ type, syntax, substr }) {
 // TODO: https://github.github.com/gfm/#delimiter-stack
 function parseInlineElements(str) {
 	if (!str) {
-		return [null]
+		return null
 	}
 	const elements = []
 	for (let x1 = 0, len = str.length; x1 < len; x1++) {
@@ -312,9 +312,9 @@ function parseInlineElements(str) {
 		}
 		elements[elements.length - 1] += char
 	}
-	// if (elements.length === 1 && typeof elements[0] === "string") {
-	// 	return elements[0]
-	// }
+	if (elements.length === 1 && typeof elements[0] === "string") {
+		return elements[0]
+	}
 	return elements
 }
 

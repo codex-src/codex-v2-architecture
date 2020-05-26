@@ -305,7 +305,7 @@ const Editor = ({
 							pos1 = state.pos1
 						}
 
-						const renderOpts = { preventRerender: false, forceRerender: true }
+						const renderOpts = { preventRerender: false, rerenderIfNeeded: true }
 						dispatch.input(data, pos1, renderOpts)
 					}),
 
@@ -329,7 +329,7 @@ const Editor = ({
 						const data = readCurrentDocumentNode(state)
 						const [pos1] = readCurrentPos(state)
 
-						const renderOpts = { preventRerender: e.nativeEvent.isComposing, forceRerender: true }
+						const renderOpts = { preventRerender: e.nativeEvent.isComposing, rerenderIfNeeded: true }
 						dispatch.input(data, pos1, renderOpts)
 					}),
 
