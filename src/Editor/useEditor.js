@@ -448,14 +448,19 @@ const methods = state => ({
 			// if (nextElement) {
 			// 	nextElement.reactKey = uuidv4().slice(0, 8)
 			// }
-			const mustRerender = (
-				state.pos1.x - 1 >= 0 &&
-				ascii.isPunctuation(state.nodes[state.pos1.y].data[state.pos1.x - 1])
-			)
+
+			const substr = state.nodes[state.pos1.y].data.slice(state.pos1.x - 2, state.pos1.x + 1)
+			const mustRerender = false // substr
+				// .split("")
+				// .some(each => ascii.isPunctuation(each))
+
 			const prevElement = state.elements.find(each => each.id === id)
 			const nextElement = nextElements.find(each => each.id === id)
-			if (prevElement && nextElement && (mustRerender || !areEqualElements(prevElement, nextElement))) {
-				console.log("forced a rerender key")
+			if (prevElement && nextElement) {
+				if (areEqualElements(prevElement, nextElement)) {
+					// No-op
+					return
+				}
 				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
 		}
