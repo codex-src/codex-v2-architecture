@@ -283,7 +283,7 @@ const Editor = ({
 						dedupedFirefoxCompositionEnd.current = true
 
 						const data = readCurrentDocumentNode(state)
-						const [pos1] = readCurrentPos(state)
+						let [pos1] = readCurrentPos(state)
 
 						// COMPAT (FF): Backspace during a composition
 						// event can create an empty text node; **REMOVE
