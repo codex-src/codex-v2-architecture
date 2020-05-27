@@ -1,5 +1,6 @@
 import attrs from "./attrs"
 import dedupeSpaces from "lib/dedupeSpaces"
+import emojiClassName from "./emojiClassName"
 import escape from "lodash/escape"
 import IfWrapper from "lib/IfWrapper"
 import Markdown from "./Markdown"
@@ -14,7 +15,6 @@ import { Strikethrough } from "./InlineElements"
 // React components.
 function toReact(children) {
 	if (children === null || typeof children === "string") {
-		// return !children ? null : <span>{children}</span>
 		return children
 	}
 	const components = []
@@ -52,7 +52,7 @@ export const Header = React.memo(({ tag: Tag, id, syntax, hash, children }) => (
 ))
 
 export const Paragraph = React.memo(({ id, children }) => (
-	<p id={id}>
+	<p id={id} className={emojiClassName(children)}>
 		{toReact(children) || (
 			<br />
 		)}
@@ -223,13 +223,13 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 			<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			{/* </IfWrapper> */}
 			{/* {(!readOnly || (readOnly && children)) && ( */}
-				<figcaption className="px-6 py-2 text-center text-sm text-gray-600">
-					<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
-						{toReact(children) || (
-							<br />
-						)}
-					</Markdown>
-				</figcaption>
+			<figcaption className="px-6 py-2 text-center text-sm text-gray-600">
+				<Markdown syntax={syntax} {...attrs.disableAutoCorrect}>
+					{toReact(children) || (
+						<br />
+					)}
+				</Markdown>
+			</figcaption>
 			{/* )} */}
 		</figure>
 	)
