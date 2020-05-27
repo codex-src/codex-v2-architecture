@@ -370,100 +370,19 @@ const methods = state => ({
 				const range = selection.getRangeAt(0)
 				rerenderNeeded = (
 					(range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset <= 1) ||
-					// TODO: Add data-codex-rerender?
 					ascendToElement(range.startContainer).getAttribute("data-codex-markdown") ||
-					ascendToElement(range.startContainer).getAttribute("aria-label")
+					(range.startContainer.nodeType === Node.TEXT_NODE && emojiTrie.atEnd(range.startContainer.nodeValue))
 				)
 				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 				id = root.id || root.querySelector("[id]").id
 			}
-
-			// if (rerenderNeeded) {
+			if (rerenderNeeded) {
 				const nextElement = nextElements.find(each => each.id === id)
 				if (nextElement) {
 					nextElement.reactKey = uuidv4().slice(0, 8)
 				}
-			// }
+			}
 
-			// const elements = parseInlineElements(state.nodes[state.pos1.y].data)
-			// console.log(elements)
-
-			// // Compares whether two children are equal. Character
-			// // data is not compared in order to preserve
-			// // spellcheck highlighting.
-			// const isString = value => {
-			// 	return typeof value === "string"
-			// }
-			// const isObject = value => {
-			// 	const ok = (
-			// 		typeof value === "object" &&
-			// 		!Array.isArray(value)
-			// 	)
-			// 	return ok
-			// }
-			// const isArray = value => {
-			// 	const ok = (
-			// 		typeof value === "object" &&
-			// 		Array.isArray(value)
-			// 	)
-			// 	return ok
-			// }
-			// const areEqualChildren = (childrenA, childrenB) => {
-			// 	if (childrenA === null || childrenB === null) {
-			// 		return childrenA === childrenB
-			// 	}
-			// 	if (isString(childrenA) && isString(childrenB)) {
-			// 		return true
-			// 	} else if (isObject(childrenA) && isObject(childrenB)) {
-			// 		const ok = (
-			// 			childrenA.type === childrenB.type &&
-			// 			JSON.stringify(childrenA.syntax) === JSON.stringify(childrenB.syntax) &&
-			// 			areEqualChildren(childrenA.children, childrenB.children)
-			// 		)
-			// 		return ok
-			// 	}
-			// 	if (!isArray(childrenA) || !isArray(childrenB) || childrenA.length !== childrenB.length) {
-			// 		return false
-			// 	}
-			// 	for (let x = 0; x < childrenA.length; x++) {
-			// 		if (!areEqualChildren(childrenA[x], childrenB[x])) {
-			// 			return false
-			// 		}
-			// 	}
-			// 	return true
-			// }
-			// // Compares whether two elements are equal. Elements
-			// // are considered to be equal if their types, ID, and
-			// // children are equal.
-			// const areEqualElements = (elementA, elementB) => {
-			// 	const ok = (
-			// 		elementA.type === elementB.type &&
-			// 		elementA.id === elementB.id &&
-			// 		JSON.stringify(elementA.syntax) === JSON.stringify(elementB.syntax) &&
-			// 		areEqualChildren(elementA.children, elementB.children)
-			// 	)
-			// 	return ok
-			// }
-			// let id = ""
-			// const selection = document.getSelection()
-			// if (selection.rangeCount) {
-			// 	const range = selection.getRangeAt(0)
-			// 	const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
-			// 	id = root.id || root.querySelector("[id]").id
-			// }
-			// const substr = state.nodes[state.pos1.y].data.slice(state.pos1.x - 2, state.pos1.x + 1)
-			// const mustRerender = false // substr
-			// 	// .split("")
-			// 	// .some(each => ascii.isPunctuation(each))
-			// const prevElement = state.elements.find(each => each.id === id)
-			// const nextElement = nextElements.find(each => each.id === id)
-			// if (prevElement && nextElement) {
-			// 	if (areEqualElements(prevElement, nextElement)) {
-			// 		// No-op
-			// 		return
-			// 	}
-			// 	nextElement.reactKey = uuidv4().slice(0, 8)
-			// }
 		}
 
 		Object.assign(state, {
