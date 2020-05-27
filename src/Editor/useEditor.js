@@ -362,26 +362,28 @@ const methods = state => ({
 		console.log("parseElements", Date.now() - t)
 
 		if (renderOpts.rerenderIfNeeded) {
-
-			let mustRerender = true
+			let rerenderNeeded = true
 
 			let id = ""
 			const selection = document.getSelection()
 			if (selection.rangeCount) {
 				const range = selection.getRangeAt(0)
-				mustRerender = (
+				rerenderNeeded = (
 					(range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset <= 1) ||
-					ascendToElement(range.startContainer).getAttribute("data-codex-markdown")
+					// TODO: Add data-codex-rerender?
+					ascendToElement(range.startContainer).getAttribute("data-codex-markdown") ||
+					ascendToElement(range.startContainer).getAttribute("aria-label")
 				)
 				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 				id = root.id || root.querySelector("[id]").id
 			}
-			if (mustRerender) {
+
+			// if (rerenderNeeded) {
 				const nextElement = nextElements.find(each => each.id === id)
 				if (nextElement) {
 					nextElement.reactKey = uuidv4().slice(0, 8)
 				}
-			}
+			// }
 
 			// const elements = parseInlineElements(state.nodes[state.pos1.y].data)
 			// console.log(elements)

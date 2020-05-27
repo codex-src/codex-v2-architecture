@@ -159,9 +159,7 @@ export const AnyListItem = ({ id, syntax, ordered, children }) => (
 
 // TODO: Add markdown to CSS to prevent useless rerenders
 export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch }) => {
-	// const [, { checkTodo }] = useEditorState()
 	const ref = React.useRef()
-
 	return (
 		<li id={id} className="relative my-1" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
@@ -187,7 +185,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 						checked={checked}
 						onChange={() => {
 							ref.current.focus()
-							dispatch(id)
+							dispatch.checkTodo(id)
 						}}
 					/>
 				</div>

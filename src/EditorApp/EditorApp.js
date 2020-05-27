@@ -223,7 +223,7 @@ const EditorApp = () => {
 			{/* RHS */}
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
 			<div className="xl:flex-shrink-0 w-full max-w-3xl">
-				<DocumentTitleAndEmoji title={(meta.title || "Untitled") + " (v0.6)"} emoji={meta.emoji}>
+				<DocumentTitleAndEmoji title={(meta.title || "Untitled") + " (v0.7)"} emoji={meta.emoji}>
 					<div className="relative">
 
 						{/* Placeholder */}
