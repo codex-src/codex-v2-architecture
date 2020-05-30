@@ -368,9 +368,10 @@ const methods = state => ({
 			if (selection.rangeCount) {
 				const range = selection.getRangeAt(0)
 				rerenderNeeded = (
-					(range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset <= 1) ||
-					ascendToElement(range.startContainer).getAttribute("data-codex-markdown") ||
-					(range.startContainer.nodeType === Node.TEXT_NODE && emojiTrie.atEnd(range.startContainer.nodeValue))
+					true
+					// (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset <= 1) ||
+					// ascendToElement(range.startContainer).getAttribute("data-codex-markdown") ||
+					// (range.startContainer.nodeType === Node.TEXT_NODE && emojiTrie.atEnd(range.startContainer.nodeValue))
 				)
 				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 				id = root.id || root.querySelector("[id]").id
