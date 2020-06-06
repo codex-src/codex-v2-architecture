@@ -211,6 +211,7 @@ function parseElements(nodes, cachedElements) {
 			id: each.id,
 		})
 	}
+	console.log(elements)
 	return elements
 }
 

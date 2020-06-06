@@ -157,6 +157,8 @@ export const AnyListItem = ({ id, syntax, ordered, children }) => (
 export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
 	const dispatch = useDispatchContext()
 
+	console.log(id)
+
 	const ref = React.useRef()
 	return (
 		<li id={id} className="relative my-2" data-codex-checked={checked}>
