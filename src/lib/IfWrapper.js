@@ -1,8 +1,8 @@
 import React from "react"
 
-// Wraps a React element when cond={true}.
-const IfWrapper = ({ cond, wrapper: Wrapper, children }) => {
-	if (!cond) {
+// Wraps a React element when when={true}.
+const IfWrapper = ({ when, wrapper: Wrapper, children }) => {
+	if (!when) {
 		return children
 	}
 	return <Wrapper>{children}</Wrapper>

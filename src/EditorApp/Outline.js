@@ -1,4 +1,3 @@
-import Button from "lib/Button"
 import React from "react"
 import Transition from "lib/Transition"
 

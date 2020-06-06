@@ -12,7 +12,7 @@ import Transition from "lib/Transition"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import useEditor from "Editor/useEditor"
 import useOutline from "./useOutline"
-import usePreferences from "./Preferences/usePreferences"
+import usePreferences from "./usePreferences"
 import useSaveStatus from "./useSaveStatus"
 import useStatusBars from "./useStatusBars"
 import useTitleAndEmoji from "./useTitleAndEmoji"
@@ -233,13 +233,8 @@ const EditorApp = () => {
 						{/* Editor */}
 						{/* <ErrorBoundary> */}
 							<Editor
-								style={{
-									// paddingBottom: `calc(100vh - 128px - ${prefs.fontSize * 1.5}px)`,
-									fontSize: prefs.fontSize,
-									transitionProperty: "font-size",
-									transitionDuration: "25ms",
-									transitionTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
-								}}
+								className="transition-all ease-in-out"
+								style={{ fontSize: prefs.fontSize, transitionDuration: "25ms" }}
 								state={state}
 								dispatch={dispatch}
 								readOnly={prefs.readOnly}

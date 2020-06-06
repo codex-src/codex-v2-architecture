@@ -177,7 +177,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 						}}
 					/>
 				</div>
-				<IfWrapper cond={checked} wrapper={({ children }) => <Strikethrough>{children}</Strikethrough>}>
+				<IfWrapper when={checked} wrapper={({ children }) => <Strikethrough>{children}</Strikethrough>}>
 					{toReact(children) || (
 						<br />
 					)}
@@ -207,7 +207,7 @@ export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
 	// const [{ readOnly }] = useEditorState()
 	return (
 		<figure id={id}>
-			{/* <IfWrapper cond={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}> */}
+			{/* <IfWrapper when={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}> */}
 			<img className="mx-auto" style={{ minHeight: "1.5em", maxHeight: "24em" }} src={src} alt={alt} />
 			{/* </IfWrapper> */}
 			{/* {(!readOnly || (readOnly && children)) && ( */}

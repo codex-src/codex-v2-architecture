@@ -1,8 +1,16 @@
-import renderModesEnum from "./renderModesEnum"
 import useMethods from "use-methods"
+import { StringEnum } from "lib/Enums"
 import { toHTML } from "Editor/Elements/cmap"
 
 const defaultFontSize = 17
+
+const renderModesEnum = new StringEnum(
+	"Readme",
+	"Text",
+	"HTML",
+	"React_js",
+	"JSON",
+)
 
 // const text = `<!--
 // You can easily export your Codex to use anywhere.
@@ -44,7 +52,7 @@ const methods = state => ({
 	// 	state.output.extension = "html"
 	// },
 	zoomIn() {
-		if (state.fontSize >= defaultFontSize + 8) {
+		if (state.fontSize >= defaultFontSize + 6) {
 			// No-op
 			return
 		}
