@@ -10,7 +10,10 @@ import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import { readCurrentDocumentNode } from "./documentNodes/read"
 
-import { ReadOnlyContext } from "./Contexts"
+import {
+	DispatchContext,
+	ReadOnlyContext,
+} from "./Contexts"
 
 import "./stylesheets/core.css"
 import "./stylesheets/custom-form-checkbox.css"
@@ -22,13 +25,14 @@ import "./stylesheets/theme.css"
 
 const ReactElements = ({ state, dispatch }) => (
 	<ReadOnlyContext.Provider value={state.readOnly}>
-		{state.elements.map(({ type: T, ...each }) => (
-			React.createElement(typeEnumArray[T], {
-				key: each.reactKey || each.id,
-				...each,
-				dispatch, // TODO: Move to a context
-			})
-		))}
+		<DispatchContext.Provider value={dispatch}>
+			{state.elements.map(({ type: T, ...each }) => (
+				React.createElement(typeEnumArray[T], {
+					key: each.reactKey || each.id,
+					...each,
+				})
+			))}
+		</DispatchContext.Provider>
 	</ReadOnlyContext.Provider>
 )
 

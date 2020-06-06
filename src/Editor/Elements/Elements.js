@@ -8,7 +8,11 @@ import prismMap from "lib/prismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
 import { Strikethrough } from "./InlineElements"
-import { useReadOnlyContext } from "../Contexts"
+
+import {
+	useDispatchContext,
+	useReadOnlyContext,
+} from "../Contexts"
 
 // TODO: Return tags for all elements and inline elements?
 
@@ -150,7 +154,9 @@ export const AnyListItem = ({ id, syntax, ordered, children }) => (
 )
 
 // TODO: Add markdown to CSS to prevent useless rerenders
-export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch }) => {
+export const TodoItem = React.memo(({ id, syntax, checked, children }) => {
+	const dispatch = useDispatchContext()
+
 	const ref = React.useRef()
 	return (
 		<li id={id} className="relative my-2" data-codex-checked={checked}>
@@ -179,19 +185,16 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 	)
 })
 
-// Pass dispatch for dispatch.checkTodo
-//
 // NOTE: Compound element; do not assign ID
-export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispatch }) => (
-		<Tag className="ml-6" style={{ "--max-monospace-width": String(range.length + ". ").length + "ch" }}>
-			{range.map(({ type: T, ...each }) => (
-				React.createElement(typeEnumArray[T], {
-					key: each.id,
-					...each,
-					dispatch,
-				})
-			))}
-		</Tag>
+export const AnyList = React.memo(({ type, tag: Tag, id, children: range }) => (
+	<Tag className="ml-6" style={{ "--max-monospace-width": String(range.length + ". ").length + "ch" }}>
+		{range.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumArray[T], {
+				key: each.id,
+				...each,
+			})
+		))}
+	</Tag>
 	// )
 ))
 
