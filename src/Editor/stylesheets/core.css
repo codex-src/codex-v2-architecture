@@ -33,9 +33,19 @@
 .codex-editor [data-codex-ordered="true"]:first-of-type {
 	counter-reset: count;
 }
+/* .codex-editor [data-codex-ordered="true"]:before { */
+/* 	margin-left: -1.5em; */
+/* 	position: absolute; */
+/* 	content: counter(count) ". "; */
+/* 	counter-increment: count; */
+/* 	font-feature-settings: "tnum"; */
+/* 	color: var(--blue-500); */
+/* } */
 .codex-editor [data-codex-ordered="true"]:before {
-	margin-left: -1.5em;
+	margin-left: calc(-0.25em - var(--max-monospace-width));
 	position: absolute;
+	width: var(--max-monospace-width);
+	text-align: right;
 	content: counter(count) ". ";
 	counter-increment: count;
 	font-feature-settings: "tnum";

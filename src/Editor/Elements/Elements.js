@@ -191,15 +191,16 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 //
 // NOTE: Compound element; do not assign ID
 export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispatch }) => (
-	<Tag className="ml-6">
-		{range.map(({ type: T, ...each }) => (
-			React.createElement(typeEnumArray[T], {
-				key: each.id,
-				...each,
-				dispatch,
-			})
-		))}
-	</Tag>
+		<Tag className="ml-6" style={{ "--max-monospace-width": `${String(range.length + ". ").length}ch` }}>
+			{range.map(({ type: T, ...each }) => (
+				React.createElement(typeEnumArray[T], {
+					key: each.id,
+					...each,
+					dispatch,
+				})
+			))}
+		</Tag>
+	// )
 ))
 
 // TODO: Can we reuse <Anchor> here? Do we want to?

@@ -2,16 +2,6 @@ import Highlighted from "./Highlighted"
 import React from "react"
 import Transition from "lib/Transition"
 
-// const Button = () => (
-// 	<button
-// 		className="p-2 inline-flex flex-row items-center font-medium text-xxs hover:text-gray-500 focus:text-gray-500 focus:outline-none"
-// 		onClick={prefsDispatch.toggleOutline}
-// 	>
-// 		Outline
-// 	</button>
-// 	<button
-// )
-
 const FixedPreferences = ({
 	stateTuple: [state, dispatch],
 	prefsTuple: [prefs, prefsDispatch],
