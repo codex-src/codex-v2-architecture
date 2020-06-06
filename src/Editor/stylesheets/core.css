@@ -1,6 +1,6 @@
-.codex-editor.feature-read-only .markdown {
+/*.codex-editor.feature-read-only .markdown {
 	display: none;
-}
+}*/
 
 .codex-editor h1 strong,
 .codex-editor h2 strong,
@@ -64,7 +64,7 @@
 	font-size: 0.875em;
 	content: counter(count);
 	counter-increment: count;
-	color: var(--gray-300);
+	color: var(--cool-gray-300);
 }
 .codex-editor pre > code > div:first-child:before,
 .codex-editor pre > code > div:last-child:before {

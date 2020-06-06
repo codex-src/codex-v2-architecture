@@ -8,6 +8,7 @@ import prismMap from "lib/prismMap"
 import React from "react"
 import typeEnumArray from "./typeEnumArray"
 import { Strikethrough } from "./InlineElements"
+import { useReadOnlyContext } from "../Contexts"
 
 // TODO: Return tags for all elements and inline elements?
 
@@ -81,15 +82,6 @@ export const Blockquote = React.memo(({ children: range }) => (
 	</blockquote>
 ))
 
-// // NOTE: Use style={{ whiteSpace: "pre" }} not className
-// // because of <Node>
-// const Pre = props => (
-// 	<Node style={{ whiteSpace: "pre" }} {...props} />
-// )
-// const PreEdge = props => (
-// 	<Node className="leading-none" style={{ whiteSpace: "pre" }} {...props} />
-// )
-
 const Pre = props => (
 	<div className="whitespace-pre" {...props} />
 )
@@ -99,7 +91,7 @@ const PreEdge = props => (
 
 // NOTE: Compound element; do not assign ID
 export const Preformatted = React.memo(({ syntax, extension, children: range }) => {
-	// const [{ readOnly }] = useEditorState()
+	const readOnly = useReadOnlyContext()
 
 	// NOTE: Use useMemo not useState; state needs to be
 	// updated eagerly
@@ -118,17 +110,17 @@ export const Preformatted = React.memo(({ syntax, extension, children: range }) 
 	}, [extension, range])
 
 	return (
-		<pre className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" style={{ "--max-monospace-width": String($range.length < 10 ? 10 : $range.length).length + "ch" }} {...attrs.disableAutoCorrect}>
+		// NOTE: rounded-none breaks md:rounded-md
+		<pre className="-mx-6 px-4 bg-cool-gray-50 md:rounded-md shadow-hero overflow-x-scroll scrolling-touch" style={{ "--max-monospace-width": String($range.length < 10 ? 10 : $range.length).length + "ch" }} {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
-						{/* {readOnly && ( */}
-						<br />
-						{/* )} */}
+						{readOnly && (
+							<br />
+						)}
 					</Markdown>
 				</PreEdge>
 				{$range.map(each => (
-					// style={{ "--width": String(range.length).length + "ch" }}
 					<Pre key={each.id} id={each.id} dangerouslySetInnerHTML={{
 						__html: each.data || (
 							"<br />"
@@ -137,9 +129,9 @@ export const Preformatted = React.memo(({ syntax, extension, children: range }) 
 				))}
 				<PreEdge id={range[range.length - 1].id}>
 					<Markdown syntax={[syntax[1]]}>
-						{/* {readOnly && (} */}
-						<br />
-						{/* )}} */}
+						{readOnly && (
+							<br />
+						)}
 					</Markdown>
 				</PreEdge>
 			</code>
@@ -205,7 +197,9 @@ export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispat
 
 // TODO: Can we reuse <Anchor> here? Do we want to?
 export const Image = React.memo(({ id, syntax, src, alt, href, children }) => {
-	// const [{ readOnly }] = useEditorState()
+	// const readOnly = useReadOnlyContext()
+
+	// TODO
 	return (
 		<figure id={id}>
 			{/* <IfWrapper when={readOnly && Boolean(href)} wrapper={({ children }) => <a href={href} {...attrs.a}>{children}</a>}> */}

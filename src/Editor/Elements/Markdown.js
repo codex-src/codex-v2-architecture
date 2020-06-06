@@ -1,4 +1,6 @@
+import dedupeSpaces from "lib/dedupeSpaces"
 import React from "react"
+import { useReadOnlyContext } from "../Contexts"
 
 // Parses syntax from a string or array of strings to an
 // array of strings.
@@ -20,7 +22,11 @@ function parseSyntax(syntax) {
 }
 
 const Syntax = ({ className, ...props }) => {
-	return <span className={`markdown ${className || ""}`.trim()} {...props} data-codex-markdown />
+	const readOnly = useReadOnlyContext()
+	if (readOnly) {
+		return null
+	}
+	return <span className={dedupeSpaces(`markdown ${className}`)} {...props} />
 }
 
 const Markdown = ({ syntax, ...props }) => {
@@ -28,8 +34,8 @@ const Markdown = ({ syntax, ...props }) => {
 	return (
 		<React.Fragment>
 
-			{/* NOTE: Do not use syntax && ( ... ); use
-			Boolean(syntax) creating revent empty text nodes */}
+			{/* COMPAT: Uses Boolean(...) or some browsers (FF)
+			can ceate an empty text node */}
 
 			{/* LHS */}
 			{Boolean(syntax1) && (

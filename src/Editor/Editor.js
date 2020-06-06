@@ -10,6 +10,8 @@ import typeEnumArray from "./Elements/typeEnumArray"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import { readCurrentDocumentNode } from "./documentNodes/read"
 
+import { ReadOnlyContext } from "./Contexts"
+
 import "./stylesheets/core.css"
 import "./stylesheets/custom-form-checkbox.css"
 import "./stylesheets/theme.css"
@@ -19,13 +21,15 @@ import "./stylesheets/theme.css"
 })()
 
 const ReactElements = ({ state, dispatch }) => (
-	state.elements.map(({ type: T, ...each }) => (
-		React.createElement(typeEnumArray[T], {
-			key: each.reactKey || each.id,
-			...each,
-			dispatch,
-		})
-	))
+	<ReadOnlyContext.Provider value={state.readOnly}>
+		{state.elements.map(({ type: T, ...each }) => (
+			React.createElement(typeEnumArray[T], {
+				key: each.reactKey || each.id,
+				...each,
+				dispatch, // TODO: Move to a context
+			})
+		))}
+	</ReadOnlyContext.Provider>
 )
 
 const Editor = ({
@@ -36,8 +40,8 @@ const Editor = ({
 	dispatch,
 	readOnly,
 	autoFocus,
-	scrollTopOffset,
-	scrollBottomOffset,
+	scrollTopOffset,    /* TODO: Deprecate */
+	scrollBottomOffset, /* TODO: Deprecate */
 }) => {
 	const ref = React.useRef()
 
