@@ -208,10 +208,10 @@ const EditorApp = () => {
 			<Transition
 				unmountOnExit={window.innerWidth <= 1328}
 				show={prefs.showOutline}
-				enter="transition ease-out duration-300"
+				enter="transition duration-300 ease-out"
 				enterFrom="transform -translate-x-32"
 				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
-				leave="transition ease-in duration-300"
+				leave="transition duration-300 ease-in"
 				leaveFrom="transform translate-x-0"
 				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
 			>

@@ -35,7 +35,7 @@ const FixedPreferences = ({
 					Zoom -
 				</Button>
 				<div
-					className="p-2 flex flex-row items-center font-medium text-xxs transition ease-out duration-500"
+					className="p-2 flex flex-row items-center font-medium text-xxs transition duration-500 ease-out"
 					style={{ opacity: !saveStatus || saveStatus === 3 ? "0" : "1" }}
 				>
 					Saved
@@ -98,10 +98,10 @@ const FixedPreferences = ({
 		<Transition
 			unmountOnExit={false}
 			show={prefs.showSidebar}
-			enter="transition ease-out duration-300"
+			enter="transition duration-300 ease-out"
 			enterFrom="transform opacity-0 translate-x-32"
 			enterTo="transform opacity-100 translate-x-0 pointer-events-auto"
-			leave="transition ease-in duration-300"
+			leave="transition duration-300 ease-in"
 			leaveFrom="transform opacity-100 translate-x-0"
 			leaveTo="transform opacity-0 translate-x-32 pointer-events-none"
 		>
