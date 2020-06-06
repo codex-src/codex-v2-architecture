@@ -8,7 +8,7 @@ import Outline from "./Outline"
 import raw from "raw.macro"
 import React from "react"
 import StatusBars from "./StatusBars"
-import Transition from "lib/Transition"
+import TransitionV2 from "lib/TransitionV2"
 import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import useEditor from "Editor/useEditor"
 import useOutline from "./useOutline"
@@ -205,20 +205,16 @@ const EditorApp = () => {
 			/>
 
 			{/* LHS */}
-			<Transition
-				unmountOnExit={window.innerWidth <= 1328}
-				show={prefs.showOutline}
-				enter="transition duration-300 ease-out"
-				enterFrom="transform -translate-x-32"
-				enterTo="opacity-100 transform translate-x-0 pointer-events-auto"
-				leave="transition duration-300 ease-in"
-				leaveFrom="transform translate-x-0"
-				leaveTo="opacity-0 transform -translate-x-32 pointer-events-none"
+			<TransitionV2
+				on={prefs.showOutline}
+				transition="transition duration-300"
+				from="opacity-0 transform -translate-x-32 ease-in pointer-events-none"
+				to="opacity-100 transform translate-x-0 ease-out pointer-events-auto"
 			>
 				<Outline title={meta.title} toggleOutline={prefsDispatch.toggleOutline}>
 					{outline}
 				</Outline>
-			</Transition>
+			</TransitionV2>
 
 			{/* RHS */}
 			<div className="flex-shrink-0 hidden lg:block w-16"></div>
@@ -254,19 +250,16 @@ const EditorApp = () => {
 
 					</div>
 				</DocumentTitleAndEmoji>
-				<Transition
-					show={!state.readOnly}
-					enter="transition duration-200"
-					enterFrom="opacity-0"
-					enterTo="opacity-100"
-					leave="transition duration-200"
-					leaveFrom="opacity-100"
-					leaveTo="opacity-0"
+				<TransitionV2
+					on={state.readOnly}
+					transition="transition duration-150 ease-in-out"
+					from="opacity-100"
+					to="opacity-0"
 				>
 					<StatusBars>
 						{[statusLHS, statusRHS]}
 					</StatusBars>
-				</Transition>
+				</TransitionV2>
 
 			</div>
 

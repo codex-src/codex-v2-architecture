@@ -16,6 +16,12 @@ const TransitionV2 = ({
 	const mounted = React.useRef()
 	React.useLayoutEffect(() => {
 		const actualRef = children.ref || ref
+		if (!actualRef.current) {
+			throw new Error((
+				"Transition: no such ref; " +
+				"nested components must use React.forwardRef((props, ref) => ...)"
+			))
+		}
 		if (!mounted.current && transitionClasses.length && transitionClasses[0]) { // Guards "".split(/\s+/) -> [""]
 			actualRef.current.classList.add(...transitionClasses)
 		}

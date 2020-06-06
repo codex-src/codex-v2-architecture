@@ -1,6 +1,6 @@
 import Button from "lib/Button"
 import React from "react"
-import Transition from "lib/Transition"
+import TransitionV2 from "lib/TransitionV2"
 
 // ---------------
 // |    128px    |
@@ -21,15 +21,15 @@ function newScrollHandler(e, id, hash) {
 	window.scrollTo(0, element.offsetTop)
 }
 
-const Outline = ({
+const Outline = React.forwardRef(({
 	title,
 	toggleOutline,
 	children: outline,
-}) => {
+}, ref) => {
 	const [hoverOutline, setHoverOutline] = React.useState(false)
 
 	return (
-		<div className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
+		<div ref={ref} className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
 
 			{/* Title */}
 			<Button
@@ -48,28 +48,22 @@ const Outline = ({
 					strokeWidth="2"
 					viewBox="0 0 24 24"
 				>
-					<Transition
-						show={!hoverOutline}
-						enter="transition duration-200"
-						enterFrom="opacity-0 transform -translate-x-8"
-						enterTo="opacity-100 transform translate-x-0"
-						leave="transition duration-200"
-						leaveFrom="opacity-100 transform translate-x-0"
-						leaveTo="opacity-0 transform -translate-x-8"
+					<TransitionV2
+						on={hoverOutline}
+						transition="transition duration-150 ease-in-out"
+						from="opacity-100 transform translate-x-0"
+						to="opacity-0 transform -translate-x-8"
 					>
-						<path d="M4 6h16M4 12h16M4 18h7"></path>
-					</Transition>
-					<Transition
-						show={hoverOutline}
-						enter="transition duration-200"
-						enterFrom="opacity-0 transform translate-x-8"
-						enterTo="opacity-100 transform translate-x-0"
-						leave="transition duration-200"
-						leaveFrom="opacity-100 transform translate-x-0"
-						leaveTo="opacity-0 transform translate-x-8"
+						<path d="M4 6h16M4 12h16M4 18h7" />
+					</TransitionV2>
+					<TransitionV2
+						on={hoverOutline}
+						transition="transition duration-150 ease-in-out"
+						from="opacity-100 transform translate-x-8"
+						to="opacity-100 transform translate-x-0"
 					>
-						<path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-					</Transition>
+						<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					</TransitionV2>
 				</svg>
 				<p className="font-semibold text-xs tracking-wide uppercase truncate">
 					{!hoverOutline ? (
@@ -109,6 +103,6 @@ const Outline = ({
 
 		</div>
 	)
-}
+})
 
 export default Outline
