@@ -1,6 +1,6 @@
 import Button from "lib/Button"
 import React from "react"
-import TransitionV2 from "lib/TransitionV2"
+import Transition from "lib/Transition"
 
 // ---------------
 // |    128px    |
@@ -48,22 +48,22 @@ const Outline = React.forwardRef(({
 					strokeWidth="2"
 					viewBox="0 0 24 24"
 				>
-					<TransitionV2
+					<Transition
 						on={hoverOutline}
 						transition="transition duration-150 ease-in-out"
 						from="opacity-100 transform translate-x-0"
 						to="opacity-0 transform -translate-x-8"
 					>
 						<path d="M4 6h16M4 12h16M4 18h7" />
-					</TransitionV2>
-					<TransitionV2
+					</Transition>
+					<Transition
 						on={hoverOutline}
 						transition="transition duration-150 ease-in-out"
 						from="opacity-100 transform translate-x-8"
 						to="opacity-100 transform translate-x-0"
 					>
 						<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-					</TransitionV2>
+					</Transition>
 				</svg>
 				<p className="font-semibold text-xs tracking-wide uppercase truncate">
 					{!hoverOutline ? (

@@ -1,4 +1,3 @@
-import * as emojiTrie from "emoji-trie"
 import * as posIterators from "./posIterators"
 import LRUCache from "lib/LRUCache"
 import parseElements from "./parser/parseElements"
@@ -361,28 +360,17 @@ const methods = state => ({
 		console.log("parseElements", Date.now() - t)
 
 		if (renderOpts.rerenderIfNeeded) {
-			let rerenderNeeded = true
-
 			let id = ""
 			const selection = document.getSelection()
 			if (selection.rangeCount) {
 				const range = selection.getRangeAt(0)
-				rerenderNeeded = (
-					true
-					// (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset <= 1) ||
-					// ascendToElement(range.startContainer).getAttribute("data-codex-markdown") ||
-					// (range.startContainer.nodeType === Node.TEXT_NODE && emojiTrie.atEnd(range.startContainer.nodeValue))
-				)
 				const root = ascendToElement(range.startContainer).closest("[data-codex-editor] > *")
 				id = root.id || root.querySelector("[id]").id
 			}
-			if (rerenderNeeded) {
-				const nextElement = nextElements.find(each => each.id === id)
-				if (nextElement) {
-					nextElement.reactKey = uuidv4().slice(0, 8)
-				}
+			const nextElement = nextElements.find(each => each.id === id)
+			if (nextElement) {
+				nextElement.reactKey = uuidv4().slice(0, 8)
 			}
-
 		}
 
 		Object.assign(state, {

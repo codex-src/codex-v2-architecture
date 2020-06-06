@@ -1,70 +1,47 @@
 import React from "react"
-import { CSSTransition } from "react-transition-group"
 
-// https://github.com/adamwathan/tailwind-ui-navbar-react/blob/1bbfde78deb96befc371d8726e41a32bdd66403d/pages/index.js#L4
-function Transition({
-	unmountOnExit,
-	show,
-	enter,
-	enterFrom,
-	enterTo,
-	enterActive,
-	leave,
-	leaveFrom,
-	leaveTo,
-	leaveActive,
+const Transition = ({
+	on,
+	transition,
+	from,
+	to,
 	children,
-}) {
-	const enterClasses = enter.split(/\s+/)
-	const enterFromClasses = enterFrom.split(/\s+/)
-	const enterToClasses = enterTo.split(/\s+/)
-	const leaveClasses = leave.split(/\s+/)
-	const leaveFromClasses = leaveFrom.split(/\s+/)
-	const leaveToClasses = leaveTo.split(/\s+/)
+}) => {
+	const ref = React.useRef()
 
-	return (
-		<CSSTransition
-			unmountOnExit={unmountOnExit === undefined ? true : unmountOnExit}
-			in={show}
-			addEndListener={(node, done) => {
-				node.addEventListener("transitionend", done, false)
-			}}
-			onEnter={node => {
-				if (!unmountOnExit) {
-					node.classList.remove(...leaveToClasses)
-				}
-				node.classList.add(...enterClasses, ...enterFromClasses)
-			}}
-			onEntering={node => {
-				node.classList.remove(...enterFromClasses)
-				node.classList.add(...enterToClasses)
-			}}
-			onEntered={node => {
-				if (unmountOnExit) {
-					node.classList.remove(...enterToClasses)
-				}
-				node.classList.remove(...enterClasses)
-			}}
-			onExit={node => {
-				if (!unmountOnExit) {
-					node.classList.remove(...enterToClasses)
-				}
-				node.classList.add(...leaveClasses, ...leaveFromClasses)
-			}}
-			onExiting={node => {
-				node.classList.remove(...leaveFromClasses)
-				node.classList.add(...leaveToClasses)
-			}}
-			onExited={node => {
-				if (unmountOnExit) {
-					node.classList.remove(...leaveToClasses)
-				}
-				node.classList.remove(...leaveClasses)
-			}}
-		>
-			{children}
-		</CSSTransition>
-	)
+	const transitionClasses = (transition || "").split(/\s+/)
+	const fromClasses = from.split(/\s+/)
+	const toClasses = to.split(/\s+/)
+
+	const mounted = React.useRef()
+	React.useLayoutEffect(() => {
+		const actualRef = children.ref || ref
+		if (!actualRef.current) {
+			throw new Error((
+				"Transition: no such ref; " +
+				"nested components must use React.forwardRef((props, ref) => ...)"
+			))
+		}
+		if (!mounted.current && transitionClasses.length && transitionClasses[0]) { // Guards "".split(/\s+/) -> [""]
+			actualRef.current.classList.add(...transitionClasses)
+		}
+		if (!on) {
+			actualRef.current.classList.remove(...toClasses)
+			actualRef.current.classList.add(...fromClasses)
+		} else {
+			actualRef.current.classList.remove(...fromClasses)
+			actualRef.current.classList.add(...toClasses)
+		}
+	}, [
+		on,
+		children.ref,
+		ref,
+		transitionClasses,
+		fromClasses,
+		toClasses,
+	])
+
+	return !children.ref ? React.cloneElement(children, { ref }) : children
 }
 
 export default Transition

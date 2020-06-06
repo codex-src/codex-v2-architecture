@@ -1,14 +1,14 @@
 import Button from "lib/Button"
 import Highlighted from "./Highlighted"
 import React from "react"
-import TransitionV2 from "lib/TransitionV2"
+import Transition from "lib/Transition"
 
 const FixedPreferences = ({
 	stateTuple: [state, dispatch],
 	prefsTuple: [prefs, prefsDispatch],
 	saveStatus,
 }) => (
-	// NOTE: Use flex flex-col for the sidebar
+	// NOTE: Uses flex flex-col for the sidebar
 	<div className="p-4 pt-0 fixed inset-0 flex flex-col z-40 pointer-events-none">
 
 		{/* Preferences */}
@@ -95,12 +95,11 @@ const FixedPreferences = ({
 
 		{/* Sidebar */}
 		<div className="flex-shrink-0 h-4" />
-		<TransitionV2
+		<Transition
 			on={prefs.showSidebar}
 			from="opacity-0 transform translate-x-32 transition duration-300 ease-in pointer-events-none"
 			to="opacity-100 transform translate-x-0 transition duration-300 ease-out pointer-events-auto"
 		>
-			{/* NOTE: leaveTo classes are duplicated at the end */}
 			<div className="p-6 self-end w-full max-w-lg max-h-full bg-white rounded-lg shadow-hero-lg overflow-y-scroll scrolling-touch">
 				<span className="inline-block">
 					<pre className="font-mono text-xs leading-snug subpixel-antialiased" style={{ MozTabSize: 2, tabSize: 2 }}>
@@ -110,7 +109,7 @@ const FixedPreferences = ({
 					</pre>
 				</span>
 			</div>
-		</TransitionV2>
+		</Transition>
 
 	</div>
 )
