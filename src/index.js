@@ -3,7 +3,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 import "debug.css"
-import "stylesheets/material-design/color-vars.css"
 import "stylesheets/prism/custom.css"
 import "stylesheets/tailwind/color-vars.css"
 import "stylesheets/tailwind/em-context.css"

@@ -8,4 +8,4 @@
 
 # Production
 /build
-*.generated.css
+tailwind.generated.css

@@ -12,8 +12,8 @@
 }
 
 .codex-editor [aria-label][role="img"] {
-	vertical-align: -10%;
-	font-size: 120%;
+	vertical-align: -18.75%;
+	font-size: 137.5%;
 	line-height: 1;
 }
 
@@ -27,7 +27,7 @@
 	margin-left: -1.5em;
 	position: absolute;
 	content: "• ";
-	color: var(--md-blue-a400);
+	color: var(--blue-500);
 }
 
 .codex-editor [data-codex-ordered="true"]:first-of-type {
@@ -39,7 +39,7 @@
 	content: counter(count) ". ";
 	counter-increment: count;
 	font-feature-settings: "tnum";
-	color: var(--md-blue-a400);
+	color: var(--blue-500);
 }
 
 .codex-editor [data-codex-checked] input[type="checkbox"] {

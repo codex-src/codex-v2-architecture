@@ -170,7 +170,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 						ref={ref}
 						className={dedupeSpaces(`
 							form-checkbox
-							text-md-blue-a200
+							text-blue-500
 							border-none
 							rounded-md
 							shadow-hero
@@ -181,6 +181,8 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 							duration-150
 							cursor-pointer
 						`)}
+						// FIXME: Remove style={{ ... }}
+						style={{ color: "var(--blue-500)" }}
 						type="checkbox"
 						checked={checked}
 						onChange={() => {

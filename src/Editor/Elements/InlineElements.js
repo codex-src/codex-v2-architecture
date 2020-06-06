@@ -43,7 +43,7 @@ export const StrongEmphasis = ({ syntax, children }) => (
 )
 
 export const Code = ({ syntax, children }) => (
-	<code className="px-1 py-px text-md-blue-a400 border rounded" {...attrs.disableAutoCorrect}>
+	<code className="px-1 py-px text-blue-500 border rounded" {...attrs.disableAutoCorrect}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
@@ -51,7 +51,7 @@ export const Code = ({ syntax, children }) => (
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<strike className="line-through text-gray-500" style={{ "--md-blue-a400": "currentColor" }}>
+	<strike className="line-through text-gray-500" style={{ "--blue-500": "currentColor" }}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>
@@ -59,7 +59,7 @@ export const Strikethrough = ({ syntax, children }) => (
 )
 
 export const Anchor = ({ syntax, href, children }) => (
-	<a className="underline text-md-blue-a400" href={href} {...attrs.a}>
+	<a className="underline text-blue-500" href={href} {...attrs.a}>
 		<Markdown syntax={!children || syntax} {...attrs.disableAutoCorrect}>
 			{children || syntax}
 		</Markdown>
