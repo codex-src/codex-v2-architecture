@@ -118,7 +118,7 @@ export const Preformatted = React.memo(({ syntax, extension, children: range }) 
 	}, [extension, range])
 
 	return (
-		<pre className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" {...attrs.disableAutoCorrect}>
+		<pre className="-mx-6 px-4 bg-white-100 rounded shadow-hero overflow-x-scroll scrolling-touch" style={{ "--max-monospace-width": String($range.length < 10 ? 10 : $range.length).length + "ch" }} {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>
@@ -148,7 +148,7 @@ export const Preformatted = React.memo(({ syntax, extension, children: range }) 
 })
 
 export const AnyListItem = ({ id, syntax, ordered, children }) => (
-	<li id={id} className="my-1" data-codex-ordered={ordered}>
+	<li id={id} className="my-2" data-codex-ordered={ordered}>
 		<Markdown className="hidden" syntax={syntax}>
 			{toReact(children) || (
 				<br />
@@ -161,7 +161,7 @@ export const AnyListItem = ({ id, syntax, ordered, children }) => (
 export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch }) => {
 	const ref = React.useRef()
 	return (
-		<li id={id} className="relative my-1" data-codex-checked={checked}>
+		<li id={id} className="relative my-2" data-codex-checked={checked}>
 			<Markdown className="hidden" syntax={syntax}>
 				{/* NOTE: Use contentEditable={false} to prevent
 				Chrome arrow keys and enable Firefox onChange */}
@@ -191,7 +191,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 //
 // NOTE: Compound element; do not assign ID
 export const AnyList = React.memo(({ type, tag: Tag, id, children: range, dispatch }) => (
-		<Tag className="ml-6" style={{ "--max-monospace-width": `${String(range.length + ". ").length}ch` }}>
+		<Tag className="ml-6" style={{ "--max-monospace-width": String(range.length + ". ").length + "ch" }}>
 			{range.map(({ type: T, ...each }) => (
 				React.createElement(typeEnumArray[T], {
 					key: each.id,

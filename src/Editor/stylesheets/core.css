@@ -33,21 +33,14 @@
 .codex-editor [data-codex-ordered="true"]:first-of-type {
 	counter-reset: count;
 }
-/* .codex-editor [data-codex-ordered="true"]:before { */
-/* 	margin-left: -1.5em; */
-/* 	position: absolute; */
-/* 	content: counter(count) ". "; */
-/* 	counter-increment: count; */
-/* 	font-feature-settings: "tnum"; */
-/* 	color: var(--blue-500); */
-/* } */
 .codex-editor [data-codex-ordered="true"]:before {
-	margin-left: calc(-0.5em - var(--max-monospace-width));
+	-webkit-font-smoothing: auto;
+	-moz-osx-font-smoothing: auto;
+
+	margin-left: calc(-0.25em - var(--max-monospace-width));
 	position: absolute;
 	width: var(--max-monospace-width);
 	text-align: right;
-	font-size: 0.9375em; /* 16px -> 15px */
-	line-height: 1.6; /* 1.5 -> 1.6 */
 	content: counter(count) ". ";
 	counter-increment: count;
 	font-feature-settings: "tnum";
@@ -62,18 +55,18 @@
 	counter-reset: count;
 }
 .codex-editor pre > code > div:before {
-	/* NOTE: Use > 2ch because of tabs */
+	/* NOTE: Use *.01 to preserve tabs */
 	margin-right: 2.01ch;
 	display: inline-block;
-	/* width: var(--width); */
-	width: 2ch;
+	width: var(--max-monospace-width);
 	text-align: right;
+	font-weight: 500;
 	font-size: 0.875em;
 	content: counter(count);
 	counter-increment: count;
-	color: var(--gray-400);
+	color: var(--gray-300);
 }
 .codex-editor pre > code > div:first-child:before,
 .codex-editor pre > code > div:last-child:before {
-	content: " ";
+	content: "";
 }

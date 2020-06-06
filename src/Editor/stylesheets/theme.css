@@ -1,13 +1,16 @@
-.codex-editor {
-	-webkit-font-smoothing: auto;
-	-moz-osx-font-smoothing: auto;
+.code-editor {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 
 	font: 1em/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
 	-moz-tab-size: 4;
 	tab-size: 4;
 }
 .codex-editor code {
-	font: 0.875em/1.3125 "iA Writer Mono var", monospace;
+	-webkit-font-smoothing: auto;
+	-moz-osx-font-smoothing: auto;
+
+	font: 0.875em/1.375 "iA Writer Mono var", monospace;
 	-moz-tab-size: 2;
 	tab-size: 2;
 }

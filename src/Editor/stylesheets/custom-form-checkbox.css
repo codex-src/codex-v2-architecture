@@ -17,10 +17,7 @@
 	height: 1em;
 	width: 1em;
 
-	box-shadow:
-		0 0 0 1px   rgba(0, 0, 0, 0.05),
-		0 1px 3px 0 rgba(0, 0, 0, 0.10),
-		0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-hero */
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-hero */
 	border-radius: 0.375em; /* rounded-md */
 }
 
@@ -31,6 +28,8 @@
 	background-size: 100% 100%;
 	background-position: center;
 	background-repeat: no-repeat;
+
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.10), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
 }
 
 .codex-editor .custom-form-checkbox:focus {
