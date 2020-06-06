@@ -29,7 +29,7 @@ function testFastPass(char) {
 
 // Parses GitHub Flavored Markdown elements.
 function parseElements(nodes, cachedElements) {
-	const cacheStrategy = newCacheStrategy(cachedElements)
+	// const cacheStrategy = newCacheStrategy(cachedElements)
 	const newURLHash = newURLHashEpoch()
 
 	const elements = []
@@ -39,11 +39,14 @@ function parseElements(nodes, cachedElements) {
 
 		// Fast pass:
 		if (!char || testFastPass(char)) {
-			const element = cacheStrategy(each, emitElements.Paragraph)
-			elements.push({
-				...element,
-				id: each.id,
-			})
+			// const element = cacheStrategy(each, emitElements.Paragraph)
+			// elements.push({
+			// 	// ...element,
+			// 	...emitElements.Paragraph(element),
+			// 	id: each.id,
+			// })
+			const element = emitElements.Paragraph(each)
+			elements.push(element)
 			continue
 		}
 
@@ -51,10 +54,15 @@ function parseElements(nodes, cachedElements) {
 		// <Header>
 		case "#":
 			if (testElements.Header(each)) {
-				const element = cacheStrategy(each, each => emitElements.Header(each))
+				// const element = cacheStrategy(each, each => emitElements.Header(each))
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// 	hash: newURLHash(toInnerText(element.children)),
+				// })
+				const element = emitElements.Paragraph(each) // TODO: Move newURLHash to emitElements.Paragraph
 				elements.push({
 					...element,
-					id: each.id,
 					hash: newURLHash(toInnerText(element.children)),
 				})
 				continue
@@ -74,15 +82,17 @@ function parseElements(nodes, cachedElements) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, emitElements.Blockquote)
-				elements.push({
-					...element,
-					id: each.id,
-					children: element.children.map((each, x) => ({
-						...each,
-						id: range[x].id,
-					})),
-				})
+				// const element = cacheStrategy(range, emitElements.Blockquote)
+				const element = emitElements.Blockquote(range)
+				elements.push(element)
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// 	children: element.children.map((each, x) => ({
+				// 		...each,
+				// 		id: range[x].id,
+				// 	})),
+				// })
 				x1 = x2
 				continue
 			}
@@ -107,15 +117,17 @@ function parseElements(nodes, cachedElements) {
 					break
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, emitElements.Preformatted)
-				elements.push({
-					...element,
-					id: each.id,
-					children: element.children.map((each, x) => ({
-						...each,
-						id: range[x].id,
-					})),
-				})
+				// const element = cacheStrategy(range, emitElements.Preformatted)
+				const element = emitElements.Preformatted(range)
+				elements.push(element)
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// 	children: element.children.map((each, x) => ({
+				// 		...each,
+				// 		id: range[x].id,
+				// 	})),
+				// })
 				x1 = x2
 				continue
 			}
@@ -146,34 +158,38 @@ function parseElements(nodes, cachedElements) {
 					}
 				}
 				const range = nodes.slice(x1, x2 + 1)
-				const element = cacheStrategy(range, emitElements.AnyList)
+				// const element = cacheStrategy(range, emitElements.AnyList)
+				const element = emitElements.AnyList(range)
 
-				// Recursively mutates <AnyList> IDs.
-				let y = 0
-				const mutateAnyListIDs = element => {
-					for (let x = 0; x < element.children.length; x++) {
-						element.children[x].id = range[y].id
-						if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
-							y++
-							continue
-						}
-						mutateAnyListIDs(element.children[x])
-					}
-				}
-				mutateAnyListIDs(element)
+				// // Recursively mutates <AnyList> IDs.
+				// let y = 0
+				// const mutateAnyListIDs = element => {
+				// 	for (let x = 0; x < element.children.length; x++) {
+				// 		element.children[x].id = range[y].id
+				// 		if (element.children[x].type === typeEnum.AnyListItem || element.children[x].type === typeEnum.TodoItem) {
+				// 			y++
+				// 			continue
+				// 		}
+				// 		mutateAnyListIDs(element.children[x])
+				// 	}
+				// }
+				// mutateAnyListIDs(element)
 
-				elements.push({
-					...element,
-					id: each.id,
-				})
+				elements.push(element)
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// })
 				x1 = x2
 				continue
 			} else if (testElements.Break(each)) {
-				const element = cacheStrategy(each, emitElements.Break)
-				elements.push({
-					...element,
-					id: each.id,
-				})
+				// const element = cacheStrategy(each, emitElements.Break)
+				const element = emitElements.Break(each)
+				elements.push(element)
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// })
 				continue
 			}
 			// No-op
@@ -190,11 +206,13 @@ function parseElements(nodes, cachedElements) {
 			}
 			if (matches) {
 				const [, alt, src, href] = matches
-				const element = cacheStrategy(each, node => emitElements.Image(node, { alt, src, href }))
-				elements.push({
-					...element,
-					id: each.id,
-				})
+				// const element = cacheStrategy(each, node => emitElements.Image(node, { alt, src, href }))
+				const element = emitElements.Image(each, { alt, src, href })
+				elements.push(element)
+				// elements.push({
+				// 	...element,
+				// 	id: each.id,
+				// })
 				continue
 			}
 			// No-op
@@ -205,11 +223,13 @@ function parseElements(nodes, cachedElements) {
 		}
 
 		// <Paragraph>
-		const element = cacheStrategy(each, emitElements.Paragraph)
-		elements.push({
-			...element,
-			id: each.id,
-		})
+		// const element = cacheStrategy(each, emitElements.Paragraph)
+		const element = emitElements.Paragraph(each)
+		elements.push(element)
+		// elements.push({
+		// 	...element,
+		// 	id: each.id,
+		// })
 	}
 	console.log(elements)
 	return elements
