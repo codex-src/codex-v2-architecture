@@ -42,10 +42,12 @@
 /* 	color: var(--blue-500); */
 /* } */
 .codex-editor [data-codex-ordered="true"]:before {
-	margin-left: calc(-0.25em - var(--max-monospace-width));
+	margin-left: calc(-0.5em - var(--max-monospace-width));
 	position: absolute;
 	width: var(--max-monospace-width);
 	text-align: right;
+	font-size: 0.9375em; /* 16px -> 15px */
+	line-height: 1.6; /* 1.5 -> 1.6 */
 	content: counter(count) ". ";
 	counter-increment: count;
 	font-feature-settings: "tnum";
