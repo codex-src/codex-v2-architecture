@@ -2,10 +2,10 @@ import Button from "lib/Button"
 import React from "react"
 import Transition from "lib/Transition"
 
-// ---------------
-// |    128px    |
-// ---------------
-// TITLE … # Title
+// -----------------
+// | 128px -> 8rem |
+// -----------------
+// TITLE ... # Title
 //
 function newScrollHandler(e, id, hash) {
 	// NOTE: Use e.preventDefault and e.stopPropagation
@@ -29,12 +29,12 @@ const Outline = React.forwardRef(({
 	const [hoverOutline, setHoverOutline] = React.useState(false)
 
 	return (
-		<div ref={ref} className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: 128 }}>
+		<div ref={ref} className="pb-12 sticky hidden lg:block w-48 overflow-x-hidden" style={{ top: "8rem" }}>
 
 			{/* Title */}
-			<Button
-				// NOTE: Use w-full text-left because of <Button>
-				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 truncate transition duration-200"
+			<button
+				// NOTE: Use w-full text-left because of <button>
+				className="py-1 flex flex-row items-center w-full text-left text-gray-500 hover:text-blue-500 focus:text-blue-500 truncate focus:outline-none transition duration-150 ease-in-out"
 				onPointerEnter={() => setHoverOutline(true)}
 				onPointerLeave={() => setHoverOutline(false)}
 				onClick={toggleOutline}
@@ -72,27 +72,26 @@ const Outline = React.forwardRef(({
 						"Hide Outline"
 					)}
 				</p>
-			</Button>
+			</button>
 
 			{/* Outline */}
-			<div className="h-2" />
-			<ul>
+			<ul className="mt-2">
 				{outline.map(({ id, hash, secondary, children }) => (
 					<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
 						{id && (
-							<a href={`#${hash}`}>
-								<h1 className="py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-200">
-									{children.trim() || "Untitled"}
-								</h1>
+							<a className="py-1 inline-block font-medium text-sm truncate text-gray-600 hover:text-blue-500 focus:text-blue-500 focus:outline-none transition duration-150 ease-in-out" href={`#${hash}`}>
+								{children.trim() || (
+									"Untitled"
+								)}
 							</a>
 						)}
 						<ul>
 							{secondary.map(({ id, hash, children }) => (
 								<li key={id} onClick={e => newScrollHandler(e, id, hash)}>
-									<a href={`#${hash}`}>
-										<h2 className="pl-4 py-1 font-medium text-sm truncate text-gray-600 hover:text-blue-500 transition duration-200">
-											{children.trim() || "Untitled"}
-										</h2>
+									<a className="pl-4 py-1 inline-block font-medium text-sm truncate text-gray-600 hover:text-blue-500 focus:text-blue-500 focus:outline-none transition duration-150 ease-in-out" href={`#${hash}`}>
+										{children.trim() || (
+											"Untitled"
+										)}
 									</a>
 								</li>
 							))}
