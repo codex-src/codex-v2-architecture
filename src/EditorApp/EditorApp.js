@@ -207,9 +207,8 @@ const EditorApp = () => {
 			{/* LHS */}
 			<TransitionV2
 				on={prefs.showOutline}
-				transition="transition duration-300"
-				from="opacity-0 transform -translate-x-32 ease-in pointer-events-none"
-				to="opacity-100 transform translate-x-0 ease-out pointer-events-auto"
+				from="opacity-0 transform -translate-x-32 transition duration-300 ease-in pointer-events-none"
+				to="opacity-100 transform translate-x-0 transition duration-300 ease-out pointer-events-auto"
 			>
 				<Outline title={meta.title} toggleOutline={prefsDispatch.toggleOutline}>
 					{outline}
