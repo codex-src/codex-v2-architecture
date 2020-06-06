@@ -1,6 +1,6 @@
 /* https://tailwindcss-custom-forms.netlify.app */
 
-.form-checkbox {
+.codex-editor .custom-form-checkbox {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -16,34 +16,24 @@
 	flex-shrink: 0;
 	height: 1em;
 	width: 1em;
-	color: #4299e1;
-	background-color: #fff;
-	border-color: #e2e8f0;
-	border-width: 1px;
-	border-radius: 0.25rem;
+
+	box-shadow:
+		0 0 0 1px   rgba(0, 0, 0, 0.05),
+		0 1px 3px 0 rgba(0, 0, 0, 0.10),
+		0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-hero */
+	border-radius: 0.375em; /* rounded-md */
 }
 
-.form-checkbox:checked {
+.codex-editor .custom-form-checkbox:checked {
 	background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
 	border-color: transparent;
 	background-color: currentColor;
 	background-size: 100% 100%;
 	background-position: center;
 	background-repeat: no-repeat;
-
-	/* @apply shadow */
-	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.form-checkbox:focus {
-	outline: none;
-
-	/* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
-	/* border-color: #63b3ed; */
-
-	/* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
-	/* border-color: #63b3ed; */
-
-	box-shadow: 0 0 0 0.1875em rgba(164, 202, 254, 0.45);
-	border-color: #a4cafe;
+.codex-editor .custom-form-checkbox:focus {
+	outline: none; /* focus:outline-none */
+	box-shadow: 0 0 0 3px rgba(164, 202, 254, 0.45); /* focus:shadow-outline */
 }

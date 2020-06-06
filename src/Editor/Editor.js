@@ -11,7 +11,7 @@ import useDOMContentLoaded from "lib/useDOMContentLoaded"
 import { readCurrentDocumentNode } from "./documentNodes/read"
 
 import "./stylesheets/core.css"
-import "./stylesheets/form-checkbox.css"
+import "./stylesheets/custom-form-checkbox.css"
 import "./stylesheets/theme.css"
 
 ;(() => {

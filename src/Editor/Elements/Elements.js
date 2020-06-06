@@ -168,7 +168,7 @@ export const TodoItem = React.memo(({ id, syntax, checked, children, dispatch })
 				<div className="absolute" contentEditable={false}>
 					<input
 						ref={ref}
-						className={dedupeSpaces(`form-checkbox text-blue-500 border-none rounded-md shadow-hero transform scale-105 transition duration-150 ease-out cursor-pointer`)}
+						className="custom-form-checkbox text-blue-500 transform scale-110 transition duration-150 ease-in-out cursor-pointer"
 						type="checkbox"
 						checked={checked}
 						onChange={() => {
