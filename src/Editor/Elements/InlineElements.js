@@ -51,7 +51,7 @@ export const Code = ({ syntax, children }) => (
 )
 
 export const Strikethrough = ({ syntax, children }) => (
-	<strike className="line-through text-gray-500" style={{ "--blue-500": "currentColor" }}>
+	<strike className="line-through text-gray-400" style={{ "--blue-500": "currentColor" }}>
 		<Markdown syntax={syntax}>
 			{children}
 		</Markdown>

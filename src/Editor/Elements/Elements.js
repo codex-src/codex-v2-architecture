@@ -115,7 +115,7 @@ export const Preformatted = React.memo(({ syntax, extension, children: range }) 
 
 	return (
 		// NOTE: rounded-none breaks md:rounded-md
-		<pre className="-mx-6 px-4 bg-cool-gray-50 md:rounded-md shadow-hero overflow-x-scroll scrolling-touch" style={{ "--max-monospace-width": String($range.length < 10 ? 10 : $range.length).length + "ch" }} {...attrs.disableAutoCorrect}>
+		<pre className="-mx-2 px-4 bg-white md:rounded-md shadow-hero overflow-x-scroll scrolling-touch" style={{ "--max-monospace-width": String($range.length < 10 ? 10 : $range.length).length + "ch" }} {...attrs.disableAutoCorrect}>
 			<code className="inline-block min-w-full">
 				<PreEdge id={range[0].id}>
 					<Markdown syntax={[syntax[0]]}>

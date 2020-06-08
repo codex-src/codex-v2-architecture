@@ -1,6 +1,9 @@
 .code-editor {
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	/* -webkit-font-smoothing: antialiased; */
+	/* -moz-osx-font-smoothing: grayscale; */
+
+	-webkit-font-smoothing: auto;
+	-moz-osx-font-smoothing: auto;
 
 	font: 1em/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
 	-moz-tab-size: 4;

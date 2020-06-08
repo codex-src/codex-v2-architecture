@@ -60,7 +60,7 @@ function parseElements(nodes, cachedElements) {
 				// 	id: each.id,
 				// 	hash: newURLHash(toInnerText(element.children)),
 				// })
-				const element = emitElements.Paragraph(each) // TODO: Move newURLHash to emitElements.Paragraph
+				const element = emitElements.Header(each) // TODO: Move newURLHash to emitElements.Header
 				elements.push({
 					...element,
 					hash: newURLHash(toInnerText(element.children)),
@@ -175,11 +175,11 @@ function parseElements(nodes, cachedElements) {
 				// }
 				// mutateAnyListIDs(element)
 
-				elements.push(element)
-				// elements.push({
-				// 	...element,
-				// 	id: each.id,
-				// })
+				// elements.push(element)
+				elements.push({
+					...element,
+					id: range[0].id,
+				})
 				x1 = x2
 				continue
 			} else if (testElements.Break(each)) {
